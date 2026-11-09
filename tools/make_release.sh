@@ -39,7 +39,8 @@ cp -R "$win/Duel Circuit_Data/StreamingAssets/licenses" "$stage/win/Duel Circuit
 mkdir -p "$stage/mac/Duel Circuit"
 ditto "$mac" "$stage/mac/Duel Circuit/Duel Circuit.app"
 cp -R "$mac/Contents/Resources/Data/StreamingAssets/licenses" "$stage/mac/Duel Circuit/Licenses"
-ditto -c -k --keepParent "$stage/mac/Duel Circuit" "$out/DuelCircuit-$version-mac.zip"
+xattr -cr "$stage/mac"  # no ._ metadata files in the zip
+ditto -c -k --norsrc --noextattr --keepParent "$stage/mac/Duel Circuit" "$out/DuelCircuit-$version-mac.zip"
 
 # The patched rules engine: ygopro-core and its Lua at their pinned commits, plus our patches applied.
 core="$root/vendor/ygopro-core"
