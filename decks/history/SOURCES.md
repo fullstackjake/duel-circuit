@@ -1,0 +1,78 @@
+# Sources of the historic deck lists
+
+Real tournament lists, credited to the players who built them.
+
+- `elfnote`: YGOPRODeck (https://ygoprodeck.com/deck/ars-magna-elfnote-739269): Runner-Up by Blake Funderburke at YCS Houston 2026 (October 17-18, 2026)
+- `light-and-darkness`: YGOPRODeck (https://ygoprodeck.com/deck/azamina-dark-magician-light-and-darkness-ritual-739266): Winner by Trevor Lee Parker at YCS Houston 2026 (October 17-18, 2026)
+- `angelechy`: YGOPRODeck (https://ygoprodeck.com/deck/angelechy-739270): Top 32 by Jamie Hunter at YCS Houston 2026 (October 17-18, 2026)
+- `branded-despia`: YGOPRODeck (https://ygoprodeck.com/deck/branded-light-and-darkness-ritual-739332): Top 32 by Shelby Redmon at YCS Houston 2026 (October 17-18, 2026)
+- `yummy`: YGOPRODeck (https://ygoprodeck.com/deck/dark-magician-yummy-739377): Top 32 by Nicholas Ordonez at YCS Houston 2026 (October 17-18, 2026)
+- `mitsurugi`: YGOPRODeck (https://ygoprodeck.com/deck/azamina-mitsurugi-dark-magician-light-and-darkness-ritual-739356): Top 16 by Jose Carlo Carrillo Toscano at YCS Houston 2026 (October 17-18, 2026)
+- `tearlaments`: Format Library deck 48312 (https://www.formatlibrary.com/decks/48312): Tearlaments, 5th by Denis Nadas at YCSMIN22 (Darkwing format, 2022-10-22)
+- `spright`: Format Library deck 48313 (https://www.formatlibrary.com/decks/48313): Spright, 5th by Ryan Levine at YCSMIN22 (Darkwing format, 2022-10-22)
+- `floowandereeze`: Format Library deck 48307 (https://www.formatlibrary.com/decks/48307): Floowandereeze, 2nd by Michael Tamez at YCSMIN22 (Darkwing format, 2022-10-22)
+- `runick-spright`: Format Library deck 48309 (https://www.formatlibrary.com/decks/48309): Runick Spright, 4th by MarcusHayden at YCSMIN22 (Darkwing format, 2022-10-22)
+- `exosister`: Format Library deck 48322 (https://www.formatlibrary.com/decks/48322): Exosister, 17th by Lyric Bruner at YCSMIN22 (Darkwing format, 2022-10-22)
+- `bystial-dragon-link`: Format Library deck 48316 (https://www.formatlibrary.com/decks/48316): Bystial Dragon Link, 9th by Clifton Land at YCSMIN22 (Darkwing format, 2022-10-22)
+- `thunder-dragon`: Format Library deck 67224 (https://www.formatlibrary.com/decks/67224): Thunder Dragon, 3rd by Jake Quinsee at YCSNIA18 (Danger 1 format, 2018-10-20)
+- `gouki`: Format Library deck 67255 (https://www.formatlibrary.com/decks/67255): Gouki, 9th by John Wilkin at YCSNIA18 (Danger 1 format, 2018-10-20)
+- `sky-striker`: Format Library deck 69624 (https://www.formatlibrary.com/decks/69624): Sky Striker, 1st by Manav Dawar at YCSCOL18 (Danger 1 format, 2018-09-23)
+- `danger-dark-world`: Format Library deck 67251 (https://www.formatlibrary.com/decks/67251): Danger! Dark World, 2nd by Dirk Wagner at YCSNIA18 (Danger 1 format, 2018-10-20)
+- `altergeist`: Format Library deck 66416 (https://www.formatlibrary.com/decks/66416): Altergeist, 3rd by Bohdan Temnyk at YCSUT18 (Danger 1 format, 2018-09-23)
+- `pendulum-magician`: Format Library deck 66172 (https://www.formatlibrary.com/decks/66172): Pendulum Magician, 2nd by Walter Jule at NAWCQ18 (Secaucus format, 2018-06-30)
+- `burning-abyss`: Format Library deck 40959 (https://www.formatlibrary.com/decks/40959): Burning Abyss, 2nd by Fabio Polito at YCSMIL14 (Burning Abyss format, 2014-12-06)
+- `qliphort`: Format Library deck 40958 (https://www.formatlibrary.com/decks/40958): Qliphort Stun, 1st by Daniele Stella at YCSMIL14 (Burning Abyss format, 2014-12-06)
+- `shaddoll`: Format Library deck 40892 (https://www.formatlibrary.com/decks/40892): Shaddoll, 2nd by Alexander Reynolds at YCSLIM14 (Shaddoll format, 2014-09-13)
+- `satellarknight`: Format Library deck 3115 (https://www.formatlibrary.com/decks/3115): Satellarknight, 2nd by Sean McCabe at YCSTOR14 (Shaddoll format, 2014-09-07)
+- `geargia`: Format Library deck 19237 (https://www.formatlibrary.com/decks/19237): Geargia, 3rd by David Shahata at YCSCHI14 (Fire-Water format, 2014-03-22)
+- `hat`: Format Library deck 49468 (https://www.formatlibrary.com/decks/49468): Hand Artifact, 17th by Leo Giner at EUWCQ14 (HAT format, 2014-06-29)
+- `chaos-yata`: Format Library deck 3432 (https://www.formatlibrary.com/decks/3432): Chaos Control, 1st by Friso de Boer at BCAMS04 (Chaos format, 2004-08-28)
+- `goat-control`: Format Library deck 3015 (https://www.formatlibrary.com/decks/3015): Goat Control, 1st by Nareg Torossian at SJCIND05 (Goat format, 2005-08-20)
+- `teledad`: Format Library deck 3496 (https://www.formatlibrary.com/decks/3496): TeleDAD, 1st by Jerry Wang at SJCHOU09 (TeleDAD format, 2009-01-17)
+- `blackwing`: Format Library deck 3512 (https://www.formatlibrary.com/decks/3512): Blackwing, 1st by Fili Luna at SJCIND09 (Cat format, 2009-08-15)
+- `lightsworn`: Format Library deck 25713 (https://www.formatlibrary.com/decks/25713): Lightsworn, 2nd by Eduard Alvarez Carrera at EUC09 (Cat format, 2009-06-27)
+- `frog-ftk`: Format Library deck 25656 (https://www.formatlibrary.com/decks/25656): Frog FTK, 1st by Rodrigo Togores at EUWCQ10 (Frog format, 2010-07-17)
+- `infernity`: Format Library deck 25940 (https://www.formatlibrary.com/decks/25940): Infernity, 1st by Aaron Noel at CAWCQ10 (Frog format, 2010-07-10)
+- `six-samurai`: Format Library deck 26873 (https://www.formatlibrary.com/decks/26873): Six Samurai, 1st by Sean Coovert at YCSCHA11 (Trishula format, 2011-03-19)
+- `plant-synchro`: Format Library deck 4211 (https://www.formatlibrary.com/decks/4211): Plant Synchro, 1st by Tyree Tinsley at YCSPROV11 (Trishula format, 2011-06-18)
+- `wind-up`: Format Library deck 35646 (https://www.formatlibrary.com/decks/35646): Wind-Up, 1st by impact at YCSTOR12 (Wind-Up format, 2012-09-02)
+- `inzektor`: Format Library deck 31491 (https://www.formatlibrary.com/decks/31491): Inzektor, 3rd by Billy Brake at YCSCHI12 (Dino Rabbit format, 2012-04-28)
+- `dino-rabbit`: Format Library deck 30493 (https://www.formatlibrary.com/decks/30493): Dino Rabbit, 1st by Aaron Noel at YCSCHI12 (Dino Rabbit format, 2012-04-28)
+- `dragon-ruler`: Format Library deck 37314 (https://www.formatlibrary.com/decks/37314): Dragon Ruler, 1st by Patrick Hoban at NAWCQ13 (Baby Ruler format, 2013-07-13)
+- `spellbook`: Format Library deck 49488 (https://www.formatlibrary.com/decks/49488): Spellbook, 1st by Chris Bountaloudis at EUWCQ13 (Baby Ruler format, 2013-06-30)
+- `nekroz`: Format Library deck 41518 (https://www.formatlibrary.com/decks/41518): Nekroz, 1st by Terrance Kinsley at YCSCOL15 (Nekroz format, 2015-05-23)
+- `kozmo`: Format Library deck 42150 (https://www.formatlibrary.com/decks/42150): Kozmo, 1st by Jessy Samek at YCSSJ15 (Clown format, 2015-11-07)
+- `performapal`: Format Library deck 38812 (https://www.formatlibrary.com/decks/38812): Performage Performapals, 1st by Jose Lagunes Maitret at YCSATL16 (Performapal format, 2016-02-06)
+- `domain-monarch`: Format Library deck 34504 (https://www.formatlibrary.com/decks/34504): Domain Monarch, 1st by Erik Christensen at NAWCQ16 (Monarch format, 2016-07-09)
+- `abc`: Format Library deck 28841 (https://www.formatlibrary.com/decks/28841): ABC, 1st by Elvis Vu at YCSANA16 (Invasion format, 2016-11-26)
+- `zoodiac`: Format Library deck 64901 (https://www.formatlibrary.com/decks/64901): Zoodiac, 1st by Kanaan Asfour at YCSBOG17 (Grass Zoo format, 2017-04-15)
+- `spyral`: Format Library deck 65637 (https://www.formatlibrary.com/decks/65637): SPYRAL, 1st by Ryan Levine at YCSMEL18 (SPYRAL format, 2018-01-15)
+- `true-draco`: Format Library deck 21776 (https://www.formatlibrary.com/decks/21776): True Draco, 9th by Sohrab Pasikhani at NAWCQ17 (Draco Zoo format, 2017-07-08)
+- `orcust`: Format Library deck 44273 (https://www.formatlibrary.com/decks/44273): Orcust, 17th by Francisco Morales Alcaraz at YCSPAS19 (TOSS format, 2019-11-24)
+- `salamangreat`: Format Library deck 44283 (https://www.formatlibrary.com/decks/44283): Salamangreat, 3rd by Walter Jule at YCSPAS19 (TOSS format, 2019-11-24)
+- `adamancipator`: Format Library deck 83323 (https://www.formatlibrary.com/decks/83323): Adamancipator, 2nd by Koty Angeloff at RDIAUG20 (Adamancipator format, 2020-08-22)
+- `eldlich`: Format Library deck 83256 (https://www.formatlibrary.com/decks/83256): Eldlich, 9th by Henry Bancroft at LCS04 (Adamancipator format, 2020-06-20)
+- `tri-brigade`: Format Library deck 85379 (https://www.formatlibrary.com/decks/85379): Tri-Brigade, 2nd by Max Timm at RDYEUJUL21 (Tri-Brigade format, 2021-07-11)
+- `drytron`: Format Library deck 85392 (https://www.formatlibrary.com/decks/85392): Drytron, 9th by Fabio Zuccato at RDYEUJUL21 (Tri-Brigade format, 2021-07-11)
+- `ishizu-tearlaments`: Format Library deck 48624 (https://www.formatlibrary.com/decks/48624): Ishizu Tearlaments, 1st by Chris LeBlanc at YCSLYON23 (Tearlaments format, 2023-02-12)
+- `kashtira`: Format Library deck 48958 (https://www.formatlibrary.com/decks/48958): Kashtira, 1st by Jeremy Mitchell at NAWCQ23 (Kashtira format, 2023-07-09)
+- `purrely`: Format Library deck 48963 (https://www.formatlibrary.com/decks/48963): Purrely, 5th by Kamal Crooks at NAWCQ23 (Kashtira format, 2023-07-09)
+- `unchained`: Format Library deck 61939 (https://www.formatlibrary.com/decks/61939): Unchained, 1st by Joseph Balbirona at YCSRIC23 (Overlord format, 2023-11-04)
+- `snake-eye`: Format Library deck 40754 (https://www.formatlibrary.com/decks/40754): Snake-Eye, 1st by Paulo Goncalves at YCSIND24 (Snake-Eye format, 2024-06-01)
+- `fire-king-snake-eye`: Format Library deck 50000 (https://www.formatlibrary.com/decks/50000): Azamina Fire King Snake-Eye, 9th by Daniel Heffernan at YCSBOL24 (Lacrima format, 2024-11-24)
+- `yubel`: Format Library deck 49987 (https://www.formatlibrary.com/decks/49987): Fiendsmith Yubel, 2nd by Francesco Gargiulo at YCSBOL24 (Lacrima format, 2024-11-24)
+- `tenpai-dragon`: Format Library deck 50012 (https://www.formatlibrary.com/decks/50012): Tenpai Dragon, 17th by Gabriel Huart at YCSBOL24 (Lacrima format, 2024-11-24)
+- `ryzeal`: Format Library deck 50363 (https://www.formatlibrary.com/decks/50363): Mitsurugi Ryzeal, 2nd by Benjamin Tamarkin at YCSORL25 (Ryzeal format, 2025-02-01)
+- `maliss`: Format Library deck 82843 (https://www.formatlibrary.com/decks/82843): Maliss, 22nd by Ali Yassine at YCSVAN25 (Justice format, 2025-08-16)
+- `k9-vanquish-soul`: Format Library deck 82822 (https://www.formatlibrary.com/decks/82822): K9 Vanquish Soul, 2nd by Kassim Hakim at YCSVAN25 (Justice format, 2025-08-16)
+- `artmage`: yugiohmeta.com (https://www.yugiohmeta.com/top-decks/south-park-october-2026-regional/artmage/lou-orem-/xyjnU/): placed 1 at a WCQ Regional, 2026-10-25
+- `blitzclique`: yugiohmeta.com (https://www.yugiohmeta.com/top-decks/kaiserslautern-german-open-2027/blitzclique/aqeel-mubarak/ELxZh/): placed 8 at a WCQ Regional, 2026-10-24
+- `chaos-ritual`: yugiohmeta.com (https://www.yugiohmeta.com/top-decks/foggia-september-2026-regional/chaos-ritual/carmine-vecchione/BOezz/): placed 1 at a WCQ Regional, 2026-09-27
+- `dark-magician-chaos-ritual`: yugiohmeta.com (https://www.yugiohmeta.com/top-decks/santo-domingo-october-2026-regional/dark-magician-chaos-ritual/johan-ruiz/BH4as/): placed 2 at a WCQ Regional, 2026-10-25
+- `dracotail`: yugiohmeta.com (https://www.yugiohmeta.com/top-decks/belo-horizonte-august-2026-regional/dracotail/charles-abreu/Xxcmc/): placed 2 at a WCQ Regional, 2026-08-29
+- `lunalight`: yugiohmeta.com (https://www.yugiohmeta.com/top-decks/footscray-september-2026-regional/lunalight/benjamin-desbois/xRI8O/): placed 1 at a WCQ Regional, 2026-09-27
+- `magistus-fairy-tail`: yugiohmeta.com (https://www.yugiohmeta.com/top-decks/amadora-september-2026-regional/magistus-fairy-tail/liam-tauber/07XNf/): placed 1 at a WCQ Regional, 2026-09-13
+- `mermail-atlantean`: yugiohmeta.com (https://www.yugiohmeta.com/top-decks/burnaby-october-2026-regional/mermail-atlantean/dami-lee-/AAyAk/): placed 1 at a WCQ Regional, 2026-10-11
+- `power-patron`: yugiohmeta.com (https://www.yugiohmeta.com/top-decks/genova-september-2026-regional/power-patron/mattia-rebora/KwZUG/): placed 2 at a WCQ Regional, 2026-09-06
+- `radiant-typhoon`: yugiohmeta.com (https://www.yugiohmeta.com/top-decks/klein-rönnau-october-2026-regional/radiant-typhoon/friedrich/r_hax/): placed 1 at a WCQ Regional, 2026-10-25
+- `sacred-beast`: yugiohmeta.com (https://www.yugiohmeta.com/top-decks/donnezac-september-2026-regional/sacred-beast/elouan-gagnerot/wSi20/): placed 2 at a WCQ Regional, 2026-09-27

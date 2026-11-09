@@ -1,0 +1,8 @@
+{
+  "name": "com.ygocampaign.engine",
+  "version": "0.1.0",
+  "displayName": "Ygo Engine",
+  "description": "C# bindings, duel loop, and bots for the ygopro-core rules engine. Shared by the Unity game and the console harness.",
+  "unity": "6000.3",
+  "license": "AGPL-3.0-or-later"
+}

@@ -1,0 +1,290 @@
+# Measured by `--circuit-study` (src/Ygo.Harness/CircuitStudy.cs): a deck at a circuit match, wins in 100,
+# first= and second= by who took the first turn (the QA stand-in's play, the CPUs as the game makes them).
+# The coin toss's tip for a player bringing that deck there (not the Stuck? advice; the CPUs never read it).
+
+wall: 0.0
+option: 75 | deck=goat-control | first=75 | second=75 | games=24
+option: 70 | deck=chaos-yata | first=58 | second=83 | games=24
+
+wall: 0.1
+option: 75 | deck=goat-control | first=58 | second=91 | games=24
+option: 70 | deck=chaos-yata | first=66 | second=75 | games=24
+
+wall: 0.2
+option: 66 | deck=chaos-yata | first=58 | second=75 | games=24
+option: 62 | deck=goat-control | first=66 | second=58 | games=24
+
+wall: 0.3
+option: 65 | deck=goat-control | first=50 | second=80 | games=72
+option: 65 | deck=chaos-yata | first=55 | second=75 | games=72
+
+wall: 1.0
+option: 72 | deck=teledad | first=63 | second=80 | games=72
+option: 70 | deck=blackwing | first=63 | second=77 | games=72
+option: 70 | deck=warriors | first=69 | second=72 | games=72
+option: 44 | deck=chaos-yata | first=33 | second=55 | games=72
+
+wall: 1.1
+option: 62 | deck=teledad | first=55 | second=69 | games=72
+option: 50 | deck=blackwing | first=38 | second=61 | games=72
+option: 37 | deck=warriors | first=30 | second=44 | games=72
+option: 30 | deck=chaos-yata | first=19 | second=41 | games=72
+
+wall: 1.2
+option: 76 | deck=teledad | first=66 | second=86 | games=72
+option: 62 | deck=warriors | first=58 | second=66 | games=72
+option: 55 | deck=chaos-yata | first=55 | second=55 | games=72
+option: 54 | deck=blackwing | first=44 | second=63 | games=72
+
+wall: 1.3
+option: 80 | deck=warriors | first=75 | second=86 | games=72
+option: 79 | deck=teledad | first=80 | second=77 | games=72
+option: 77 | deck=blackwing | first=72 | second=83 | games=72
+option: 54 | deck=chaos-yata | first=50 | second=58 | games=72
+
+wall: 10.0
+option: 100 | deck=ishizu-tearlaments | first=100 | second=100 | games=72
+option: 98 | deck=eldlich | first=100 | second=97 | games=72
+option: 98 | deck=kashtira | first=97 | second=100 | games=72
+option: 95 | deck=tearlaments | first=97 | second=94 | games=72
+
+wall: 10.1
+option: 93 | deck=eldlich | first=88 | second=97 | games=72
+option: 86 | deck=tearlaments | first=86 | second=86 | games=72
+option: 86 | deck=kashtira | first=80 | second=91 | games=72
+option: 80 | deck=ishizu-tearlaments | first=75 | second=86 | games=72
+
+wall: 10.2
+option: 56 | deck=snake-eye | first=50 | second=63 | games=72
+option: 52 | deck=eldlich | first=61 | second=44 | games=72
+option: 48 | deck=kashtira | first=55 | second=41 | games=72
+option: 38 | deck=tearlaments | first=36 | second=41 | games=72
+option: 37 | deck=ishizu-tearlaments | first=25 | second=50 | games=72
+
+wall: 10.3
+option: 61 | deck=snake-eye | first=52 | second=69 | games=72
+option: 44 | deck=kashtira | first=36 | second=52 | games=72
+option: 44 | deck=danger-dark-world | first=19 | second=69 | games=72
+option: 37 | deck=tearlaments | first=38 | second=36 | games=72
+option: 30 | deck=eldlich | first=33 | second=27 | games=72
+option: 29 | deck=ishizu-tearlaments | first=22 | second=36 | games=72
+
+wall: 11.0
+option: 95 | deck=kashtira | first=91 | second=100 | games=72
+option: 94 | deck=tearlaments | first=91 | second=97 | games=72
+option: 93 | deck=ryzeal | first=91 | second=94 | games=72
+option: 90 | deck=ishizu-tearlaments | first=86 | second=94 | games=72
+
+wall: 11.1
+option: 68 | deck=ryzeal | first=61 | second=75 | games=72
+option: 65 | deck=kashtira | first=50 | second=80 | games=72
+option: 47 | deck=ishizu-tearlaments | first=36 | second=58 | games=72
+option: 45 | deck=tearlaments | first=30 | second=61 | games=72
+
+wall: 11.2
+option: 55 | deck=ryzeal | first=52 | second=58 | games=72
+option: 50 | deck=kashtira | first=38 | second=61 | games=72
+option: 50 | deck=thunder-dragon | first=41 | second=58 | games=72
+option: 44 | deck=tearlaments | first=22 | second=66 | games=72
+option: 44 | deck=spright | first=44 | second=44 | games=72
+option: 37 | deck=ishizu-tearlaments | first=36 | second=38 | games=72
+
+wall: 11.3
+option: 48 | deck=fire-king-snake-eye | first=44 | second=52 | games=72
+option: 45 | deck=ryzeal | first=47 | second=44 | games=72
+option: 38 | deck=kashtira | first=25 | second=52 | games=72
+option: 37 | deck=bystial-dragon-link | first=27 | second=47 | games=72
+option: 36 | deck=tearlaments | first=27 | second=44 | games=72
+option: 34 | deck=ishizu-tearlaments | first=19 | second=50 | games=72
+
+wall: 2.0
+option: 100 | deck=blackwing | first=100 | second=100 | games=24
+option: 95 | deck=teledad | first=100 | second=91 | games=24
+option: 95 | deck=six-samurai | first=100 | second=91 | games=24
+option: 91 | deck=plant-synchro | first=83 | second=100 | games=24
+
+wall: 2.1
+option: 95 | deck=teledad | first=91 | second=100 | games=24
+option: 95 | deck=six-samurai | first=100 | second=91 | games=24
+option: 87 | deck=blackwing | first=100 | second=75 | games=24
+option: 83 | deck=plant-synchro | first=83 | second=83 | games=24
+
+wall: 2.2
+option: 87 | deck=teledad | first=83 | second=91 | games=24
+option: 87 | deck=six-samurai | first=91 | second=83 | games=24
+option: 79 | deck=blackwing | first=66 | second=91 | games=24
+option: 66 | deck=plant-synchro | first=50 | second=83 | games=24
+
+wall: 2.3
+option: 91 | deck=six-samurai | first=86 | second=97 | games=72
+option: 75 | deck=teledad | first=75 | second=75 | games=24
+option: 75 | deck=blackwing | first=66 | second=83 | games=24
+option: 63 | deck=plant-synchro | first=58 | second=69 | games=72
+
+wall: 3.0
+option: 91 | deck=wind-up | first=83 | second=100 | games=24
+option: 91 | deck=six-samurai | first=83 | second=100 | games=24
+option: 91 | deck=dragon-ruler | first=83 | second=100 | games=24
+option: 87 | deck=teledad | first=83 | second=91 | games=24
+
+wall: 3.1
+option: 100 | deck=dragon-ruler | first=100 | second=100 | games=24
+option: 83 | deck=teledad | first=83 | second=83 | games=24
+option: 79 | deck=six-samurai | first=83 | second=75 | games=24
+option: 66 | deck=wind-up | first=66 | second=66 | games=24
+
+wall: 3.2
+option: 95 | deck=teledad | first=91 | second=100 | games=24
+option: 95 | deck=dragon-ruler | first=91 | second=100 | games=24
+option: 91 | deck=six-samurai | first=83 | second=100 | games=24
+option: 70 | deck=wind-up | first=66 | second=75 | games=24
+
+wall: 3.3
+option: 87 | deck=wind-up | first=83 | second=91 | games=24
+option: 87 | deck=dragon-ruler | first=75 | second=100 | games=24
+option: 83 | deck=teledad | first=83 | second=83 | games=24
+option: 66 | deck=six-samurai | first=50 | second=83 | games=24
+
+wall: 4.0
+option: 93 | deck=six-samurai | first=94 | second=91 | games=72
+option: 83 | deck=shaddoll | first=88 | second=77 | games=72
+option: 76 | deck=wind-up | first=77 | second=75 | games=72
+option: 27 | deck=dragon-ruler | first=19 | second=36 | games=72
+
+wall: 4.1
+option: 88 | deck=six-samurai | first=83 | second=94 | games=72
+option: 87 | deck=wind-up | first=83 | second=91 | games=72
+option: 86 | deck=shaddoll | first=94 | second=77 | games=72
+option: 36 | deck=dragon-ruler | first=33 | second=38 | games=72
+
+wall: 4.2
+option: 93 | deck=shaddoll | first=88 | second=97 | games=72
+option: 90 | deck=six-samurai | first=86 | second=94 | games=72
+option: 84 | deck=wind-up | first=83 | second=86 | games=72
+option: 11 | deck=dragon-ruler | first=8 | second=13 | games=72
+
+wall: 4.3
+option: 56 | deck=shaddoll | first=55 | second=58 | games=72
+option: 54 | deck=six-samurai | first=50 | second=58 | games=72
+option: 27 | deck=wind-up | first=22 | second=33 | games=72
+option: 6 | deck=dragon-ruler | first=2 | second=11 | games=72
+
+wall: 5.0
+option: 95 | deck=shaddoll | first=91 | second=100 | games=24
+option: 91 | deck=kozmo | first=100 | second=83 | games=24
+option: 87 | deck=wind-up | first=83 | second=91 | games=24
+option: 45 | deck=dragon-ruler | first=33 | second=58 | games=24
+
+wall: 5.1
+option: 70 | deck=shaddoll | first=75 | second=66 | games=24
+option: 70 | deck=kozmo | first=50 | second=91 | games=24
+option: 45 | deck=wind-up | first=33 | second=58 | games=24
+option: 8 | deck=dragon-ruler | first=0 | second=16 | games=24
+
+wall: 5.2
+option: 62 | deck=shaddoll | first=66 | second=58 | games=24
+option: 54 | deck=kozmo | first=25 | second=83 | games=24
+option: 45 | deck=wind-up | first=33 | second=58 | games=24
+option: 16 | deck=dragon-ruler | first=16 | second=16 | games=24
+
+wall: 5.3
+option: 58 | deck=kozmo | first=47 | second=69 | games=72
+option: 37 | deck=wind-up | first=38 | second=36 | games=72
+option: 25 | deck=shaddoll | first=25 | second=25 | games=24
+option: 8 | deck=dragon-ruler | first=8 | second=8 | games=24
+
+wall: 6.0
+option: 100 | deck=wind-up | first=100 | second=100 | games=24
+option: 95 | deck=kozmo | first=100 | second=91 | games=24
+option: 95 | deck=abc | first=100 | second=91 | games=24
+option: 91 | deck=shaddoll | first=91 | second=91 | games=24
+
+wall: 6.1
+option: 83 | deck=abc | first=83 | second=83 | games=24
+option: 79 | deck=shaddoll | first=83 | second=75 | games=24
+option: 70 | deck=kozmo | first=58 | second=83 | games=24
+option: 66 | deck=wind-up | first=75 | second=58 | games=24
+
+wall: 6.2
+option: 70 | deck=abc | first=58 | second=83 | games=24
+option: 54 | deck=kozmo | first=50 | second=58 | games=24
+option: 29 | deck=shaddoll | first=33 | second=25 | games=24
+option: 16 | deck=wind-up | first=16 | second=16 | games=24
+
+wall: 6.3
+option: 83 | deck=abc | first=83 | second=83 | games=24
+option: 70 | deck=shaddoll | first=66 | second=75 | games=24
+option: 66 | deck=kozmo | first=58 | second=75 | games=24
+option: 54 | deck=wind-up | first=33 | second=75 | games=24
+
+wall: 7.0
+option: 100 | deck=danger-dark-world | first=100 | second=100 | games=72
+option: 97 | deck=shaddoll | first=97 | second=97 | games=72
+option: 95 | deck=kozmo | first=94 | second=97 | games=72
+option: 90 | deck=thunder-dragon | first=91 | second=88 | games=72
+
+wall: 7.1
+option: 100 | deck=shaddoll | first=100 | second=100 | games=72
+option: 98 | deck=danger-dark-world | first=100 | second=97 | games=72
+option: 95 | deck=kozmo | first=97 | second=94 | games=72
+option: 95 | deck=thunder-dragon | first=94 | second=97 | games=72
+
+wall: 7.2
+option: 72 | deck=thunder-dragon | first=58 | second=86 | games=72
+option: 61 | deck=danger-dark-world | first=30 | second=91 | games=72
+option: 44 | deck=kozmo | first=27 | second=61 | games=72
+option: 15 | deck=shaddoll | first=8 | second=22 | games=72
+
+wall: 7.3
+option: 54 | deck=thunder-dragon | first=50 | second=58 | games=72
+option: 38 | deck=danger-dark-world | first=16 | second=61 | games=72
+option: 20 | deck=kozmo | first=25 | second=16 | games=72
+option: 15 | deck=shaddoll | first=19 | second=11 | games=72
+
+wall: 8.0
+option: 100 | deck=kozmo | first=100 | second=100 | games=24
+option: 100 | deck=eldlich | first=100 | second=100 | games=24
+option: 95 | deck=thunder-dragon | first=91 | second=100 | games=24
+option: 95 | deck=danger-dark-world | first=91 | second=100 | games=24
+
+wall: 8.1
+option: 100 | deck=eldlich | first=100 | second=100 | games=24
+option: 95 | deck=kozmo | first=91 | second=100 | games=24
+option: 87 | deck=danger-dark-world | first=75 | second=100 | games=24
+option: 79 | deck=thunder-dragon | first=83 | second=75 | games=24
+
+wall: 8.2
+option: 91 | deck=eldlich | first=100 | second=83 | games=24
+option: 70 | deck=danger-dark-world | first=75 | second=66 | games=24
+option: 33 | deck=thunder-dragon | first=25 | second=41 | games=24
+option: 33 | deck=kozmo | first=33 | second=33 | games=24
+
+wall: 8.3
+option: 61 | deck=eldlich | first=52 | second=69 | games=72
+option: 48 | deck=danger-dark-world | first=44 | second=52 | games=72
+option: 37 | deck=thunder-dragon | first=33 | second=41 | games=24
+option: 12 | deck=kozmo | first=0 | second=25 | games=24
+
+wall: 9.0
+option: 100 | deck=eldlich | first=100 | second=100 | games=24
+option: 100 | deck=thunder-dragon | first=100 | second=100 | games=24
+option: 95 | deck=tearlaments | first=91 | second=100 | games=24
+option: 91 | deck=spright | first=83 | second=100 | games=24
+
+wall: 9.1
+option: 91 | deck=tearlaments | first=91 | second=91 | games=24
+option: 87 | deck=eldlich | first=91 | second=83 | games=24
+option: 83 | deck=spright | first=75 | second=91 | games=24
+option: 45 | deck=thunder-dragon | first=33 | second=58 | games=24
+
+wall: 9.2
+option: 83 | deck=tearlaments | first=75 | second=91 | games=24
+option: 58 | deck=eldlich | first=66 | second=50 | games=24
+option: 54 | deck=spright | first=41 | second=66 | games=24
+option: 16 | deck=thunder-dragon | first=0 | second=33 | games=24
+
+wall: 9.3
+option: 58 | deck=tearlaments | first=41 | second=75 | games=24
+option: 25 | deck=spright | first=8 | second=41 | games=24
+option: 20 | deck=thunder-dragon | first=16 | second=25 | games=24
+option: 12 | deck=eldlich | first=8 | second=16 | games=24

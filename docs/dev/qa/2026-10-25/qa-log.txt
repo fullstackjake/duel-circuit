@@ -1,0 +1,173 @@
+Duel Circuit QA play, 2026-10-25 19:42
+[19:42:09] g0 setup: story (campaign start): : <i>A bell rings as the door swings shut behind you. Card sleeves, coffee, and the clack of shuffling.</i>
+[19:42:11] g0 setup: story (campaign start): Old Gus, the Fortress: Well, a new face. Welcome to the shop. Name's Gus. I've been dueling since before your deck had a rulebook.
+[19:42:12] g0 setup: story (campaign start): Old Gus, the Fortress: Every week there's a circuit: a few duelists, a few matches, and a prize for whoever wins them all.
+[19:42:14] g0 setup: story (campaign start): Old Gus, the Fortress: Win, earn Duel Points, buy packs over there. Lose, and you still learn something. Usually.
+[19:42:16] g0 setup: story (campaign start): Vera, the Vanguard: Gus, is this the new one? Hm. Nice deck. Let's see if you can keep up with it.
+[19:42:17] g0 setup: story (campaign start): Old Gus, the Fortress: That's Vera. She thinks attacking is a personality. She's not wrong, exactly.
+[19:42:19] g0 setup: story (campaign start): Vera, the Vanguard: First circuit's tonight. Don't make it boring.
+[19:42:21] g0 setup: started: deck Mekk-Knight Invoked, 1000 DP, 55 cards, era-limited True, your style from Albaz the Fallen
+[19:42:22] g1 Beginner Circuit match 1 (Ryo, classic): duel starts at 4/s
+[19:42:22] g1 Beginner Circuit match 1 (Ryo, classic): turn 0 (you): LP 8000 / 8000
+[19:42:23] g1 Beginner Circuit match 1 (Ryo, classic): turn 1 (you): LP 8000 / 8000
+[19:42:48] g1 Beginner Circuit match 1 (Ryo, classic): turn 2 (Ryo): LP 8000 / 8000
+[19:42:54] g1 Beginner Circuit match 1 (Ryo, classic): turn 3 (you): LP 8000 / 8000
+[19:43:08] g1 Beginner Circuit match 1 (Ryo, classic): turn 4 (Ryo): LP 8000 / 8000
+[19:43:15] g1 Beginner Circuit match 1 (Ryo, classic): turn 5 (you): LP 8000 / 8000
+[19:43:59] g1 Beginner Circuit match 1 (Ryo, classic): turn 6 (Ryo): LP 8000 / 1300
+[19:44:05] g1 Beginner Circuit match 1 (Ryo, classic): turn 7 (you): LP 8000 / 1300
+[19:44:14] g1 Beginner Circuit match 1 (Ryo, classic): duel over: won on turn 7, LP 8000 / 0, 1.9 min
+[19:44:17] g1 Beginner Circuit match 1 (Ryo, classic): results: Victory!, 350 DP earned (Win 150, First win against them 200), now 1350 DP; news: Recipe unlocked: Ryo's Classic. See it in the Recipe Book
+[19:44:19] g2 Beginner Circuit match 2 (Captain Brask, warriors): duel starts at 16/s
+[19:44:19] g2 Beginner Circuit match 2 (Captain Brask, warriors): turn 0 (you): LP 8000 / 8000
+[19:44:19] g2 Beginner Circuit match 2 (Captain Brask, warriors): turn 1 (you): LP 8000 / 8000
+[19:44:30] g2 Beginner Circuit match 2 (Captain Brask, warriors): turn 2 (Captain Brask): LP 8000 / 8000
+[19:44:34] g2 Beginner Circuit match 2 (Captain Brask, warriors): turn 3 (you): LP 8000 / 8000
+[19:44:38] g2 Beginner Circuit match 2 (Captain Brask, warriors): turn 4 (Captain Brask): LP 8000 / 5500
+[19:44:39] g2 Beginner Circuit match 2 (Captain Brask, warriors): turn 5 (you): LP 8000 / 5500
+[19:44:42] g2 Beginner Circuit match 2 (Captain Brask, warriors): turn 6 (Captain Brask): LP 8000 / 2000
+[19:44:42] g2 Beginner Circuit match 2 (Captain Brask, warriors): turn 7 (you): LP 8000 / 2000
+[19:44:45] g2 Beginner Circuit match 2 (Captain Brask, warriors): duel over: won on turn 7, LP 8000 / 0, 0.4 min
+[19:44:47] g2 Beginner Circuit match 2 (Captain Brask, warriors): results: Victory!, 500 DP earned (Win 150, First win against them 200, Level 2 reward 150), now 1850 DP; news: Level 2! +1 Card Token: trade it for any card at the Card Trader | Recipe unlocked: Captain Brask's Warriors. See it in the Recipe Book
+[19:44:50] g3 Beginner Circuit match 3 (Ryo, warriors): duel starts at 16/s
+[19:44:50] g3 Beginner Circuit match 3 (Ryo, warriors): turn 0 (you): LP 8000 / 8000
+[19:44:50] g3 Beginner Circuit match 3 (Ryo, warriors): turn 1 (you): LP 8000 / 8000
+[19:44:53] g3 Beginner Circuit match 3 (Ryo, warriors): turn 2 (Ryo): LP 8000 / 8000
+[19:44:57] g3 Beginner Circuit match 3 (Ryo, warriors): turn 3 (you): LP 7200 / 6800
+[19:44:58] g3 Beginner Circuit match 3 (Ryo, warriors): turn 4 (Ryo): LP 7200 / 6800
+[19:45:00] g3 Beginner Circuit match 3 (Ryo, warriors): turn 5 (you): LP 3600 / 6800
+[19:45:11] g3 Beginner Circuit match 3 (Ryo, warriors): turn 6 (Ryo): LP 2100 / 6800
+[19:45:12] g3 Beginner Circuit match 3 (Ryo, warriors): turn 7 (you): LP 2100 / 6800
+[19:45:20] g3 Beginner Circuit match 3 (Ryo, warriors): turn 8 (Ryo): LP 2100 / 3500
+[19:45:21] g3 Beginner Circuit match 3 (Ryo, warriors): turn 9 (you): LP 2100 / 3500
+[19:45:34] g3 Beginner Circuit match 3 (Ryo, warriors): duel over: won on turn 9, LP 2100 / 0, 0.7 min
+[19:45:37] g3 Beginner Circuit match 3 (Ryo, warriors): results: Victory!, 1125 DP earned (Win 150, First win against them 200, Beginner Circuit prize 600, Level 3 reward 175), now 2975 DP; news: Level 3! | Recipe unlocked: Ryo's Warriors. See it in the Recipe Book | Beginner Circuit cleared! | New circuit: Rookie Cup (Beginner) | Card Shop: sets up to 2007 are on sale
+[19:45:38] g3 Beginner Circuit match 3 (Ryo, warriors): story (after the results): Vera, the Vanguard: So you actually won something. Fine.
+[19:45:39] g3 Beginner Circuit match 3 (Ryo, warriors): story (after the results): Vera, the Vanguard: The Rookie Cup is next. I'll be watching. Closely.
+[19:45:41] g3 Beginner Circuit match 3 (Ryo, warriors): story (after the results): Old Gus, the Fortress: She says that to everyone she's worried about.
+[19:45:43] g3 Beginner Circuit match 3 (Ryo, warriors): story (after the results): Old Gus, the Fortress: Before the Rookie Cup, a word about chains. Every duelist trips over them sooner or later.
+[19:45:44] g3 Beginner Circuit match 3 (Ryo, warriors): story (after the results): Old Gus, the Fortress: I keep three little lessons behind the counter. Short duels, set boards, no pressure. They're under Lessons, top of the campaign screen.
+[19:45:46] g3 Beginner Circuit match 3 (Ryo, warriors): story (after the results): Vera, the Vanguard: He made me do those. Twice. ...The second time was on purpose.
+[19:45:49] g4 Rookie Cup match 1 (Captain Brask, gadgets): duel starts at 16/s
+[19:45:49] g4 Rookie Cup match 1 (Captain Brask, gadgets): turn 0 (you): LP 8000 / 8000
+[19:45:50] g4 Rookie Cup match 1 (Captain Brask, gadgets): turn 1 (you): LP 8000 / 8000
+[19:45:50] g4 Rookie Cup match 1 (Captain Brask, gadgets): turn 2 (Captain Brask): LP 8000 / 8000
+[19:45:52] g4 Rookie Cup match 1 (Captain Brask, gadgets): turn 3 (you): LP 6700 / 8000
+[19:46:00] g4 Rookie Cup match 1 (Captain Brask, gadgets): turn 4 (Captain Brask): LP 6700 / 5800
+[19:46:03] g4 Rookie Cup match 1 (Captain Brask, gadgets): turn 5 (you): LP 5500 / 5800
+[19:46:13] g4 Rookie Cup match 1 (Captain Brask, gadgets): turn 6 (Captain Brask): LP 5500 / 1800
+[19:46:14] g4 Rookie Cup match 1 (Captain Brask, gadgets): turn 7 (you): LP 5500 / 1800
+[19:46:17] g4 Rookie Cup match 1 (Captain Brask, gadgets): turn 8 (Captain Brask): LP 5500 / 1800
+[19:46:18] g4 Rookie Cup match 1 (Captain Brask, gadgets): turn 9 (you): LP 5500 / 1800
+[19:46:21] g4 Rookie Cup match 1 (Captain Brask, gadgets): duel over: won on turn 9, LP 5500 / 0, 0.5 min
+[19:46:24] g4 Rookie Cup match 1 (Captain Brask, gadgets): results: Victory!, 425 DP earned (Win 225, First win against them 200), now 3400 DP; news: Recipe unlocked: Captain Brask's Gadgets. See it in the Recipe Book
+[19:46:26] g5 Rookie Cup match 2 (Old Gus, classic): duel starts at 16/s
+[19:46:26] g5 Rookie Cup match 2 (Old Gus, classic): turn 0 (you): LP 8000 / 8000
+[19:46:26] g5 Rookie Cup match 2 (Old Gus, classic): turn 1 (you): LP 8000 / 8000
+[19:46:27] g5 Rookie Cup match 2 (Old Gus, classic): turn 2 (Old Gus): LP 8000 / 8000
+[19:46:29] g5 Rookie Cup match 2 (Old Gus, classic): turn 3 (you): LP 6800 / 8000
+[19:46:35] g5 Rookie Cup match 2 (Old Gus, classic): turn 4 (Old Gus): LP 6800 / 7000
+[19:46:40] g5 Rookie Cup match 2 (Old Gus, classic): turn 5 (you): LP 5000 / 7000
+[19:46:45] g5 Rookie Cup match 2 (Old Gus, classic): turn 6 (Old Gus): LP 5000 / 6900
+[19:46:47] g5 Rookie Cup match 2 (Old Gus, classic): turn 7 (you): LP 5000 / 6900
+[19:46:49] g5 Rookie Cup match 2 (Old Gus, classic): turn 8 (Old Gus): LP 5000 / 4300
+[19:46:50] g5 Rookie Cup match 2 (Old Gus, classic): turn 9 (you): LP 5000 / 4300
+[19:46:52] g5 Rookie Cup match 2 (Old Gus, classic): turn 10 (Old Gus): LP 5000 / 4300
+[19:46:53] g5 Rookie Cup match 2 (Old Gus, classic): turn 11 (you): LP 5000 / 4300
+[19:47:09] g5 Rookie Cup match 2 (Old Gus, classic): turn 12 (Old Gus): LP 5000 / 4300
+[19:47:11] g5 Rookie Cup match 2 (Old Gus, classic): turn 13 (you): LP 5000 / 4300
+[19:47:15] g5 Rookie Cup match 2 (Old Gus, classic): turn 14 (Old Gus): LP 5000 / 4300
+[19:47:15] g5 Rookie Cup match 2 (Old Gus, classic): turn 15 (you): LP 5000 / 4300
+[19:47:19] g5 Rookie Cup match 2 (Old Gus, classic): duel over: won on turn 15, LP 5000 / 0, 0.9 min
+[19:47:22] g5 Rookie Cup match 2 (Old Gus, classic): results: Victory!, 625 DP earned (Win 225, First win against them 200, Level 4 reward 200), now 4025 DP; news: Level 4! +1 Card Token: trade it for any card at the Card Trader | Recipe unlocked: Old Gus's Classic. See it in the Recipe Book
+[19:47:24] g6 Rookie Cup match 3 (Tink, gadgets): duel starts at 16/s
+[19:47:24] g6 Rookie Cup match 3 (Tink, gadgets): turn 0 (you): LP 8000 / 8000
+[19:47:24] g6 Rookie Cup match 3 (Tink, gadgets): turn 1 (you): LP 8000 / 8000
+[19:47:26] g6 Rookie Cup match 3 (Tink, gadgets): turn 2 (Tink): LP 8000 / 8000
+[19:47:29] g6 Rookie Cup match 3 (Tink, gadgets): turn 3 (you): LP 7400 / 8000
+[19:47:33] g6 Rookie Cup match 3 (Tink, gadgets): turn 4 (Tink): LP 7400 / 6000
+[19:47:35] g6 Rookie Cup match 3 (Tink, gadgets): turn 5 (you): LP 6100 / 6000
+[19:47:38] g6 Rookie Cup match 3 (Tink, gadgets): turn 6 (Tink): LP 6100 / 6000
+[19:47:41] g6 Rookie Cup match 3 (Tink, gadgets): turn 7 (you): LP 6100 / 6000
+[19:47:43] g6 Rookie Cup match 3 (Tink, gadgets): turn 8 (Tink): LP 6100 / 6000
+[19:47:44] g6 Rookie Cup match 3 (Tink, gadgets): turn 9 (you): LP 4700 / 6000
+[19:47:54] g6 Rookie Cup match 3 (Tink, gadgets): turn 10 (Tink): LP 4700 / 6000
+[19:47:55] g6 Rookie Cup match 3 (Tink, gadgets): turn 11 (you): LP 3300 / 6000
+[19:48:01] g6 Rookie Cup match 3 (Tink, gadgets): turn 12 (Tink): LP 3300 / 5400
+[19:48:04] g6 Rookie Cup match 3 (Tink, gadgets): turn 13 (you): LP 1000 / 5400
+[19:48:09] g6 Rookie Cup match 3 (Tink, gadgets): turn 14 (Tink): LP 1000 / 5200
+[19:48:12] g6 Rookie Cup match 3 (Tink, gadgets): duel over: lost on turn 14, LP 0 / 5200, 0.8 min
+[19:48:15] g6 Rookie Cup match 3 (Tink, gadgets): results: Defeat, 50 DP earned (For the duel 50), now 4075 DP; news: 
+[19:48:17] g7 Rookie Cup match 3 (Tink, gadgets): duel starts at 16/s
+[19:48:17] g7 Rookie Cup match 3 (Tink, gadgets): turn 0 (you): LP 8000 / 8000
+[19:48:18] g7 Rookie Cup match 3 (Tink, gadgets): turn 1 (you): LP 8000 / 8000
+[19:48:26] g7 Rookie Cup match 3 (Tink, gadgets): turn 2 (Tink): LP 8000 / 8000
+[19:48:30] g7 Rookie Cup match 3 (Tink, gadgets): turn 3 (you): LP 7200 / 8000
+[19:48:33] g7 Rookie Cup match 3 (Tink, gadgets): turn 4 (Tink): LP 7200 / 7300
+[19:48:34] g7 Rookie Cup match 3 (Tink, gadgets): turn 5 (you): LP 7200 / 7300
+[19:48:37] g7 Rookie Cup match 3 (Tink, gadgets): turn 6 (Tink): LP 7200 / 7300
+[19:48:38] g7 Rookie Cup match 3 (Tink, gadgets): turn 7 (you): LP 7200 / 7300
+[19:48:41] g7 Rookie Cup match 3 (Tink, gadgets): turn 8 (Tink): LP 7200 / 6400
+[19:48:42] g7 Rookie Cup match 3 (Tink, gadgets): turn 9 (you): LP 7200 / 6400
+[19:49:03] g7 Rookie Cup match 3 (Tink, gadgets): duel over: won on turn 9, LP 7200 / 0, 0.8 min
+[19:49:06] g7 Rookie Cup match 3 (Tink, gadgets): results: Victory!, 1450 DP earned (Win 225, First win against them 200, Rookie Cup prize 800, Level 5 reward 225), now 5525 DP; news: Level 5! +1 Card Token: trade it for any card at the Card Trader | Recipe unlocked: Tink's Gadgets. See it in the Recipe Book | Rookie Cup cleared! | New Tag Cup: Card Shop Tag Night. Team up with a duelist you've beaten | New circuit: Town Tournament (Beginner) | Card Shop: sets up to 2009 are on sale
+[19:49:07] g7 Rookie Cup match 3 (Tink, gadgets): story (after the results): Old Gus, the Fortress: Fridays, we do things differently: tag duels. Two of you, two of them, one field, one set of Life Points.
+[19:49:08] g7 Rookie Cup match 3 (Tink, gadgets): story (after the results): Old Gus, the Fortress: You take your turn, they take theirs, then your partner, then their partner. Round and round.
+[19:49:10] g7 Rookie Cup match 3 (Tink, gadgets): story (after the results): Old Gus, the Fortress: Anyone you've beaten can partner you. Losing to someone tells you a lot about them. Turns out that's how friendships start here too.
+[19:49:12] g7 Rookie Cup match 3 (Tink, gadgets): story (after the results): Vera, the Vanguard: I'm not partnering with you. Yet.
+[19:49:15] g8 Town Tournament match 1 (Old Gus, zombies): duel starts at 16/s
+[19:49:15] g8 Town Tournament match 1 (Old Gus, zombies): turn 0 (you): LP 8000 / 8000
+[19:49:15] g8 Town Tournament match 1 (Old Gus, zombies): turn 1 (you): LP 8000 / 8000
+[19:49:28] g8 Town Tournament match 1 (Old Gus, zombies): turn 2 (Old Gus): LP 8000 / 8000
+[19:49:30] g8 Town Tournament match 1 (Old Gus, zombies): turn 3 (you): LP 8000 / 8000
+[19:49:34] g8 Town Tournament match 1 (Old Gus, zombies): turn 4 (Old Gus): LP 8000 / 8000
+[19:49:35] g8 Town Tournament match 1 (Old Gus, zombies): turn 5 (you): LP 8000 / 8000
+[19:49:57] g8 Town Tournament match 1 (Old Gus, zombies): turn 6 (Old Gus): LP 8000 / 8000
+[19:50:01] g8 Town Tournament match 1 (Old Gus, zombies): turn 7 (you): LP 8000 / 8000
+[19:50:05] g8 Town Tournament match 1 (Old Gus, zombies): turn 8 (Old Gus): LP 8000 / 8000
+[19:50:07] g8 Town Tournament match 1 (Old Gus, zombies): turn 9 (you): LP 8000 / 8000
+[19:50:21] g8 Town Tournament match 1 (Old Gus, zombies): turn 10 (Old Gus): LP 8000 / 8000
+[19:50:26] g8 Town Tournament match 1 (Old Gus, zombies): turn 11 (you): LP 8000 / 8000
+[19:50:38] g8 Town Tournament match 1 (Old Gus, zombies): turn 12 (Old Gus): LP 8000 / 800
+[19:50:42] g8 Town Tournament match 1 (Old Gus, zombies): turn 13 (you): LP 8000 / 800
+[19:50:51] g8 Town Tournament match 1 (Old Gus, zombies): duel over: won on turn 13, LP 8000 / 0, 1.6 min
+[19:50:53] g8 Town Tournament match 1 (Old Gus, zombies): results: Victory!, 500 DP earned (Win 300, First win against them 200), now 6025 DP; news: Recipe unlocked: Old Gus's Zombies. See it in the Recipe Book
+[19:50:55] g9 Town Tournament match 2 (Tink, stall-burn): duel starts at 16/s
+[19:50:55] g9 Town Tournament match 2 (Tink, stall-burn): turn 0 (you): LP 8000 / 8000
+[19:50:56] g9 Town Tournament match 2 (Tink, stall-burn): turn 1 (you): LP 8000 / 8000
+[19:50:57] g9 Town Tournament match 2 (Tink, stall-burn): turn 2 (Tink): LP 8000 / 8000
+[19:51:00] g9 Town Tournament match 2 (Tink, stall-burn): turn 3 (you): LP 6900 / 8000
+[19:51:18] g9 Town Tournament match 2 (Tink, stall-burn): turn 4 (Tink): LP 6900 / 8000
+[19:51:22] g9 Town Tournament match 2 (Tink, stall-burn): turn 5 (you): LP 6900 / 7900
+[19:51:24] g9 Town Tournament match 2 (Tink, stall-burn): turn 6 (Tink): LP 6900 / 7900
+[19:51:29] g9 Town Tournament match 2 (Tink, stall-burn): turn 7 (you): LP 4900 / 7300
+[19:51:31] g9 Town Tournament match 2 (Tink, stall-burn): turn 8 (Tink): LP 4900 / 7300
+[19:51:33] g9 Town Tournament match 2 (Tink, stall-burn): turn 9 (you): LP 3900 / 7200
+[19:51:35] g9 Town Tournament match 2 (Tink, stall-burn): turn 10 (Tink): LP 3900 / 7200
+[19:51:40] g9 Town Tournament match 2 (Tink, stall-burn): turn 11 (you): LP 2900 / 7100
+[19:51:42] g9 Town Tournament match 2 (Tink, stall-burn): turn 12 (Tink): LP 2900 / 7100
+[19:51:44] g9 Town Tournament match 2 (Tink, stall-burn): turn 13 (you): LP 2900 / 7000
+[19:51:47] g9 Town Tournament match 2 (Tink, stall-burn): turn 14 (Tink): LP 2900 / 7000
+[19:51:48] g9 Town Tournament match 2 (Tink, stall-burn): turn 15 (you): LP 2900 / 6900
+[19:52:06] g9 Town Tournament match 2 (Tink, stall-burn): duel over: won on turn 15, LP 2900 / 0, 1.2 min
+[19:52:08] g9 Town Tournament match 2 (Tink, stall-burn): results: Victory!, 500 DP earned (Win 300, First win against them 200), now 6525 DP; news: Recipe unlocked: Tink's Stall Burn. See it in the Recipe Book
+[19:52:11] g10 Town Tournament match 3 (Vera, warriors): duel starts at 16/s
+[19:52:11] g10 Town Tournament match 3 (Vera, warriors): turn 0 (you): LP 8000 / 8000
+[19:52:11] g10 Town Tournament match 3 (Vera, warriors): turn 1 (you): LP 8000 / 8000
+[19:52:20] g10 Town Tournament match 3 (Vera, warriors): turn 2 (Vera): LP 8000 / 8000
+[19:52:22] g10 Town Tournament match 3 (Vera, warriors): turn 3 (you): LP 8000 / 8000
+[19:52:26] g10 Town Tournament match 3 (Vera, warriors): turn 4 (Vera): LP 8000 / 5500
+[19:52:27] g10 Town Tournament match 3 (Vera, warriors): turn 5 (you): LP 8000 / 5500
+[19:52:35] g10 Town Tournament match 3 (Vera, warriors): turn 6 (Vera): LP 8000 / 5300
+[19:52:38] g10 Town Tournament match 3 (Vera, warriors): turn 7 (you): LP 8000 / 5300
+[19:52:40] g10 Town Tournament match 3 (Vera, warriors): turn 8 (Vera): LP 8000 / 5300
+[19:52:42] g10 Town Tournament match 3 (Vera, warriors): turn 9 (you): LP 8000 / 5300
+[19:52:45] g10 Town Tournament match 3 (Vera, warriors): turn 10 (Vera): LP 8000 / 4500
+[19:52:47] g10 Town Tournament match 3 (Vera, warriors): turn 11 (you): LP 8000 / 4500
+[19:52:50] g10 Town Tournament match 3 (Vera, warriors): turn 12 (Vera): LP 8000 / 4000
+[19:52:52] g10 Town Tournament match 3 (Vera, warriors): turn 13 (you): LP 8000 / 4000
+[19:52:58] g10 Town Tournament match 3 (Vera, warriors): turn 14 (Vera): LP 8000 / 2100
+[19:52:59] g10 Town Tournament match 3 (Vera, warriors): turn 15 (you): LP 8000 / 2100
+[19:53:03] g10 Town Tournament match 3 (Vera, warriors): duel over: won on turn 15, LP 8000 / 0, 0.9 min
+[19:53:06] g10 Town Tournament match 3 (Vera, warriors): results: Victory!, 1750 DP earned (Win 300, First win against them 200, Town Tournament prize 1000, Level 6 reward 250), now 8275 DP; news: Level 6! +1 Card Token: trade it for any card at the Card Trader | Recipe unlocked: Vera's Warriors. See it in the Recipe Book | Town Tournament cleared! | New circuit: Regional Qualifier (Beginner) | Card Shop: sets up to 2010 are on sale
+[19:53:07] g11 end: done: 9 won, 1 lost; 922 decisions clicked, 0 answered directly; 0 issues

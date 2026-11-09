@@ -1,0 +1,187 @@
+# The card shop's featured shelf (docs/dev/SHOP-REWORK-SPEC-2026-11-01.md): 3-4 real sets per circuit, chosen because
+# they hold that circuit's opponents' cards. Everything else on sale goes to the back shelves.
+#   shelf: <circuit name, as in circuits.txt> | postgame
+#   set:  <set code> | <opponent decks, comma-separated> | <why: the cards, one short line>
+#   soon: <set code> | <opponent decks> | <why>      a set the shop opens with levels before this band ends (0-2)
+# Rules (the harness checks them):
+#   - a set: is in the shop's catalog and released by the circuit's era, so it's on sale while the circuit is current;
+#   - a soon: is released after the era and by the next band's era (it opens with levels);
+#   - every deck named is a match deck of that circuit and has at least one Main/Extra card in the set;
+#   - every match deck of the circuit is named by at least one set: or soon: line;
+#   - 3 or 4 set: lines per shelf, at most 2 soon: lines. The postgame shelf names no decks.
+
+# ---- Beginner (era 2005) ----
+
+shelf: Beginner Circuit
+set: DB2 | warriors, classic | Marauding Captain, Command Knight, Blade Knight, Stamping Destruction
+set: DB1 | classic, warriors | Blue-Eyes White Dragon, Gearfried the Iron Knight, Goblin Attack Force
+set: DR1 | classic, warriors | Luster Dragon, D.D. Warrior Lady
+set: FET | warriors, classic | Gearfried the Swordmaster, Release Restraint, King Dragun
+soon: DR3 | warriors | Gearfried the Swordmaster
+soon: DLG1 | classic | Lord of D., Kaibaman
+
+shelf: Rookie Cup
+set: CRV | gadgets | Cyber Dragon
+set: DB1 | classic, gadgets | Blue-Eyes White Dragon, Upstart Goblin, Mystical Space Typhoon
+set: DB2 | gadgets, classic | Exiled Force, Book of Moon, Stamping Destruction
+set: DR1 | classic, gadgets | Luster Dragon, Sakuretsu Armor
+soon: DPYG | gadgets | Red, Green and Yellow Gadget
+
+shelf: Town Tournament
+set: PGD | zombies, stall-burn | Pyramid Turtle, Book of Life, Spirit Reaper
+set: DB1 | stall-burn, warriors | Big Shield Gardna, Giant Soldier of Stone, Gearfried the Iron Knight
+set: DB2 | zombies, warriors | Vampire Lord, Call of the Mummy, Marauding Captain
+set: DR1 | stall-burn, zombies | Des Koala, Wave-Motion Cannon, Despair from the Dark
+soon: GLD3 | zombies | Goblin Zombie, Mezuki, Plaguespreader Zombie
+
+shelf: Regional Qualifier
+set: DR1 | stall-burn, zombies | Wave-Motion Cannon, Des Koala, Spirit Reaper
+set: PGD | zombies, gadgets | Pyramid Turtle, Book of Life, Call of the Mummy, Book of Moon
+set: DB1 | stall-burn, gadgets, zombies | Big Shield Gardna, Messenger of Peace
+set: CRV | gadgets | Cyber Dragon
+soon: DPYG | gadgets, stall-burn | Red, Green and Yellow Gadget, Marshmallon
+
+# ---- Novice (era 2011) ----
+
+shelf: Underdog Open
+set: STOR | six-samurai | Kagemusha of the Six Samurai, Legendary Six Samurai - Kizan, Legendary Six Samurai - Kageki
+set: DR04 | frog-ftk, burning-abyss | Poison Draw Frog, Des Frog, Treeborn Frog, Karma Cut
+set: GLD2 | six-samurai, frog-ftk, spellbook, burning-abyss | Six Samurai United, Double-Edged Sword Technique
+set: DB2 | spellbook, six-samurai | Kycoo the Ghost Destroyer, Jowgen the Spiritualist, Royal Oppression
+soon: BP03 | spellbook, burning-abyss | Spellbook of Wisdom, Night Beam, Ghostrick Alucard
+soon: PGL2 | spellbook, burning-abyss | The Grand Spellbook Tower, Karma Cut, Downerd Magician
+
+shelf: Trap Masters Cup
+set: GENF | geargia | Geargiano
+set: ABPF | geargia | Fiendish Chain
+set: DR1 | domain-monarch, zoodiac | Reasoning, My Body as a Shield
+set: DR3 | altergeist | Mind Crush
+soon: HSRD | zoodiac | Speedroid Terrortop
+soon: PGLD | zoodiac | Fire Formation - Tenki
+
+shelf: Small Engines Invitational
+set: TDGS | purrely | Book of Eclipse
+set: PGD | runick-spright, purrely, floowandereeze | Lava Golem, Book of Moon, Terraforming
+set: DR1 | runick-spright, floowandereeze | Lava Golem, Terraforming
+set: DB2 | yummy, purrely | Witch of the Black Forest, Book of Moon
+
+# ---- Intermediate (era 2015) ----
+
+shelf: Synchro Dawn Classic
+set: GLD3 | blackwing, infernity, lightsworn, teledad | the Blackwings, Infernity Archfiend, Judgment Dragon, Destiny HERO - Malicious
+set: LODT | lightsworn | Lumina, Lightsworn Summoner; Wulf, Lightsworn Beast; Honest
+set: TSHD | infernity | Infernity Beetle, Infernity Launcher, Infernity Barrier
+set: DP05 | teledad | Destiny HERO - Malicious, Destiny Draw, Destiny HERO - Diamond Dude
+soon: LEHD | teledad | Destiny HERO - Malicious, Destiny Draw
+
+shelf: Xyz and Link Regionals
+set: PHSW | dino-rabbit | Rescue Rabbit, Evolzar Laggia, Evolzar Dolkka
+set: ORCS | inzektor | Inzektor Dragonfly, Inzektor Hornet, Inzektor Centipede
+set: NECH | qliphort | Qliphort Scout, Qliphort Helix
+set: DLG1 | gouki, dino-rabbit | Destiny HERO - Malicious, Gorz the Emissary of Darkness
+soon: SP18 | gouki | Gouki Suprex, Gouki Re-Match
+
+shelf: Link Age Open
+set: CORE | pendulum-magician | Magical Abductor
+set: PGLD | sky-striker, maliss | Reinforcement of the Army, Gold Sarcophagus
+set: SP15 | pendulum-magician | Timegazer Magician
+set: THSF | pendulum-magician, salamangreat | Abyss Dweller
+soon: DASA | sky-striker | Sky Striker Mobilize - Engage!, Sky Striker Ace - Raye, Sky Striker Mecha - Widow Anchor
+soon: PEVO | pendulum-magician | Chronograph Sorcerer
+
+# ---- Advanced (era 2019) ----
+
+shelf: Golden Age Championship
+set: BP01 | goat-control, chaos-yata, plant-synchro | Airknight Parshath, Scapegoat, Creature Swap, Caius the Shadow Monarch
+set: DB1 | goat-control, chaos-yata | Thousand-Eyes Restrict, Magician of Faith, Jinzo, Cyber Jar
+set: LTGY | dragon-ruler | Tempest, Redox, Blaster and Tidal: the Dragon Rulers
+set: PGL2 | plant-synchro | Debris Dragon, Formula Synchron, Glow-Up Bulb
+soon: MAMA | chaos-yata | Yata-Garasu
+
+shelf: Control Kings Cup
+set: PRIO | hat, abc, true-draco | Artifact Moralltach, Artifact Sanctum, Artifact Ignition
+set: DUEA | satellarknight | Satellarknight Deneb, Satellarknight Altair, Satellarknight Vega
+set: MACR | true-draco | Dinomight Knight, the True Dracofighter; True Draco Heritage
+set: BLRR | abc, true-draco | Brilliant Fusion, Union Hangar, Dragonic Diagram
+soon: DLCS | hat | Fire Hand, Ice Hand
+
+shelf: Hybrid Engines Invitational
+set: SOFU | orcust | Orcust Harp Horror, Orcustrated Return, Galatea, the Orcust Automaton
+set: CHIM | unchained | Unchained Twins - Aruha, Abomination's Prison, Escape of the Unchained
+set: HSRD | tri-brigade | PSY-Framegear Gamma, PSY-Frame Driver
+set: PGD | exosister | Necrovalley
+soon: GRCR | exosister | Exosister Elis, Exosister Stella, Exosister Pax
+soon: DUNE | unchained | Unchained Soul of Sharvara, Unchained Soul Lord of Yama
+
+# ---- Expert (era 2023) ----
+
+shelf: Expert Series: Shadows and Storms
+set: DUEA | shaddoll | Shaddoll Beast, Shaddoll Hedgehog, Shaddoll Falco, El Shaddoll Construct
+set: GENF | wind-up | Wind-Up Factory, Wind-Up Magician
+set: PGL3 | kozmo | Kozmo Dark Destroyer, Kozmo Farmgirl, Kozmo Forerunner, Kozmotown
+set: CYHO | danger-dark-world | Danger! Bigfoot!, Danger! Nessie!
+soon: BLGG | shaddoll | Shaddoll Dragon, El Shaddoll Construct
+
+shelf: Expert Series: Rituals and Fire
+set: DABL | yubel | Kashtira Unicorn, Kashtira Fenrir, Kashtira Birth
+set: GEIM | drytron | Drytron Alpha Thuban, Drytron Gamma Eltanin, Drytron Zeta Aldhibah
+set: SESL | adamancipator | Adamancipator Analyzer, Adamancipator Seeker, Adamancipator Researcher
+set: MAGO | drytron, adamancipator, tenpai-dragon | Herald of the Arc Light
+soon: LEDE | tenpai-dragon | Tenpai Dragon Paidra, Tenpai Dragon Chundra, Sangen Kaimen
+soon: INFO | yubel | Fiendsmith Engraver
+
+shelf: Expert Series: The New Wave
+set: AGOV | fire-king-snake-eye | Snake-Eye Ash, Snake-Eye Oak, Snake-Eyes Flamberge Dragon
+set: LD10 | fire-king-snake-eye | Salamangreat Raging Phoenix
+set: DIFO | elfnote | Psychic End Punisher
+set: BLRR | angelechy, ryzeal, elfnote | Foolish Burial Goods
+soon: CRBR | ryzeal | Ext Ryzeal, Ice Ryzeal
+soon: CORI | angelechy | Angelechy Problem
+
+shelf: Expert Series: Fall Format
+set: LED4 | lunalight, artmage | Lunalight Kaleido Chick, Luna Light Perfume, Lunalight Leo Dancer
+set: SHVI | lunalight | Lunalight Black Sheep, Lunalight Wolf
+set: AGOV | mermail-atlantean | Xyz Armor Torpedo, Full Armored Dark Knight Lancer
+set: BLLR | mermail-atlantean, dracotail | Mermail Abyssteus, Odd-Eyes Dissolver
+soon: JUSH | dracotail | Dracotail Faimena, Dracotail Urgula
+soon: DUAD | artmage | Medius the Pure, Artmage Power Patron
+
+# ---- Master and the Gauntlet (era 2026; every set is on sale, so no soon lines) ----
+
+shelf: Master League: Link Wars
+set: POTE | spright | Spright Blue, Spright Jet, Spright Starter, Spright Elf
+set: DABL | bystial-dragon-link | The Bystial Lubellion, Bystial Saronir
+set: SOFU | thunder-dragon | Thunder Dragonroar, Thunder Dragondark, Thunder Dragonhawk
+set: MGED | eldlich, bystial-dragon-link | Eldlich the Golden Lord, Cursed Eldland, Rokket Tracer
+
+shelf: Master League: Graveyard Kings
+set: POTE | tearlaments | Tearlaments Havnis, Tearlaments Merrli, Tearlaments Reinoheart, Tearlaments Scheiren
+set: DABL | kashtira, tearlaments | Kashtira Fenrir, Kashtira Birth, Kashtira Shangri-Ira, Tearlaments Rulkallos
+set: AGOV | snake-eye, k9-vanquish-soul | Snake-Eye Ash, Snake-Eyes Flamberge Dragon, Vanquish Soul Jiaolong
+set: WISU | k9-vanquish-soul | Vanquish Soul Razen, Vanquish Soul Dr. Mad Love, Vanquish Soul - Stake your Soul!
+
+shelf: Master League: Houston 2026
+set: L26D | mitsurugi, branded-despia | Mitsurugi Prayers, Ame no Murakumo no Mitsurugi
+set: ROTA | light-and-darkness | The Hallowed Azamina, Deception of the Sinful Spoils
+set: RA04 | branded-despia, light-and-darkness | Fallen of Albaz, Blazing Cartesia, the Virtuous, Dark Magician
+set: MAMO | light-and-darkness, mitsurugi | Diabellstar the Black Witch, Dark Magician, the Pharaoh's Servant
+
+shelf: Master League: October 2026
+set: CORI | blitzclique, sacred-beast, chaos-ritual, dark-magician-chaos-ritual | their cores
+set: INFO | sacred-beast, blitzclique | the Fiendsmith engine, Dominus Purge
+set: MAMO | dark-magician-chaos-ritual | Multiplying Kuriboh!, Master of Chaos
+set: RA04 | chaos-ritual, sacred-beast | Fallen of Albaz, Incredible Ecclesia, the Virtuous, Fiendsmith Engraver
+
+shelf: Tier 0 Gauntlet
+set: POTE | tearlaments, ishizu-tearlaments | Tearlaments Havnis, Tearlaments Merrli, Tearlaments Scheiren, Tearlaments Perlereino
+set: JUSH | k9-vanquish-soul | K9-17 Izuna, K9-17 "Ripper"
+set: MGED | eldlich | the Golden Land core
+set: MAMA | ishizu-tearlaments, eldlich | Kelbek the Ancient Vanguard, Keldo the Sacred Protector, Mudora the Sword Oracle, Gozen Match
+
+# ---- After the Tier 0 Gauntlet ----
+
+shelf: postgame
+set: RA05 | | the chase: every rarity
+set: BLGG | | 146 cards with Starlight Rares
+set: CORI | | the newest core set
+set: BETB | | a newest core set

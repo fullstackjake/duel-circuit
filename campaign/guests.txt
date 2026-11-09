@@ -1,0 +1,50 @@
+# Special guests: duelists outside the circuits, each unlocked by a milestone (Campaign > Guests). Challenge one on one,
+# or face them in a tag duel with their partner; once beaten they can partner you in the Tag Cups.
+#   guest: <character> <deck>[, <deck>...] [+ <partner character> <partner deck>]
+#                              More than one deck: they play one a duel, in order, moving on with each win against them
+#                              (a loss or a draw keeps the same deck). No partner: no tag duel against them.
+#   unlock: lessons | band:<band> | tagwins:<n> | final (the Format Library's Every Era final won)
+#   tagunlock: <rule>          when the tag duel opens, on top of unlock: the same rules or cup:<Tag Cup> (that cup cleared).
+#                              Left out: the first Tag Cup (Card Shop Tag Night) cleared, so a guest's tag duel never comes
+#                              before the game teaches tag duels and you've picked a partner on a Tag Cup's screen.
+#   blurb: <one line>          prize: <DP for the first win, one on one and in tag>[ once]
+#                              The prize pays again each New Game+ cycle (New Game+ clears the wins). "once": the one-on-one
+#                              prize pays once ever (the post-final guests: their unlock survives New Game+); rematches
+#                              still pay the usual win DP. Paid is kept as guestprize:<character> in the save's unlocks.
+
+guest: ines goat-control + old-gus stall-burn
+unlock: lessons
+# One on one right after the lessons; the tag duel (her and Gus, goat control and stall burn) waits for Tag Night.
+tagunlock: cup:Card Shop Tag Night
+blurb: Gus's old rival from the shop's first tournaments. She heard he's teaching again.
+prize: 1500
+
+guest: nocturne hat + altergeist altergeist
+unlock: band:Novice
+blurb: A masked duelist who only shows up after the Novice band falls. Nobody knows who's under the mask.
+prize: 3000
+
+guest: rhea thunder-dragon + sky-striker sky-striker
+unlock: tagwins:12
+blurb: The reigning tag champion. Win twelve tag duels and she'll take you seriously.
+prize: 5000
+
+guest: seraph light-and-darkness + dragon-ruler dragon-ruler
+unlock: band:Advanced
+blurb: A traveling pro who plays only those who've cleared the Advanced band.
+prize: 8000
+
+guest: ilse synchron, zombies, gadgets, modern
+unlock: final
+# After the Every Era final: four decks, one a duel, each beaten in turn. No tag duel ("This one's only between us").
+blurb: The name at the top of Gus's corkboard. She hasn't sat down across from anyone in years.
+prize: 10000 once
+
+guest: vera warriors
+unlock: final
+# Her rematch after the Every Era final (owner, 2026-11-06: "a post-final guest on a warriors build that waits on its
+# traps"). Her circuit deck: no other warriors deck has more traps and is a warriors build (Satellarknight is Sir Tobin's
+# Tellarknights; Six Samurai swarms). One on one only. Her signature was paid at your first win over her in the circuits,
+# so a win here raises guestbeat:vera, not beat:vera. The prize is the final's tier, as Ilse's, and pays once ever.
+blurb: She hasn't asked for a rematch since the Regional Qualifier. She's asking now.
+prize: 10000 once

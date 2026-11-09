@@ -1,0 +1,134 @@
+# Measured by `--wall-study` (src/Ygo.Harness/WallStudy.cs): each option's wins in 100 at a hard match, best first.
+# deck=yours is your own deck (measured with the Mekk-Knight Evolved starter); anything else is a recipe to borrow.
+# Your stand-in plays with the planner, chain prompts as Chain: Auto asks; first= and second= are by who took the first turn.
+# The Stuck? advice names the best option the player has.
+
+wall: guest:seraph
+option: 62 | deck=tearlaments | first=50 | second=75 | games=32
+option: 59 | deck=branded-despia | first=62 | second=56 | games=32
+option: 56 | deck=mitsurugi | first=50 | second=62 | games=32
+option: 53 | deck=light-and-darkness | first=31 | second=75 | games=32
+option: 46 | deck=ishizu-tearlaments | first=43 | second=50 | games=32
+option: 34 | deck=eldlich | first=31 | second=37 | games=32
+option: 31 | deck=k9-vanquish-soul | first=18 | second=43 | games=32
+option: 31 | deck=yours | first=31 | second=31 | games=32
+
+wall: guesttag:seraph
+option: 40 | deck=yours | partner=unchained | partnerdeck=unchained | first=37 | second=43 | games=32
+option: 37 | deck=yours | partner=kit | partnerdeck=hat | first=31 | second=43 | games=32
+option: 34 | deck=yours | partner=old-gus | partnerdeck=zombies | first=37 | second=31 | games=32
+option: 34 | deck=yours | partner=hat | partnerdeck=hat | first=31 | second=37 | games=32
+option: 31 | deck=unchained | partner=unchained | partnerdeck=unchained | first=25 | second=37 | games=32
+option: 28 | deck=hat | partner=kit | partnerdeck=unchained | first=25 | second=31 | games=32
+option: 21 | deck=unchained | partner=hat | partnerdeck=hat | first=25 | second=18 | games=32
+option: 18 | deck=unchained | partner=kit | partnerdeck=hat | first=18 | second=18 | games=32
+option: 15 | deck=hat | partner=unchained | partnerdeck=unchained | first=12 | second=18 | games=32
+option: 15 | deck=hat | partner=hat | partnerdeck=hat | first=12 | second=18 | games=32
+option: 12 | deck=unchained | partner=old-gus | partnerdeck=zombies | first=12 | second=12 | games=32
+option: 6 | deck=hat | partner=old-gus | partnerdeck=zombies | first=6 | second=6 | games=32
+
+wall: tag4.0
+option: 62 | deck=danger-dark-world | partner=kozmo | partnerdeck=kozmo | first=62 | second=62 | games=32
+option: 59 | deck=danger-dark-world | partner=kit | partnerdeck=kozmo | first=62 | second=56 | games=32
+option: 56 | deck=kozmo | partner=kozmo | partnerdeck=kozmo | first=56 | second=56 | games=32
+option: 53 | deck=yours | partner=kit | partnerdeck=danger-dark-world | first=62 | second=43 | games=32
+option: 53 | deck=kozmo | partner=kit | partnerdeck=danger-dark-world | first=75 | second=31 | games=32
+option: 50 | deck=danger-dark-world | partner=old-gus | partnerdeck=zombies | first=43 | second=56 | games=32
+option: 37 | deck=yours | partner=kozmo | partnerdeck=kozmo | first=56 | second=18 | games=32
+option: 15 | deck=kozmo | partner=old-gus | partnerdeck=zombies | first=6 | second=25 | games=32
+option: 15 | deck=yours | partner=old-gus | partnerdeck=zombies | first=18 | second=12 | games=32
+
+wall: tag4.1
+option: 90 | deck=yours | partner=kit | partnerdeck=danger-dark-world | first=93 | second=87 | games=32
+option: 78 | deck=danger-dark-world | partner=danger-dark-world | partnerdeck=danger-dark-world | first=68 | second=87 | games=32
+option: 78 | deck=yours | partner=danger-dark-world | partnerdeck=danger-dark-world | first=81 | second=75 | games=32
+option: 75 | deck=kozmo | partner=kit | partnerdeck=danger-dark-world | first=68 | second=81 | games=32
+option: 75 | deck=danger-dark-world | partner=kit | partnerdeck=kozmo | first=56 | second=93 | games=32
+option: 71 | deck=kozmo | partner=danger-dark-world | partnerdeck=danger-dark-world | first=68 | second=75 | games=32
+option: 71 | deck=danger-dark-world | partner=kozmo | partnerdeck=kozmo | first=50 | second=93 | games=32
+option: 65 | deck=kozmo | partner=kozmo | partnerdeck=kozmo | first=43 | second=87 | games=32
+option: 65 | deck=danger-dark-world | partner=old-gus | partnerdeck=zombies | first=50 | second=81 | games=32
+option: 43 | deck=yours | partner=old-gus | partnerdeck=zombies | first=25 | second=62 | games=32
+option: 37 | deck=yours | partner=kozmo | partnerdeck=kozmo | first=12 | second=62 | games=32
+option: 25 | deck=kozmo | partner=old-gus | partnerdeck=zombies | first=12 | second=37 | games=32
+
+wall: tag4.2
+option: 62 | deck=danger-dark-world | partner=danger-dark-world | partnerdeck=danger-dark-world | first=75 | second=50 | games=32
+option: 50 | deck=kozmo | partner=kozmo | partnerdeck=kozmo | first=43 | second=56 | games=32
+option: 43 | deck=danger-dark-world | partner=kit | partnerdeck=kozmo | first=50 | second=37 | games=32
+option: 40 | deck=danger-dark-world | partner=kozmo | partnerdeck=kozmo | first=37 | second=43 | games=32
+option: 37 | deck=kozmo | partner=kit | partnerdeck=danger-dark-world | first=56 | second=18 | games=32
+option: 37 | deck=yours | partner=kit | partnerdeck=danger-dark-world | first=43 | second=31 | games=32
+option: 34 | deck=yours | partner=danger-dark-world | partnerdeck=danger-dark-world | first=37 | second=31 | games=32
+option: 34 | deck=yours | partner=kozmo | partnerdeck=kozmo | first=31 | second=37 | games=32
+option: 34 | deck=kozmo | partner=danger-dark-world | partnerdeck=danger-dark-world | first=43 | second=25 | games=32
+option: 34 | deck=danger-dark-world | partner=old-gus | partnerdeck=zombies | first=18 | second=50 | games=32
+option: 18 | deck=yours | partner=old-gus | partnerdeck=zombies | first=12 | second=25 | games=32
+option: 18 | deck=kozmo | partner=old-gus | partnerdeck=zombies | first=12 | second=25 | games=32
+
+wall: tag6.0
+option: 71 | deck=fire-king-snake-eye | partner=fire-king-snake-eye | partnerdeck=fire-king-snake-eye | first=62 | second=81 | games=32
+option: 68 | deck=fire-king-snake-eye | partner=kit | partnerdeck=eldlich | first=68 | second=68 | games=32
+option: 62 | deck=eldlich | partner=kit | partnerdeck=fire-king-snake-eye | first=62 | second=62 | games=32
+option: 50 | deck=eldlich | partner=fire-king-snake-eye | partnerdeck=fire-king-snake-eye | first=43 | second=56 | games=32
+option: 46 | deck=yours | partner=kit | partnerdeck=eldlich | first=50 | second=43 | games=32
+option: 31 | deck=yours | partner=fire-king-snake-eye | partnerdeck=fire-king-snake-eye | first=18 | second=43 | games=32
+option: 31 | deck=eldlich | partner=old-gus | partnerdeck=zombies | first=18 | second=43 | games=32
+option: 21 | deck=fire-king-snake-eye | partner=old-gus | partnerdeck=zombies | first=25 | second=18 | games=32
+option: 9 | deck=yours | partner=old-gus | partnerdeck=zombies | first=6 | second=12 | games=32
+
+wall: tag6.1
+option: 65 | deck=fire-king-snake-eye | partner=fire-king-snake-eye | partnerdeck=fire-king-snake-eye | first=56 | second=75 | games=32
+option: 50 | deck=fire-king-snake-eye | partner=kit | partnerdeck=eldlich | first=37 | second=62 | games=32
+option: 46 | deck=fire-king-snake-eye | partner=eldlich | partnerdeck=eldlich | first=43 | second=50 | games=32
+option: 40 | deck=eldlich | partner=eldlich | partnerdeck=eldlich | first=37 | second=43 | games=32
+option: 31 | deck=yours | partner=eldlich | partnerdeck=eldlich | first=18 | second=43 | games=32
+option: 31 | deck=yours | partner=fire-king-snake-eye | partnerdeck=fire-king-snake-eye | first=37 | second=25 | games=32
+option: 28 | deck=eldlich | partner=kit | partnerdeck=fire-king-snake-eye | first=31 | second=25 | games=32
+option: 28 | deck=eldlich | partner=fire-king-snake-eye | partnerdeck=fire-king-snake-eye | first=37 | second=18 | games=32
+option: 21 | deck=yours | partner=kit | partnerdeck=eldlich | first=18 | second=25 | games=32
+option: 18 | deck=eldlich | partner=old-gus | partnerdeck=zombies | first=31 | second=6 | games=32
+option: 3 | deck=fire-king-snake-eye | partner=old-gus | partnerdeck=zombies | first=0 | second=6 | games=32
+option: 0 | deck=yours | partner=old-gus | partnerdeck=zombies | first=0 | second=0 | games=32
+
+wall: tag6.2
+option: 75 | deck=tearlaments | partner=ishizu-tearlaments | partnerdeck=ishizu-tearlaments | first=75 | second=75 | games=32
+option: 75 | deck=tearlaments | partner=kit | partnerdeck=ishizu-tearlaments | first=68 | second=81 | games=32
+option: 71 | deck=ishizu-tearlaments | partner=tearlaments | partnerdeck=tearlaments | first=62 | second=81 | games=32
+option: 68 | deck=tearlaments | partner=kit | partnerdeck=branded-despia | first=56 | second=81 | games=32
+option: 65 | deck=tearlaments | partner=tearlaments | partnerdeck=tearlaments | first=43 | second=87 | games=32
+option: 62 | deck=ishizu-tearlaments | partner=kit | partnerdeck=branded-despia | first=43 | second=81 | games=32
+option: 62 | deck=light-and-darkness | partner=tearlaments | partnerdeck=tearlaments | first=62 | second=62 | games=32
+option: 62 | deck=ishizu-tearlaments | partner=kit | partnerdeck=tearlaments | first=56 | second=68 | games=32
+option: 59 | deck=light-and-darkness | partner=ishizu-tearlaments | partnerdeck=ishizu-tearlaments | first=56 | second=62 | games=32
+option: 59 | deck=ishizu-tearlaments | partner=ishizu-tearlaments | partnerdeck=ishizu-tearlaments | first=50 | second=68 | games=32
+option: 53 | deck=branded-despia | partner=kit | partnerdeck=tearlaments | first=31 | second=75 | games=32
+option: 53 | deck=yours | partner=ishizu-tearlaments | partnerdeck=ishizu-tearlaments | first=56 | second=50 | games=32
+option: 46 | deck=branded-despia | partner=tearlaments | partnerdeck=tearlaments | first=25 | second=68 | games=32
+option: 46 | deck=branded-despia | partner=ishizu-tearlaments | partnerdeck=ishizu-tearlaments | first=31 | second=62 | games=32
+option: 46 | deck=branded-despia | partner=kit | partnerdeck=ishizu-tearlaments | first=37 | second=56 | games=32
+option: 46 | deck=ishizu-tearlaments | partner=eldlich | partnerdeck=eldlich | first=31 | second=62 | games=32
+option: 43 | deck=yours | partner=tearlaments | partnerdeck=tearlaments | first=50 | second=37 | games=32
+option: 43 | deck=tearlaments | partner=eldlich | partnerdeck=eldlich | first=25 | second=62 | games=32
+option: 43 | deck=angelechy | partner=ryzeal | partnerdeck=ryzeal | first=43 | second=43 | games=32
+option: 40 | deck=angelechy | partner=angelechy | partnerdeck=angelechy | first=37 | second=43 | games=32
+option: 40 | deck=branded-despia | partner=eldlich | partnerdeck=eldlich | first=31 | second=50 | games=32
+option: 40 | deck=light-and-darkness | partner=kit | partnerdeck=tearlaments | first=31 | second=50 | games=32
+option: 37 | deck=light-and-darkness | partner=kit | partnerdeck=branded-despia | first=31 | second=43 | games=32
+option: 34 | deck=yours | partner=kit | partnerdeck=tearlaments | first=37 | second=31 | games=32
+option: 34 | deck=tearlaments | partner=old-gus | partnerdeck=zombies | first=18 | second=50 | games=32
+option: 34 | deck=angelechy | partner=kit | partnerdeck=ryzeal | first=43 | second=25 | games=32
+option: 31 | deck=eldlich | partner=ishizu-tearlaments | partnerdeck=ishizu-tearlaments | first=31 | second=31 | games=32
+option: 31 | deck=eldlich | partner=kit | partnerdeck=branded-despia | first=18 | second=43 | games=32
+option: 31 | deck=branded-despia | partner=old-gus | partnerdeck=zombies | first=18 | second=43 | games=32
+option: 28 | deck=eldlich | partner=tearlaments | partnerdeck=tearlaments | first=31 | second=25 | games=32
+option: 28 | deck=eldlich | partner=kit | partnerdeck=tearlaments | first=31 | second=25 | games=32
+option: 25 | deck=yours | partner=kit | partnerdeck=branded-despia | first=31 | second=18 | games=32
+option: 25 | deck=light-and-darkness | partner=eldlich | partnerdeck=eldlich | first=12 | second=37 | games=32
+option: 25 | deck=eldlich | partner=eldlich | partnerdeck=eldlich | first=25 | second=25 | games=32
+option: 25 | deck=ishizu-tearlaments | partner=old-gus | partnerdeck=zombies | first=12 | second=37 | games=32
+option: 25 | deck=thunder-dragon | partner=kit | partnerdeck=angelechy | first=25 | second=25 | games=32
+option: 15 | deck=yours | partner=eldlich | partnerdeck=eldlich | first=12 | second=18 | games=32
+option: 12 | deck=light-and-darkness | partner=old-gus | partnerdeck=zombies | first=0 | second=25 | games=32
+option: 3 | deck=yours | partner=old-gus | partnerdeck=zombies | first=6 | second=0 | games=32
+option: 0 | deck=eldlich | partner=old-gus | partnerdeck=zombies | first=0 | second=0 | games=32

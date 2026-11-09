@@ -1,0 +1,186 @@
+# The Format Library (POST-GAME-PLAN step 3; measured first in Phase 0): 12 cups, each under its anchor ban list
+# (lflists/history.lflist.conf), its pool the cards released by `pool:` (year-month). Same format as circuits.txt;
+# the harness studies read it with `--circuits campaign/library.txt`. Matches in Elo order, the boss last.
+# `local: <character> <deck>` (same syntax as `match:`, 3 per cup): the cup's Locals bracket field beyond its own decks
+# (BRACKETS-SPEC-2026-11-01), checked by `--locals-check`; not matches.
+
+circuit: Goat Cup
+pool: 2005-09
+band: Library
+era: 2005
+banlist: TCG April 2005
+prize: 2500
+match: hollis stall-burn
+match: chaos-yata chaos-yata
+match: brask gadgets
+match: ines goat-control
+local: goat-control goat-control
+local: old-gus stall-burn
+local: tink gadgets
+
+circuit: TeleDAD Cup
+pool: 2009-08
+band: Library
+era: 2009
+banlist: TCG September 2008
+prize: 2500
+match: lightsworn lightsworn
+match: hollis machine-re-volt
+match: blackwing blackwing
+match: teledad teledad
+local: chaos-yata chaos-yata
+local: goat-control goat-control
+local: ines goat-control
+
+circuit: Synchro Peak Cup
+pool: 2012-02
+band: Library
+era: 2012
+banlist: TCG March 2011
+prize: 2500
+match: frog-ftk frog-ftk
+match: infernity infernity
+match: plant-synchro plant-synchro
+match: six-samurai six-samurai
+local: wind-up wind-up
+local: teledad teledad
+local: dino-rabbit dino-rabbit
+
+circuit: Rabbits & Rulers Cup
+pool: 2013-12
+band: Library
+era: 2013
+banlist: TCG September 2012
+prize: 2500
+match: spellbook spellbook
+match: inzektor inzektor
+match: dino-rabbit dino-rabbit
+match: dragon-ruler dragon-ruler
+local: six-samurai six-samurai
+local: wind-up wind-up
+local: teledad teledad
+
+circuit: HAT & Shaddoll Cup
+pool: 2014-12
+band: Library
+era: 2014
+banlist: TCG July 2014
+prize: 2500
+match: qliphort qliphort
+match: burning-abyss burning-abyss
+match: hat hat
+match: shaddoll shaddoll
+local: dragon-ruler dragon-ruler
+local: wind-up wind-up
+local: six-samurai six-samurai
+
+circuit: Nekroz & PePe Cup
+pool: 2016-07
+band: Library
+era: 2016
+banlist: TCG April 2015
+prize: 2500
+match: domain-monarch domain-monarch
+match: performapal performapal
+match: nekroz nekroz
+match: kozmo kozmo
+local: shaddoll shaddoll
+local: hat hat
+local: qliphort qliphort
+
+circuit: ABC to SPYRAL Cup
+pool: 2017-10
+band: Library
+era: 2017
+banlist: TCG March 2017
+prize: 2500
+match: zoodiac zoodiac
+match: true-draco true-draco
+match: spyral spyral
+match: abc abc
+local: kozmo kozmo
+local: shaddoll shaddoll
+local: wind-up wind-up
+
+circuit: Link Dawn Cup
+pool: 2019-09
+band: Library
+era: 2019
+banlist: TCG September 2018
+prize: 2500
+match: altergeist altergeist
+match: sky-striker sky-striker
+match: danger-dark-world danger-dark-world
+match: thunder-dragon thunder-dragon
+local: kozmo kozmo
+local: abc abc
+local: orcust orcust
+
+circuit: TOSS & Eldlich Cup
+pool: 2021-06
+band: Library
+era: 2021
+banlist: TCG June 2020
+prize: 2500
+match: salamangreat salamangreat
+match: orcust orcust
+match: adamancipator adamancipator
+match: eldlich eldlich
+local: thunder-dragon thunder-dragon
+local: rhea thunder-dragon
+local: danger-dark-world danger-dark-world
+
+circuit: Tearlaments Cup
+pool: 2022-11
+band: Library
+era: 2022
+banlist: TCG October 2022
+prize: 2500
+match: floowandereeze floowandereeze
+match: exosister exosister
+match: spright spright
+match: tearlaments tearlaments
+local: ishizu-tearlaments ishizu-tearlaments
+local: eldlich eldlich
+local: bystial-dragon-link bystial-dragon-link
+
+circuit: Kashtira & Snake-Eye Cup
+pool: 2024-04
+band: Library
+era: 2024
+banlist: TCG June 2023
+prize: 2500
+match: purrely purrely
+match: unchained unchained
+match: snake-eye snake-eye
+match: kashtira kashtira
+local: spright spright
+local: exosister exosister
+local: bystial-dragon-link bystial-dragon-link
+
+circuit: Ryzeal Cup
+pool: 2025-05
+band: Library
+era: 2025
+banlist: TCG December 2024
+prize: 2500
+match: maliss maliss
+match: yubel yubel
+match: fire-king-snake-eye fire-king-snake-eye
+champion: ryzeal ryzeal
+local: tenpai-dragon tenpai-dragon
+local: snake-eye snake-eye
+local: unchained unchained
+
+# The "Every Era" final (POST-GAME-PLAN step 10): opens once all 12 cups are cleared, framed by Duchess Ilse. Six
+# rounds in order, each one cup's boss under that cup's list and pool, with a deck you built for it (no loaner, no Ban
+# Passes); a lost round is played again. Its clear pays `finalprize:` and 3 Card Tokens.
+#   round: <cup name> | <character id> <deck>
+final: Every Era
+finalprize: 10000
+round: Goat Cup | ines goat-control
+round: Synchro Peak Cup | six-samurai six-samurai
+round: Nekroz & PePe Cup | kozmo kozmo
+round: Link Dawn Cup | thunder-dragon thunder-dragon
+round: TOSS & Eldlich Cup | eldlich eldlich
+round: Ryzeal Cup | ryzeal ryzeal

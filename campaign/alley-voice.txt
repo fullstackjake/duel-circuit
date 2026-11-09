@@ -1,0 +1,642 @@
+# The Back Alley's voice (docs/dev/ALLEY-STORY-2026-11-01.md; hooks from ALLEY-SPEC section 12).
+# Text can use {card}, {table}, {handle}, and [new] {nick}, {step}. Speaker "opponent" is the CPU you just played [new].
+# Phase A (docs/dev/ALLEY-SPEC-2026-11-01.md section 16): the alley's pools as written in docs/dev/ALLEY-STORY-2026-11-01.md
+# section 5, plus its 31 card taunts. Penny's pools change at penny-lost (before:/after: gates). The van's pools
+# are campaign/van.txt (Phase B). Checked by ShopVoice.Problems with BackAlley.IsVoiceHook.
+
+# ---- Regulars: their own intro, win and lose (spec: regular:intro|win|lose[:<table id>]) ----
+# [new] regular:intro:card:<card name>: a regular's taunt when that card made its handle. Most specific wins.
+# The 31 card taunts are in section 6's table; these are the table fallbacks.
+
+pool: regular:intro
+opponent: Contraband's face up. Read it, then cry about it.
+opponent: I've had this seat since before the lights were up.
+
+pool: regular:intro:dumpster-row
+opponent: Old cards, old tricks. Old tricks work.
+opponent: I've been sitting at this crate since before the lights were up.
+
+pool: regular:intro:basement
+opponent: Mind the dryer. It hits harder than I do. Nearly.
+
+pool: regular:intro:black-market
+opponent: Everything I'm running got banned for being right.
+
+pool: regular:win
+# You lose: the stake stays with them. Any table's, so no crates in these (only Dumpster Row sits on crates).
+opponent: Thanks for the points. Come back and win them back.
+opponent: Good duel. Don't take it personal. I take everybody's points.
+opponent: Tell Baz I said it was close. It wasn't, but tell him.
+opponent: Same time next Friday? I'll keep your seat warm.
+opponent: You nearly had me. Nearly's free down here.
+opponent: Don't look at the card like that. It's staying with me.
+opponent: Shake on it. Win or lose, you shake. Alley manners.
+opponent: Your points are buying me a coffee. I'll think of you.
+
+pool: regular:lose
+# You win their card ({card}).
+opponent: Take it. It liked me better, but take it.
+opponent: {card}'s yours. Don't bother selling it to Moth. Moth won't buy it.
+opponent: Fair's fair. Look after it. It's been good to me.
+opponent: Lost it fair. That's the only way I'd ever let it go.
+opponent: Should've put up a spare. Everybody says that. Nobody does.
+opponent: Go on, put {card} somewhere it'll get played.
+opponent: Keep it sleeved. It's never been out of a sleeve in its life.
+opponent: Baz is going to chalk this. Baz chalks everything.
+
+# The card taunts (section 6): a regular's intro when that card made its handle.
+pool: regular:intro:card:Pot of Greed
+opponent: Own three. Brought one. The other two stay home for luck.
+
+pool: regular:intro:card:Raigeki
+opponent: Line your monsters up nice. Saves me time.
+
+pool: regular:intro:card:Harpie's Feather Duster
+opponent: Set all the backrow you like. I tidy up.
+
+pool: regular:intro:card:Graceful Charity
+opponent: I give. I just give to myself first.
+
+pool: regular:intro:card:Change of Heart
+opponent: Your best monster's coming over to my side. Just for the evening.
+
+pool: regular:intro:card:Monster Reborn
+opponent: Nothing stays in a Graveyard at my crate. Yours or mine.
+
+pool: regular:intro:card:Snatch Steal
+opponent: I'll borrow it. You'll get some Life Points for the trouble.
+
+pool: regular:intro:card:Dark Hole
+opponent: Mine go too. I don't mind. Do you?
+
+pool: regular:intro:card:Premature Burial
+opponent: Buried is just a word. Back for a few Life Points.
+
+pool: regular:intro:card:Heavy Storm
+opponent: Weather's turning. Your backrow first.
+
+pool: regular:intro:card:Black Luster Soldier - Envoy of the Beginning
+opponent: One light, one dark, and a soldier who swings twice.
+
+pool: regular:intro:card:Chaos Sorcerer
+opponent: Pick a monster. Any monster. Now it's gone.
+
+pool: regular:intro:card:Brain Control
+opponent: Cheapest rental in town. Your best, for a few hundred.
+
+pool: regular:intro:card:Witch of the Black Forest
+opponent: Go on, destroy her. She knows people.
+
+pool: regular:intro:card:Sangan
+opponent: Little fella. Big address book.
+
+pool: regular:intro:card:Solemn Judgment
+opponent: Half my Life Points say no.
+
+pool: regular:intro:card:Blackwing - Steam the Cloak
+opponent: Leaves a cloud behind. Leaves you guessing.
+
+pool: regular:intro:card:Goyo Guardian
+opponent: Your monster, my side. I'll take good care of it.
+
+pool: regular:intro:card:Glow-Up Bulb
+opponent: Little bulb. Very bright idea.
+
+pool: regular:intro:card:Level Eater
+opponent: One star. That's all I eat. Every time.
+
+pool: regular:intro:card:Artifact Scythe
+opponent: Extra Deck's closed tonight. Kitchen's shut.
+
+pool: regular:intro:card:Evilswarm Exciton Knight
+opponent: More cards than me? Not for long.
+
+pool: regular:intro:card:Crush Card Virus
+opponent: I'll look at your hand. Then your deck. Then we'll talk.
+
+pool: regular:intro:card:Maxx "C"
+opponent: Summon all you like. I'll be drawing.
+
+pool: regular:intro:card:Call of the Haunted
+opponent: The Graveyard's just a waiting room.
+
+pool: regular:intro:card:Elder Entity Norden
+opponent: Cold in here. Something's coming back.
+
+pool: regular:intro:card:That Grass Looks Greener
+opponent: My Graveyard's about to outgrow your deck.
+
+pool: regular:intro:card:Mirage of Nightmare
+opponent: I draw on your turn. Don't worry about it.
+
+pool: regular:intro:card:Morphing Jar
+opponent: Everybody throws their hand in. Everybody draws five. Very fair.
+
+pool: regular:intro:card:Called by the Grave
+opponent: Called it.
+
+pool: regular:intro:card:Cyber Jar
+opponent: Flip it, and everybody starts over. I like starting over.
+
+# ---- Baz on the versus and the table (spec: tell:<id>, baz:stake, baz:empty, baz:turncap, baz:firstturn, baz:orvel) ----
+
+pool: baz:stake
+baz: Points down against {card}! Shake on it!
+baz: Your points, their {card}. Everybody saw it. That's the contract.
+
+pool: baz:empty
+baz: {handle}'s binder is empty tonight! You're dueling for the chalk!
+baz: Nothing in the binder but dust. The fee's still the fee.
+
+pool: baz:turncap
+baz: TURN FORTY! Bell's rung! Higher Life Points takes it!
+baz: Forty turns! Cards down! Count the Life Points!
+
+pool: baz:firstturn
+baz: Lost before your first turn? Nobody charges for that down here. Pick your stake back up.
+
+pool: baz:orvel
+baz: The House shows its hand! Three cards, and every one of them insured!
+baz: Orvel's Table! Spares only, slabs on the cloth, voices down!
+
+# [new] baz:contraband: Baz over the versus screen's CONTRABAND row (the spec's label).
+pool: baz:contraband
+baz: {handle} is carrying! Three cards, face up, nothing up the sleeves.
+baz: Read the crate, {nick}. That's what's coming.
+baz: {handle} brought {card}. Plan for it, or plan to pay for it.
+baz: Nobody hides contraband down here. Hiding's for upstairs.
+
+# [new] baz:contraband:nyx: Nyx's seats.
+pool: baz:contraband:nyx
+baz: Nyx's crate. Old words. Read them carefully. They mean exactly what they say.
+
+pool: tell:yata-mags
+baz: Mags runs three Chaos Emperors and a crow. Keep a card back for after the wipe.
+
+pool: tell:return-rook
+baz: Rook banishes his own monsters, then brings them home for one big swing. Hit hard before they come back.
+
+pool: tell:mass-driver-moss
+baz: Moss runs a Mass Driver. Bring something for the Graveyard.
+
+pool: tell:trishula-trish
+baz: Trish wants a Synchro for nine. Stop the Tuner and the garden never grows.
+
+pool: tell:gateway-gwen
+baz: Gwen runs three Gateways. Every samurai pays for the next one. Stop the first summon.
+
+pool: tell:master-plan-marlo
+baz: Marlo's whole board starts with one agent. Stop the first search.
+
+pool: tell:gumblar-gail
+baz: Gail links up into a hand rip. Spend your hand before Gail gets there.
+
+pool: tell:scientist-turtle
+baz: Lyle never attacks. Lyle doesn't need to. Count your Life Points, not your monsters.
+
+# [new] Ante moments, beside the results screen's own lines: baz:antewin, baz:antelose, baz:rail, orvel:pays.
+pool: baz:antewin
+baz: {card} changes binders! Chalk it!
+kit: Front page of the binder. It's the rule.
+
+pool: baz:antelose
+baz: The table keeps the points! Better luck, {nick}!
+moth: Points go in the jar. The jar never loses.
+kit: Points are just points. Spares are just spares. That's Fridays.
+
+pool: baz:rail
+power-patron: Into the ledger. {card}, five duels, claim at half again.
+moth: {card}'s on the rail. Five duels on the clock.
+baz: {card} goes on a hook! The clock is running!
+
+pool: orvel:pays
+power-patron: The House pays. Mind the case.
+odile: I checked it twice. The House doesn't get a third look.
+
+# Penny's seat ([new] regular:intro:penny, regular:win:penny).
+pool: regular:intro:penny
+before: penny-lost
+penny: Same card. Same crate. Same luck.
+penny: It's never been on the rail. It doesn't know what the rail looks like.
+
+pool: regular:win:penny
+before: penny-lost
+penny: Still mine. Same time tomorrow?
+
+# After the streak breaks (penny-lost): a fresh Common, night one.
+pool: regular:intro:penny
+after: penny-lost
+penny: New Common. Night one of a new streak.
+penny: This one's shy. It'll warm up.
+penny: Don't mention the old one. This one's sensitive.
+
+pool: regular:win:penny
+after: penny-lost
+penny: Night two! Same time tomorrow?
+penny: There. Now it knows what winning feels like.
+
+# ---- Brackets (spec: mc:<kind>:<round>, stream:<kind>:<round>; kind brawl | midnight) ----
+# Round keys as Bracket.RoundName, lower-case: round-of-16, quarter-final, semi-final, final.
+# [new] mc:upset, mc:out, mc:crowned: any kind, any round. mc:game:<n>: a best-of-three's game n (2, 3), picked once a
+# game; plain mc:game is its fallback for a game-neutral line (none yet).
+
+pool: mc:brawl:quarter-final
+baz: Alley Brawl! Eight names on the slate! Single elimination, no do-overs, no crying on the van!
+baz: {nick} versus {handle}! Shake hands and show your contraband!
+
+pool: mc:brawl:semi-final
+baz: Four left! Half of you are going home! The other half are going to the final!
+
+pool: mc:brawl:final
+baz: The Brawl final! Two names left and one bell!
+
+pool: mc:midnight:round-of-16
+baz: The Midnight Open! Sixteen names! Eyes on the board, hands off the bell!
+baz: {nick} to the crate! {handle}, try to look surprised!
+
+pool: mc:midnight:quarter-final
+baz: Eight left! The slate's getting tidier!
+
+pool: mc:midnight:semi-final
+baz: Four names, two crates, and the top seat watching!
+
+pool: mc:midnight:final
+baz: The Midnight final! Best of three, and it's past two!
+
+pool: mc:game:2
+baz: Game two! Shuffle up, the slate's watching!
+
+pool: mc:game:3
+baz: Game three! All the chalk on one crate!
+
+pool: mc:upset
+baz: UPSET! Somebody owes somebody a coffee!
+baz: Nobody had that on their card! Nobody! I didn't! Chalk it!
+
+pool: mc:out
+baz: That's the {round} for {nick}! Paid at the hatch! Stay and watch, or go home and think about it!
+baz: The chalk stays up, {nick}. Names don't come off my board.
+
+pool: mc:crowned
+baz: Top of the board! Ring it twice!
+
+pool: stream:brawl:quarter-final
+mika: Streaming the Brawl. Chat's already wrong about the seeds.
+
+pool: stream:brawl:final
+mika: Brawl final. Clip it, whatever happens.
+
+pool: stream:midnight:round-of-16
+mika: Midnight Open. Sixteen decks, and half of them aren't legal anywhere. Chat's thrilled.
+
+pool: stream:midnight:semi-final
+mika: Semis. Somebody in chat just said "easy". Ban them.
+
+pool: stream:midnight:final
+mika: Best of three. If you're watching with the sound off, the bell means something happened.
+
+# ---- Headliner commentary (HEADLINERS "The show": the combo, payoff and fizzle moments) ----
+
+pool: baz:combo
+baz: {handle}'S GOING FOR IT! Everybody off the crates!
+baz: Here comes the act! Nobody blink!
+mika: Chat, this is the line. Watch the Graveyard.
+
+pool: baz:payoff
+baz: THERE it is! That's the whole act!
+mika: That's the clip. Clipping it.
+
+pool: baz:fizzle
+baz: FIZZLED at step {step}! Somebody ring the bell! ...I'm the bell!
+baz: The act's cancelled! Everybody sit back down!
+mika: Clean interrupt. Highlights.
+
+# ---- No Limits (docs/dev/NO-LIMITS-STORY-2026-11-02.md section 5; hooks from NO-LIMITS-SPEC section 10.3): the out-of-towners behind Nyx's wall ----
+# pilot:intro|win|lose:<id> (No Limits), pilot:restored:<id> (their own banned card, won), pilot:encore:<id> (the champions'),
+# outoftowner:intro|win|lose:<id> (the Alley Brawl, Alley-legal decks), baz:restored[:<id>] (the versus's UNBANNED row),
+# baz:nolimits, baz:stake:nolimits, mc:brawl:outoftowner, mc:invitational:<round>, stream:invitational:<round>.
+# {card}: the restored card (baz:restored, pilot:restored) or the card won (pilot:lose). "Local" is literal: the
+# out-of-towners' word for you. Gated variants use after:/before: on the No Limits scenes (story.txt's nl-* ids).
+# Remy closes once ready and Junia wildcards (spec section 16, decision 6): Junia's "after: nl-remy" line assumes it.
+
+# ---- Baz behind the wall ----
+
+pool: baz:nolimits
+baz: No Limits! No list, three of anything, and one rule: everybody gets to play!
+baz: Three chairs and the end chair! Mind the pits. They're boarded. I checked twice.
+baz: Voices up! It's a depot! It echoes! I LOVE it!
+
+pool: baz:stake:nolimits
+baz: Your points against {card}! Not a spare, not a slab. The card itself!
+baz: {handle} puts up the card the list took. You put up points. Fairer than the list!
+
+pool: baz:restored
+baz: UNBANNED! {handle}'s got {card}, and not one copy! Three!
+baz: Read that row twice, {nick}. That's what the list took. It's back for the night.
+baz: {card}! Back from the list! Somebody check its pulse!
+
+pool: baz:restored:junia
+baz: Spoils at three! That's what a whole summer looked like!
+pool: baz:restored:remy
+baz: Rotary's back in the deck! It'll be playing on your turn! Everything is!
+pool: baz:restored:anselm
+baz: Habakiri! The blade they took a year too late! It's on time tonight!
+pool: baz:restored:tova
+baz: Detonators, plural! Half the room had one, one winter! Now it's all hers!
+pool: baz:restored:augie
+baz: Noroi's off the lead! It sniffs your hand! Hold it close!
+pool: baz:restored:sasha
+baz: Sangen at full strength! Build it tall, {nick}! It's coming down in one swing!
+pool: baz:restored:imogen
+baz: Albion AND Expulsion! The lead's costume and the trapdoor!
+pool: baz:restored:rue
+baz: Lacrima's back! Every hit you land comes back with interest!
+pool: baz:restored:lux
+baz: Four cards back that the Monday took! Still warm! VERY warm!
+pool: baz:restored:margo
+baz: Every patch, undone! Bring something for the banished, and something for when they come back!
+pool: baz:restored:inka
+baz: Bookmark at three! Every page she needs, and she knows which ones!
+
+# ---- The pilots at No Limits (versus intro; they win; they lose: {card} is yours) ----
+
+pool: pilot:intro:junia
+junia: It's still July at my table. Sit down.
+junia: A list never beat me. You're welcome to try.
+junia: Three of it tonight, Local. Not one. Three.
+
+pool: pilot:intro:junia
+after: nl-oot-junia
+junia: Told you, Local. Three, where I usually play. Here we are.
+
+pool: pilot:intro:junia
+after: nl-junia-beat
+junia: You've sat in my chair. Don't get comfortable. It's still summer.
+
+pool: pilot:intro:junia
+# Once Rotary has sat (wave 2): he closes once ready, and Junia wildcards (decision 6).
+after: nl-remy
+junia: Rotary's got my chair tonight. I've got the rest of the summer.
+
+pool: pilot:win:junia
+junia: Still summer.
+junia: Come back when it's cooler. It won't be.
+
+pool: pilot:lose:junia
+junia: {card}. Look after it. It's had a long summer.
+junia: Hm. That's the first breeze in two years.
+
+pool: pilot:restored:junia
+junia: {card}. The list took it with a memo. You took it with a duel. I prefer yours.
+
+pool: pilot:encore:junia
+junia: Again? Good. Summer's long.
+
+pool: pilot:intro:remy
+remy: Your turn, my turn. Same song.
+remy: One, two. Drop.
+remy: Didn't come for you. Came for the chair.
+
+pool: pilot:intro:remy
+after: nl-remy-beat
+remy: Rematch. I put you on the set list. Top billing. Don't tell Albion.
+
+pool: pilot:win:remy
+remy: Set's over. Tip the DJ.
+remy: You were dancing on my turn. That one's on you.
+
+pool: pilot:lose:remy
+remy: Record skipped. Keep {card}. It's a good track.
+remy: Okay. Okay. Taking that one off the set.
+
+pool: pilot:restored:remy
+remy: {card}. They pulled the record three weeks after its biggest night. Spin it for me.
+
+pool: pilot:encore:remy
+remy: Encore? Crowd asked. I play what the crowd asks.
+
+pool: pilot:intro:anselm
+anselm: In my year, nobody touched me.
+anselm: Every Tribute pays me. Kindly keep giving.
+anselm: They wrote to me late. I don't read late correspondence.
+
+pool: pilot:intro:anselm
+after: nl-anselm-beat
+anselm: You have the date. I have the rest of the calendar. Sit.
+
+pool: pilot:win:anselm
+anselm: As it was in my year.
+anselm: Untouched. Again.
+
+pool: pilot:lose:anselm
+anselm: Outplayed. Briefly. {card} is yours.
+anselm: I'll note the date.
+
+pool: pilot:restored:anselm
+anselm: {card}. They took it a year after it mattered. You took it while it did. Thank you.
+
+pool: pilot:intro:tova
+tova: Tell me you're not on my deck. ...Don't. I'll find out.
+tova: One winter I played myself eleven times in a day.
+tova: Half my wins are filed under somebody else.
+
+pool: pilot:win:tova
+tova: Again.
+tova: Stand back. ...Done.
+
+pool: pilot:lose:tova
+tova: Not a mirror. Finally. Take {card}.
+tova: Different. Better.
+
+pool: pilot:restored:tova
+tova: {card}. Half the room had one, one winter. Now you've got mine, and the room's empty.
+
+pool: pilot:intro:augie
+augie: Show you mine. Then the dogs show me yours.
+augie: Took it, gave it back, took it again. I've stopped unpacking.
+augie: Both hounds tonight, kid.
+
+pool: pilot:win:augie
+augie: Good boys.
+augie: Load-out, kid. Back of the van.
+
+pool: pilot:lose:augie
+augie: Honest hands win. {card}'s yours.
+augie: You won that fair. More than the list did.
+
+pool: pilot:restored:augie
+augie: {card}. The lead's yours now. It comes when it likes.
+
+pool: pilot:intro:sasha
+sasha: After you. Please.
+sasha: Build whatever you like. I'll wait.
+sasha: I've always gone second. It's the best seat in the house.
+
+pool: pilot:win:sasha
+sasha: One turn. Thank you for waiting.
+sasha: Mind the step on your way out.
+
+pool: pilot:lose:sasha
+sasha: After you, then. {card} too.
+sasha: You held something back. Nobody does that.
+
+pool: pilot:restored:sasha
+sasha: {card}. I'd hold the door for it, but it's going with you. After you both.
+
+pool: pilot:intro:imogen
+imogen: Second billing all year. Tonight I'm the lead.
+imogen: Thirteen good notices. Never the opening night.
+imogen: Places, please.
+
+pool: pilot:win:imogen
+imogen: Curtain. And they say I can't carry a show.
+imogen: Top billing. Frame the poster.
+
+pool: pilot:lose:imogen
+imogen: Second again. {card}'s yours. Mind the curtain.
+imogen: Understudy to the understudy. A new low. Bravo.
+
+pool: pilot:restored:imogen
+imogen: {card}. The lead's costume. It never fit me anyway. ...It fit beautifully.
+
+pool: pilot:intro:rue
+rue: Where does it hurt?
+rue: Go on. I've seen worse on a Tuesday.
+rue: Hit me. I'll send it back with notes.
+
+pool: pilot:win:rue
+rue: Keep pressure on it. You'll be fine.
+rue: Every hit you gave me, I gave back. That's all it was.
+
+pool: pilot:lose:rue
+rue: There. You found where it hurts. {card} is yours.
+rue: Don't apologise. I'd be disappointed.
+
+pool: pilot:restored:rue
+rue: {card}. The deck won its biggest weekend without it. It'll manage without me too.
+
+pool: pilot:intro:lux
+lux: Saturday it won. Monday they took four cards. Let's go.
+lux: Not that I'm counting days. I'm counting days.
+lux: Let's see if you're fair. The list wasn't.
+
+pool: pilot:intro:lux
+after: nl-lux-beat
+lux: Better week. Not good. Better. Deal.
+
+pool: pilot:win:lux
+lux: That's for Monday.
+lux: Better. A little better.
+
+pool: pilot:lose:lux
+lux: Saturday, Monday, you. {card}'s yours. It's been a week.
+lux: Fine. Fine. ...Fine.
+
+pool: pilot:restored:lux
+lux: {card}. I wasn't ready to put it down. Turns out nobody asks if you're ready.
+
+pool: pilot:intro:margo
+margo: Ticket's open. Describe the problem.
+margo: Banish it, bring it back. Have you tried that? Try that.
+margo: Patched four times. Still running.
+
+pool: pilot:win:margo
+margo: Resolved. Closing ticket.
+margo: Known issue. The known issue is you.
+
+pool: pilot:lose:margo
+margo: Can't reproduce your fix. {card}'s yours.
+margo: Escalating. To bed.
+
+pool: pilot:restored:margo
+margo: {card}. One of the first things they patched. Keep it running for me.
+
+pool: pilot:intro:inka
+inka: Hold still. I'm drawing you.
+inka: I drew you already. You came out funny.
+inka: Where I'm from, this was the summer's deck. Here they limited it before it landed.
+
+pool: pilot:win:inka
+inka: Last panel. The end.
+inka: Ink's dry. You lost.
+
+pool: pilot:lose:inka
+inka: Not how I drew it. I like yours better. {card}'s yours.
+inka: Redraw. Redraw!
+
+pool: pilot:restored:inka
+inka: {card}. Keep it in the margins. That's where the good bits go.
+
+# ---- The four out-of-towners at the Alley Brawl (Alley-legal decks, one copy of everything; after The Black Market) ----
+
+pool: mc:brawl:outoftowner
+baz: {nick} versus an out-of-towner! {handle}'s carrying, but not playing it! Street rules!
+
+pool: outoftowner:intro:junia
+junia: One copy tonight. Street rules. The rest stays in the toploader.
+pool: outoftowner:intro:junia
+after: nl-wall-opens
+junia: Street rules, Local. You know what I carry behind the wall.
+pool: outoftowner:win:junia
+junia: One copy was plenty.
+pool: outoftowner:lose:junia
+junia: Good. Now come and try it against three.
+
+pool: outoftowner:intro:rue
+rue: Where does it hurt? Nowhere yet. Give it a minute.
+pool: outoftowner:intro:rue
+after: nl-wall-opens
+rue: Street night. The card stays round my neck. You know where it comes off.
+pool: outoftowner:win:rue
+rue: Ice it. You'll be back.
+pool: outoftowner:lose:rue
+rue: Good. Behind the wall, I hit back properly.
+
+pool: outoftowner:intro:sasha
+sasha: After you. One copy each. It's only polite.
+pool: outoftowner:intro:sasha
+after: nl-wall-opens
+sasha: After you. You know where the rest of my deck lives now.
+pool: outoftowner:win:sasha
+sasha: Only one copy, and still one turn. Thank you for waiting.
+pool: outoftowner:lose:sasha
+sasha: You held the door yourself. Well done.
+
+pool: outoftowner:intro:augie
+augie: One hound short tonight, kid. Still got the nose.
+pool: outoftowner:intro:augie
+after: nl-wall-opens
+augie: Street rules. The other hound waits behind the wall.
+pool: outoftowner:win:augie
+augie: Good boy. Just the one tonight.
+pool: outoftowner:lose:augie
+augie: Fair's fair. Come and meet the other one.
+
+# ---- The No Limits Invitational (NL-2, spec section 9; kind invitational; rounds as Bracket.RoundName, lower-case) ----
+
+pool: mc:invitational:round-of-16
+baz: The No Limits Invitational! Sixteen names, three boards, and a depot full of echo!
+baz: {nick} versus {handle}! The alley against out of town! Shake on it!
+baz: The top seat waits for the final! So does {nick}! Somebody's not waiting long!
+
+pool: mc:invitational:quarter-final
+baz: Eight left! Half the out-of-towners are packing their bags! Not into Moth's van! A different van!
+
+pool: mc:invitational:semi-final
+baz: Four names! The depot's never been this quiet! Somebody cough!
+
+pool: mc:invitational:final
+baz: The Invitational final! Best of three! No list, no limits, nobody leaves till it's done!
+baz: Top seat against {nick}! Everybody stand! We need the chairs!
+
+pool: stream:invitational:round-of-16
+mika: Invitational. Chat wants the decklists. Chat, there's no list. That's the whole point.
+
+pool: stream:invitational:quarter-final
+mika: Every deck still in got cut by a list somewhere. Chat says museum. Chat is wrong. It's a zoo.
+
+pool: stream:invitational:semi-final
+mika: Semis. I'm in a doorway with one bar. If the stream drops, assume something amazing.
+
+pool: stream:invitational:final
+mika: Best of three. Kit's on a crate in the doorway, pretending not to watch. Clip that too.

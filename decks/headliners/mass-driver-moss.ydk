@@ -1,0 +1,81 @@
+#created by Duel Circuit - Mass Driver Moss (Frog FTK, 2010)
+#era 2010
+#tier Alley headliner (docs/dev/HEADLINERS-2026-11-01.md)
+#about Substitoad pulls a Frog from the Deck, Mass Driver shoots it for 400, and Ronintoadin comes back on every Frog in the Graveyard: twenty shots and the duel is over on turn 1.
+#why Mass Driver, Ronintoadin and Fishborg Blaster are Forbidden today and Substitoad is at one; under the March 2010 list all were legal at three.
+#source Built from Format Library deck 25656 (decks/history/frog-ftk.ydk): three Mass Driver and three Ronintoadin for Des Frog and Flip Flop Frog, so the loop comes together more often
+#banlist TCG March 2010
+#recipe frog-ftk
+#main
+20663556
+20663556
+20663556
+1357146
+1357146
+1357146
+9126351
+9126351
+9126351
+46239604
+46239604
+46239604
+56840658
+56840658
+56840658
+12538374
+12538374
+12538374
+56052205
+56052205
+56052205
+81278754
+81278754
+49522489
+84451804
+93369354
+34906152
+34906152
+34906152
+2295440
+22123627
+22123627
+22123627
+74519184
+74519184
+74519184
+72892473
+96947648
+96947648
+42703248
+#extra
+29071332
+29071332
+26593852
+07391448
+50321796
+73580471
+44508094
+23693634
+27315304
+42810973
+46195773
+18013090
+74860293
+74860293
+79229522
+!side
+47297616
+47297616
+70095154
+70095154
+20932152
+20932152
+24508238
+24508238
+19613556
+05318639
+60682203
+84290642
+44330098
+87910978
+53582587

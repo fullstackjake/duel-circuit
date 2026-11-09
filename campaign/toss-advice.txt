@@ -1,0 +1,48 @@
+# Measured by `--circuit-study` (src/Ygo.Harness/CircuitStudy.cs): a deck at a circuit match, wins in 100,
+# first= and second= by who took the first turn (the QA stand-in's play, the CPUs as the game makes them).
+# The coin toss's tip for a player bringing that deck there (not the Stuck? advice; the CPUs never read it).
+
+wall: 15.0
+option: 64 | deck=ryzeal | first=53 | second=75 | games=64
+
+wall: 15.1
+option: 34 | deck=ryzeal | first=25 | second=43 | games=64
+
+wall: 15.2
+option: 32 | deck=ryzeal | first=28 | second=37 | games=64
+
+wall: 15.3
+option: 78 | deck=ryzeal | first=75 | second=81 | games=64
+
+wall: 19.0
+option: 62 | deck=tearlaments | first=37 | second=87 | games=64
+
+wall: 19.1
+option: 56 | deck=tearlaments | first=34 | second=78 | games=64
+
+wall: 19.2
+option: 56 | deck=tearlaments | first=40 | second=71 | games=64
+
+wall: 20.0
+option: 78 | deck=tearlaments | first=62 | second=93 | games=64
+
+wall: 20.1
+option: 53 | deck=tearlaments | first=43 | second=62 | games=64
+
+wall: 20.2
+option: 64 | deck=tearlaments | first=34 | second=93 | games=64
+
+wall: 20.3
+option: 43 | deck=tearlaments | first=18 | second=68 | games=64
+
+wall: 21.0
+option: 71 | deck=tearlaments | first=62 | second=81 | games=64
+
+wall: 21.1
+option: 82 | deck=tearlaments | first=81 | second=84 | games=64
+
+wall: 21.2
+option: 57 | deck=tearlaments | first=46 | second=68 | games=64
+
+wall: 21.3
+option: 62 | deck=tearlaments | first=53 | second=71 | games=64

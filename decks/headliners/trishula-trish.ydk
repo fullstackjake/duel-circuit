@@ -1,0 +1,82 @@
+#created by Duel Circuit - Trishula Trish (Plant Synchro, 2011)
+#era 2011
+#tier Alley headliner (docs/dev/HEADLINERS-2026-11-01.md)
+#about Foolish Burial sends Dandylion for two Fluff Tokens, Debris Dragon brings it back, and four monsters make nine: Trishula banishes a card from your hand, your field and your Graveyard. Glow-Up Bulb and Spore come back for whatever Levels are left.
+#why Trishula, Dandylion and Glow-Up Bulb are Forbidden today (Spore and Debris Dragon long limited); in March 2011 Trishula, Glow-Up Bulb and Spore were all legal at three.
+#source Built from Format Library deck 4211 (decks/history/plant-synchro.ydk, YCSPROV11): three Glow-Up Bulb, three Spore, Fishborg Blaster and Tour Guide for the Monarchs, Ryko and some backrow, so nine comes together more often
+#banlist TCG March 2011
+#recipe trishula-trish
+#rating plant-synchro
+#main
+14943837
+14943837
+15341821
+48686504
+48686504
+67441435
+67441435
+67441435
+11747708
+11747708
+11747708
+10028593
+10028593
+10028593
+85087012
+85087012
+26202165
+93369354
+93369354
+10802915
+10802915
+97268402
+97268402
+44330098
+81439173
+2295440
+83764718
+98645731
+98645731
+98645731
+67169062
+53129443
+5318639
+14087893
+97077563
+84749824
+84749824
+53582587
+44095762
+41420027
+#extra
+52687916
+52687916
+52687916
+73580471
+44508094
+76774528
+50321796
+50091196
+50091196
+29071332
+26593852
+25862681
+43385557
+19974580
+79229522
+!side
+70095154
+70095154
+24508238
+24508238
+51119924
+51119924
+71564252
+71564252
+71044499
+29401950
+57139487
+57139487
+60082869
+93016201
+59482302

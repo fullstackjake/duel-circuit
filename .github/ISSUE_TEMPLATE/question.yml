@@ -1,0 +1,40 @@
+name: Question or help
+description: Ask how something works, or get help with installing, card pictures, saves or modding.
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ask anything. There are no silly questions.
+        Many answers are already in the [README](https://github.com/fullstackjake/duel-circuit#install-and-play) and the [guides](https://github.com/fullstackjake/duel-circuit/blob/main/docs/README.md).
+        Found something that doesn't work right? Use the **Bug report** form instead.
+  - type: textarea
+    id: question
+    attributes:
+      label: What are you trying to do?
+      description: Tell us what you want to do, what you tried, and where you got stuck.
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Your computer
+      options:
+        - Windows 10 or 11 (64-bit)
+        - Mac (Apple silicon)
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Game version
+      description: The version at the bottom left of the title screen (for example v0.1.1). Leave it empty if you can't open the game.
+      placeholder: v0.1.1
+  - type: checkboxes
+    id: content
+    attributes:
+      label: Before you send
+      options:
+        - label: My question has no card images or full-card screenshots.
+          required: true

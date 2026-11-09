@@ -1,0 +1,1109 @@
+[
+ {
+  "id": "elfnote",
+  "name": "Elfnote / Power Patron",
+  "year": 2026,
+  "tier": "Pre-list elite / among the most represented",
+  "how": "Elfnote monsters, Medius and Power Patron cards convert compact openings into chains of Synchro and Extra Deck interactions, including lines playable on the opponent’s turn.",
+  "why": "Elfnote placed 10 builds in Houston’s Top 32 including the runner-up. Its important extender Elfnote Tinia was forbidden on October 19.",
+  "formats": [
+   "houston:elfnote"
+  ],
+  "types": []
+ },
+ {
+  "id": "light-and-darkness",
+  "name": "Light and Darkness Ritual / Dark Magician Chaos",
+  "year": 2026,
+  "tier": "Pre-list elite / Houston champion",
+  "how": "Black Chaos, Light and Darkness Ritual and Dark Magician-linked cards form a recursive Ritual-focused engine with multiple directions for follow-up and disruption. Hybrid variants can incorporate Albaz/Branded and Azamina tools.",
+  "why": "Trevor Parker won YCS Houston with the strategy. Magicians’ Souls was subsequently forbidden; the winning configuration cannot simply be copied into the new format.",
+  "formats": [
+   "houston:light-and-darkness-ritual"
+  ],
+  "types": []
+ },
+ {
+  "id": "angelechy",
+  "name": "Angelechy",
+  "year": 2026,
+  "tier": "Pre-list elite / major top-cut presence",
+  "how": "A chess-themed control/Synchro strategy centered on its \"Problem,\" \"Strategy Score,\" and \"Opening to e4\" cards, supported by high-density hand traps and disruption.",
+  "why": "Eight Angelechy variants occupied Houston Top 32 places, including a semifinalist and two other Top 8 finishes.",
+  "formats": [
+   "houston:angelechy"
+  ],
+  "types": []
+ },
+ {
+  "id": "branded-despia",
+  "name": "Branded / Despia",
+  "year": 2026,
+  "tier": "Viable major-event contender",
+  "how": "Fallen of Albaz, Mirrorjade and a broad Fusion toolbox turn the Extra Deck into removal, interruption and Grind-game recursion; Dogmatika and Chaos support permit hybrid builds.",
+  "why": "Reached Houston’s Top 16, but stood below the three dominant families in representation.",
+  "formats": [
+   "houston:branded"
+  ],
+  "types": []
+ },
+ {
+  "id": "yummy",
+  "name": "Yummy",
+  "year": 2026,
+  "tier": "Competitive challenger",
+  "how": "Low-Level monsters and compact Synchro routes let Yummy spend more of its Main Deck on proactive disruption and hand traps than many combo decks can afford.",
+  "why": "A Yummy list reached Houston’s Top 32. Cupsy★Yummy Way was forbidden on October 19, changing the deck’s prospects.",
+  "formats": [
+   "houston:yummy"
+  ],
+  "types": []
+ },
+ {
+  "id": "mitsurugi",
+  "name": "Mitsurugi (pure / hybrid)",
+  "year": 2026,
+  "tier": "Historically relevant 2026 engine / below Houston leaders",
+  "how": "Ritual monsters plus flexible support recycle resources and extend through interaction; the engine also mixes well with other packages, including Chaos Ritual lines.",
+  "why": "Present at high-level Houston tables and as part of evolving hybrid configurations; it should not be treated as a proven standalone top-six post-list strategy. Ame no Habakiri no Mitsurugi was forbidden.",
+  "formats": [
+   "houston:mitsurugi"
+  ],
+  "types": []
+ },
+ {
+  "id": "tearlaments",
+  "name": "Tearlaments",
+  "year": 2022,
+  "tier": "Tier 1 / leading engine",
+  "how": "Milling or sending Tearlaments monsters to the Graveyard triggered Fusion Summons by returning materials to the Deck. Its reactive effects converted ordinary setup into pressure on both turns.",
+  "why": "Tearlaments appeared in 17 of the Top 32 at YCS Minneapolis, including hybrids. The later Ishizu version was far more dominant.",
+  "formats": [
+   "Darkwing",
+   "Elements"
+  ],
+  "types": [
+   "Tearlaments",
+   "Danger! Tearlaments"
+  ]
+ },
+ {
+  "id": "spright",
+  "name": "Spright",
+  "year": 2022,
+  "tier": "Tier 1 / leading engine",
+  "how": "Level/Rank/Link 2 monsters such as Spright Blue, Jet, Gigantic Spright and Spright Elf produced repetitive, consistent starters and interruptions while restricting Special Summon choices.",
+  "why": "Eleven Minneapolis Top 32 lists used Spright cards; two builds combined Spright and Tearlaments.",
+  "formats": [
+   "Darkwing",
+   "Elements"
+  ],
+  "types": [
+   "Spright",
+   "Bystial Spright"
+  ]
+ },
+ {
+  "id": "floowandereeze",
+  "name": "Floowandereeze",
+  "year": 2022,
+  "tier": "Tier 1 counterstrategy",
+  "how": "Chains of Normal Summons, returning banished small birds, and cards like Empen and Dimension Shifter attacked decks that depended on the Graveyard.",
+  "why": "Three decks made the Minneapolis Top 32. Particularly effective at exploiting Tearlaments matchups.",
+  "formats": [
+   "Darkwing",
+   "Elements"
+  ],
+  "types": [
+   "Floowandereeze"
+  ]
+ },
+ {
+  "id": "runick-spright",
+  "name": "Runick Spright",
+  "year": 2022,
+  "tier": "Tier 1 hybrid",
+  "how": "Joined Spright’s Level 2 consistency with Runick Quick-Play Spells and Fountain to gain cards, disrupt actions and banish the opponent’s Deck.",
+  "why": "An important champion-level combination, with Runick Spright visible in the Minneapolis Top 32. It exemplified the era’s interchangeable small engines.",
+  "formats": [
+   "Darkwing",
+   "Elements"
+  ],
+  "types": [
+   "Runick Spright"
+  ]
+ },
+ {
+  "id": "exosister",
+  "name": "Exosister",
+  "year": 2022,
+  "tier": "Tier 1 / anti-meta specialist",
+  "how": "Punished cards moving out of Graveyards, upgraded Level 4 sisters into impactful Xyz monsters, and could banish opposing cards efficiently.",
+  "why": "Won a major 2022 YCS and remained a strong response to Graveyard-centric formats; present in the Minneapolis Top 32.",
+  "formats": [
+   "Darkwing",
+   "Elements",
+   "Despia"
+  ],
+  "types": [
+   "Exosister"
+  ]
+ },
+ {
+  "id": "bystial-dragon-link",
+  "name": "Bystial Dragon Link",
+  "year": 2022,
+  "tier": "High-ceiling competitor / smaller share",
+  "how": "Bystial monsters banished LIGHT/DARK cards from Graveyards while dragon engines linked together extenders, searching and Synchro/Link threats.",
+  "why": "A Dragon Link list and Bystial-based variations made the Minneapolis top cut, but this family was not as prevalent as Tearlaments or Spright.",
+  "formats": [
+   "Darkwing",
+   "Elements"
+  ],
+  "types": [
+   "Bystial Dragon Link",
+   "Dragon Link"
+  ]
+ },
+ {
+  "id": "thunder-dragon",
+  "name": "Thunder Dragon",
+  "year": 2018,
+  "tier": "Tier 1 / most represented",
+  "how": "Discard and banishment triggers generated card advantage, while Thunder Dragon Colossus blocked the opponent from adding cards from the Deck to hand except by drawing.",
+  "why": "Nine of Niagara Falls’ Top 32 lists were Thunder Dragon. The deck checked opponents that relied heavily on searching.",
+  "formats": [
+   "Danger 1",
+   "Secaucus"
+  ],
+  "types": [
+   "Thunder Dragon",
+   "Danger! Thunder Dragon"
+  ]
+ },
+ {
+  "id": "gouki",
+  "name": "Gouki / Warrior Link",
+  "year": 2018,
+  "tier": "Tier 1 / premier combo",
+  "how": "Gouki monsters replaced themselves through Graveyard searches and fueled Link climbing, Extra Link boards, and at times hand-disruption routes.",
+  "why": "Eight of the Top 32 at Niagara Falls played Gouki; the runner-up used it. Its oppressive end boards helped define early Link-era design problems.",
+  "formats": [
+   "Danger 1",
+   "Secaucus"
+  ],
+  "types": [
+   "Gouki",
+   "Danger! Gouki"
+  ]
+ },
+ {
+  "id": "sky-striker",
+  "name": "Sky Striker",
+  "year": 2018,
+  "tier": "Tier 1 / premier control",
+  "how": "A small engine around Raye and multiple Extra Deck forms, powered by Engage, Widow Anchor and three-Spells-in-Graveyard bonuses.",
+  "why": "Four Sky Striker decks reached Niagara Falls Top 32 and the archetype won the event, showing that representation and winning are not identical.",
+  "formats": [
+   "Danger 1",
+   "Secaucus"
+  ],
+  "types": [
+   "Sky Striker"
+  ]
+ },
+ {
+  "id": "danger-dark-world",
+  "name": "Danger! Dark World / Burning Abyss",
+  "year": 2018,
+  "tier": "Tier 1 hybrid family",
+  "how": "Danger! monsters offered reveal-and-discard interactions that often both Special Summoned a body and drew a card, supercharging Graveyard-friendly partners.",
+  "why": "The official Niagara list contained three Danger! Dark World, two Danger! Burning Abyss and one Danger! SPYRAL lists.",
+  "formats": [
+   "Danger 1",
+   "Danger 2"
+  ],
+  "types": [
+   "Danger! Dark World",
+   "Danger! Burning Abyss"
+  ]
+ },
+ {
+  "id": "altergeist",
+  "name": "Altergeist",
+  "year": 2018,
+  "tier": "Strong Tier 1 / Tier 2 depending event",
+  "how": "Trap-centric control around Multifaker, Silquitous and Hexstia repeatedly interrupted opponents while maintaining resources.",
+  "why": "Two Altergeist decks qualified for Niagara Top 32; a dangerous option for players who preferred reactive duel pacing.",
+  "formats": [
+   "Danger 1",
+   "Secaucus"
+  ],
+  "types": [
+   "Altergeist"
+  ]
+ },
+ {
+  "id": "pendulum-magician",
+  "name": "Pendulum Magician",
+  "year": 2018,
+  "tier": "Former Tier 1 / viable by October",
+  "how": "Heavymetalfoes Electrumite helped convert Pendulum cards into searching, recycling and extra resources for a broad Extra Deck.",
+  "why": "One Pendulum deck made the Niagara Top 32. Earlier 2018 variants were more prominent than this late-year result suggests.",
+  "formats": [
+   "Secaucus",
+   "Danger 1",
+   "Magician"
+  ],
+  "types": [
+   "Pendulum Magician",
+   "Odd-Eyes Pendulum Magician",
+   "Odd-Eyes Magician"
+  ]
+ },
+ {
+  "id": "burning-abyss",
+  "name": "Burning Abyss",
+  "year": 2014,
+  "tier": "Tier 1 / most represented",
+  "how": "Dante milled cards to trigger Malebranche Graveyard effects; looping monsters and traps let the deck grind through repeated exchanges.",
+  "why": "Eleven of the 32 Anaheim decks used Burning Abyss. It remained competitively relevant long after 2014.",
+  "formats": [
+   "Burning Abyss",
+   "London",
+   "Shaddoll"
+  ],
+  "types": [
+   "Burning Abyss"
+  ]
+ },
+ {
+  "id": "qliphort",
+  "name": "Qliphort",
+  "year": 2014,
+  "tier": "Tier 1 / major newcomer",
+  "how": "Pendulum Scales repeatedly replaced Tribute material and enabled huge threats such as Apoqliphort Towers, often protected by floodgates.",
+  "why": "Ten Anaheim top-cut decks played Qliphort, making it the most prominent early Pendulum deck of the period.",
+  "formats": [
+   "Burning Abyss",
+   "London"
+  ],
+  "types": [
+   "Qliphort",
+   "Qliphort Stun",
+   "Qliphort Turbo"
+  ]
+ },
+ {
+  "id": "shaddoll",
+  "name": "Shaddoll",
+  "year": 2014,
+  "tier": "Tier 1 / format-defining Fusion deck",
+  "how": "Shaddoll Fusion punished opponents controlling Extra Deck monsters, while Flip and Graveyard effects rewarded both Fusion Summoning and sending material away.",
+  "why": "Nine Anaheim Top 32 lists were Shaddoll. El Shaddoll Construct and Winda shaped how players planned their turns.",
+  "formats": [
+   "Shaddoll",
+   "Burning Abyss",
+   "London"
+  ],
+  "types": [
+   "Shaddoll"
+  ]
+ },
+ {
+  "id": "satellarknight",
+  "name": "Satellarknight / Tellarknight",
+  "year": 2014,
+  "tier": "Tier 1 early on / still viable late",
+  "how": "Deneb–Altair loops created recurring Level 4 bodies to make disruptive Rank 4 Xyz monsters, including Triverr, backed by effective traps.",
+  "why": "Two Tellarknight players qualified for Anaheim Top 32; a measured Xyz-control strategy.",
+  "formats": [
+   "Shaddoll",
+   "London",
+   "Burning Abyss"
+  ],
+  "types": [
+   "Satellarknight",
+   "Artifact Satellarknight"
+  ]
+ },
+ {
+  "id": "geargia",
+  "name": "Geargia",
+  "year": 2014,
+  "tier": "Tier 1 in earlier 2014",
+  "how": "Geargiarmor, Geargiaccelerator and Geargiagear produced repetitive Machine searching and Rank 4 access while sustaining a heavy trap lineup.",
+  "why": "A major first-half strategy rather than a leading November deck; included to represent the entire calendar year.",
+  "formats": [
+   "Fire-Water",
+   "Vegas"
+  ],
+  "types": [
+   "Geargia",
+   "Artifact Geargia"
+  ]
+ },
+ {
+  "id": "hat",
+  "name": "HAT (Hands / Artifacts / Traptrix)",
+  "year": 2014,
+  "tier": "Tier 1 during spring–summer 2014",
+  "how": "Fire Hand and Ice Hand punished destruction, Artifacts forced reactive interaction, and Traptrix provided searches and Trap Hole lines.",
+  "why": "A signature adaptable control shell; displaced by the Shaddoll/Burning Abyss/Qliphort rise later in the year.",
+  "formats": [
+   "HAT",
+   "Vegas",
+   "Fire-Water"
+  ],
+  "types": [
+   "Hand Artifact",
+   "Artifact Traptrix",
+   "Traptrix"
+  ]
+ },
+ {
+  "id": "chaos-yata",
+  "name": "Chaos / Yata-Lock",
+  "year": 2004,
+  "tier": "Historic oppressive strategy",
+  "how": "Chaos Emperor Dragon – Envoy of the End, Sangan/Witch and Yata-Garasu could wipe resources and deny future draws; Chaos builds also used Black Luster Soldier – Envoy of the Beginning.",
+  "why": "A foundational example of why the Forbidden List was necessary. \"Yata-Lock\" describes a particular lock sequence, not every Chaos deck.",
+  "formats": [
+   "Chaos",
+   "Scientist",
+   "Vampire"
+  ],
+  "types": [
+   "Chaos Control",
+   "Yata Lock",
+   "Chaos Return"
+  ]
+ },
+ {
+  "id": "goat-control",
+  "name": "Goat Control",
+  "year": 2005,
+  "tier": "Format-defining Tier 1; enduring retro format",
+  "how": "Scapegoat, Metamorphosis, Thousand-Eyes Restrict and a flexible suite of power spells made a slow, technical resource game.",
+  "why": "Its strategic depth is still celebrated through Goat Format events; generally not described as a modern-style Tier 0 deck.",
+  "formats": [
+   "Goat"
+  ],
+  "types": [
+   "Goat Control"
+  ]
+ },
+ {
+  "id": "teledad",
+  "name": "TeleDAD",
+  "year": 2008,
+  "tier": "Tier 0-like / historically dominant",
+  "how": "Emergency Teleport supplied easy Tuners to a Destiny HERO draw engine and Dark Armed Dragon for powerful removal and finishers.",
+  "why": "Defined a famously expensive and concentrated tournament environment and accelerated the importance of Synchro Summoning.",
+  "formats": [
+   "TeleDAD"
+  ],
+  "types": [
+   "TeleDAD"
+  ]
+ },
+ {
+  "id": "blackwing",
+  "name": "Blackwing",
+  "year": 2009,
+  "tier": "Tier 1",
+  "how": "Black Whirlwind searched a large suite of self-Special-Summoning DARK Winged Beasts while Icarus Attack controlled the board.",
+  "why": "One of the key Synchro-era archetypes; fast, straightforward board development paired with strong removal.",
+  "formats": [
+   "Cat",
+   "TeleDAD"
+  ],
+  "types": [
+   "Blackwing"
+  ]
+ },
+ {
+  "id": "lightsworn",
+  "name": "Lightsworn",
+  "year": 2009,
+  "tier": "Tier 1 / significant rival",
+  "how": "Milling fuelled Judgment Dragon, Wulf and other powerful finishers; the deck traded perfect consistency for explosive ceiling.",
+  "why": "A formative high-variance competitive deck remembered for ending games in a rush of board wipes and Special Summons.",
+  "formats": [
+   "Cat",
+   "Lightsworn"
+  ],
+  "types": [
+   "Lightsworn",
+   "Twilight"
+  ]
+ },
+ {
+  "id": "frog-ftk",
+  "name": "Frog FTK",
+  "year": 2010,
+  "tier": "Explosive competitive combo / format problem",
+  "how": "Substitoad repeatedly sent Frogs to the Graveyard to enable a Mass Driver burn loop that could win on the first turn.",
+  "why": "Historically important as an FTK engine even though a first-turn kill is not the same as a proven Tier 0 share; Substitoad was forbidden.",
+  "formats": [
+   "Frog",
+   "Edison"
+  ],
+  "types": [
+   "Frog FTK",
+   "Frog Monarch",
+   "Frog"
+  ]
+ },
+ {
+  "id": "infernity",
+  "name": "Infernity",
+  "year": 2010,
+  "tier": "Tier 1 combo",
+  "how": "Infernity Archfiend and Infernity Launcher rewarded empty hands with chained searches and Synchro summons.",
+  "why": "An influential precursor to combo decks with enormous first-turn advantage; Launcher restrictions reduced its power.",
+  "formats": [
+   "Edison",
+   "Frog",
+   "Lightsworn"
+  ],
+  "types": [
+   "Infernity"
+  ]
+ },
+ {
+  "id": "six-samurai",
+  "name": "Six Samurai",
+  "year": 2011,
+  "tier": "Tier 1 / early-2011 powerhouse",
+  "how": "Gateway of the Six and Legendary Six Samurai - Shi En made fast swarms and strong Spell/Trap negation possible.",
+  "why": "A favorite of the early 2011 championship field and a major test of how much value a repeatable searching card could produce.",
+  "formats": [
+   "Starstrike",
+   "X-Saber",
+   "Trishula"
+  ],
+  "types": [
+   "Six Samurai"
+  ]
+ },
+ {
+  "id": "plant-synchro",
+  "name": "Plant Synchro",
+  "year": 2011,
+  "tier": "Tier 1 / signature Synchro toolbox",
+  "how": "Lonefire Blossom, Spore, Glow-Up Bulb and Dandylion enabled multiple flexible Synchro lines from Graveyard-friendly materials.",
+  "why": "A gold standard for intricate resource sequencing in the 5D’s period; its core remained influential in later combo decks.",
+  "formats": [
+   "Trishula",
+   "Tengu",
+   "Starstrike"
+  ],
+  "types": [
+   "Plant Synchro",
+   "Tengu Plant",
+   "Plant"
+  ]
+ },
+ {
+  "id": "wind-up",
+  "name": "Wind-Up",
+  "year": 2012,
+  "tier": "Tier 1 / hand-loop threat",
+  "how": "Wind-Up Magician, Shark, Rat and Carrier Zenmaity converted small openings into Rank 3/4 Xyz and repeated Hunter hand destruction.",
+  "why": "A defining 2012 archetype; key restrictions targeted the oppressive hand loop.",
+  "formats": [
+   "Wind-Up",
+   "Dino Rabbit"
+  ],
+  "types": [
+   "Wind-Up"
+  ]
+ },
+ {
+  "id": "inzektor",
+  "name": "Inzektor",
+  "year": 2012,
+  "tier": "Tier 1 / removal engine",
+  "how": "Dragonfly and Centipede equipped Hornet to destroy cards, summon or search additional Inzektors and snowball advantage.",
+  "why": "Feared for converting ordinary engine cards into repeated targeted removal.",
+  "formats": [
+   "Dino Rabbit",
+   "Wind-Up"
+  ],
+  "types": [
+   "Inzektor"
+  ]
+ },
+ {
+  "id": "dino-rabbit",
+  "name": "Dino Rabbit",
+  "year": 2012,
+  "tier": "Tier 1 / Xyz control",
+  "how": "Rescue Rabbit summoned Normal Dinosaurs that became Evolzar Laggia or Dolkka, backed by efficient traps and Tour Guide packages.",
+  "why": "One of the cleanest examples of an Xyz-era control deck with a compact, reliable opening.",
+  "formats": [
+   "Dino Rabbit"
+  ],
+  "types": [
+   "Dino Rabbit"
+  ]
+ },
+ {
+  "id": "dragon-ruler",
+  "name": "Dragon Ruler",
+  "year": 2013,
+  "tier": "Tier 1 and often considered Tier 0-level pressure",
+  "how": "Blaster, Tidal, Tempest and Redox repeatedly revived or searched Dragons, fuelling Rank 7 Xyz, huge boards and relentless recursion.",
+  "why": "Defined 2013 alongside Spellbooks. Won the 2013 North American WCQ, and its capacity to rebuild almost indefinitely made multiple waves of restrictions necessary.",
+  "formats": [
+   "Baby Ruler",
+   "Meadowlands"
+  ],
+  "types": [
+   "Dragon Ruler"
+  ]
+ },
+ {
+  "id": "spellbook",
+  "name": "Spellbook / Prophecy",
+  "year": 2013,
+  "tier": "Tier 1 / opposing pole to Dragon Ruler",
+  "how": "Spellbook of Judgment could add multiple Spellbooks and summon Jowgen to lock out Special Summons.",
+  "why": "The archetypal control foil to Dragon Ruler in one of Yu-Gi-Oh!’s most famous two-deck environments; Judgment was forbidden.",
+  "formats": [
+   "Baby Ruler",
+   "Meadowlands",
+   "Miami"
+  ],
+  "types": [
+   "Spellbook"
+  ]
+ },
+ {
+  "id": "nekroz",
+  "name": "Nekroz",
+  "year": 2015,
+  "tier": "Tier 0-like at launch; sustained Tier 1",
+  "how": "Nekroz of Brionac and Clausolas searched Ritual pieces; Unicore suppressed Extra Deck effects; Trishula punished opposing hands, fields and Graveyards.",
+  "why": "The important missing deck from the original comparison: 22 of 32 duelists at YCS Tacoma played Nekroz, or 68.75% of the top cut. It is a signature Ritual benchmark.",
+  "formats": [
+   "Nekroz",
+   "Charleston"
+  ],
+  "types": [
+   "Nekroz"
+  ]
+ },
+ {
+  "id": "kozmo",
+  "name": "Kozmo",
+  "year": 2015,
+  "tier": "Tier 1",
+  "how": "Small Psychic pilots tagged out into large untargetable Machines; Kozmo Dark Destroyer and Farmgirl enabled sudden removal and OTK pressure.",
+  "why": "A high-impact, thematically distinctive deck whose resilience and fast damage kept it in major events well into 2016.",
+  "formats": [
+   "Clown",
+   "Performapal",
+   "Dracoslayer"
+  ],
+  "types": [
+   "Kozmo"
+  ]
+ },
+ {
+  "id": "performapal",
+  "name": "Performapal Performage (PePe)",
+  "year": 2016,
+  "tier": "Clear Tier 0 moment",
+  "how": "Performapal Monkeyboard, Skullcrobat Joker, Pendulum Sorcerer and Performage Plushfire turned destruction into searches, then swarmed Synchro/Xyz material.",
+  "why": "At YCS Atlanta (Feb. 7), 29 of 32 top-cut lists were Performapal Pendulum variants. An emergency list restricted Plushfire, Damage Juggler and key starters starting Feb. 8.",
+  "formats": [
+   "Performapal"
+  ],
+  "types": [
+   "Performage Performapal",
+   "Performapal",
+   "Performapal Pendulum",
+   "Odd-Eyes Performapal"
+  ]
+ },
+ {
+  "id": "domain-monarch",
+  "name": "Domain Monarch",
+  "year": 2016,
+  "tier": "Tier 1 / anti-Extra-Deck control",
+  "how": "Ehther and Erebus converted tribute summons into enormous tempo swings while Domain of the True Monarchs could deny Extra Deck plays.",
+  "why": "A leading foil to Pendulum strategies; nine or more Monarch variants reached the 2016 North American WCQ Top 32.",
+  "formats": [
+   "Monarch",
+   "Dracoslayer"
+  ],
+  "types": [
+   "Domain Monarch",
+   "Monarch"
+  ]
+ },
+ {
+  "id": "abc",
+  "name": "ABC / Union Hangar",
+  "year": 2016,
+  "tier": "Tier 1 / fusion-control specialist",
+  "how": "Union Hangar supplied A-, B-, and C-Piece resources that assembled ABC-Dragon Buster, a quick banishing boss that could tag back into material.",
+  "why": "One of the most efficient Machine engines of its era and a major post-PePe championship threat.",
+  "formats": [
+   "Invasion",
+   "Grass Zoo",
+   "Monarch"
+  ],
+  "types": [
+   "ABC"
+  ]
+ },
+ {
+  "id": "zoodiac",
+  "name": "Zoodiac",
+  "year": 2017,
+  "tier": "Tier 1, with Tier 0-like peak periods",
+  "how": "A single Zoodiac monster became several Xyz Monsters stacked one atop another, gaining searches, draws and disruption at little initial cost.",
+  "why": "A transformative one-card Xyz engine; eleven pure Zoo lists plus a SPYRAL Zoo hybrid reached YCS Denver Top 32 even after Ratpier had been restricted.",
+  "formats": [
+   "Grass Zoo",
+   "Draco Zoo"
+  ],
+  "types": [
+   "Zoodiac",
+   "Grass Zoodiac",
+   "Grass Zoo"
+  ]
+ },
+ {
+  "id": "spyral",
+  "name": "SPYRAL",
+  "year": 2017,
+  "tier": "Documented Tier 0",
+  "how": "Double Helix and the \"Super Agent\" engine repeatedly searched or revived resources, building oppressive Link boards and sometimes denying most meaningful counterplay.",
+  "why": "An extraordinary 29 of the 32 Top 32 lists at YCS Dallas were SPYRAL (90.6%). One of the clearest documented Tier 0 event snapshots.",
+  "formats": [
+   "SPYRAL"
+  ],
+  "types": [
+   "SPYRAL"
+  ]
+ },
+ {
+  "id": "true-draco",
+  "name": "True Draco",
+  "year": 2017,
+  "tier": "Tier 1 control / enduring floodgate deck",
+  "how": "Tribute Summoning over Continuous Spells or Traps and the Draco search/draw engine let it use floodgates while maintaining resources.",
+  "why": "One of the year’s major non-combo competitors, notable for its ability to fight without conventional Extra Deck dependence.",
+  "formats": [
+   "Draco Zoo",
+   "Link Zoo",
+   "Decode"
+  ],
+  "types": [
+   "True Draco",
+   "True King",
+   "True Draco King"
+  ]
+ },
+ {
+  "id": "orcust",
+  "name": "Orcust",
+  "year": 2019,
+  "tier": "Tier 1 / TOSS pillar",
+  "how": "Harp Horror, Knightmare, Galatea and Dingirsu created accessible DARK Machine Link/Xyz resource loops; many other engines could feed them.",
+  "why": "A quarter-plus of premier-event tops often used Orcust and its hybrids: 12 Orcust variants made YCS Fort Worth Top 32.",
+  "formats": [
+   "TOSS",
+   "Lunalight"
+  ],
+  "types": [
+   "Orcust"
+  ]
+ },
+ {
+  "id": "salamangreat",
+  "name": "Salamangreat",
+  "year": 2019,
+  "tier": "Tier 1 / TOSS pillar",
+  "how": "Gazelle, Spinny, Sunlight Wolf and searchable traps recycled the same small engine across turns, offering reliable interaction and strong follow-up.",
+  "why": "A relatively accessible tournament staple and defining cyberse midrange deck; one of the four groups in the famous TOSS metagame.",
+  "formats": [
+   "TOSS",
+   "Lunalight"
+  ],
+  "types": [
+   "Salamangreat"
+  ]
+ },
+ {
+  "id": "adamancipator",
+  "name": "Adamancipator",
+  "year": 2020,
+  "tier": "Tier 1 / explosive combo",
+  "how": "Rock Tuners excavated the Deck to Special Summon more Rocks; Block Dragon amplified advantage to set up Synchro/Link boards.",
+  "why": "A central peak-2020 strategy, especially in remote-play environments; its consistency and end boards prompted major restrictions.",
+  "formats": [
+   "Adamancipator"
+  ],
+  "types": [
+   "Adamancipator"
+  ]
+ },
+ {
+  "id": "eldlich",
+  "name": "Eldlich",
+  "year": 2020,
+  "tier": "Tier 1 / versatile engine",
+  "how": "Eldlich the Golden Lord and recurring Golden Land/Eldlixir traps made a slow, resilient control deck; later builds added Synchro, Dogmatika or other engines.",
+  "why": "One of the strongest engines of the 2020 era, and an important counterweight to giant combo boards.",
+  "formats": [
+   "Infernoble",
+   "Adamancipator",
+   "Virtual World",
+   "Dragon Link"
+  ],
+  "types": [
+   "Eldlich"
+  ]
+ },
+ {
+  "id": "tri-brigade",
+  "name": "Tri-Brigade",
+  "year": 2021,
+  "tier": "Tier 1 hybrid platform",
+  "how": "Fraktall, Kitt, Nervall and Revolt used Beast/Beast-Warrior/Winged Beast Graveyard resources to summon Link Monsters and banish enemy cards.",
+  "why": "Its compact engine partnered with Zoodiac, Lyrilusc and others to anchor many 2021 top-level lists.",
+  "formats": [
+   "Tri-Brigade",
+   "Dragon Link"
+  ],
+  "types": [
+   "Tri-Brigade",
+   "Tri-Brigade Zoodiac"
+  ]
+ },
+ {
+  "id": "drytron",
+  "name": "Drytron",
+  "year": 2021,
+  "tier": "Tier 1 / Ritual combo",
+  "how": "Drytron monsters used ATK-based Ritual support to cheat conventional Level restrictions and enabled Herald of Ultimateness or other recurring negation threats.",
+  "why": "Became a defining example of how a generic Ritual-support system could enable extreme turn-one control.",
+  "formats": [
+   "Virtual World",
+   "Dragon Link",
+   "Tri-Brigade"
+  ],
+  "types": [
+   "Drytron"
+  ]
+ },
+ {
+  "id": "ishizu-tearlaments",
+  "name": "Ishizu Tearlaments",
+  "year": 2022,
+  "tier": "Documented Tier 0",
+  "how": "Agido/Kelbek milled huge quantities while Keldo/Mudora shuffled Graveyards; combined with Tearlaments’ Fusion triggers to generate huge reactive chains on both turns.",
+  "why": "At YCS Pasadena in November, 26 of 32 top-cut decks used Ishizu Tearlaments (81.25%). This is a much stronger Tier 0 case than the base October 2022 list.",
+  "formats": [
+   "Tearlaments"
+  ],
+  "types": [
+   "Ishizu Tearlaments",
+   "Tearlaments",
+   "Horus Ishizu Tearlaments"
+  ]
+ },
+ {
+  "id": "kashtira",
+  "name": "Kashtira",
+  "year": 2023,
+  "tier": "Tier 1 / often highly concentrated",
+  "how": "Unicorn, Fenrir, Shangri-Ira and Arise-Heart weaponized face-down banishment and sometimes locked Monster Zones.",
+  "why": "A central 2023 tournament deck: 20 of the Top 32 at the 250th YCS Los Angeles were Kashtira.",
+  "formats": [
+   "Kashtira",
+   "Hypernova"
+  ],
+  "types": [
+   "Kashtira"
+  ]
+ },
+ {
+  "id": "purrely",
+  "name": "Purrely",
+  "year": 2023,
+  "tier": "Tier 1",
+  "how": "Small Purrely monsters converted Quick-Play Spells into Xyz material, building large towers-like threats and repeated draws.",
+  "why": "A premier efficient-Xyz deck and a major alternative to Kashtira across several banlist cycles.",
+  "formats": [
+   "Kashtira",
+   "Hypernova"
+  ],
+  "types": [
+   "Purrely"
+  ]
+ },
+ {
+  "id": "unchained",
+  "name": "Unchained",
+  "year": 2023,
+  "tier": "Tier 1 / late-year leader",
+  "how": "Destroying its own cards triggered extenders; link monsters could use opponents’ monsters as materials to remove boards while advancing its own plan.",
+  "why": "Eight Unchained decks made YCS Richmond Top 32, the largest group there.",
+  "formats": [
+   "Overlord"
+  ],
+  "types": [
+   "Unchained"
+  ]
+ },
+ {
+  "id": "snake-eye",
+  "name": "Snake-Eye / Diabellstar",
+  "year": 2024,
+  "tier": "Tier 1 / dominant engine family",
+  "how": "Snake-Eye Ash, Poplar and Flamberge Dragon generated strong one-card sequences, moved monsters into Spell/Trap Zones and supplied resilient Fire Link boards.",
+  "why": "At YCS Raleigh, 20 of the Top 32 decks used Snake-Eye cards across pure and hybrid variants. Dominant, though not automatically a Tier 0 format.",
+  "formats": [
+   "Snake-Eye",
+   "Fire King"
+  ],
+  "types": [
+   "Snake-Eye",
+   "Fiendsmith Snake-Eye"
+  ]
+ },
+ {
+  "id": "fire-king-snake-eye",
+  "name": "Fire King Snake-Eye / Azamina",
+  "year": 2024,
+  "tier": "Tier 1 / key hybrid",
+  "how": "Fire King destruction recursion paired with Snake-Eye/Diabellstar consistency and later Azamina support to create difficult, layered boards.",
+  "why": "An important hybrid and later-year contender; several Fire King Snake-Eye Azamina decks reached YCS Niagara Falls Top 32.",
+  "formats": [
+   "Lacrima",
+   "Fiendsmith"
+  ],
+  "types": [
+   "Azamina Fire King Snake-Eye",
+   "Fire King Snake-Eye"
+  ]
+ },
+ {
+  "id": "yubel",
+  "name": "Yubel",
+  "year": 2024,
+  "tier": "Tier 1",
+  "how": "Yubel forms converted attacks and battle damage into threats for the opponent, backed by modern Fiend combo support and powerful disruption.",
+  "why": "One of the strongest non-Snake-Eye competitors in the second half of 2024, with five Niagara Falls Top 32 decks.",
+  "formats": [
+   "Lacrima",
+   "Fiendsmith"
+  ],
+  "types": [
+   "Yubel",
+   "Fiendsmith Yubel"
+  ]
+ },
+ {
+  "id": "tenpai-dragon",
+  "name": "Tenpai Dragon",
+  "year": 2024,
+  "tier": "Tier 1 / iconic going-second choice",
+  "how": "Tenpai used Battle Phase Synchro effects and protection to dismantle established boards and end duels with extraordinary damage.",
+  "why": "A major exception to modern going-first combo orthodoxy; five Niagara Falls Top 32 lists.",
+  "formats": [
+   "Lacrima",
+   "Fiendsmith"
+  ],
+  "types": [
+   "Tenpai Dragon"
+  ]
+ },
+ {
+  "id": "ryzeal",
+  "name": "Ryzeal / Mitsurugi Ryzeal",
+  "year": 2025,
+  "tier": "Tier 1",
+  "how": "Level 4 access and Rank 4 disruption mixed with Ritual-engine consistency, creating flexible, repeatable starts.",
+  "why": "Ryzeal and its variants led many early-2025 fields; multiple Mitsurugi Ryzeal and Fiendsmith Mitsurugi Ryzeal builds made the 2025 NAWCQ Top 32.",
+  "formats": [
+   "Maliss",
+   "Ryzeal"
+  ],
+  "types": [
+   "Mitsurugi Ryzeal",
+   "Ryzeal Mitsurugi",
+   "Ryzeal"
+  ]
+ },
+ {
+  "id": "maliss",
+  "name": "Maliss / @Ignister Maliss",
+  "year": 2025,
+  "tier": "Tier 1",
+  "how": "Cyberse Link engines exploited banish-based Maliss effects, combining recursive extension with difficult-to-trade-through interaction.",
+  "why": "Ten Bystial @Ignister Maliss decks reached the 2025 North American WCQ Top 32; an elite mid-2025 engine.",
+  "formats": [
+   "Maliss",
+   "Justice"
+  ],
+  "types": [
+   "Maliss",
+   "Fiendsmith Maliss"
+  ]
+ },
+ {
+  "id": "k9-vanquish-soul",
+  "name": "K9 Vanquish Soul",
+  "year": 2025,
+  "tier": "Tier 1 / late-2025 headline",
+  "how": "Vanquish Soul revealed monster Attributes in hand for tailored interactions, while K9 pieces improved consistency and pressure.",
+  "why": "Twelve of YCS Vancouver’s Top 32 decks used K9 Vanquish Soul, the biggest grouping at that event.",
+  "formats": [
+   "Justice",
+   "Mjollnir"
+  ],
+  "types": [
+   "K9 Vanquish Soul",
+   "Vanquish Soul"
+  ]
+ },
+ {
+  "id": "dark-magician-chaos-ritual",
+  "name": "Dark Magician Chaos Ritual",
+  "year": 2026,
+  "tier": "October 2026 TCG meta",
+  "how": "Dark Magician and the Chaos Rituals: Ragged Records of Rites finds the Ritual pieces, Dark Magical Curtain and Gaze of Timaeus bring Dark Magician and its Fusions.",
+  "why": "8.0% of TCG tops in October 2026 (yugiohmeta), the third most-topped deck, and second at the Santo Domingo Regional after the October 19 list.",
+  "formats": [
+   "oct2026:dark-magician-chaos-ritual"
+  ],
+  "types": []
+ },
+ {
+  "id": "chaos-ritual",
+  "name": "Chaos Ritual",
+  "year": 2026,
+  "tier": "October 2026 TCG meta",
+  "how": "Black Luster Soldier and Black Chaos Rituals with Fallen of Albaz Fusions: Ragged Records and Light and Darkness Ritual into Super Polymerization and Dogmatika boards.",
+  "why": "4.3% of TCG tops in October 2026 (yugiohmeta); won Foggia in September. Called by the Grave and Albion were forbidden on October 19, swapped here.",
+  "formats": [
+   "oct2026:chaos-ritual"
+  ],
+  "types": []
+ },
+ {
+  "id": "blitzclique",
+  "name": "Blitzclique",
+  "year": 2026,
+  "tier": "October 2026 TCG meta",
+  "how": "Thunder monsters that Special Summon themselves from the hand by destroying Spells and Traps, backed by Hideout in the Sky, Coulomb and Dogmatika Fusions.",
+  "why": "3.7% of TCG tops in October 2026 (yugiohmeta), the sixth most-topped deck.",
+  "formats": [
+   "oct2026:blitzclique"
+  ],
+  "types": []
+ },
+ {
+  "id": "artmage",
+  "name": "Artmage",
+  "year": 2026,
+  "tier": "October 2026 TCG meta",
+  "how": "Artmage and Power Patron Fusions: Quick Effect Fusions from Artmage Power Patron, Pendulum Treasure and Super Polymerization, with Ars Magna Spells.",
+  "why": "2.8% of TCG tops in October 2026 (yugiohmeta); won the South Park Regional after the October 19 list.",
+  "formats": [
+   "oct2026:artmage"
+  ],
+  "types": []
+ },
+ {
+  "id": "radiant-typhoon",
+  "name": "Radiant Typhoon",
+  "year": 2026,
+  "tier": "October 2026 TCG meta",
+  "how": "Wind monsters built around Mystical Space Typhoon: Eldam and Swen summon themselves, and Radiant Typhoon Spells set themselves again when MST destroys them.",
+  "why": "2.2% of TCG tops in October 2026 (yugiohmeta); won Klein Ronnau and Linz in late October.",
+  "formats": [
+   "oct2026:radiant-typhoon"
+  ],
+  "types": []
+ },
+ {
+  "id": "sacred-beast",
+  "name": "Sacred Beast",
+  "year": 2026,
+  "tier": "October 2026 TCG meta",
+  "how": "Hamon, Raviel and Uria brought out fast by Martyr of the Sacred Beasts, Sacred Beasts Released and the Fiendsmith engine.",
+  "why": "2.2% of TCG tops in October 2026 (yugiohmeta); second at Donnezac in September.",
+  "formats": [
+   "oct2026:sacred-beast"
+  ],
+  "types": []
+ },
+ {
+  "id": "lunalight",
+  "name": "Lunalight",
+  "year": 2026,
+  "tier": "October 2026 TCG meta",
+  "how": "Lunalight Fusions: Gold Leo and Tri-Brigade Fraktall feed Perfume Dancer and Leo Dancer, with Fire Formation - Tenki and Forbidden Droplet.",
+  "why": "1.5% of TCG tops in October 2026 (yugiohmeta); won Footscray in September. Called by the Grave, Triple Tactics Talent and Dugares were forbidden on October 19, swapped here.",
+  "formats": [
+   "oct2026:lunalight"
+  ],
+  "types": []
+ },
+ {
+  "id": "mermail-atlantean",
+  "name": "Mermail Atlantean",
+  "year": 2026,
+  "tier": "October 2026 TCG meta",
+  "how": "Atlanteans discard Water monsters for value and Mermail Abyssteus searches them, ending on Poseidra Abyss and Rank 7 Xyz.",
+  "why": "1.2% of TCG tops in October 2026 (yugiohmeta); won the Burnaby Regional in October.",
+  "formats": [
+   "oct2026:mermail-atlantean"
+  ],
+  "types": []
+ },
+ {
+  "id": "power-patron",
+  "name": "Power Patron",
+  "year": 2026,
+  "tier": "October 2026 TCG meta",
+  "how": "Power Patron Pendulums with Medius the Pure and Shade the Obscure, Prohibited Power Patron Portal - Terminus and Pendulum Treasure.",
+  "why": "1.2% of TCG tops in October 2026 (yugiohmeta); second at Genova in September. Called by the Grave, Triple Tactics Talent and Albion were forbidden on October 19, swapped here.",
+  "formats": [
+   "oct2026:power-patron"
+  ],
+  "types": []
+ },
+ {
+  "id": "magistus-fairy-tail",
+  "name": "Magistus Fairy Tail",
+  "year": 2026,
+  "tier": "October 2026 TCG meta",
+  "how": "Magistus Spellcasters with the Fairy Tail engine: Spenta searches, Fairy Tail - Luna bounces, and Magistus Fusions and Links protect the board.",
+  "why": "1.2% of TCG tops in October 2026 (yugiohmeta); won Amadora in September. Called by the Grave was forbidden on October 19, swapped here.",
+  "formats": [
+   "oct2026:magistus-fairy-tail"
+  ],
+  "types": []
+ },
+ {
+  "id": "dracotail",
+  "name": "Dracotail",
+  "year": 2026,
+  "tier": "October 2026 TCG meta",
+  "how": "Dracotail Fusions from the hand at Quick-Effect speed (Faimena), with the End Dragons and Dracotail Spells and Traps set from the deck.",
+  "why": "1.2% of TCG tops in October 2026 (yugiohmeta); second at Belo Horizonte in August.",
+  "formats": [
+   "oct2026:dracotail"
+  ],
+  "types": []
+ }
+]

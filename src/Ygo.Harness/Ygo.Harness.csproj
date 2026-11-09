@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Ygo.Harness</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ygo.Engine\Ygo.Engine.csproj" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.20" />
+  </ItemGroup>
+
+  <!-- The native rules engine built from vendor/ygopro-core (see README). -->
+  <ItemGroup>
+    <None Include="..\..\vendor\ygopro-core\build\libocgcore.dylib" Condition="Exists('..\..\vendor\ygopro-core\build\libocgcore.dylib')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>libocgcore.dylib</Link>
+    </None>
+  </ItemGroup>
+
+</Project>

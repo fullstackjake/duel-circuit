@@ -1,0 +1,381 @@
+# The shop's lines: pools of lines, one picked each time its hook fires (docs/dev/SHOP-VOICE-2026-11-01.md).
+#   pool: <hook>           starts a pool (the hooks are listed below)
+#   after: <scene id>      the pool plays only once that story scene has been seen (Profile.Seen); repeatable, all must hold
+#   before: <scene id>     ...and stops once that scene has been seen
+#   band: <band>[+]        only while your newest open circuit is in that band ("+": that band or any later one)
+#   <speaker>: <text>      a line, as in story.txt: a character id, or "-" for a shop label; [era] / [open] work too
+# Text can use {card}, {rarity}, {opponent}, {opponents}, {deck}, {year}, {packs} and {circuit}.
+# A hook with several eligible pools draws from all of them. A more specific hook (pull:opponent:old-gus) wins over
+# the general one (pull:opponent).
+
+pool: header
+-: GUS'S CARDS
+
+# Small talk from the first tables. Not in New Game+ (it has its own pool).
+pool: footer
+band: Beginner
+before: champion
+old-gus: Prices are on the tags. Nobody haggles here. Ask Brask. He tried.
+old-gus: Open your packs over the mat. Last kid who didn't is still looking for a foil under the radiator.
+old-gus: Ryo bought six packs yesterday and wrote down every pull. Even the commons.
+old-gus: Tink keeps the wrappers. I've stopped asking what for.
+old-gus: Vera only buys a pack after she wins. Says it's better that way.
+old-gus: Coffee's for paying customers. ...Fine. Have a cup.
+
+# Any time.
+pool: footer
+old-gus: Sleeves are by the register. A card you're going to play deserves one.
+old-gus: Back in '04, this whole shop was one folding table and a shoebox of packs.
+old-gus: Don't lean on the glass case, kid. It's older than you and less forgiving.
+old-gus: A pack's a maybe. A card in your deck is a yes. Know which one you're paying for.
+old-gus: Commons win more duels than anybody admits.
+
+pool: footer
+after: tag-night
+old-gus: Friday nights I sell more sleeves than packs. Tag duelists are nervous people.
+old-gus: That's Kit at the next table. Same binder of spares every night. I've never seen the bottom of it.
+kit: Gus says he doesn't sort the commons. Gus sorts the commons.
+
+pool: footer
+after: novice
+old-gus: The regional crowd shops here now. They buy by the box and complain by the pack.
+old-gus: A kid from the regional asked if I stock frogs. I said this is a card shop.
+old-gus [era]: Hollis made me tape the list to the register. Now people read it instead of paying.
+
+pool: footer
+after: intermediate
+old-gus: Synchro kids. They buy one Tuner and ask me to find them a deck that goes with it.
+old-gus: Haven't seen this many out-of-towners since the shop had carpet.
+
+pool: footer
+after: advanced
+old-gus: Wren came by. Bought one pack and took an hour to open it.
+
+pool: footer
+after: golden-age-clear
+old-gus: Ines used to buy the last pack on the shelf just so I couldn't.
+
+# Seraph (a guest once the Advanced band is cleared, at expert): planted before, met after (seraph-table).
+pool: footer
+after: golden-age-clear
+before: expert
+old-gus: A traveling pro came by asking about you. Violet cloak. Didn't buy anything.
+
+pool: footer
+after: seraph-table
+old-gus: That pro in the cloak asked for tea again. I've started keeping a box. Don't tell anyone.
+
+pool: footer
+after: rhea-table
+old-gus: Rhea bought a pack and opened it at the tag table. Said it was luckier there. It wasn't.
+
+pool: footer
+after: expert
+old-gus: These days half my sales are cards that stop other cards. Back in my day, we had walls.
+old-gus: Vera's been in every day since the Expert Series opened. Says she's just browsing.
+
+pool: footer
+after: master
+old-gus: Master League folks come in to see where you started. I point at the table by the window.
+
+pool: footer
+after: october-list
+old-gus: New list went up on the wall. Half my case dropped in price overnight. The other half doubled.
+
+pool: footer
+after: champion
+old-gus: The champion's discount is zero percent. I checked.
+old-gus: People ask which table the champion sat at. I've started charging. Not really. ...A little.
+
+pool: footer
+after: library-opens
+old-gus: Hollis only comes out of that back room for coffee and receipts.
+
+pool: footer
+after: cup-goat-clear
+old-gus: Ines came in and bought a 2005 pack. Didn't open it. Just looked at it a while.
+
+pool: footer
+after: every-era-corkboard
+old-gus: Customers keep asking whose name is over mine on the board. I tell them: a regular.
+
+# The Back Alley (docs/dev/ALLEY-STORY-2026-11-01.md section 5): Gus's quiet disapproval. No lecture, ever.
+pool: footer
+after: alley-upstairs
+before: held-card-home
+old-gus: Chalk comes off with a damp cloth. Not that I'd know.
+old-gus: Back door sticks. Never fixed it. Never will.
+old-gus: Moth still parks that van by the bins? Huh. Don't tell Moth I asked.
+old-gus: Friday nights, nobody buys sleeves. They're all out back with their spares.
+
+pool: footer
+after: tag-night
+after: alley-kit
+kit: Where do my spares come from? Fridays. Where do they go? Also Fridays.
+
+pool: footer
+after: vera-ante
+old-gus: Vera's gone quiet about Fridays. I haven't asked. She hasn't told me.
+
+pool: footer
+after: held-card-home
+old-gus: Back door doesn't stick anymore. Kit says it's too quiet now.
+old-gus: Ines bought a sleeve today. One sleeve. Said she had a card that needed it.
+
+# The alley's and No Limits' titles, heard from upstairs (STORY-REVIEW-2026-11-06, structure F5).
+pool: footer
+after: midnight-open-win
+old-gus: Somebody chalked MIDNIGHT on my back step. Damp cloth's under the counter.
+
+pool: footer
+after: nl-clear
+hollis: A whole table of two-date cards. I've run out of column.
+
+# New Game+: the shop knows you.
+pool: footer
+after: new-game-plus
+old-gus: Regulars keep pointing at your name on the board, then at you. I've stopped explaining.
+old-gus: Second lap. Prices haven't changed. Neither have I.
+
+pool: footer
+after: new-game-plus
+after: tag-night
+kit: Second lap? I'm counting. I count everything.
+
+pool: footer
+after: new-game-plus
+band: Beginner
+old-gus: The rookies want to know why the new kid's binder is already full. I tell them to keep buying.
+
+# No Limits (docs/dev/NO-LIMITS-STORY-2026-11-02.md section 5): the depot, heard from upstairs. Gus and Hollis never go down.
+pool: footer
+after: nl-wall-opens
+old-gus: You smell like diesel. That's new.
+old-gus: Three of anything, I hear. In 2004 we had three of anything too. We just didn't have anything.
+vera: THREE of anything? ...I'm not anteing. I'm asking. There's a difference.
+hollis: Every deck from behind that wall has a month on it. Its best month. I've started a column.
+
+# Kit's lines wait for Tag Night (SHOP-REWORK-SPEC section 6), so Kit's are their own pools.
+pool: footer
+after: tag-night
+after: nl-wall-opens
+kit: I hold the door down there. Only job behind that wall that needs no spares.
+
+pool: footer
+after: tag-night
+after: nl-restored
+after: held-card-home
+kit: Somebody upstairs lost a card fair once. Took twenty-one years to come back. Theirs take a night.
+
+pool: kit-hello
+kit: Don't mind me. Kit, next table over. I watch everybody's pulls.
+
+pool: pull:ultra
+old-gus: There's the shiny one. Sleeve it before Tink asks what it's made of.
+old-gus: {rarity}. That pack just paid for itself. Don't tell the next three.
+
+pool: pull:ultra
+after: tag-night
+kit: Ooh. That one gets the front page of the binder. Don't argue, it's the rule.
+
+pool: pull:secret
+old-gus: {rarity}. Hold it by the edges, kid. I've got a case for those.
+old-gus: Pulled my first Secret in '04 and didn't play it for a year. Don't be me.
+
+pool: pull:secret
+after: tag-night
+kit: No way. Hold it still, I want to see the foil under the light.
+
+pool: pull:ultimate
+old-gus: Run your thumb over it. They printed those to be felt, not just looked at.
+
+pool: pull:collectors
+old-gus: Collector's Rare, they call it. I call it a card. Play it.
+
+pool: pull:ghost
+old-gus: {rarity}. I've sold three of those since they started printing them. That makes four.
+
+pool: pull:ghost
+after: tag-night
+kit: Is that a Ghost? It is. Okay. Give me a second.
+
+pool: pull:quarter-century
+old-gus: Quarter Century. Twenty-five years of cards, and the anniversary lands in your pack.
+
+pool: pull:starlight
+old-gus: ...Starlight. Don't move. I'm getting the good sleeve.
+
+pool: pull:starlight
+after: tag-night
+kit: Starlight. I've only ever seen one at a regional, behind glass.
+
+# A key card of an upcoming opponent. Kit scouts; Gus covers before Tag Night.
+pool: pull:opponent
+after: tag-night
+kit: That's in {opponent}'s deck. Nice to see one from this side of the table.
+kit: {card}. I watched that card win a game for {opponent}. Twice.
+kit: Somewhere, {opponent} just felt a chill.
+kit: That copy's worth a lot to {opponent}. Don't trade it.
+kit: Remember that one. You'll see it again, across the table from {opponent}.
+kit: Pulling {opponent}'s cards before you face {opponent}. That's either scouting or a sign.
+kit: That's a page out of {opponent}'s deck. Read it before it gets read to you.
+
+pool: pull:opponent
+before: tag-night
+old-gus: That's {opponent}'s kind of card, kid. Better in your binder than across the table.
+old-gus: Same card {opponent} bought off this counter last month. Small town.
+
+# The main cast, by id (these win over pull:opponent).
+pool: pull:opponent:old-gus
+old-gus: That's out of my own deck, kid. Sold it to you anyway. Fair's fair.
+
+pool: pull:opponent:vera
+after: tag-night
+kit: Vera plays that. Don't let her see you pull it. She'll want a rematch before it's sleeved.
+
+pool: pull:opponent:hollis
+after: tag-night
+kit: That's one of the Professor's. He'll ask which pack it came from. For his notes.
+
+pool: pull:opponent:tink
+after: tag-night
+kit: That's a Tink part. Tink's going to want the wrapper too.
+
+# A card your active recipe is missing (a new copy toward it), or a new copy or upgrade of a card in your deck.
+pool: pull:recipe
+old-gus: That's the one your deck was waiting on. The pack earned its price.
+
+pool: pull:recipe
+after: tag-night
+kit: One off the recipe. Cross it out.
+
+pool: pull:deck
+old-gus: That one already has a seat in your deck. Good. A card earns its price by getting played.
+
+pool: pull:deck
+after: tag-night
+kit: You run that, right? Now you've got a spare. That's how a binder starts.
+
+pool: prize-pull
+hollis: Ah. I'd hoped that one would find you. Noted.
+hollis: A fine pull. I'd like to claim I planned it. Statistics won't let me.
+
+# The first visit: the shop's opening stock.
+pool: arrival:2005
+old-gus: Everything on the wall's from 2005 or before. Good year. Best one, if you ask me.
+
+pool: arrival:2011
+old-gus: 2011 boxes came in this morning. Mind the frogs.
+
+pool: arrival:2015
+old-gus: Truck came in. 2015 stock's up front. Don't open it all at the counter.
+
+pool: arrival:2019
+old-gus: 2019 boxes, just in. Half the cards point arrows at each other. Ask Hollis, not me.
+
+pool: arrival:2023
+old-gus: 2023 stock's out. These cards have more words on them than my lease.
+
+pool: arrival:2026
+old-gus: 2026, kid. Same as the calendar. You've caught up.
+
+# The years between, one a level.
+pool: arrival
+old-gus: A few {year} boxes came in. Top shelf, left side.
+old-gus: Found some {year} stock in the back. Priced it fair.
+old-gus: {year}'s on the shelf now. Open it over the mat.
+
+pool: house-pack:name
+-: House Pack: {deck}
+
+# The description line (detail panel and list row), with the deck's players from circuits.txt.
+pool: house-pack:about
+-: Gus's own repack of {opponents}'s deck, bagged at the counter.
+
+# When Old Gus is among the deck's players (Legendary Dragons, Undead Legion).
+pool: house-pack:about-gus
+-: Gus's own repack of his deck. He swears he kept nothing back.
+
+pool: shelf:Beginner Circuit
+old-gus: Ryo built a whole deck off this shelf, one allowance at a time. Brask bought the same packs in one go.
+
+pool: shelf:Rookie Cup
+old-gus: Tink's machines and Brask's both came out of these boxes. So did my dragons. No shame in it.
+
+pool: shelf:Town Tournament
+old-gus: My zombies, Tink's walls, Vera's warriors. All this shelf. Vera bought most of it.
+
+pool: shelf:Regional Qualifier
+old-gus: Hollis built his walls out of these packs and a library card. Vera borrowed my zombies. Same shelf.
+
+pool: shelf:Underdog Open
+kit: Ribbit Ruiz cleaned this shelf out once. Isamu Tokiwa bought what was left and bowed to the register.
+
+pool: shelf:Trap Masters Cup
+kit: Gears, traps and one little rat. Ostrand swears he never opened a pack in his life. These say otherwise.
+
+pool: shelf:Small Engines Invitational
+kit: Small monsters, every one. Pip bought these for the cat art and kept winning anyway.
+
+pool: shelf:Synchro Dawn Classic
+old-gus: Damon Vey's dragon, Kestrel's birds. In 2009, every table in town ran something off this shelf.
+
+pool: shelf:Xyz and Link Regionals
+kit: Bunny Rex's rabbit, Hornet Vale's bugs, QL-1's machines. Coach Gouki just buys these for the wrestlers.
+
+pool: shelf:Link Age Open
+kit: Ace Raye runs one monster and a pile of spells. Every one of those spells is on this shelf.
+
+pool: shelf:Golden Age Championship
+old-gus: Wren's goats, Corvus's crow, Ignatia's dragons. I sold these packs the first time around.
+
+pool: shelf:Control Kings Cup
+kit: King Barrund won't be seen buying packs. Bea's in here every week for parts.
+
+pool: shelf:Hybrid Engines Invitational
+kit: Celandine, Sorrel, Annick, Rex. Four engines that bolt onto anything. The bolts are on this shelf.
+
+pool: shelf:Expert Series: Shadows and Storms
+kit: Nadia buys strings here. Captain Mae buys ships. Tock buys one pack, then asks to see it again.
+
+pool: shelf:Expert Series: Rituals and Fire
+kit: Sotelo's fleet and Kenta's dragons both go off in one turn. Every piece of both turns is on this shelf.
+
+pool: shelf:Expert Series: The New Wave
+kit: The Castell twins bought two of everything on this shelf. Of course they did.
+
+pool: shelf:Expert Series: Fall Format
+kit: Nobody preps for the rogue decks. That's why this shelf is still full.
+
+pool: shelf:Master League: Link Wars
+old-gus: Aurum's gold, Volta's storms. I sold out of these twice the year they came out.
+
+pool: shelf:Master League: Graveyard Kings
+kit: Coralie fills her Graveyard. Pilar sends yours away face-down. Both decks are on this shelf.
+
+pool: shelf:Master League: Houston 2026
+kit: Houston's top tables, a month old, and already on Gus's shelf. That's how you know it's real.
+
+pool: shelf:Master League: October 2026
+old-gus: New list, new decks. I put these out the morning it went up. Jolt was waiting at the door.
+
+pool: shelf:Tier 0 Gauntlet
+old-gus: Everything those four play is on this shelf. Whatever you buy tonight, buy it to play.
+
+pool: back-shelves
+old-gus: Everything else I've got, by year. The dust is free.
+
+pool: box
+old-gus: A whole box? Sit down, then. I'll get you a bin for the commons.
+old-gus: {packs} packs. Open them slow, kid. A box only gets opened once.
+
+pool: box
+after: tag-night
+kit: Box night! I'll sort your commons. Just the commons. ...Mostly.
+
+pool: box-best
+old-gus: There's the one the box promised. Everything else was your own luck.
+
+pool: odds
+old-gus: Odds are printed on the wrapper. I can't change them, and I wouldn't.
+old-gus: Same odds for everybody, me included. I've checked.

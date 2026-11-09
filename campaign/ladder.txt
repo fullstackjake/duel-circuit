@@ -1,0 +1,31 @@
+# The Champion's Ladder (docs/dev/CHAMPIONS-LADDER-SPEC-2026-11-06.md): "Past the binders", a plaque below the Every Era plaque.
+# Rungs are listed from the bottom. Each holder plays their rung's deck at skill 1.0 (Ladder.Opponent), whatever their
+# profile says. You climb one rung at a time: beat the holder of the rung above yours and you take it. No falling in v1.
+#   opens: <character>          the ladder opens once the Every Era final is won and you've beaten this character once
+#   prize: <DP>                 the top rung's prize, paid once ever (plus Ladder.TopTokens Card Tokens and the poster)
+#   rung: <character> <deck>[, <deck>...]
+#                               more than one deck: one sitting, every deck in order (a loss or a draw starts it over)
+#   visitors: <alley bracket kind>
+#                               the visitors arrive once you hold that bracket's title (invitational: the No Limits Invitational)
+#   visitor: <character> <deck> one at a time, in this order, each taking the rung above yours until you beat them
+# The roster and the numbers are [PLACEHOLDER] until the tuning pass (spec section 11). Elo from deck-ratings.txt.
+
+opens: ilse
+prize: 5000
+
+rung: rhea thunder-dragon                          # 1693: the reigning tag champion, one on one at last
+rung: eldlich eldlich                              # 1764: Count Aurum, the 2021 binder's champion
+rung: seraph light-and-darkness                    # 1768: the traveling pro
+rung: angelechy angelechy                          # 1810: Grandmaster Celeste
+rung: kashtira kashtira                            # 1828: Pilar Sendra, halfway
+rung: branded-despia branded-despia                # 1830: Corin Vasse
+rung: dark-magician-chaos-ritual dark-magician-chaos-ritual   # 1839: Mage Valdris
+rung: ryzeal ryzeal                                # 1867: Nico and Nina Castell, playing for no year
+rung: ilse synchron, zombies, gadgets, modern      # 1384-1527: one sitting, all four decks, in her guest order
+rung: ladder-top chaos-ritual                      # 1896: the strongest deck legal under the Gauntlet's list
+
+visitors: invitational
+visitor: rue yubel
+visitor: sasha tenpai-dragon
+visitor: augie k9-vanquish-soul
+visitor: junia snake-eye                           # last: "other doors" pays off when she climbs the stairs

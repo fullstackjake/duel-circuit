@@ -1,0 +1,270 @@
+// Structure decks sold in the Card Shop: themed, playable out of the box, about as strong as the circuits of their era.
+// #price is in DP; #era is the shop year they go on sale.
+
+deck: decks/structure/spellcasters-command.ydk
+#title Spellcaster's Command
+#era 2005
+#price 1200
+#about Dark Magician and friends: Magical Dimension swaps in your aces, and Skilled Dark Magician becomes Dark Magician from the deck.
+main:
+3 Dark Magician
+2 Dark Magician Girl
+2 Skilled Dark Magician
+2 Apprentice Magician
+2 Old Vindictive Magician
+2 Breaker the Magical Warrior
+2 Magician's Valkyria
+2 Mythical Beast Cerberus
+2 Royal Magical Library
+1 Kycoo the Ghost Destroyer
+2 Magical Dimension
+2 Dark Magic Curtain
+1 Thousand Knives
+1 Magical Citadel of Endymion
+1 Monster Reborn
+1 Swords of Revealing Light
+2 Mystical Space Typhoon
+2 Magic Cylinder
+2 Mirror Force
+2 Trap Hole
+1 Spellbinding Circle
+1 Dark Magic Attack
+2 Dust Tornado
+extra:
+1 Dark Paladin
+
+deck: decks/structure/fury-from-the-deep.ydk
+#title Fury from the Deep
+#era 2005
+#price 1200
+#about A Legendary Ocean shrinks your Water monsters' Levels, so Levia-Dragon - Daedalus hits the field fast and wipes it.
+main:
+2 Levia-Dragon - Daedalus
+1 Ocean Dragon Lord - Neo-Daedalus
+3 Mother Grizzly
+2 Unshaven Angler
+2 Amphibian Beast
+2 Tribe-Infecting Virus
+2 Penguin Soldier
+1 Spear Dragon
+2 Cyber Shark
+2 Mermaid Knight
+2 Giant Red Seasnake
+1 Terrorking Salmon
+3 A Legendary Ocean
+1 Salvage
+2 Big Wave Small Wave
+1 Monster Reborn
+1 Mystical Space Typhoon
+2 Torrential Tribute
+2 Trap Hole
+2 Tornado Wall
+2 Sakuretsu Armor
+2 Dust Tornado
+extra:
+
+deck: decks/structure/machine-re-volt.ydk
+#title Machine Re-Volt
+#era 2008
+#price 1500
+#about Cyber Dragon comes out for free, Machine Duplication copies it, and Cyber Twin Dragon swings twice.
+main:
+3 Cyber Dragon
+2 Proto-Cyber Dragon
+2 Cyber Phoenix
+2 Cyber Valley
+2 Jinzo
+2 Machine King Prototype
+2 Heavy Mech Support Platform
+2 Machine Duplication
+2 Power Bond
+1 Overload Fusion
+2 Limiter Removal
+1 Monster Reborn
+2 Mystical Space Typhoon
+1 Swords of Revealing Light
+2 Mirror Force
+2 Trap Hole
+2 Call of the Haunted
+2 Sakuretsu Armor
+2 Compulsory Evacuation Device
+3 Cyber Dragon Core
+2 Cyber Emergency
+extra:
+2 Cyber Twin Dragon
+1 Cyber End Dragon
+1 Chimeratech Overdragon
+
+deck: decks/structure/dinosaurs-rage.ydk
+#title Dinosaur's Rage
+#era 2009
+#price 1500
+#about Big Evolution Pill lets Dinosaurs come out without Tributes, and Ultimate Tyranno attacks every monster you have.
+main:
+3 Ultimate Tyranno
+2 Black Tyranno
+2 Gilasaurus
+2 Black Stego
+2 Sabersaurus
+2 Hyper Hammerhead
+2 Babycerasaurus
+2 Miracle Jurassic Egg
+2 Kabazauls
+2 Big Evolution Pill
+2 Jurassic World
+2 Hunting Instinct
+2 Survival Instinct
+1 Monster Reborn
+2 Mystical Space Typhoon
+1 Swords of Revealing Light
+2 Trap Hole
+2 Bottomless Trap Hole
+2 Sakuretsu Armor
+2 Dust Tornado
+1 Call of the Haunted
+extra:
+
+deck: decks/structure/lost-sanctuary.ydk
+#title Lost Sanctuary
+#era 2011
+#price 1800
+#about Sanctuary in the Sky makes your Fairies take no battle damage while Herald of Orange Light and The Sanctuary's Agents keep the cards flowing.
+main:
+3 Herald of Orange Light
+2 Herald of Green Light
+2 Guardian of Order
+2 Harvest Angel of Wisdom
+2 Bountiful Artemis
+2 Splendid Venus
+2 Athena
+2 Tethys, Goddess of Light
+2 Hecatrice
+2 Valhalla, Hall of the Fallen
+3 The Sanctuary in the Sky
+1 Cards from the Sky
+1 Mystical Space Typhoon
+1 Monster Reborn
+2 Solemn Judgment
+2 Divine Punishment
+2 Return from the Different Dimension
+2 Bottomless Trap Hole
+2 Mirror Force
+3 Trap Hole
+extra:
+
+deck: decks/structure/dragunity-legion.ydk
+#title Dragunity Legion
+#era 2013
+#price 2000
+#about Dragunity Dux searches, Phalanx and Aklys equip from the deck, and Dragunity Knight - Vajrayana climbs into big Synchros.
+main:
+3 Dragunity Phalanx
+3 Dragunity Dux
+2 Dragunity Legionnaire
+2 Dragunity Tribus
+2 Dragunity Militum
+2 Dragunity Aklys
+2 Dragunity Brandistock
+2 Dragunity Arma Leyvaten
+2 Dragon Ravine
+2 Cards of Consonance
+1 Monster Reborn
+2 Mystical Space Typhoon
+1 Swords of Revealing Light
+2 Dragon's Bind
+2 Bottomless Trap Hole
+2 Trap Hole
+2 Mirror Force
+1 Call of the Haunted
+2 Sakuretsu Armor
+3 Dragunity Corsesca
+extra:
+2 Dragunity Knight - Vajrayana
+1 Dragunity Knight - Gae Dearg
+1 Dragunity Knight - Trident
+1 Stardust Dragon
+1 Black Rose Dragon
+1 Scrap Dragon
+
+deck: decks/structure/synchron-extreme.ydk
+#title Synchron Extreme
+#era 2015
+#price 2200
+#about Junk Synchron revives a Level 1 or 2, Quillbolt Hedgehog comes back for free, and you climb to Junk Warrior and Stardust.
+main:
+3 Junk Synchron
+3 Quillbolt Hedgehog
+2 Doppelwarrior
+2 Tuningware
+2 Level Eater
+2 Quickdraw Synchron
+2 Jet Synchron
+1 Glow-Up Bulb
+1 Effect Veiler
+2 Speed Warrior
+2 Junk Forward
+2 Synchro Boost
+1 Synchro Gift
+2 Mystical Space Typhoon
+1 Monster Reborn
+2 Book of Moon
+2 Bottomless Trap Hole
+2 Trap Hole
+2 Mirror Force
+2 Fiendish Chain
+2 Starlight Road
+extra:
+2 Junk Warrior
+1 Stardust Dragon
+1 Junk Berserker
+1 Junk Destroyer
+1 Junk Gardna
+1 Formula Synchron
+1 Shooting Star Dragon
+1 Nitro Warrior
+1 Armory Arm
+1 Turbo Warrior
+1 Accel Synchron
+
+deck: decks/structure/mekk-knight.ydk
+#title Mekk-Knight Crusade
+#era 2018
+#price 2500
+#about Mekk-Knights Special Summon themselves into a column with two or more cards; Crusadia and World Legacy Links move your monsters between zones and lock down the column you choose.
+main:
+3 Mekk-Knight Blue Sky
+3 Mekk-Knight Indigo Eclipse
+2 Mekk-Knight Purple Nightfall
+2 Mekk-Knight Red Moon
+2 Mekk-Knight Yellow Star
+1 Mekk-Knight Orange Sunset
+1 Mekk-Knight Green Horizon
+1 Mekk-Knight Avram
+2 Crusadia Arboria
+2 Crusadia Draco
+1 Crusadia Leonis
+2 Crusadia Maximus
+1 Crusadia Reclusia
+2 World Legacy's Memory
+2 World Legacy Discovery
+2 Mystical Space Typhoon
+1 Monster Reborn
+1 Called by the Grave
+1 Crusadia Revival
+2 Ash Blossom & Joyous Spring
+2 Infinite Impermanence
+2 World Legacy Clash
+2 Solemn Strike
+2 Bottomless Trap Hole
+2 Torrential Tribute
+extra:
+1 Mekk-Knight Spectrum Supreme
+1 Crusadia Equimax
+1 Mekk-Knight Crusadia Avramax
+1 Knightmare Phoenix
+1 Knightmare Cerberus
+1 Knightmare Unicorn
+1 Isolde, Two Tales of the Noble Knights
+1 Linkuriboh
+1 Crusadia Regulex
+1 Dark Templar @Ignister

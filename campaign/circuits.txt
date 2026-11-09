@@ -1,0 +1,310 @@
+# Duel Circuit campaign: circuits in order. Clear every match in a circuit to open the next one.
+#   circuit: <name>            starts a circuit
+#   band: <difficulty>         the difficulty band it belongs to (a heading in the list)
+#   era: <year>                card shop sets released up to this year open with the circuit
+#   banlist: <list name>       the era's Forbidden/Limited list (lflists/history.lflist.conf): in era-limited play your
+#                              team's decks must be legal under it; otherwise nobody answers to it, and the CPUs never
+#                              do. The Beginner circuits play house rules (no list)
+#   blurb: <one line>          shown under its name
+#   prize: <DP>                paid the first time you clear it
+#   match: <character> <deck>  an opponent (personalities/<character>.profile) with one of the decks in decks/
+# Bands follow measured deck strength (campaign/deck-ratings.txt: bot vs bot Elo), not release year; each circuit
+# groups decks from nearby years. The opponents' skill also rises band by band. The late bands (Expert, Master,
+# Gauntlet) pay more per win and bigger prizes, plus Card Tokens per clear: by then a player needs several top decks.
+# The Gauntlet brings back four of the strongest decks (not the Houston bosses just beaten) so the finale is hardest.
+
+circuit: Beginner Circuit
+band: Beginner
+era: 2005
+blurb: Friendly duels at the local card shop. Everyone starts here.
+prize: 600
+match: rookie-ryo classic
+match: brask warriors
+match: rookie-ryo warriors
+
+circuit: Rookie Cup
+band: Beginner
+era: 2005
+blurb: The shop's weekly tournament. Some regulars take it seriously.
+prize: 800
+match: brask gadgets
+match: old-gus classic
+match: tink gadgets
+
+circuit: Town Tournament
+band: Beginner
+era: 2005
+blurb: Duelists from the whole town, and a few from out of it.
+prize: 1000
+match: old-gus zombies
+match: tink stall-burn
+match: vera warriors
+
+circuit: Regional Qualifier
+band: Beginner
+era: 2005
+blurb: Win here and the regional circuit opens up.
+prize: 1200
+match: vera zombies
+match: tink gadgets
+match: hollis stall-burn
+
+circuit: Underdog Open
+band: Novice
+era: 2011
+banlist: TCG March 2011
+blurb: Frog FTK, Six Samurai, Spellbooks and Burning Abyss: decks from 2010 to 2014.
+prize: 1400
+match: frog-ftk frog-ftk
+match: six-samurai six-samurai
+match: spellbook spellbook
+match: burning-abyss burning-abyss
+
+circuit: Trap Masters Cup
+band: Novice
+era: 2011
+banlist: TCG March 2011
+blurb: Geargia, Domain Monarch, Zoodiac and Altergeist: decks from 2014 to 2018.
+prize: 1600
+match: geargia geargia
+match: domain-monarch domain-monarch
+match: zoodiac zoodiac
+match: altergeist altergeist
+
+circuit: Small Engines Invitational
+band: Novice
+era: 2011
+banlist: TCG March 2011
+blurb: Floowandereeze, Runick Spright, Purrely and Yummy: decks from 2022 to 2026.
+prize: 1800
+match: floowandereeze floowandereeze
+match: runick-spright runick-spright
+match: purrely purrely
+match: yummy yummy
+
+circuit: Synchro Dawn Classic
+band: Intermediate
+era: 2015
+banlist: TCG April 2015
+blurb: TeleDAD, Blackwing, Lightsworn and Infernity: decks from 2008 to 2010.
+prize: 2000
+match: teledad teledad
+match: blackwing blackwing
+match: lightsworn lightsworn
+match: infernity infernity
+
+circuit: Xyz and Link Regionals
+band: Intermediate
+era: 2015
+banlist: TCG April 2015
+blurb: Dino Rabbit, Inzektor, Qliphort and Gouki: decks from 2012 to 2018.
+prize: 2200
+match: dino-rabbit dino-rabbit
+match: inzektor inzektor
+match: qliphort qliphort
+match: gouki gouki
+
+circuit: Link Age Open
+band: Intermediate
+era: 2015
+banlist: TCG April 2015
+blurb: Pendulum Magicians, Sky Striker, Salamangreat and Maliss: decks from 2018 to 2025.
+prize: 2400
+match: pendulum-magician pendulum-magician
+match: sky-striker sky-striker
+match: salamangreat salamangreat
+match: maliss maliss
+
+circuit: Golden Age Championship
+band: Advanced
+era: 2019
+banlist: TCG October 2019
+blurb: Yata-Lock, Goat Control, Plant Synchro and the Dragon Rulers: decks from 2004 to 2013.
+prize: 2600
+match: chaos-yata chaos-yata
+match: goat-control goat-control
+match: plant-synchro plant-synchro
+match: dragon-ruler dragon-ruler
+
+circuit: Control Kings Cup
+band: Advanced
+era: 2019
+banlist: TCG October 2019
+blurb: HAT, Satellarknight, ABC and True Draco: decks from 2014 to 2017.
+prize: 2800
+match: hat hat
+match: satellarknight satellarknight
+match: abc abc
+match: true-draco true-draco
+
+circuit: Hybrid Engines Invitational
+band: Advanced
+era: 2019
+banlist: TCG October 2019
+blurb: Orcust, Tri-Brigade, Exosister and Unchained: decks from 2019 to 2023.
+prize: 3000
+match: orcust orcust
+match: tri-brigade tri-brigade
+match: exosister exosister
+match: unchained unchained
+
+circuit: Expert Series: Shadows and Storms
+band: Expert
+era: 2023
+banlist: TCG June 2023
+blurb: Wind-Up, Shaddoll, Kozmo and Danger! Dark World: decks from 2012 to 2018.
+prize: 6000
+match: wind-up wind-up
+match: shaddoll shaddoll
+match: kozmo kozmo
+match: danger-dark-world danger-dark-world
+
+circuit: Expert Series: Rituals and Fire
+band: Expert
+era: 2023
+banlist: TCG June 2023
+blurb: Adamancipator, Drytron, Yubel and Tenpai Dragon: decks from 2020 to 2024.
+prize: 6500
+match: adamancipator adamancipator
+match: drytron drytron
+match: yubel yubel
+match: tenpai-dragon tenpai-dragon
+
+circuit: Expert Series: The New Wave
+band: Expert
+era: 2023
+banlist: TCG June 2023
+blurb: Fire King Snake-Eye, Ryzeal, Angelechy and Elfnote: decks from 2024 to 2026.
+prize: 7000
+match: fire-king-snake-eye fire-king-snake-eye
+match: ryzeal ryzeal
+match: angelechy angelechy
+match: elfnote elfnote
+
+circuit: Expert Series: Fall Format
+band: Expert
+era: 2023
+banlist: TCG June 2023
+blurb: Artmage, Dracotail, Mermail Atlantean and Lunalight: the rogue decks of autumn 2026.
+prize: 7500
+match: artmage artmage
+match: dracotail dracotail
+match: mermail-atlantean mermail-atlantean
+match: lunalight lunalight
+
+circuit: Master League: Link Wars
+band: Master
+era: 2026
+banlist: TCG September 2026
+blurb: Thunder Dragon, Eldlich, Bystial Dragon Link and Spright: decks from 2018 to 2022.
+prize: 8000
+match: thunder-dragon thunder-dragon
+match: eldlich eldlich
+match: bystial-dragon-link bystial-dragon-link
+match: spright spright
+
+circuit: Master League: Graveyard Kings
+band: Master
+era: 2026
+banlist: TCG September 2026
+blurb: Tearlaments, Kashtira, Snake-Eye and K9 Vanquish Soul: decks from 2022 to 2025.
+prize: 8500
+match: tearlaments tearlaments
+match: kashtira kashtira
+match: snake-eye snake-eye
+match: k9-vanquish-soul k9-vanquish-soul
+
+circuit: Master League: Houston 2026
+band: Master
+era: 2026
+banlist: TCG September 2026
+blurb: The decks that topped YCS Houston, October 2026.
+prize: 9000
+match: mitsurugi mitsurugi
+match: light-and-darkness light-and-darkness
+match: branded-despia branded-despia
+
+circuit: Master League: October 2026
+band: Master
+era: 2026
+banlist: TCG October 2026
+blurb: The decks topping regionals after the October 19 list: Blitzclique, Sacred Beast and the Chaos Rituals.
+prize: 9500
+match: blitzclique blitzclique
+match: sacred-beast sacred-beast
+match: dark-magician-chaos-ritual dark-magician-chaos-ritual
+match: chaos-ritual chaos-ritual
+
+circuit: Tier 0 Gauntlet
+band: Gauntlet
+era: 2026
+banlist: TCG September 2026
+blurb: The champions return with the strongest decks the circuit has seen, back to back: Eldlich, K9 Vanquish Soul, Tearlaments and Ishizu Tearlaments.
+prize: 15000
+match: eldlich eldlich
+match: k9-vanquish-soul k9-vanquish-soul
+match: tearlaments tearlaments
+match: ishizu-tearlaments ishizu-tearlaments
+
+# ---- Tag Cups: tag duels (you and a partner against two duelists). Each opens when its "after" circuit is cleared
+# and blocks nothing. Your partner is any duelist you've beaten, with their own deck.
+#   tagcup: <name>     after: <circuit name>     blurb:     prize:
+#   tag: <character> <deck> + <character> <deck>   (their lead first)
+
+tagcup: Card Shop Tag Night
+after: Rookie Cup
+blurb: Friday nights at the shop are for tag duels. Bring a friend.
+prize: 900
+tag: brask warriors + tink gadgets
+tag: old-gus classic + rookie-ryo warriors
+tag: vera warriors + hollis stall-burn
+
+tagcup: Novice Tag Cup
+after: Underdog Open
+blurb: Odd couples from the Novice band: an FTK and a wall of traps, among others.
+prize: 1800
+tag: frog-ftk frog-ftk + geargia geargia
+tag: six-samurai six-samurai + spellbook spellbook
+tag: burning-abyss burning-abyss + altergeist altergeist
+
+tagcup: Intermediate Tag Cup
+after: Synchro Dawn Classic
+blurb: Synchro engines on one side, Xyz and Links on the other.
+prize: 2800
+tag: blackwing blackwing + lightsworn lightsworn
+tag: dino-rabbit dino-rabbit + inzektor inzektor
+tag: sky-striker sky-striker + salamangreat salamangreat
+
+tagcup: Advanced Tag Cup
+after: Golden Age Championship
+blurb: Champions of their eras, teamed up across the years.
+prize: 3800
+tag: goat-control goat-control + dragon-ruler dragon-ruler
+tag: hat hat + true-draco true-draco
+tag: orcust orcust + tri-brigade tri-brigade
+
+tagcup: Expert Tag Cup
+after: Expert Series: Shadows and Storms
+blurb: Control meets combo: two experts who never let you finish a turn.
+prize: 5000
+tag: shaddoll shaddoll + danger-dark-world danger-dark-world
+tag: drytron drytron + tenpai-dragon tenpai-dragon
+tag: fire-king-snake-eye fire-king-snake-eye + angelechy angelechy
+
+tagcup: Fall Format Tag Cup
+after: Expert Series: Fall Format
+blurb: Autumn's rogue decks, two at a time: patrons, storytellers and storms.
+prize: 5500
+tag: power-patron power-patron + artmage artmage
+tag: magistus-fairy-tail magistus-fairy-tail + dracotail dracotail
+tag: radiant-typhoon radiant-typhoon + lunalight lunalight
+
+tagcup: Master Tag Cup
+# Opens after Graveyard Kings (it opened after Link Wars until 2026-10-31): its match 3 measured about 45% with the
+# teams a player had after Link Wars, 65-75% with the Tearlaments loaner and Kitkallos that Graveyard Kings brings.
+after: Master League: Graveyard Kings
+blurb: The best decks of their day, two at a time.
+prize: 7000
+tag: eldlich eldlich + bystial-dragon-link bystial-dragon-link
+tag: tearlaments tearlaments + kashtira kashtira
+tag: mitsurugi mitsurugi + branded-despia branded-despia

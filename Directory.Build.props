@@ -1,0 +1,10 @@
+<Project>
+  <!--
+    Keep dotnet build output out of src/: Unity imports src/Ygo.Engine as a local package,
+    and stray bin/obj folders there would be imported as duplicate assemblies.
+  -->
+  <PropertyGroup>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)build/obj/$(MSBuildProjectName)/</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)build/bin/$(MSBuildProjectName)/</BaseOutputPath>
+  </PropertyGroup>
+</Project>

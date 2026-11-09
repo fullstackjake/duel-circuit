@@ -1,0 +1,17 @@
+Anchored deck ratings (docs/dev/NO-LIMITS-SPEC-2026-11-02.md P3): decks rated against the frozen pool of deck-ratings.txt,
+which they never move. Written by `--rate-anchored <folders> --write`; read after deck-ratings.txt (DeckRatings.Load).
+Last run: decks/no-limits, 600 duels a deck, seed 1; calibration within ±40.
+
+  1. nl-branded                 Elo  1865   won  66% of 600   avg  7.5 turns   start 1830,   35   pool opponents 1612-1947
+  2. gravekeepers-contraband    Elo  1826   won  64% of 600   avg  8.6 turns   start 1764,   62   pool opponents 1527-1947
+  3. nl-vanquish-soul           Elo  1763   won  63% of 600   avg  7.2 turns   start 1673,   90   pool opponents 1435-1947
+  4. nl-snake-eye               Elo  1728   won  61% of 600   avg  9.2 turns   start 1612,  116   pool opponents 1367-1947
+  5. nl-vanquish-soul-brawl     Elo  1715   won  59% of 600   avg  7.7 turns   start 1673,   42   pool opponents 1416-1947
+  6. nl-yubel                   Elo  1696   won  57% of 600   avg  9.4 turns   start 1653,   43   pool opponents 1392-1947
+  7. nl-snake-eye-brawl         Elo  1695   won  59% of 600   avg  9.0 turns   start 1612,   83   pool opponents 1376-1947
+  8. nl-mitsurugi               Elo  1683   won  57% of 600   avg  7.2 turns   start 1867, -184   pool opponents 1367-1947
+  9. nl-yubel-brawl             Elo  1679   won  58% of 600   avg  9.3 turns   start 1653,   26   pool opponents 1416-1947
+ 10. nl-tenpai                  Elo  1675   won  58% of 600   avg  8.9 turns   start 1675,    0   pool opponents 1371-1947
+ 11. nl-ryzeal                  Elo  1673   won  59% of 600   avg  8.1 turns   start 1867, -194   pool opponents 1338-1896
+ 12. nl-tenpai-brawl            Elo  1586   won  57% of 600   avg 12.2 turns   start 1675,  -89   pool opponents 1273-1830
+ 13. orvels-house               Elo  1539   won  51% of 600   avg  9.8 turns   start 1546,   -7   pool opponents 1297-1896

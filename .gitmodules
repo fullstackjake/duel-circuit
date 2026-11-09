@@ -1,0 +1,16 @@
+[submodule "vendor/ygopro-core"]
+	path = vendor/ygopro-core
+	url = https://github.com/edo9300/ygopro-core.git
+	ignore = untracked
+[submodule "vendor/CardScripts"]
+	path = vendor/CardScripts
+	url = https://github.com/ProjectIgnis/CardScripts.git
+	ignore = untracked
+[submodule "vendor/BabelCDB"]
+	path = vendor/BabelCDB
+	url = https://github.com/ProjectIgnis/BabelCDB.git
+	ignore = untracked
+[submodule "vendor/LFLists"]
+	path = vendor/LFLists
+	url = https://github.com/ProjectIgnis/LFLists
+	ignore = untracked

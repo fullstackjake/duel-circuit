@@ -1,0 +1,64 @@
+#created by Duel Circuit - Gravekeeper's Contraband (Nyx: Eldlich, 2020, with the oldest contraband)
+#era 2026
+#tier Alley authored deck: Nyx's Table, seat 4 (docs/dev/ALLEY-SPEC-2026-11-01.md section 6, decision O2)
+#about Nyx the Gravekeeper's own: Eldlich the Golden Lord's Zombies (decks/history/eldlich.ydk), who come back from the Graveyard however often they're destroyed, keeping eleven of the oldest contraband cards beside them, in the words they were printed with. No floodgates (Gozen Match is a boss-only lock her seat doesn't allow) and no hand traps: she keeps her answers for the board.
+#why Out: 3 Gozen Match, 3 Ash Blossom & Joyous Spring, 3 Infinite Impermanence, 2 Effect Veiler. In: Pot of Greed, Graceful Charity, Raigeki, Harpie's Feather Duster, Change of Heart, Snatch Steal, Heavy Storm, Monster Reborn, Premature Burial, Witch of the Black Forest, Sangan. Measured 2026-11-02 (the alley study's duel: the QA stand-in planning with its best deck, Fire King Snake-Eye, against Nyx planning at skill 1.0, the turn cap): the player won 56.7% of 60 (target 55%). Tried first: a Gravekeeper's deck with twenty contraband cards (no playbook): the player won 82.5% of 40.
+#recipe eldlich
+#main
+95440946
+95440946
+95440946
+15397015
+15397015
+15397015
+49238328
+49238328
+49238328
+68829754
+68829754
+94224458
+31434645
+31434645
+31434645
+20612097
+20612097
+20612097
+20590515
+20590515
+20590515
+82732705
+93191801
+93191801
+93191801
+41420027
+41420027
+41420027
+56984514
+55144522
+79571449
+12580477
+18144506
+4031928
+45986603
+19613556
+83764718
+70828912
+78010363
+26202165
+#extra
+26096328
+49032236
+56910167
+56910167
+73964868
+73964868
+73964868
+50449881
+98127546
+86066372
+38342335
+45819647
+2857636
+50588353
+7778726
+!side

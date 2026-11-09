@@ -1,0 +1,87 @@
+# The Back Alley's contraband, curated per event (POST-GAME-PLAN "The Back Alley"; Game Designer, 2026-11-01).
+# The splash builder (src/Ygo.Engine/Campaign/Alley.cs) fills the roles a base deck lacks first (draw, wipe, backrow,
+# steal, revive, removal, handtrap/negate, beater; one card a role, two for draw), then the rest best-first.
+#   event: <name>
+#   card: <name> | <role> | <needs> [| for: <base>,<base>] [| late]
+#       needs: any, dark-low-atk:N, light-dark:N, dark:N, synchro, xyz, link, fusion, monsters:N, spells:N
+#       for: offered only to those bases, ahead of the shared list (era cards that plug into their engine);
+#       late: keeps its place in the list instead. At most one Extra Deck card a deck, only from a base's own cards.
+#   skip: <base>, <base>      bases that sit the event out
+#   cap: <base> <role> <n>    a base's own cap on a role (one card a role, two for draw, otherwise)
+#   size: <base> <n>          a base's own splash size (tightly tuned decks lose to a full splash)
+# Main Deck cards only: one-card effects the bot plays well. Cards not out by the event's year are dropped when read.
+
+event: Dumpster Row
+skip: stall-burn               # measured -3 to +5, and its duels with Goat Control run past turn 40
+card: Pot of Greed | draw | any
+card: Raigeki | wipe | any
+card: Harpie's Feather Duster | backrow | any
+card: Graceful Charity | draw | any
+card: Change of Heart | steal | any
+card: Monster Reborn | revive | any
+card: Snatch Steal | steal | any
+card: Dark Hole | wipe | any
+card: Premature Burial | revive | any
+card: Heavy Storm | backrow | any
+card: Black Luster Soldier - Envoy of the Beginning | beater | light-dark:4
+card: Chaos Sorcerer | removal | light-dark:4
+card: Brain Control | steal | any
+card: Witch of the Black Forest | search | any
+card: Sangan | search | any
+card: Solemn Judgment | negate | any
+
+event: The Basement Game
+# Era cards for its bases (Game Designer, 2026-11-01).
+skip: wind-up, dragon-ruler     # nothing in the era plugs into Wind-Up; the 1-copy list guts Dragon Ruler
+skip: hat                       # measured -35 with four cards and -38 with one: its traps are the deck
+card: Blackwing - Steam the Cloak | extender | synchro | for: blackwing
+card: Goyo Guardian | beater | synchro | for: six-samurai,plant-synchro
+card: Glow-Up Bulb | extender | synchro | for: six-samurai,teledad,blackwing
+card: Level Eater | extender | any | for: teledad,plant-synchro
+card: Artifact Scythe | beater | any | for: hat
+card: Chaos Sorcerer | removal | light-dark:4 | for: shaddoll,inzektor
+card: Pot of Greed | draw | any
+card: Evilswarm Exciton Knight | wipe | xyz | for: dino-rabbit,inzektor | late
+card: Raigeki | wipe | any
+card: Harpie's Feather Duster | backrow | any
+card: Graceful Charity | draw | any
+card: Change of Heart | steal | any
+card: Monster Reborn | revive | any
+card: Crush Card Virus | removal | dark-low-atk:3
+card: Snatch Steal | steal | any
+card: Dark Hole | wipe | any
+card: Maxx "C" | handtrap | any
+card: Heavy Storm | backrow | any
+card: Brain Control | steal | any
+card: Premature Burial | revive | any
+card: Solemn Judgment | negate | any
+card: Call of the Haunted | revive | any
+card: Glow-Up Bulb | extender | synchro
+
+event: The Black Market
+# Era cards for its bases (Game Designer, 2026-11-01). Kozmo takes none and only one draw card (it's fast already).
+cap: kozmo draw 1
+skip: abc                       # measured -81 with four cards: every splash cuts its Twin Twisters and Solemn Strikes
+skip: thunder-dragon            # measured -21 to -3 with four cards and -7 to -3 with two
+card: Chaos Sorcerer | removal | light-dark:4 | for: thunder-dragon,shaddoll
+card: Elder Entity Norden | revive | fusion | for: thunder-dragon
+card: That Grass Looks Greener | extender | any | for: shaddoll
+card: Mirage of Nightmare | draw | any | for: danger-dark-world
+card: Pot of Greed | draw | any
+card: Raigeki | wipe | any
+card: Harpie's Feather Duster | backrow | any
+card: Return from the Different Dimension | revive | any | for: abc,thunder-dragon | late
+card: Graceful Charity | draw | any
+card: Morphing Jar | draw | any | for: danger-dark-world | late
+card: Change of Heart | steal | any
+card: Maxx "C" | handtrap | any
+card: Monster Reborn | revive | any
+card: Dark Hole | wipe | any
+card: Snatch Steal | steal | any
+card: Crush Card Virus | removal | dark-low-atk:3
+card: Heavy Storm | backrow | any
+card: Black Luster Soldier - Envoy of the Beginning | beater | light-dark:4
+card: Brain Control | steal | any
+card: Premature Burial | revive | any
+card: Called by the Grave | negate | any
+card: Solemn Judgment | negate | any

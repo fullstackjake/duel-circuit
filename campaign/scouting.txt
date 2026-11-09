@@ -1,0 +1,171 @@
+# Scouting reports: shown on the versus screen and after a loss. Written for the decks at the campaign's walls; every
+# other deck gets one put together from its cards (its playbook's bosses, its most-played monsters).
+#   deck: <deck file name>
+#   for: <character>     optional: the report is only for that character's games with the deck (a deck file others share,
+#                        like Ilse's zombies and Old Gus's, keeps her late-era advice off their tables)
+#   plan: how the deck wins, in a sentence or two
+#   keys: the cards to watch, separated by ;
+#   beats it: what it struggles against
+#   build: cards to put in your deck against it, separated by ; (the Scout panel shows how many you own)
+#   turn: first | second - why (against it, the turn you'd rather take; leave out when it doesn't matter)
+
+deck: shaddoll
+plan: Shaddoll Fusion makes El Shaddoll Construct or Winda, even from the Deck when you have an Extra Deck monster out. Every Shaddoll sent to the GY by an effect triggers: searches, draws, pops, revivals.
+keys: Shaddoll Fusion; El Shaddoll Construct; El Shaddoll Winda; Shaddoll Beast
+beats it: Banishing turns off their GY triggers: D.D. Crow, Macro Cosmos or Dimensional Fissure. Winda lets each player Special Summon only once per turn, so remove it before your big turn.
+build: D.D. Crow; Macro Cosmos; Dimensional Fissure; Dark Ruler No More; Called by the Grave
+
+deck: danger-dark-world
+plan: Each Danger! monster reveals itself to make them discard at random; it pays off whatever goes, summoning, searching, destroying and drawing. Card Destruction and Allure of Darkness keep the hand full.
+keys: Danger! Nessie!; Danger! Bigfoot!; Danger!? Jackalope?; Card Destruction
+beats it: Hand traps early: Ash Blossom on Nessie's search or a draw spell. Nibiru, the Primal Being once they've summoned five times. Clear their bodies before they become Knightmare Links.
+build: Ash Blossom & Joyous Spring; Nibiru, the Primal Being; Droll & Lock Bird; Effect Veiler
+
+deck: drytron
+plan: Each Drytron Tributes another Drytron or a Ritual Monster to summon itself; Meteonis Drytron then Ritual Summons Herald of Ultimateness or Meteonis Draconids, which negate.
+keys: Cyber Emergency; Drytron Alpha Thuban; Meteonis Drytron; Herald of Ultimateness
+beats it: Their turn needs several Drytrons: Ash Blossom on Cyber Emergency or Drytron Nova, Effect Veiler or Infinite Impermanence on a Drytron, or Nibiru, the Primal Being. Bait Herald of Ultimateness's negate before your best card.
+build: Ash Blossom & Joyous Spring; Effect Veiler; Infinite Impermanence; Nibiru, the Primal Being; Ghost Ogre & Snow Rabbit
+
+deck: tenpai-dragon
+plan: Clears your backrow first (Lightning Storm, Harpie's Feather Duster), then summons the Tenpai Dragons and Synchro Summons during its own Battle Phase for a big swing.
+keys: Sangen Summoning; Tenpai Dragon Chundra; Tenpai Dragon Genroku; Sangen Kaimen
+beats it: Stop the Battle Phase: Kaiju to take a monster away, Swords of Revealing Light, or monsters that survive battle. Ash Blossom on Sangen Summoning's search cuts the turn short.
+build: Gameciel, the Sea Turtle Kaiju; Swords of Revealing Light; Ash Blossom & Joyous Spring; Effect Veiler; Infinite Impermanence
+turn: second - Tenpai wants to go second and clear your board; make it go first instead
+
+deck: fire-king-snake-eye
+plan: The Snake-Eye engine with Fire Kings that destroy each other for value: every destroyed Fire King comes back, so the board rebuilds itself.
+keys: Snake-Eye Ash; Fire King Island; Fire King High Avatar Kirin; Sacred Fire King Garunix
+beats it: Destroying them only feeds them: banish or bounce instead (D.D. Crow, Bystial monsters, Kaiju to Tribute one away). Ash Blossom on Snake-Eye Ash's or Fire King Island's search.
+build: D.D. Crow; Bystial Druiswurm; Bystial Magnamhut; Ash Blossom & Joyous Spring; Gameciel, the Sea Turtle Kaiju
+
+deck: angelechy
+plan: A Main Deck of Spells and Traps; every Angelechy monster waits in the Extra Deck. Angelechy Problem brings them out and places more as Continuous Spells; its Synchros banish what they can reach.
+keys: Angelechy Problem; Terraforming; Rainbow Bridge Bifrost; Angelechy Strategy Score
+beats it: Its turn starts from Angelechy Problem: Ash Blossom on Terraforming's or Strategy Score's search. Spell/Trap removal (Harpie's Feather Duster, Lightning Storm) hurts it more than monster hand traps do.
+build: Harpie's Feather Duster; Lightning Storm; Cosmic Cyclone; Ash Blossom & Joyous Spring
+
+deck: eldlich
+plan: A Trap deck that grinds: Eldlich sends any card on the field to the GY and comes back from the GY; Golden Land Traps summon more Zombies.
+keys: Eldlich the Golden Lord; Cursed Eldland; Eldlixir of Black Awakening; Conquistador of the Golden Land
+beats it: Clear their backrow before you commit (Harpie's Feather Duster, Lightning Storm, Evenly Matched), and banish Eldlich so it can't come back (Bystial monsters, D.D. Crow, Macro Cosmos). Ash Blossom on Cursed Eldland's search.
+build: Harpie's Feather Duster; Lightning Storm; Evenly Matched; Cosmic Cyclone; Bystial Magnamhut
+turn: second - with the strongest decks against it, going second won 75% and going first 58% (the sixth card and the first attack beat its turn-1 board)
+
+deck: bystial-dragon-link
+plan: The Bystials summon themselves by banishing a LIGHT or DARK monster from either GY; the Rokket Dragons search each other and link into Borrelend Dragon.
+keys: Bystial Magnamhut; Bystial Druiswurm; Rokket Tracer; Absorouter Dragon
+beats it: Keep LIGHT and DARK monsters out of your GY, or they banish them to summon. Ash Blossom on Chaos Space or a Rokket search; Nibiru, the Primal Being as they link up.
+build: Ash Blossom & Joyous Spring; Nibiru, the Primal Being; Infinite Impermanence; Effect Veiler; Called by the Grave
+
+deck: tearlaments
+plan: Mills itself: every Tearlaments sent to the GY by an effect Fusion Summons, so a few cards become Kitkallos, Rulkallos and Kaleido-Heart on either player's turn.
+keys: Tearlaments Scheiren; Tearlaments Reinoheart; Tearlaments Kitkallos; Tearlaments Rulkallos
+beats it: Banishing shuts it off: D.D. Crow, Macro Cosmos, Dimension Shifter or Bystial monsters. Ash Blossom on Reinoheart's or Scheiren's send. Rulkallos negates a Special Summon: bait it before your best one.
+build: D.D. Crow; Dimension Shifter; Macro Cosmos; Bystial Druiswurm; Ash Blossom & Joyous Spring
+turn: second - with the strongest decks against it, going second won 50% and going first 33% (the sixth card and the first attack beat its turn-1 board)
+
+deck: kashtira
+plan: Fenrir and Unicorn summon themselves on an empty field and search; two Level 7s make Kashtira Shangri-Ira, which locks a zone each time your cards are banished face-down.
+keys: Kashtira Fenrir; Kashtira Unicorn; Kashtira Riseheart; Kashtira Shangri-Ira
+beats it: Their starters need an empty field: a monster on your side turns Fenrir and Unicorn off. Ash Blossom on Fenrir's or Unicorn's search; break Shangri-Ira before you play into its locks.
+build: Ash Blossom & Joyous Spring; Effect Veiler; Infinite Impermanence; Dark Ruler No More
+turn: first - a monster on your field turns off their starters
+
+deck: mitsurugi
+plan: Every Mitsurugi Ritual Monster comes back when it's Tributed, so each Ritual pays for the next: Habakiri calls Saji, Saji finds Mitsurugi Ritual, Aramasa finds Ame no Murakumo, Kusanagi returns the Ritual. It ends on Habakiri, Murakumo and Futsu no Mitama with a set Trap, and Murakumo destroys every monster you control, often on your own turn.
+keys: Mitsurugi Ritual; Ame no Murakumo no Mitsurugi; Mitsurugi no Mikoto, Saji; Mitsurugi no Mikoto, Aramasa
+beats it: Stop the first search (Ash Blossom on Saji's or Aramasa's), or banish a Tributed Mitsurugi in the GY before it comes back (Called by the Grave, D.D. Crow). Don't flood the field into Ame no Murakumo: keep a threat in the hand for after its wipe.
+build: Ash Blossom & Joyous Spring; Infinite Impermanence; Called by the Grave; D.D. Crow; Effect Veiler
+turn: second - with the strongest decks against it, going second won 55% and going first 41% (the sixth card and the first attack beat its turn-1 board)
+
+deck: branded-despia
+plan: Branded Fusion makes Albion from the Deck almost every turn, which fuses again; Mirrorjade banishes a monster each turn, and the Fusions sent to the GY pay off at the End Phase.
+keys: Branded Fusion; Fallen of Albaz; Aluber the Jester of Despia; Mirrorjade the Iceblade Dragon
+beats it: Ash Blossom on Branded Fusion or Aluber's search. If your card makes Mirrorjade leave the field, it destroys your monsters at the End Phase: negate it (Effect Veiler, Infinite Impermanence) or remove it with your last play.
+build: Ash Blossom & Joyous Spring; Droll & Lock Bird; Effect Veiler; Infinite Impermanence; Dimension Shifter
+turn: second - with the strongest decks against it, going second won 55% and going first 28% (the sixth card and the first attack beat its turn-1 board)
+
+deck: light-and-darkness
+plan: Ragged Records of Rites finds Celtic Mystic, which draws three and discards two that pay off from the hand or GY; Black Chaos and the Ritual Monsters banish and negate.
+keys: Ragged Records of Rites; Light and Darkness Ritual; Magician of Dark Chaos - Black Chaos; Dark Magician
+beats it: Ash Blossom on Ragged Records of Rites' search; Droll & Lock Bird once they've drawn. Black Chaos and the Soldier of Light and Darkness ignore your activated effects unless they target them, so board wipes fail: use targeting cards (Infinite Impermanence, Effect Veiler) or battle. Their discards are fuel: banish them (D.D. Crow).
+build: Ash Blossom & Joyous Spring; Droll & Lock Bird; Infinite Impermanence; Effect Veiler; D.D. Crow
+turn: second - with the strongest decks against it, going second won 64% and going first 33% (the sixth card and the first attack beat its turn-1 board)
+
+deck: dragon-ruler
+plan: The Level 7 Dragon Rulers summon themselves by banishing Dragons from the hand and GY, then rank up into Mecha Phantom Beast Dracossack or Number 11: Big Eye.
+keys: Blaster, Dragon Ruler of Infernos; Tempest, Dragon Ruler of Storms; Redox, Dragon Ruler of Boulders; Mecha Phantom Beast Dracossack
+beats it: Cut their fuel: Macro Cosmos or D.D. Crow on their GY. Keep a second threat: Big Eye takes your best monster.
+build: D.D. Crow; Macro Cosmos; Dimensional Fissure; Effect Veiler
+
+deck: thunder-dragon
+plan: The Thunder Dragons discard themselves for value and float when banished; Thunder Dragon Colossus stops your Deck searches and Titan destroys a card each time they use an effect in the hand.
+keys: Thunder Dragon; Thunder Dragondark; Thunder Dragon Colossus; Thunder Dragon Titan
+beats it: Ash Blossom on Thunder Dragon's or Dragondark's search. Remove Thunder Dragon Colossus before your combo, or it stops your searches.
+build: Ash Blossom & Joyous Spring; Infinite Impermanence; Effect Veiler; Dark Ruler No More
+
+deck: sky-striker
+plan: One monster, many spells: Sky Striker Ace - Raye becomes a Link and back again while Engage and Area Zero keep finding more.
+keys: Sky Striker Ace - Raye; Sky Striker Mobilize - Engage!; Sky Striker Mecha - Widow Anchor; Sky Striker Ace - Kagari
+beats it: Ash Blossom on Engage; Effect Veiler or Infinite Impermanence on Raye. It has few monsters: keep Raye off the field and it runs out of cards.
+build: Ash Blossom & Joyous Spring; Effect Veiler; Infinite Impermanence; Anti-Spell Fragrance; Cosmic Cyclone
+
+deck: k9-vanquish-soul
+plan: Razen and Dr. Mad Love search when Normal Summoned; Heavy Borger and Caesar Valius summon themselves by returning a Vanquish Soul to the hand to search again, and the Attributes they reveal power quick effects on your turn. K9-66a Jokul brings two Level 5s for K9-17 "Ripper".
+keys: Vanquish Soul Razen; Vanquish Soul Dr. Mad Love; K9-66a Jokul; Vanquish Soul Caesar Valius
+beats it: The Normal Summon starts everything: Ash Blossom on Razen's or Dr. Mad Love's search. Their quick effects need cards to reveal from the hand, so Droll & Lock Bird and hand discard slow them. Expect them to answer you on your turn: bait with your weaker plays first.
+build: Ash Blossom & Joyous Spring; Droll & Lock Bird; Effect Veiler; Infinite Impermanence; Nibiru, the Primal Being
+turn: second - with the strongest decks against it, going second won 80% and going first 47% (the sixth card and the first attack beat its turn-1 board)
+
+deck: ishizu-tearlaments
+plan: Tearlaments with the Ishizu engine: Kelbek and Agido, sent from the hand, mill five from both Decks, and every Tearlaments milled Fusion Summons. Keldo and Mudora shuffle your GY away as they go.
+keys: Tearlaments Scheiren; Kelbek the Ancient Vanguard; Agido the Ancient Sentinel; Tearlaments Kitkallos
+beats it: Banishing shuts it off: D.D. Crow, Macro Cosmos, Dimension Shifter or Bystial monsters. It mills your Deck too, so don't rely on your own GY plays. Ash Blossom on Reinoheart's or Scheiren's send.
+build: D.D. Crow; Dimension Shifter; Macro Cosmos; Bystial Druiswurm; Ash Blossom & Joyous Spring
+turn: second - with the strongest decks against it, going second won 47% and going first 30% (the sixth card and the first attack beat its turn-1 board)
+
+deck: snake-eye
+plan: Snake-Eye Ash and WANTED's Diabellstar start a loop of Fire monsters that send themselves and each other to the GY and come back; Original Sinful Spoils and Snake-Eyes Poplar extend it.
+keys: Snake-Eye Ash; Snake-Eye Oak; Diabellstar the Black Witch; Snake-Eyes Poplar
+beats it: Ash Blossom on Snake-Eye Ash's search; banish what they send to the GY (D.D. Crow, Bystial monsters) so it can't come back. They place your monsters in their Spell/Trap Zone: keep a second threat.
+build: Ash Blossom & Joyous Spring; D.D. Crow; Bystial Druiswurm; Infinite Impermanence; Dark Ruler No More
+
+deck: synchron
+for: ilse
+plan: Junk Synchron, Quillbolt Hedgehog and Doppelwarrior turn one Normal Summon into Synchros and Links: Crystron Halqifibrax, Junk Destroyer, Baronne de Fleur, then Accesscode Talker. Lightning Storm and Harpie's Feather Duster clear your backrow first.
+keys: Junk Synchron; Quillbolt Hedgehog; Crystron Halqifibrax; Baronne de Fleur; Accesscode Talker
+beats it: The whole turn starts from Junk Synchron: Effect Veiler or Infinite Impermanence on it, Ash Blossom on One for One or Foolish Burial. Ghost Belle stops the Quillbolt and Glow-Up Bulb revivals. Bait Baronne's negate before your best card.
+build: Ash Blossom & Joyous Spring; Effect Veiler; Infinite Impermanence; Ghost Belle & Haunted Mansion; Nibiru, the Primal Being
+turn: second - their board needs a full turn to build, and your hand traps break it before Baronne lands
+
+deck: zombies
+for: ilse
+plan: Zombie World and a graveyard that never stays empty: Mezuki banishes itself to bring a Zombie back, Goblin Zombie and Pyramid Turtle fetch more, and Il Blud, Red-Eyes Zombie Dragon and Book of Life recycle the fallen.
+keys: Mezuki; Goblin Zombie; Pyramid Turtle; Il Blud; Red-Eyes Zombie Dragon
+beats it: Banish their graveyard and the engine stops: D.D. Crow on Mezuki, Macro Cosmos or Dimensional Fissure. Called by the Grave shuts off a Mezuki in the GY. Bottomless Trap Hole banishes what Zombie World lets them revive.
+build: D.D. Crow; Macro Cosmos; Dimensional Fissure; Called by the Grave; Bottomless Trap Hole
+
+deck: gadgets
+for: ilse
+plan: Each Gadget searches the next, so they never run out of bodies; Machina Gearframe, Card Trooper and Machine Duplication add more, and Gear Gigant X and the Xyz ranks close games behind a wall of traps.
+keys: Red Gadget; Green Gadget; Yellow Gadget; Machina Gearframe; Gear Gigant X
+beats it: Clear the traps before you commit: Harpie's Feather Duster, Lightning Storm. Ash Blossom on a Gadget's search breaks the chain of +1s; Droll & Lock Bird stops the whole loop for a turn.
+build: Harpie's Feather Duster; Lightning Storm; Ash Blossom & Joyous Spring; Droll & Lock Bird; Dark Ruler No More
+turn: second - you see their traps set first, and Harpie's Feather Duster or Lightning Storm clears them before you summon
+
+deck: modern
+for: ilse
+plan: A fair deck with every answer: Junk Synchron and Quillbolt Hedgehog into Links and Synchros, hand traps for your turn, Triple Tactics Talent when you use effects in theirs, and a backrow that has Mirror Force and Solemn Warning.
+keys: Junk Synchron; Triple Tactics Talent; Maxx "C"; Accesscode Talker; Thunder King Rai-Oh
+beats it: Grind them out rather than race: they trade one for one and punish your monster effects in their Main Phase with Triple Tactics Talent. Clear the backrow before your big summon; Nibiru, the Primal Being if they extend five times.
+build: Harpie's Feather Duster; Lightning Storm; Infinite Impermanence; Called by the Grave; Nibiru, the Primal Being
+
+deck: warriors
+for: vera
+plan: Reinforcement of the Army finds the Warrior she needs; Marauding Captain and Command Knight swarm the field and shield each other, and every equip on Gearfried the Swordmaster destroys a monster. Her traps punish the attack you thought was safe.
+keys: Gearfried the Swordmaster; Marauding Captain; Command Knight; Sakuretsu Armor; Dimensional Prison
+beats it: Clear a set card before you swing, or lead with your least valuable monster so Sakuretsu Armor and Dimensional Prison spend themselves on it. Marauding Captain keeps your attacks off her other Warriors and Command Knight can't be attacked beside another monster: remove them with card effects.
+build: Mystical Space Typhoon; Dust Tornado; Giant Trunade; Royal Decree; Jinzo
+turn: second - she sets her traps first, and Mystical Space Typhoon or Dust Tornado clears one before you attack

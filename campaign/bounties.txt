@@ -1,0 +1,48 @@
+# Gus's bounty board (CARD-UNLOCKS-SPEC-2026-11-01): three bounties per band, each paid once per save.
+#   band: <band>[, <circuit band>...]   the board; circuits of the bands after the first count on it too
+#   bounty: <id> | <checks> | <text>    every check must hold in a one-on-one circuit duel you win in that band
+# Checks:
+#   finisher:normal   a Normal Monster's attack took their last LP
+#   finisher:extra    an Extra Deck monster's attack (Fusion, Synchro, Xyz, Link) took it
+#   finisher:effect   effect damage (not battle) took it
+#   nodamage          you took no damage (LP paid as a cost doesn't count)
+#   byturn:N          won by turn N (turns count both players')
+#   comeback:LP       your LP fell to LP or less
+#   bighit:N          one hit of N damage or more
+#   turn:N            N damage or more in one turn
+#   summons:N         N summons or more in one of your turns
+#   traps:N           N trap activations or more
+#   second            you went second
+#   own               your own deck (no loaner)
+# A bounty pays the card your Recipe misses most (in the shop's era, not on the no-pass list); with no Recipe set,
+# the band's first pays 1 Card Token and the rest are owed until you set one.
+
+band: Beginner
+bounty: beginner-vanilla | finisher:normal | Finish a duel with a Normal Monster's attack
+bounty: beginner-clean | nodamage | Win without taking a point of damage
+bounty: beginner-quick | byturn:7 | Win by turn 7
+
+band: Novice
+bounty: novice-comeback | comeback:1000 | Win after falling to 1000 LP or less
+bounty: novice-bighit | bighit:3000 | Deal 3000 damage or more in one hit
+bounty: novice-traps | own traps:2 | Activate 2 traps and win with your own deck
+
+band: Intermediate
+bounty: intermediate-extra | finisher:extra | Finish a duel with an Extra Deck monster's attack
+bounty: intermediate-swarm | summons:5 | Summon 5 times in one turn
+bounty: intermediate-second | second byturn:9 | Go second and win by turn 9
+
+band: Advanced
+bounty: advanced-traps | traps:4 | Activate 4 traps in one duel
+bounty: advanced-otk | turn:8000 | Deal 8000 damage in one turn
+bounty: advanced-burn | finisher:effect | Finish a duel with effect damage
+
+band: Expert
+bounty: expert-comeback | second comeback:2000 | Go second, fall to 2000 LP or less, and win
+bounty: expert-clean | own nodamage | Win with your own deck without taking damage
+bounty: expert-swarm | summons:8 | Summon 8 times in one turn
+
+band: Master, Gauntlet
+bounty: master-quick | byturn:4 | Win by turn 4
+bounty: master-otk | second turn:8000 | Go second and deal 8000 damage in one turn
+bounty: master-vanilla | own finisher:normal | Finish a duel with a Normal Monster's attack, with your own deck

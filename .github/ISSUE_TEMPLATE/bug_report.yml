@@ -1,0 +1,73 @@
+name: Bug report
+description: Something in the game doesn't work right.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping make the game better! Fill in what you can. Short answers are fine.
+        Need help finding the replay code or `Player.log`? See [Report a bug](https://github.com/fullstackjake/duel-circuit/blob/main/CONTRIBUTING.md#report-a-bug).
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Your computer
+      options:
+        - Windows 10 or 11 (64-bit)
+        - Mac (Apple silicon)
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Game version
+      description: It's at the bottom left of the title screen.
+      placeholder: v0.1.1
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Tell us what you saw.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to make it happen again
+      description: If you know them. One step per line.
+      placeholder: |
+        1. Open Free Duel
+        2. Pick ...
+        3. ...
+  - type: textarea
+    id: replay
+    attributes:
+      label: Replay code
+      description: |
+        For a bug in a duel. During the duel: gear button (top right), then Save replay; the code is copied for you.
+        After the duel: main menu, Replays, then Copy code. Paste it here.
+      placeholder: YGOR1:...
+      render: text
+  - type: textarea
+    id: log
+    attributes:
+      label: Player.log
+      description: |
+        Drag your `Player.log` file here. Copy it before you open the game again (each start makes a new log).
+        Mac: `~/Library/Logs/YgoCampaign/Duel Circuit/Player.log`
+        Windows: `%USERPROFILE%\AppData\LocalLow\YgoCampaign\Duel Circuit\Player.log`
+  - type: checkboxes
+    id: content
+    attributes:
+      label: Before you send
+      options:
+        - label: My report has no card images or full-card screenshots.
+          required: true

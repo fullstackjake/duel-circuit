@@ -1,0 +1,68 @@
+# Signature duel mats: the rival and every circuit's final opponent get a mat of their own, painted in code.
+#   <character id>: <deep> <mid> <accent> <motif>
+# Motifs: rays, flames, waves, gears, circuit, runes, sparkles, chains, scales, stripes, staff, ring, void, mist, sigil,
+#   eclipse, halos, arrows, brick.
+# A picture in mods/mats/<character id>.png (or art/mats/, shipped with the game) replaces the painted mat.
+# Everyone else gets a plain mat colored by their deck's main Attribute.
+
+# The rival
+vera: #1C0D0B #6A1F17 #FFB347 rays
+
+# Beginner
+rookie-ryo: #0B1424 #1E3E6E #8FC8FF sparkles
+tink: #17110A #5A3A1A #E8A15A gears
+hollis: #0A1A1A #1F4F4C #7FE3D2 runes
+
+# Novice
+burning-abyss: #160606 #5A120C #FF6A2B flames
+altergeist: #140A18 #4C1F5A #FF7AD9 mist
+yummy: #1E0F17 #6B2F4E #FFC2E2 sparkles
+
+# Intermediate
+infernity: #080608 #2A0F14 #FF4040 void
+gouki: #1A0F06 #6A3510 #FFB040 ring
+maliss: #160709 #551522 #FF5C70 circuit
+
+# Advanced
+dragon-ruler: #1A0C06 #5E2A10 #FF9A40 scales
+true-draco: #18140A #5C4A1C #FFE08A sigil
+unchained: #0F0818 #3A1A60 #C78CFF chains
+
+# Expert
+danger-dark-world: #0A120C #243A22 #9BE07A mist
+tenpai-dragon: #1A0A06 #6A2410 #FFD24A flames
+elfnote: #0A1610 #1E5034 #9CFFC0 staff
+lunalight: #0E0A1A #3A2A5E #E6D8FF ring
+
+# Master
+spright: #08121C #164A6A #6FF0FF sparkles
+k9-vanquish-soul: #0A0E1A #1E2A4E #FFD84A stripes
+branded-despia: #140A0C #4E1A22 #FFE6C8 sigil
+chaos-ritual: #0C0C10 #3A3A48 #F2E6B8 runes
+
+# Gauntlet
+ishizu-tearlaments: #061416 #10464C #6FF5E0 waves
+
+# Era mats (the Library: bought for your side once a cup is cleared)
+era-goat-cup: #0B120A #2A4222 #F0DCA0 eclipse
+era-teledad-cup: #0A0B08 #2C3022 #C8FF4A void
+era-synchro-peak-cup: #0A0F16 #2A3848 #E4FFEC halos
+era-rabbits-rulers-cup: #110E0A #3E3428 #E6BC7A scales
+era-hat-shaddoll-cup: #0E0A12 #3A2648 #EEE4F6 gears
+era-nekroz-pepe-cup: #070B1C #1F2E62 #D0E6FF runes
+era-abc-to-spyral-cup: #0D0E10 #36393E #4CF0B4 circuit
+era-link-dawn-cup: #050D18 #0F3450 #FF7A48 arrows
+era-toss-eldlich-cup: #0E0B05 #3A2F12 #FFD45C sparkles
+era-tearlaments-cup: #0A0A1A #2E2456 #8FF0F0 mist
+era-kashtira-snake-eye-cup: #0C0810 #2A1A30 #FF8A40 flames
+era-ryzeal-cup: #120C14 #4A2E40 #F5D2C0 rays
+
+# The Back Alley's tables (ALLEY-SPEC section 13; the "brick" motif is the alley's own). Orvel's and Nyx's tables use
+# their characters' mats when they have one here, else the table's.
+alley-dumpster-row: #0D0B0A #2A211C #FF4FA3 brick
+alley-basement: #0A0B0D #1E2630 #3FE0D0 chains
+alley-black-market: #0E0A0D #2E1A26 #FF4FA3 chains
+# Orvel's Table: Patron Orvel's own (the House's brass seal on old mahogany felt).
+power-patron: #0C0907 #3A2614 #E8B860 sigil
+# No Limits (NO-LIMITS-SPEC section 11): cold strip-light grey, the warm bulb over the end chair as the accent, on the chains.
+no-limits: #0B0C0E #1C2026 #F2C14E chains

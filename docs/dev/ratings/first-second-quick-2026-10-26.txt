@@ -1,0 +1,174 @@
+Rating 79 decks over 300 rounds (11700 duels)...
+  round 10/300  (00:05)
+  round 20/300  (00:09)
+  round 30/300  (00:13)
+  round 40/300  (00:19)
+  round 50/300  (00:24)
+  round 60/300  (00:28)
+  round 70/300  (00:33)
+  round 80/300  (00:37)
+  round 90/300  (00:42)
+  round 100/300  (00:46)
+  round 110/300  (00:51)
+  round 120/300  (00:55)
+  round 130/300  (01:02)
+  round 140/300  (01:07)
+  round 150/300  (01:11)
+  round 160/300  (01:16)
+  round 170/300  (01:20)
+  round 180/300  (01:25)
+  round 190/300  (01:30)
+  round 200/300  (01:35)
+  round 210/300  (01:40)
+  round 220/300  (01:45)
+  round 230/300  (01:50)
+  round 240/300  (01:55)
+  round 250/300  (02:00)
+  round 260/300  (02:05)
+  round 270/300  (02:10)
+  round 280/300  (02:15)
+  round 290/300  (02:19)
+  round 300/300  (02:24)
+
+  1. ishizu-tearlaments         Elo  1971   won  91% of 297   avg  5.0 turns   first  91% / second  91%
+  2. tearlaments                Elo  1967   won  93% of 296   avg  5.7 turns   first  90% / second  95%
+  3. branded-despia             Elo  1921   won  89% of 298   avg  6.0 turns   first  87% / second  91%
+  4. ryzeal                     Elo  1901   won  84% of 296   avg  6.2 turns   first  82% / second  88%   2 errors
+  5. light-and-darkness         Elo  1891   won  88% of 299   avg  6.6 turns   first  89% / second  88%
+  6. mitsurugi                  Elo  1820   won  85% of 294   avg  7.5 turns   first  80% / second  89%
+  7. eldlich                    Elo  1805   won  81% of 296   avg 10.4 turns   first  81% / second  82%
+  8. angelechy                  Elo  1804   won  82% of 299   avg  7.2 turns   first  87% / second  76%
+  9. spright                    Elo  1799   won  78% of 293   avg  7.2 turns   first  78% / second  80%   1 errors
+ 10. k9-vanquish-soul           Elo  1795   won  82% of 296   avg  7.3 turns   first  81% / second  84%   1 errors
+ 11. fire-king-snake-eye        Elo  1786   won  78% of 296   avg  9.3 turns   first  80% / second  77%
+ 12. kashtira                   Elo  1731   won  77% of 296   avg 11.1 turns   first  73% / second  80%
+ 13. bystial-dragon-link        Elo  1727   won  74% of 297   avg  9.1 turns   first  70% / second  79%
+ 14. yubel                      Elo  1693   won  70% of 297   avg  9.5 turns   first  73% / second  72%   9 errors
+ 15. mekk-knight-invoked        Elo  1690   won  63% of 296   avg 10.3 turns   first  59% / second  68%   1 errors
+ 16. thunder-dragon             Elo  1674   won  72% of 299   avg  7.2 turns   first  67% / second  78%
+ 17. elfnote                    Elo  1639   won  63% of 293   avg  9.2 turns   first  64% / second  63%
+ 18. danger-dark-world          Elo  1624   won  62% of 298   avg  7.9 turns   first  50% / second  74%   1 errors
+ 19. unchained                  Elo  1599   won  60% of 293   avg 10.6 turns   first  53% / second  67%
+ 20. snake-eye                  Elo  1597   won  65% of 296   avg  9.1 turns   first  68% / second  63%
+ 21. drytron                    Elo  1593   won  63% of 298   avg  9.3 turns   first  60% / second  65%
+ 22. shaddoll                   Elo  1585   won  59% of 296   avg 10.2 turns   first  57% / second  63%   2 errors
+ 23. adamancipator              Elo  1583   won  60% of 295   avg 11.7 turns   first  61% / second  60%
+ 24. kozmo                      Elo  1577   won  62% of 297   avg 10.2 turns   first  58% / second  67%
+ 25. orcust                     Elo  1577   won  57% of 296   avg  9.7 turns   first  55% / second  59%
+ 26. tenpai-dragon              Elo  1572   won  56% of 297   avg 10.7 turns   first  55% / second  67%   24 errors
+ 27. true-draco                 Elo  1567   won  52% of 298   avg 11.3 turns   first  47% / second  57%
+ 28. spyral                     Elo  1561   won  55% of 297   avg 11.2 turns   first  52% / second  59%   1 errors
+ 29. abc                        Elo  1517   won  56% of 295   avg 10.7 turns   first  51% / second  62%   1 errors
+ 30. nekroz                     Elo  1517   won  52% of 299   avg 10.0 turns   first  53% / second  51%   1 errors
+ 31. tri-brigade                Elo  1498   won  48% of 298   avg  9.6 turns   first  45% / second  50%
+ 32. plant-synchro              Elo  1497   won  45% of 298   avg 12.4 turns   first  49% / second  42%   1 errors
+ 33. stall-burn                 Elo  1488   won  45% of 296   avg 20.4 turns   first  38% / second  53%
+ 34. chaos-yata                 Elo  1479   won  47% of 295   avg 12.6 turns   first  43% / second  50%
+ 35. wind-up                    Elo  1476   won  52% of 294   avg 12.8 turns   first  52% / second  52%
+ 36. warriors                   Elo  1472   won  45% of 292   avg 12.4 turns   first  44% / second  46%
+ 37. synchron                   Elo  1470   won  50% of 294   avg 11.3 turns   first  43% / second  58%   1 errors
+ 38. modern                     Elo  1467   won  43% of 299   avg 13.6 turns   first  41% / second  47%   2 errors
+ 39. teledad                    Elo  1464   won  40% of 293   avg 11.3 turns   first  36% / second  45%
+ 40. gadgets                    Elo  1462   won  46% of 299   avg 14.4 turns   first  42% / second  49%
+ 41. six-samurai                Elo  1460   won  44% of 293   avg 10.3 turns   first  39% / second  48%
+ 42. mekk-knight                Elo  1458   won  45% of 294   avg 12.6 turns   first  40% / second  51%
+ 43. spellcasters-command       Elo  1452   won  46% of 298   avg 12.0 turns   first  47% / second  46%
+ 44. dragon-ruler               Elo  1449   won  49% of 297   avg 12.0 turns   first  46% / second  53%
+ 45. pendulum-magician          Elo  1432   won  43% of 299   avg 10.8 turns   first  43% / second  43%   1 errors
+ 46. dino-rabbit                Elo  1429   won  45% of 299   avg 12.7 turns   first  43% / second  47%   1 errors
+ 47. goat-control               Elo  1426   won  43% of 295   avg 15.0 turns   first  46% / second  39%   1 errors
+ 48. floowandereeze             Elo  1424   won  37% of 295   avg 13.9 turns   first  33% / second  40%
+ 49. sky-striker                Elo  1421   won  35% of 297   avg 11.9 turns   first  32% / second  38%
+ 50. hat                        Elo  1419   won  48% of 297   avg 13.2 turns   first  46% / second  50%
+ 51. satellarknight             Elo  1417   won  42% of 294   avg 10.1 turns   first  46% / second  38%   1 errors
+ 52. machine-re-volt            Elo  1410   won  40% of 297   avg 12.4 turns   first  36% / second  45%
+ 53. exosister                  Elo  1408   won  41% of 295   avg 11.2 turns   first  34% / second  49%
+ 54. inzektor                   Elo  1402   won  38% of 295   avg 11.1 turns   first  38% / second  38%
+ 55. salamangreat               Elo  1394   won  43% of 296   avg 11.0 turns   first  37% / second  49%   1 errors
+ 56. dragunity-legion           Elo  1390   won  37% of 299   avg 12.7 turns   first  34% / second  39%   1 errors
+ 57. burning-abyss              Elo  1390   won  38% of 297   avg 12.2 turns   first  36% / second  39%   1 errors
+ 58. performapal                Elo  1387   won  37% of 299   avg 12.3 turns   first  36% / second  38%
+ 59. lightsworn                 Elo  1384   won  41% of 296   avg 10.6 turns   first  40% / second  43%
+ 60. qliphort                   Elo  1361   won  37% of 295   avg  9.9 turns   first  38% / second  35%
+ 61. zombies                    Elo  1358   won  39% of 296   avg 12.1 turns   first  36% / second  44%   3 errors
+ 62. maliss                     Elo  1351   won  40% of 295   avg 10.4 turns   first  38% / second  42%
+ 63. fury-from-the-deep         Elo  1347   won  28% of 295   avg 14.5 turns   first  28% / second  28%
+ 64. lost-sanctuary             Elo  1344   won  35% of 299   avg 12.0 turns   first  29% / second  41%   1 errors
+ 65. gouki                      Elo  1344   won  37% of 298   avg 11.2 turns   first  36% / second  38%   1 errors
+ 66. blackwing                  Elo  1333   won  33% of 294   avg 10.1 turns   first  26% / second  38%
+ 67. geargia                    Elo  1318   won  30% of 299   avg 16.1 turns   first  28% / second  32%
+ 68. altergeist                 Elo  1313   won  29% of 295   avg 11.2 turns   first  29% / second  30%
+ 69. yummy                      Elo  1306   won  28% of 295   avg 11.3 turns   first  30% / second  26%   2 errors
+ 70. spellbook                  Elo  1295   won  24% of 297   avg 10.8 turns   first  22% / second  26%
+ 71. domain-monarch             Elo  1285   won  32% of 296   avg 10.7 turns   first  38% / second  25%
+ 72. synchron-extreme           Elo  1273   won  27% of 294   avg 13.1 turns   first  23% / second  31%
+ 73. classic                    Elo  1269   won  28% of 294   avg 13.7 turns   first  25% / second  32%   1 errors
+ 74. infernity                  Elo  1269   won  27% of 295   avg 10.9 turns   first  28% / second  26%   1 errors
+ 75. runick-spright             Elo  1234   won  24% of 297   avg 10.4 turns   first  22% / second  27%
+ 76. dinosaurs-rage             Elo  1233   won  26% of 298   avg 12.8 turns   first  25% / second  27%
+ 77. purrely                    Elo  1183   won  19% of 297   avg 12.4 turns   first  17% / second  21%
+ 78. zoodiac                    Elo  1168   won  19% of 295   avg 11.1 turns   first  15% / second  23%
+ 79. frog-ftk                   Elo  1109   won  11% of 293   avg 11.8 turns   first   8% / second  14%
+
+Better going second (second minus first, in points; * = beyond two standard errors):
+  danger-dark-world             23  (first 50% of 145, second 74% of 152) *
+  exosister                     16  (first 34% of 155, second 49% of 140) *
+  unchained                     15  (first 53% of 152, second 67% of 141) *
+  stall-burn                    15  (first 38% of 150, second 53% of 146) *
+  synchron                      15  (first 43% of 146, second 58% of 147) *
+  blackwing                     12  (first 26% of 130, second 38% of 164) *
+  lost-sanctuary                12  (first 29% of 144, second 41% of 154) *
+  salamangreat                  12  (first 37% of 151, second 49% of 144) *
+  tenpai-dragon                 11  (first 55% of 132, second 67% of 141)
+  thunder-dragon                11  (first 67% of 161, second 78% of 138) *
+  abc                           11  (first 51% of 155, second 62% of 139)
+  mekk-knight                   11  (first 40% of 150, second 51% of 144)
+  true-draco                    10  (first 47% of 137, second 57% of 161)
+  mekk-knight-invoked            9  (first 59% of 163, second 68% of 132)
+  six-samurai                    9  (first 39% of 146, second 48% of 147)
+  machine-re-volt                9  (first 36% of 158, second 45% of 139)
+  synchron-extreme               9  (first 23% of 154, second 31% of 140)
+  kozmo                          9  (first 58% of 150, second 67% of 147)
+  mitsurugi                      9  (first 80% of 148, second 89% of 146) *
+  zoodiac                        9  (first 15% of 136, second 23% of 159)
+  bystial-dragon-link            9  (first 70% of 155, second 79% of 142)
+  teledad                        8  (first 36% of 152, second 45% of 141)
+  zombies                        8  (first 36% of 152, second 44% of 141)
+  dragon-ruler                   8  (first 46% of 151, second 53% of 146)
+  chaos-yata                     7  (first 43% of 130, second 50% of 165)
+  floowandereeze                 7  (first 33% of 151, second 40% of 144)
+  gadgets                        7  (first 42% of 149, second 49% of 150)
+  spyral                         7  (first 52% of 158, second 59% of 138)
+  classic                        7  (first 25% of 148, second 32% of 145)
+  ryzeal                         6  (first 82% of 166, second 88% of 128)
+  kashtira                       6  (first 73% of 143, second 80% of 153)
+  modern                         6  (first 41% of 161, second 47% of 136)
+  shaddoll                       6  (first 57% of 141, second 63% of 153)
+  frog-ftk                       5  (first 8% of 146, second 14% of 147)
+  runick-spright                 5  (first 22% of 144, second 27% of 153)
+  sky-striker                    5  (first 32% of 148, second 38% of 149)
+  dragunity-legion               5  (first 34% of 143, second 39% of 155)
+  tri-brigade                    5  (first 45% of 140, second 50% of 158)
+  tearlaments                    5  (first 90% of 153, second 95% of 143)
+  maliss                         5  (first 38% of 151, second 42% of 144)
+  drytron                        5  (first 60% of 144, second 65% of 154)
+  spellbook                      4  (first 22% of 145, second 26% of 152)
+  hat                            4  (first 46% of 156, second 50% of 141)
+  dino-rabbit                    4  (first 43% of 149, second 47% of 149)
+  geargia                        4  (first 28% of 141, second 32% of 158)
+  orcust                         4  (first 55% of 153, second 59% of 143)
+  purrely                        4  (first 17% of 147, second 21% of 150)
+  branded-despia                 3  (first 87% of 140, second 91% of 158)
+  burning-abyss                  3  (first 36% of 154, second 39% of 142)
+  lightsworn                     3  (first 40% of 141, second 43% of 155)
+  k9-vanquish-soul               3  (first 81% of 148, second 84% of 147)
+  dinosaurs-rage                 2  (first 25% of 155, second 27% of 143)
+  warriors                       2  (first 44% of 136, second 46% of 156)
+  performapal                    2  (first 36% of 145, second 38% of 154)
+  gouki                          2  (first 36% of 148, second 38% of 149)
+  spright                        2  (first 78% of 140, second 80% of 152)
+  eldlich                        1  (first 81% of 155, second 82% of 141)
+  altergeist                     1  (first 29% of 144, second 30% of 151)
+  pendulum-magician              0  (first 43% of 152, second 43% of 146)
+  inzektor                       0  (first 38% of 139, second 38% of 156)
+  fury-from-the-deep             0  (first 28% of 153, second 28% of 142)

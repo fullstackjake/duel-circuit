@@ -1,0 +1,197 @@
+# --card-search-test: the result sets the editor's old queries returned (count and FNV-1a hash of the sorted codes),
+# and the Related lists in order. Made from the pre-feature CardSearch.cs (commit 911b14d). Columns: kind, count, hash, query (or card name).
+db	c1c8597d8c8b001a
+find	99	af2d94b257b14669	dark magician
+find	58	3ce280221f498c17	blue-eyes
+find	80	81ec163da32e8da9	dragon lv8 atk>=3000
+find	110	d5965de4b7c65f92	handtrap
+find	59	3a04825fb41baf4d	synchro tuner
+find	75	56725f010fb51e5a	trap "destroy all"
+find	43	5026f54933e0ee4b	link2 cyberse
+find	9	04d1f2326ef759e7	dragon -effect lv8
+find	1963	9f05dbd57a00f15e	attr:light
+find	49	28524c54ce5a44df	type:spellcaster lv7
+find	181	f13d36f933ac000f	negateactivation trap
+find	70	0b6e78fbdacd30a1	"dark magician"
+find	1	4ffc26c90177fcc1	"ash blossom"
+find	19	038da1aa9e3f9482	"stardust dragon"
+find	2836	643d870316e2acbb	dark
+find	2111	0a765c9a9c1264d4	light
+find	2136	24109a8915c5b0a8	earth
+find	971	de277245f503852a	water
+find	907	2bc8ce5ab5d29c41	fire
+find	940	396625b19ffcb83e	wind
+find	53	7946e5dcc6dee67c	divine
+find	1132	ace757781dcca2d9	dragon
+find	1245	da432a9b459a465f	warrior
+find	820	14bda7519c2869d6	spellcaster
+find	336	1be02e117ad28d6f	wingedbeast
+find	16	3b6d361ec3302035	winged beast
+find	1718	8034dd7190c178fa	searcher
+find	1718	8034dd7190c178fa	search
+find	769	d4a6470b063bdb18	draw
+find	7053	856efbc94c4821bd	specialsummon
+find	2338	dfc2921027ba12fa	revive
+find	2562	ddab2f3cde842298	destroymonster
+find	1148	b0b213415f24026c	destroyst
+find	1599	e4d8c24ddae73d5c	negate
+find	3003	16b1e4bedccd43b0	banish
+find	33	518c248bc87ac4e1	wipe
+find	33	518c248bc87ac4e1	boardwipe
+find	3483	e4002be3524f6898	removal
+find	1103	88a37ca5adab78c3	burn
+find	339	4c0d3d003dd24720	gainlp
+find	1001	09f4d570e66c995b	discard
+find	664	b2b42e12dc78c957	negateeffect
+find	485	a55cfc0466e447b3	negateactivation
+find	9383	acd24d9dc69281d0	monster
+find	7179	c4465597066c2c02	monster -extra
+find	2204	ce38053ab4b23583	extra
+find	2896	fcf7c82fbbac6e41	spell
+find	2092	ce349fd808e61cb7	trap
+find	724	52886987c7e830a6	normal
+find	8574	a857f601e41308b6	effect
+find	611	574e28514cf22ca9	tuner
+find	584	9cf8653b28842506	fusion
+find	243	fe57c45a1f206b99	ritual
+find	541	26bafc8704c165a3	synchro
+find	603	9ce9ed055bc74db1	xyz
+find	476	fb2d3b4ba7565bc6	link
+find	390	39e259345cdb2a62	pendulum
+find	212	f07455fc6e9792be	flip
+find	578	5d46fe68f3051f2f	quickplay
+find	578	5d46fe68f3051f2f	quick-play
+find	1094	63f338f06b3de376	continuous
+find	340	0ba60148583fbc8c	field
+find	283	f3c40c84d50f6901	equip
+find	180	d231de9cd975be5a	counter
+find	578	5d46fe68f3051f2f	spell quickplay
+find	571	8d0691c6ce9132fd	continuous trap
+find	38	3e208fe08dca44b0	pendulum scale5
+find	206	511b2f2c68426538	rank4
+find	105	0d332fae79bf7894	xyz rank>=8
+find	221	b47a4ebae7cc051a	atk<500 tuner
+find	727	4dd4a2a62ce787e2	def:2000
+find	729	9870e73a062abc85	atk:0
+find	78	702679a29051940d	atk>=3000 def<=1000
+find	439	64c387d84c132c97	level>=10
+find	84	92f742f501006b7e	scale>=8
+find	185	15565e12410fbf38	link>=3
+find	406	317e3793065b8dad	lv4 warrior
+find	252	eed2f866ce569dc9	normal lv4
+find	145	7c014fd8ef2617f5	attr:dark type:fiend lv4
+find	5	fd1226ddd966457d	lv1 tuner handtrap
+find	4	93fef463127cc56f	light lv4 handtrap
+find	468	ec079fe70ffca2c1	searcher spell
+find	154	acc693dafba55b57	elemental hero
+find	311	d4baa73068dcbe5e	hero
+find	35	a9a864d67deb4546	sky striker
+find	1693	ff8f5dfc110de716	-monster destroy
+find	28	d918bf52a6ace740	pot of
+find	5	096d78cceaf8d804	raigeki
+find	3	218ed273c028eed3	monster reborn
+find	1920	d377610eda8e4566	"special summon" -monster
+find	59	91943e7dc2e10dec	blue eyes
+find	12	e426fb3118cd90e1	exodia
+find	15	31376728a5933afd	dark magician girl
+find	203	492c949977b3583c	magician
+find	37	dbd5a2e4c4fb67ed	kuriboh
+find	40	068d7f435523abaf	cyber dragon
+find	40	d0bbdf61a7206762	harpie
+find	18	4925e1bb5a5c38d4	ojama
+find	173	1e993bc0e4e3a5e7	"draw 2"
+find	5	751b43c1586b20fd	mst
+find	8	8ee993270b6077a7	solemn
+find	34	a7b8b6dac5b07364	x-saber
+find	1892	40f2fa5e6616305c	graveyard
+find	5407	ab2609a0a6fa090c	gy
+find	14369	d8d96ee7799f7060	a
+find	12567	e6d14c7294327574	the
+find	14371	4fc89c226b665ae2	""
+find	6720	ee748dd04d089290	-
+find	5122	fb7bc597976d419c	destroy
+find	7053	856efbc94c4821bd	special summon
+find	13	ef04d946bb76d68a	mirror force
+find	1	4ffc26c90177fcc1	ash blossom
+find	1	2ceed3ca42922432	maxx
+find	85	c68745bec0f8af5c	-effect -normal monster
+find	151	c55c68018619a6bc	lv4 dragon
+find	249	82814461ff1ad6f9	lv4 spellcaster
+find	375	5ad70ed5cb92918e	"destroy all"
+find	46	e7180adf84e90442	neos
+find	61	0f25e1d4b26f4c10	utopia
+find	1018	e4db1830ae27461a	number
+find	9	0251932f08c2a00e	dragon handtrap
+find	110	d5965de4b7c65f92	handtrap monster -extra
+find	139	39063049a26fbf78	dragon searcher
+find	920	05a7fd88fd7c349b	searcher monster -extra
+find	31	0e9fe12289e9623b	dragon draw
+find	306	eea666ea5875c864	draw monster -extra
+find	717	1c20c0f07a769ec8	dragon specialsummon
+find	3978	86610081da68bf88	specialsummon monster -extra
+find	281	ded16b9b4b204b53	dragon revive
+find	1131	c7b5d2b6a2b66b77	revive monster -extra
+find	232	a8524815ce5ad5c2	dragon destroymonster
+find	1101	9e4218e07ce409b7	destroymonster monster -extra
+find	87	ccdfba4eb11ef6f3	dragon destroyst
+find	532	36a01afae8dd17c5	destroyst monster -extra
+find	166	524ef01c8d771881	dragon negate
+find	577	0000bec52c8a97d4	negate monster -extra
+find	281	11df8796a9dc80ef	dragon banish
+find	1273	8ce75277b287caf4	banish monster -extra
+find	7	a6ef2553e29144dd	dragon wipe
+find	11	d701fbb7ead911e7	wipe monster -extra
+find	2094	cf07d58055ff2e46	attr:earth
+find	960	fc074290408cd91c	attr:water
+find	830	0e174648c672b77e	attr:fire
+find	865	0d5f25995f59ca2c	attr:wind
+find	2664	d6c95916ad980e57	attr:dark
+find	7	276e4f1e59bf7309	attr:divine
+find	1169	7ca0472e2730ea58	type:warrior
+find	816	5fe7bbd66523a8b9	type:spellcaster
+find	582	7391eecd78ce8d4e	type:fairy
+find	920	d89a71a2b552a107	type:fiend
+find	275	9b9e4e36994e0c9b	type:zombie
+find	1060	42e4de162a1fb36b	type:machine
+find	293	f634996662a496bd	type:aqua
+find	162	8c2d2add325d14ee	type:pyro
+find	275	2128e3b26a1fa962	type:rock
+find	336	1be02e117ad28d6f	type:wingedbeast
+find	261	9727db2427ed1d91	type:plant
+find	275	1927ac6da28b5f3b	type:insect
+find	153	bf5fb311223e83f8	type:thunder
+find	821	cc07216fbacf65de	type:dragon
+find	431	02ff454c145e367c	type:beast
+find	269	5b8a2debee8fc377	type:beastwarrior
+find	151	05e005e9aad73c56	type:dinosaur
+find	147	2e3c164c5e7f4b3c	type:fish
+find	106	304930a2322e086e	type:seaserpent
+find	194	e04f779cc572c2e8	type:reptile
+find	218	56b4435db38a9754	type:psychic
+find	6	d97c501a9095d1c3	type:divinebeast
+find	1	35df17dfc22ac8e3	type:creatorgod
+find	100	c5aebd6cdaa45fa9	type:wyrm
+find	300	477992628134c5a6	type:cyberse
+find	62	5d14e69353c8389b	type:illusion
+find	690	de2b06a89bad3bd4	lv1
+find	712	985fecfded876bb8	lv2
+find	1206	bdef200abfd6c83d	lv3
+find	2417	d97780d1d714778a	lv4
+find	627	9747b75b70be5352	lv5
+find	691	37bf0b68f3e04e2f	lv6
+find	544	b3bbe35db532ba64	lv7
+find	812	c62bcc2b149656c1	lv8
+find	166	2517ebe11b784076	lv9
+find	313	34d95d5f954b4047	lv10
+find	37	8689c9e4f850f71d	lv11
+find	89	f7ceadda6b2c8059	lv12
+find	3	c2e96fd948748cc4	handtrap searcher monster attr:light lv1
+find	468	ec079fe70ffca2c1	spell searcher
+find	435	e05f77d1844fe63c	trap negate
+find	70	e9ec4fda398d79eb	extra type:dragon lv8
+find	14	8163228d8f454e16	dark magician monster type:spellcaster lv7
+find	0	cbf29ce484222325	hero handtrap searcher draw specialsummon revive destroymonster destroyst negate banish wipe
+related	72	f3fc7f08a7180eae	Dark Magician
+related	45	723fc8ae21788f7d	Blue-Eyes White Dragon
+related	186	5848df7e2b0b86fb	Elemental HERO Neos
+related	19	e2f140b172e98ae3	Dante, Traveler of the Burning Abyss

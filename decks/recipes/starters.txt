@@ -1,0 +1,243 @@
+// Starter decks: each built around one combo you can feel from the first turn, without the era's power cards.
+
+deck: decks/classic.ydk
+#about Lord of D. and the Flute call Blue-Eyes from your hand; Trade-In and Silver's Cry turn dead dragons into cards and comebacks.
+main:
+3 Blue-Eyes White Dragon
+3 Lord of D.
+2 Kaibaman
+2 Masked Dragon
+3 Luster Dragon
+2 Alexandrite Dragon
+1 Troop Dragon
+1 Different Dimension Dragon
+2 The Flute of Summoning Dragon
+2 Trade-In
+2 Silver's Cry
+2 Ancient Rules
+1 Monster Reborn
+1 Swords of Revealing Light
+1 Mystical Space Typhoon
+1 Polymerization
+2 Stamping Destruction
+2 Trap Hole
+1 Dragon's Rebirth
+1 Mirror Force
+1 Magic Cylinder
+2 Burst Breath
+2 Dragon Capture Jar
+extra:
+1 Blue-Eyes Ultimate Dragon
+1 King Dragun
+
+deck: decks/warriors.ydk
+#about Gearfried the Swordmaster destroys a monster every time you equip it; Marauding Captain and Command Knight keep the swordmaster safe.
+main:
+3 Gearfried the Iron Knight
+2 Gearfried the Swordmaster
+3 Marauding Captain
+2 Command Knight
+2 Warrior Lady of the Wasteland
+2 Blade Knight
+1 Exiled Force
+1 D.D. Warrior Lady
+2 Goblin Attack Force
+1 Mystic Swordsman LV2
+3 Reinforcement of the Army
+2 Release Restraint
+2 Lightning Blade
+2 Fairy Meteor Crush
+1 Fusion Sword Murasame Blade
+1 Axe of Despair
+1 The Warrior Returning Alive
+1 Fighting Spirit
+1 Swords of Revealing Light
+1 Mystical Space Typhoon
+2 Sakuretsu Armor
+2 Bottomless Trap Hole
+2 Dimensional Prison
+extra:
+
+deck: decks/zombies.ydk
+#about Zombie World and Book of Life keep your undead coming back; Pyramid Turtle and Goblin Zombie fetch the next one when one falls.
+main:
+3 Pyramid Turtle
+3 Goblin Zombie
+3 Mezuki
+2 Zombie Master
+2 Uni-Zombie
+1 Gozuki
+1 Plaguespreader Zombie
+1 Shutendoji
+2 Ryu Kokki
+1 Vampire Lord
+1 Il Blud
+1 Red-Eyes Zombie Dragon
+1 Despair from the Dark
+1 Spirit Reaper
+2 Book of Life
+1 Call of the Mummy
+1 Foolish Burial
+2 Zombie World
+1 Monster Reborn
+1 Zombie Necronize
+1 Swords of Revealing Light
+1 Mystical Space Typhoon
+2 Trap Hole
+1 Bottomless Trap Hole
+1 Call of the Haunted
+2 Overpowering Eye
+1 Sakuretsu Armor
+extra:
+
+// A modern starter for players who want one: far stronger than the early circuits' decks. Mekk-Knight Invoked Evolved,
+// from the 2026 TCG deck guide (docs/dev/decks/MEKK-KNIGHT-INVOKED-EVOLVED.md): legal under every circuit's list except
+// Super Polymerization under TCG April 2015 (a Ban Pass covers it).
+deck: decks/mekk-knight-invoked.ydk
+#title Mekk-Knight Invoked Evolved
+#era 2026
+#banlist 2026.10 TCG
+#about Going second: interrupt what matters (Ash Blossom, Infinite Impermanence, Mulcharmy Fuwalos), break the field (Gameciel, Forbidden Droplet, Super Polymerization), land Mekk-Knights in columns full of the opponent's cards, then finish with an Invoked or Mekk-Knight push, or hold with Mechaba and World Legacy's Secret.
+#starters 86120751 28692962 20537097 69811710 47679935
+main:
+3 Aleister the Invoker
+3 Mekk-Knight Purple Nightfall
+3 Mekk-Knight Blue Sky
+2 Girsu, the Orcust Mekk-Knight
+1 Mekk-Knight Indigo Eclipse
+1 Mekk-Knight Red Moon
+1 Mekk-Knight Yellow Star
+3 Ash Blossom & Joyous Spring
+3 Mulcharmy Fuwalos
+2 Gameciel, the Sea Turtle Kaiju
+1 Nibiru, the Primal Being
+3 Magical Meltdown
+2 Invocation
+2 World Legacy's Memory
+2 Super Polymerization
+2 Forbidden Droplet
+1 Harpie's Feather Duster
+1 Terraforming
+3 Infinite Impermanence
+1 World Legacy's Secret
+extra:
+2 Invoked Mechaba
+1 Invoked Purgatrio
+1 Invoked Augoeides
+1 Invoked Caliga
+1 Invoked Raidjin
+1 Garura, Wings of Resonant Life
+1 Mudragon of the Swamp
+1 Artemis, the Magistus Moon Maiden
+1 Salamangreat Almiraj
+1 Mekk-Knight of the Morning Star
+1 Lib the World Key Blademaster
+1 S:P Little Knight
+1 Accesscode Talker
+1 Mekk-Knight Crusadia Avramax
+side:
+3 Evenly Matched
+3 Cosmic Cyclone
+2 Nibiru, the Primal Being
+3 Solemn Strike
+2 Book of Eclipse
+2 Lightning Storm
+
+// Historic Rules editions of the classic starters (CampaignState.Starters' HistoricDeck): what a new player under the
+// history way starts with, legal under the first list (TCG March 2011) with every card released by its format's end, so
+// the three starting Ban Passes go to power cards, not repairs.
+
+deck: decks/classic-2011.ydk
+#about Lord of D. and the Flute call Blue-Eyes from your hand; Trade-In and Dragon's Mirror turn dead dragons into cards and comebacks.
+#era 2011
+#banlist TCG March 2011
+main:
+3 Blue-Eyes White Dragon
+3 Lord of D.
+2 Kaibaman
+2 Masked Dragon
+3 Luster Dragon
+2 Alexandrite Dragon
+1 Troop Dragon
+1 Different Dimension Dragon
+2 The Flute of Summoning Dragon
+2 Trade-In
+2 Ancient Rules
+1 Monster Reborn
+1 Swords of Revealing Light
+1 Mystical Space Typhoon
+1 Polymerization
+2 Stamping Destruction
+2 Trap Hole
+1 Dragon's Rebirth
+1 Mirror Force
+1 Magic Cylinder
+2 Burst Breath
+2 Dragon Capture Jar
+1 Dragon's Mirror
+1 Call of the Haunted
+extra:
+1 Blue-Eyes Ultimate Dragon
+1 King Dragun
+
+deck: decks/warriors-2011.ydk
+#about Gearfried the Swordmaster destroys a monster every time you equip it; Marauding Captain and Command Knight keep the swordmaster safe.
+#era 2011
+#banlist TCG March 2011
+main:
+3 Gearfried the Iron Knight
+2 Gearfried the Swordmaster
+3 Marauding Captain
+3 Command Knight
+2 Warrior Lady of the Wasteland
+2 Blade Knight
+1 Exiled Force
+1 D.D. Warrior Lady
+2 Goblin Attack Force
+1 Mystic Swordsman LV2
+1 Reinforcement of the Army
+2 Release Restraint
+2 Lightning Blade
+2 Fairy Meteor Crush
+1 Fusion Sword Murasame Blade
+1 Axe of Despair
+1 The Warrior Returning Alive
+1 Fighting Spirit
+1 Swords of Revealing Light
+1 Mystical Space Typhoon
+2 Sakuretsu Armor
+2 Bottomless Trap Hole
+2 Dimensional Prison
+1 The A. Forces
+extra:
+
+deck: decks/zombies-2011.ydk
+#about Zombie World and Book of Life keep your undead coming back; Pyramid Turtle and Goblin Zombie fetch the next one when one falls.
+#era 2011
+#banlist TCG March 2011
+main:
+3 Pyramid Turtle
+3 Goblin Zombie
+1 Mezuki
+3 Zombie Master
+1 Plaguespreader Zombie
+1 Shutendoji
+3 Ryu Kokki
+2 Vampire Lord
+1 Il Blud
+1 Red-Eyes Zombie Dragon
+1 Despair from the Dark
+2 Spirit Reaper
+3 Book of Life
+2 Call of the Mummy
+1 Foolish Burial
+2 Zombie World
+1 Monster Reborn
+1 Swords of Revealing Light
+1 Mystical Space Typhoon
+2 Trap Hole
+1 Bottomless Trap Hole
+1 Call of the Haunted
+2 Overpowering Eye
+1 Sakuretsu Armor
+extra:

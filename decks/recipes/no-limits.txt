@@ -1,0 +1,544 @@
+// No Limits (docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 5): the wave-1 peak builds. Each starts from the real list of
+// its deck's peak month (NL-0, P4: Main and Extra as played), then NL-1 adds the build: the deck's own banned cards back
+// at 3 (Extra at the list's count), its contraband picks, and cuts from the hand-trap and flex block only (never the
+// engine). Where each list came from is decks/no-limits/SOURCES.md (repo only); no #source line, so no real player's
+// name reaches the game (N12). The four Brawl decks (section 8) follow: a 2024-25 base made legal for the Alley list with
+// Loaners.Adjust, plus 3 Basement Game cards picked by the splash builder (`--brawl-gen <base> --seed 1`) and frozen here.
+// Build:  python3 tools/build_deck.py decks/recipes/no-limits.txt
+
+deck: decks/no-limits/nl-snake-eye.ydk
+#created by Duel Circuit - No Limits: Fiendsmith Snake-Eye, summer 2024 (Junia "Spoils")
+#title Fiendsmith Snake-Eye (2024, uncut)
+#era 2024
+#tier No Limits peak build: the end chair (wave 1) (docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 5)
+#about Won the 2024 North America WCQ, the year's biggest room (2,635 players, 29 of the Top 64 on this deck). Snake-Eye Ash and Diabellstar mill and revive FIRE monsters into a multi-interruption board; the Fiendsmith engine, new that summer, adds Lacrima, Desirae and a second line through any hand trap. Here with three Original Sinful Spoils, three Poplar and the old Spell/Trap Zone tools it was built to abuse.
+#why Peak list: July 2024; restored: Original Sinful Spoils - Snake-Eye x3, Snake-Eye Ash x3, Snake-Eyes Poplar x3, Fiendsmith's Lacrima (Extra, 1); picks: Union Carrier (Extra), Card of Safe Return, Soul Charge, Blaster, Dragon Ruler of Infernos; cuts: Effect Veiler x3 (hand traps), Silhouhatte Rabbit (Extra). Measured 2026-11-03: rated 1728 (+116 over snake-eye 1612).
+#banlist TCG April 2024
+#recipe snake-eye
+main:
+3 Snake-Eye Ash
+1 Snake-Eyes Flamberge Dragon
+1 Snake-Eye Oak
+3 Snake-Eyes Poplar
+1 Snake-Eyes Diabellstar
+3 Diabellstar the Black Witch
+1 Fabled Lurrie
+3 Fiendsmith Engraver
+1 Blaster, Dragon Ruler of Infernos
+3 Ash Blossom & Joyous Spring
+2 Ghost Ogre & Snow Rabbit
+1 Bystial Magnamhut
+2 Bystial Druiswurm
+1 Bystial Baldrake
+3 Nibiru, the Primal Being
+2 Ghost Mourner & Moonlit Chill
+3 Bonfire
+1 Fiendsmith's Tract
+3 WANTED: Seeker of Sinful Spoils
+3 Original Sinful Spoils - Snake-Eye
+1 Divine Temple of the Snake-Eye
+1 Angel Statue - Azurune
+1 Card of Safe Return
+1 Soul Charge
+3 Infinite Impermanence
+extra:
+1 Union Carrier
+1 Relinquished Anima
+1 Knightmare Phoenix
+1 Promethean Princess, Bestower of Flames
+1 I:P Masquerena
+1 S:P Little Knight
+1 Selene, Queen of the Master Magicians
+1 Apollousa, Bow of the Goddess
+1 Beatrice, Lady of the Eternal
+1 Moon of the Closed Heaven
+1 Fiendsmith's Requiem
+1 Fiendsmith's Sequence
+1 Hiita the Fire Charmer, Ablaze
+1 Fiendsmith's Desirae
+1 Fiendsmith's Lacrima
+
+deck: decks/no-limits/nl-mitsurugi.ydk
+#created by Duel Circuit - No Limits: Ryzeal Mitsurugi, summer 2025 (Anselm "Habakiri")
+#title Ryzeal Mitsurugi (2025, uncut)
+#era 2025
+#tier No Limits peak build: pool (docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 5)
+#about Won YCS Providence (May 2025, 1,572 players) in the format where Mitsurugi took a third of every premier top cut. Ame no Habakiri and the Mitsurugi Rituals tribute for on-field negation and removal on either turn; the Ryzeal engine and Seventh Tachyon add Rank 4 Xyz plays. Here with three Habakiri and the old free altars: every Tribute fires a Mitsurugi trigger.
+#why Peak list: May 2025; restored: Ame no Habakiri no Mitsurugi x3; picks: Mass Driver, Pharaonic Advent, Sinister Serpent, King of the Feral Imps (Extra, already in the list); cuts: Droll & Lock Bird x3 (flex), Number 41: Bagooska (Extra; an Alley exclusion, so the Extra Deck is 14). Measured 2026-11-03: rated 1683 (-184 under ryzeal 1867; the base's playbook is written for its own Mitsurugi Ryzeal list, so the gain over the base is not the measure here: the peak list as played rated 1689).
+#banlist TCG April 2025
+#recipe ryzeal
+main:
+3 Ame no Habakiri no Mitsurugi
+1 Ame no Murakumo no Mitsurugi
+1 Mitsurugi no Mikoto, Saji
+1 Mitsurugi no Mikoto, Aramasa
+1 Mitsurugi no Mikoto, Kusanagi
+1 Pharaonic Advent
+1 Sinister Serpent
+2 Ext Ryzeal
+2 Ice Ryzeal
+2 Sword Ryzeal
+1 Star Ryzeal
+1 Node Ryzeal
+3 Mulcharmy Fuwalos
+1 Mulcharmy Purulia
+3 Ash Blossom & Joyous Spring
+3 Nibiru, the Primal Being
+1 Ryzeal Cross
+3 Mitsurugi Prayers
+1 Mitsurugi Ritual
+3 Seventh Tachyon
+1 Bonfire
+1 Mass Driver
+1 Crossout Designator
+1 Called by the Grave
+3 Infinite Impermanence
+extra:
+1 King of the Feral Imps
+1 Eclipse Twins
+1 Ryzeal Detonator
+2 Ryzeal Duo Drive
+1 Evilswarm Ouroboros
+1 Mereologic Aggregator
+1 Divine Golden Shadow Dragon Dragluxion
+1 Evilswarm Exciton Knight
+1 Gallant Granite
+1 Castel, the Skyblaster Musketeer
+1 Number 60: Dugares the Timeless
+1 Number 104: Masquerade
+1 Dyna Mondo
+
+deck: decks/no-limits/nl-ryzeal.ydk
+#created by Duel Circuit - No Limits: Fiendsmith Ryzeal, winter 2024-25 (Tova "Detonator")
+#title Fiendsmith Ryzeal (2025, uncut)
+#era 2025
+#tier No Limits peak build: pool (docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 5)
+#about Won YCS Orlando (February 2025, 2,223 players), where 24 of the Top 64 were Fiendsmith Ryzeal and nearly half of every premier top cut that winter was Ryzeal. Ice, Sword and Ext Ryzeal make Rank 4s into Ryzeal Detonator; Fiendsmith adds Requiem, Sequence and Agnumday. Here with three Sword Ryzeal and the banned Rank 4 toolbox: Lavalval Chain, Daigusto Emeral and Fairy Tail - Snow keep the Level 4s coming back.
+#why Peak list: February 2025; restored: Ryzeal Detonator (Extra, 2), Ext Ryzeal x3, Ice Ryzeal x3, Sword Ryzeal x3; picks: Fairy Tail - Snow, Lavalval Chain (Extra), Daigusto Emeral (Extra); held back: Pot of Greed; cuts: Effect Veiler x1 (hand trap), Chaos Angel and Necroquip Princess (Extra). Measured 2026-11-03: rated 1673 (-194 under ryzeal 1867; its playbook work is parked with the tuning pass).
+#banlist TCG December 2024
+#recipe ryzeal
+main:
+3 Ash Blossom & Joyous Spring
+1 Bystial Magnamhut
+1 Bystial Druiswurm
+2 Effect Veiler
+3 Ext Ryzeal
+3 Ice Ryzeal
+1 Node Ryzeal
+3 Sword Ryzeal
+1 Fairy Tail - Snow
+1 Ryzeal Cross
+1 Fabled Lurrie
+3 Fiendsmith Engraver
+1 Lacrima the Crimson Tears
+2 Fiendsmith's Tract
+1 Fiendsmith in Paradise
+3 Mulcharmy Fuwalos
+3 Nibiru, the Primal Being
+3 Bonfire
+1 Called by the Grave
+2 Triple Tactics Talent
+3 Infinite Impermanence
+extra:
+2 Ryzeal Detonator
+1 Ryzeal Duo Drive
+1 Lavalval Chain
+1 Daigusto Emeral
+1 Fiendsmith's Desirae
+1 Fiendsmith's Sequence
+2 Fiendsmith's Requiem
+1 Fiendsmith's Agnumday
+1 Abyss Dweller
+1 D/D/D Wave High King Caesar
+1 Eclipse Twins
+1 Mereologic Aggregator
+1 Moon of the Closed Heaven
+
+deck: decks/no-limits/nl-vanquish-soul.ydk
+#created by Duel Circuit - No Limits: K9 Vanquish Soul, late 2025 (Augie "Noroi")
+#title K9 Vanquish Soul (2025, uncut)
+#era 2025
+#tier No Limits peak build: pool (docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 5)
+#about Won YCS Bologna (November 2025, 2,429 players), between its world title in August and its two 300th-YCS wins in February. Vanquish Soul reveals cards for quick effects on both turns; three K9-04 Noroi and the K9 Xyz package add disruption from the hand. Here with three Razen and three Stake your Soul! again, and the old hand-peek cards beside the hounds.
+#why Peak list: November 2025; restored: K9-04 Noroi x3, Vanquish Soul Razen x3, Stake your Soul! x3, Vanquish Soul Hollie Sue x3, K9-66a Jokul x3, "A Case for K9" x3; picks: Confiscation, Trap Dustshoot, Outer Entity Azathot (Extra); cuts: Mulcharmy Fuwalos x2 (flex), Number C104: Umbral Horror Masquerade (Extra). Measured 2026-11-03: rated 1763 (+90 over k9-vanquish-soul 1673).
+#banlist TCG October 2025
+#recipe k9-vanquish-soul
+main:
+3 Vanquish Soul Razen
+3 Vanquish Soul Hollie Sue
+3 Vanquish Soul Dr. Mad Love
+3 Vanquish Soul Jiaolong
+1 Vanquish Soul Heavy Borger
+1 Vanquish Soul Caesar Valius
+3 K9-17 Izuna
+3 K9-66a Jokul
+2 K9-ØØ Lupis
+3 K9-04 Noroi
+1 K9-66b Lantern
+1 Mulcharmy Fuwalos
+3 Ash Blossom & Joyous Spring
+3 Stake your Soul!
+1 Vanquish Soul, Start!
+1 K9-X Forced Release
+3 "A Case for K9"
+1 Triple Tactics Talent
+1 Reinforcement of the Army
+1 Called by the Grave
+1 Confiscation
+1 Vanquish Soul Snow Devil
+1 Trap Dustshoot
+extra:
+2 Rock of the Vanquisher
+1 S:P Little Knight
+1 Saryuja Skull Dread
+1 Divine Arsenal AA-ZEUS - Sky Thunder
+1 Super Starslayer TY-PHON - Sky Crisis
+1 Vallon, the Super Psy Skyblaster
+1 Number 104: Masquerade
+1 Outer Entity Azathot
+1 N.As.H. Knight
+1 CXyz N.As.Ch. Knight
+1 K9-X "Werewolf"
+1 K9-66X "Jacks"
+2 K9-17 "Ripper"
+
+deck: decks/no-limits/nl-tenpai.ydk
+#created by Duel Circuit - No Limits: Tenpai Dragon, summer 2024 (Sasha "Sangen")
+#title Tenpai Dragon (2024, uncut)
+#era 2024
+#tier No Limits peak build: pool (docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 5)
+#about Won the 2024 European WCQ, the summer it was the second-most played deck in the biggest rooms. It goes second on purpose: Raigeki, Dark Hole and Lightning Storm clear the board, then the Tenpai Dragons Synchro Summon in the Battle Phase for one-turn wins. Here with Giant Trunade bouncing the backrow first and two FIRE Dragon Rulers in the grave.
+#why Peak list: July 2024; restored: Sangen Summoning x3, Tenpai Dragon Chundra x3, Sangen Kaimen x3; picks: Giant Trunade, Raigeki (the power card, already at 3 in the list), Blaster, Dragon Ruler of Infernos, Burner, Dragon Ruler of Sparks; cuts: Dimension Shifter x3 (it banishes the Dragon Rulers' and Fadra's revives). Measured 2026-11-03: rated 1675 (+0 over tenpai-dragon 1675).
+#banlist TCG April 2024
+#recipe tenpai-dragon
+main:
+3 Tenpai Dragon Chundra
+3 Tenpai Dragon Paidra
+2 Tenpai Dragon Fadra
+1 Tenpai Dragon Genroku
+1 Blaster, Dragon Ruler of Infernos
+1 Burner, Dragon Ruler of Sparks
+3 Mulcharmy Purulia
+3 Sangen Summoning
+3 Sangen Kaimen
+3 Raigeki
+3 Dark Hole
+3 Pot of Prosperity
+2 Lightning Storm
+1 Harpie's Feather Duster
+1 Giant Trunade
+1 Terraforming
+3 Forbidden Droplet
+3 Infinite Impermanence
+extra:
+1 Ruddy Rose Dragon
+1 Trident Dragion
+1 Sangenpai Transcendent Dragion
+1 Samurai Destroyer
+2 Sangenpai Bident Dragion
+1 Odd-Eyes Meteorburst Dragon
+1 Kuibelt the Blade Dragon
+1 Black Rose Dragon
+1 Promethean Princess, Bestower of Flames
+1 Hiita the Fire Charmer, Ablaze
+1 S:P Little Knight
+1 Duelittle Chimera
+1 Hieratic Seal of the Heavenly Spheres
+1 Striker Dragon
+
+deck: decks/no-limits/nl-branded.ydk
+#created by Duel Circuit - No Limits: Despia Branded, summer 2026 (Imogen "Albion")
+#title Despia Branded (2026, uncut)
+#era 2026
+#tier No Limits peak build: pool (docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 5)
+#about Top 4 at the 2026 European WCQ (2,268 players), in the summer it won thirteen national titles and never the big one. Aluber, Branded Opening and Super Polymerization fuse on both turns, often with the opponent's monsters; Albion the Branded Dragon and Mirrorjade end the turn. No Light and Darkness Ritual package. Here with three Branded Fusion, Branded Expulsion back, and the Chaos cards its LIGHT and DARK grave feeds.
+#why Peak list: July 2026; restored: Albion the Branded Dragon (Extra, 2), Branded Fusion x3, Branded in High Spirits x3, Branded Opening x3, Branded Expulsion x2; picks: Eclipse Wyvern, Chaos Sorcerer (the list has 7 LIGHT and 7 DARK monsters and two Albion the Shrouded Dragon for Wyvern, so no Monster Reborn); cuts: Droll & Lock Bird x2, Forbidden Crown x1 (flex). Measured 2026-11-03: rated 1865 (+35 over branded-despia 1830).
+#banlist TCG May 2026
+#recipe branded-despia
+main:
+2 Aluber the Jester of Despia
+2 Fallen of the White Dragon
+1 Fallen of Albaz
+1 Guiding Quem, the Virtuous
+2 Blazing Cartesia, the Virtuous
+2 Incredible Ecclesia, the Virtuous
+1 Dogmatika Ecclesia, the Virtuous
+1 Tri-Brigade Springans Kitt
+2 Albion the Shrouded Dragon
+1 Eclipse Wyvern
+1 Chaos Sorcerer
+3 Mulcharmy Fuwalos
+3 Branded Fusion
+3 Branded Opening
+3 Branded in High Spirits
+3 The Fallen & The Virtuous
+1 Forbidden Droplet
+1 Forbidden Crown
+2 Fusion Deployment
+3 Super Polymerization
+1 Triple Tactics Talent
+1 Called by the Grave
+1 Branded Retribution
+2 Branded Expulsion
+extra:
+2 Albion the Branded Dragon
+1 Mirrorjade the Iceblade Dragon
+2 Granguignol the Dusk Dragon
+1 Titaniklad the Ash Dragon
+1 Rindbrumm the Striking Dragon
+1 Borreload Furious Dragon
+2 The Dragon that Devours the Dogma
+1 Mixousia the Confounder
+1 Secreterion Dragon
+1 Predaplant Dragostapelia
+1 The Three Champions of Swordsoul
+1 Ecclesia and the Dark Dragon
+
+deck: decks/no-limits/nl-yubel.ydk
+#created by Duel Circuit - No Limits: Fiendsmith Yubel, autumn 2024 (Rue "Lacrima")
+#title Fiendsmith Kashtira Yubel (2024, uncut)
+#era 2024
+#tier No Limits peak build: pool (docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 5)
+#about Won YCS Cancun (October 2024), the autumn Yubel led every premier top cut (21.7%) and took the world title. Spirit of Yubel, Samsara D Lotus and Nightmare Throne build a resilient Fiend board that burns and removes on both turns; Fiendsmith and Kashtira add the extenders. Here Fiendsmith's Lacrima, Forbidden the month before, comes home, with three Opening of the Spirit Gates and the old Fiend searchers digging for Yubel.
+#why Peak list: October 2024; restored: Fiendsmith's Lacrima (Extra, 1), Phantom of Yubel (Extra, 2), Opening of the Spirit Gates x3; picks: Sangan, Witch of the Black Forest; cuts: Dark Ruler No More x2 (flex), Muckraker From the Underworld (Extra). Measured 2026-11-03: rated 1696 (+43 over yubel 1653).
+#banlist TCG September 2024
+#recipe yubel
+main:
+1 Yubel - Terror Incarnate
+1 Yubel
+2 Spirit of Yubel
+2 Gruesome Grave Squirmer
+3 Dark Beckoning Beast
+1 Unchained Soul of Sharvara
+1 Fabled Lurrie
+2 Fiendsmith Engraver
+3 Samsara D Lotus
+1 Sangan
+1 Witch of the Black Forest
+2 Kashtira Unicorn
+1 Kashtira Fenrir
+3 Triple Tactics Talent
+1 Dark Ruler No More
+3 Nightmare Throne
+1 Nightmare Pain
+1 Fiendsmith's Tract
+3 Opening of the Spirit Gates
+1 Terraforming
+1 Set Rotation
+1 Pressured Planet Wraitsoth
+1 Kashtira Birth
+3 Forbidden Droplet
+1 Abominable Chamber of the Unchained
+3 Infinite Impermanence
+extra:
+2 Phantom of Yubel
+1 Fiendsmith's Desirae
+1 Fiendsmith's Lacrima
+1 Necroquip Princess
+1 Aerial Eater
+1 D/D/D Wave High King Caesar
+1 Varudras, the Final Bringer of the End Times
+1 Unchained Soul Lord of Yama
+1 Unchained Soul of Rage
+1 Moon of the Closed Heaven
+1 Fiendsmith's Requiem
+1 Fiendsmith's Sequence
+1 S:P Little Knight
+1 Underworld Goddess of the Closed World
+
+// ---- The Alley Brawl's out-of-towners (section 8): the base made legal for the Alley list (Loaners.Adjust, one copy of
+// anything the list limits; the base's own cards top it up, its Side Deck among them), plus 3 Basement Game cards from
+// campaign/alley.txt picked by the splash builder (`--brawl-gen snake-eye,k9-vanquish-soul,yubel,tenpai-dragon --seed 1`).
+
+deck: decks/no-limits/nl-snake-eye-brawl.ydk
+#created by Duel Circuit - No Limits: Junia's Alley Brawl deck (Snake-Eye, toploaded)
+#title Snake-Eye (Alley Brawl)
+#era 2024
+#tier No Limits out-of-towner: the Alley Brawl deck, Alley-legal with a Basement splash (docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 8)
+#about Snake-Eye / Diabellstar as played in 2024, cut to the Alley list (one Bonfire, one Crossout, one Triple Tactics) and topped up with its own cards, then three Basement Game cards from the alley's curated list.
+#why Base: snake-eye (decks/history), Alley-legal through Loaners.Adjust; Basement splash (seed 1): Raigeki, Change of Heart, Pot of Greed. Measured 2026-11-03: rated 1695 anchored (campaign/peak-ratings.txt).
+#banlist TCG April 2024
+#recipe snake-eye
+main:
+3 Snake-Eye Ash
+2 Snake-Eyes Flamberge Dragon
+3 Snake-Eyes Poplar
+1 Snake-Eyes Diabellstar
+1 Snake-Eye Oak
+3 Diabellstar the Black Witch
+3 Ash Blossom & Joyous Spring
+3 Effect Veiler
+3 Ghost Ogre & Snow Rabbit
+3 Ghost Mourner & Moonlit Chill
+3 Nibiru, the Primal Being
+1 Bonfire
+3 WANTED: Seeker of Sinful Spoils
+1 Original Sinful Spoils - Snake-Eye
+1 Divine Temple of the Snake-Eye
+1 Crossout Designator
+1 Triple Tactics Talent
+1 Called by the Grave
+3 Infinite Impermanence
+1 Raigeki
+1 Change of Heart
+1 Pot of Greed
+extra:
+1 Relinquished Anima
+1 Link Spider
+1 Accesscode Talker
+1 Salamangreat Raging Phoenix
+1 Knightmare Phoenix
+1 Promethean Princess, Bestower of Flames
+1 Hiita the Fire Charmer, Ablaze
+1 Dharc the Dark Charmer, Gloomy
+1 I:P Masquerena
+1 S:P Little Knight
+1 Worldsea Dragon Zealantis
+1 Selene, Queen of the Master Magicians
+1 Apollousa, Bow of the Goddess
+1 Mecha Phantom Beast Dracossack
+1 Number 38: Hope Harbinger Dragon Titanic Galaxy
+
+deck: decks/no-limits/nl-vanquish-soul-brawl.ydk
+#created by Duel Circuit - No Limits: Augie's Alley Brawl deck (K9 Vanquish Soul, toploaded)
+#title K9 Vanquish Soul (Alley Brawl)
+#era 2025
+#tier No Limits out-of-towner: the Alley Brawl deck, Alley-legal with a Basement splash (docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 8)
+#about K9 Vanquish Soul as played in 2025, cut to the Alley list (one Hollie Sue, no Pair-a-Dice Smasher) and topped up with its own cards, then three Basement Game cards from the alley's curated list.
+#why Base: k9-vanquish-soul (decks/history), Alley-legal through Loaners.Adjust; Basement splash (seed 1): Change of Heart, Monster Reborn, Pot of Greed. Measured 2026-11-03: rated 1715 anchored (campaign/peak-ratings.txt).
+#banlist TCG April 2025
+#recipe k9-vanquish-soul
+main:
+3 Vanquish Soul Razen
+1 Vanquish Soul Hollie Sue
+3 Vanquish Soul Dr. Mad Love
+1 Vanquish Soul Caesar Valius
+2 Vanquish Soul Heavy Borger
+3 Vanquish Soul Jiaolong
+3 K9-17 Izuna
+1 K9-66a Jokul
+1 K9-ØØ Lupis
+2 Fantastical Dragon Phantazmay
+3 Mulcharmy Fuwalos
+3 Ash Blossom & Joyous Spring
+2 Nibiru, the Primal Being
+1 Bystial Magnamhut
+3 Stake your Soul!
+1 Vanquish Soul, Start!
+3 Pot of Extravagance
+1 Reinforcement of the Army
+3 Vanquish Soul Snow Devil
+1 Change of Heart
+1 Monster Reborn
+1 Pot of Greed
+extra:
+3 Rock of the Vanquisher
+1 S:P Little Knight
+1 Divine Arsenal AA-ZEUS - Sky Thunder
+1 Super Starslayer TY-PHON - Sky Crisis
+2 Vallon, the Super Psy Skyblaster
+1 N.As.H. Knight
+2 Number C101: Silent Honor DARK
+1 Number 101: Silent Honor ARK
+2 K9-17 "Ripper"
+1 Vanquish Soul Rocks
+
+deck: decks/no-limits/nl-yubel-brawl.ydk
+#created by Duel Circuit - No Limits: Rue's Alley Brawl deck (Yubel, toploaded)
+#title Yubel (Alley Brawl)
+#era 2024
+#tier No Limits out-of-towner: the Alley Brawl deck, Alley-legal with a Basement splash (docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 8)
+#about Fiendsmith Yubel as played in 2024, cut to the Alley list (one Droll, one Phantom of Yubel, one Crossout) and topped up with its own cards, then three Basement Game cards from the alley's curated list.
+#why Base: yubel (decks/history), Alley-legal through Loaners.Adjust; Basement splash (seed 1): Pot of Greed, Raigeki, Change of Heart for Escape of the Unchained, Kashtira Birth and Fabled Lurrie. Measured 2026-11-03: rated 1679 anchored (campaign/peak-ratings.txt).
+#banlist TCG September 2024
+#recipe yubel
+main:
+3 Samsara D Lotus
+2 Spirit of Yubel
+1 Gruesome Grave Squirmer
+1 Yubel
+1 Yubel - Terror Incarnate
+3 Fiendsmith Engraver
+1 Lacrima the Crimson Tears
+3 Dark Beckoning Beast
+1 Unchained Soul of Sharvara
+2 Kashtira Unicorn
+1 Kashtira Fenrir
+3 Ash Blossom & Joyous Spring
+1 Droll & Lock Bird
+2 Mulcharmy Fuwalos
+1 Ghost Ogre & Snow Rabbit
+3 Nightmare Throne
+1 Nightmare Pain
+2 Fiendsmith's Tract
+1 Pressured Planet Wraitsoth
+1 Called by the Grave
+1 Opening of the Spirit Gates
+1 Set Rotation
+1 Terraforming
+3 Infinite Impermanence
+1 Pot of Greed
+1 Raigeki
+1 Change of Heart
+extra:
+1 Phantom of Yubel
+2 Fiendsmith's Desirae
+1 Aerial Eater
+1 Varudras, the Final Bringer of the End Times
+1 D/D/D Wave High King Caesar
+1 Underworld Goddess of the Closed World
+1 Fiendsmith's Sequence
+2 Unchained Soul Lord of Yama
+1 Unchained Soul of Rage
+1 S:P Little Knight
+1 Moon of the Closed Heaven
+1 Muckraker From the Underworld
+1 Fiendsmith's Requiem
+
+deck: decks/no-limits/nl-tenpai-brawl.ydk
+#created by Duel Circuit - No Limits: Sasha's Alley Brawl deck (Tenpai Dragon, toploaded)
+#title Tenpai Dragon (Alley Brawl)
+#era 2024
+#tier No Limits out-of-towner: the Alley Brawl deck, Alley-legal with a Basement splash (docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 8)
+#about Tenpai Dragon as played in 2024, cut to the Alley list (one Chundra, one Sangen Kaimen, one Dimension Shifter) and topped up with its own cards, then three Basement Game cards from the alley's curated list.
+#why Base: tenpai-dragon (decks/history), Alley-legal through Loaners.Adjust; Basement splash (seed 1): Raigeki, Heavy Storm, Change of Heart for two Lightning Storm and a Koa'ki Meiru Drago. Measured 2026-11-03: rated 1586 anchored (campaign/peak-ratings.txt).
+#banlist TCG September 2024
+#recipe tenpai-dragon
+main:
+3 Tenpai Dragon Fadra
+3 Tenpai Dragon Paidra
+3 Tenpai Dragon Genroku
+1 Tenpai Dragon Chundra
+3 Mulcharmy Purulia
+3 Mulcharmy Fuwalos
+3 Santa Claws
+1 Dimension Shifter
+1 Bystial Magnamhut
+1 Harpie's Feather Duster
+1 Terraforming
+1 Pot of Prosperity
+1 Sangen Summoning
+3 Super Polymerization
+1 Sangen Kaimen
+3 Infinite Impermanence
+3 Dominus Impulse
+1 Retaliating "C"
+1 Koa'ki Meiru Drago
+1 Raigeki
+1 Heavy Storm
+1 Change of Heart
+extra:
+1 Mudragon of the Swamp
+1 Garura, Wings of Resonant Life
+1 Azamina Sol Erysichthon
+1 Predaplant Dragostapelia
+1 Black Rose Dragon
+1 Odd-Eyes Meteorburst Dragon
+1 Samurai Destroyer
+2 Sangenpai Bident Dragion
+1 Kuibelt the Blade Dragon
+1 Trident Dragion
+1 Ruddy Rose Dragon
+1 Sangenpai Transcendent Dragion
+1 Hieratic Seal of the Heavenly Spheres
+1 S:P Little Knight

@@ -1,0 +1,40 @@
+# Reprints dated apart from their set name (docs/dev/CARD-VERSIONS-SPEC-2026-11-03.md S4, F3; docs/dev/CV2-BUILD-2026-11-05.md).
+# Read by `--export-printings` and baked into printings.bin (version 4; the app reads only that). PrintingIndex.DateOf
+# checks these lines first, in order, then the set name's date from cardsets.json. A copy's text follows from its
+# printing's date, so a reprint dated as the set it's filed under would carry an original text no such card ever had.
+#
+#   <set code, or a code prefix ending in *> <yyyy-mm-dd>   # what it is
+#
+# Sources:
+#   data/ygoprodeck/cardinfo.json and cardsets.json (downloaded 2026-10-23) file the 25th Anniversary Edition reprints of
+#   LOB, MRD, SRL, PSV, DCR and IOC under the original set names and prefixes, with EN codes. Konami printed those six as
+#   25th Anniversary Edition packs in Legendary Collection: 25th Anniversary Edition (2023-04-20 in Europe, 2023-04-21 in
+#   North America; LOB, MRD, SRL, PSV and IOC were sold again as standalone packs on 2023-07-13), and skipped LON, LOD,
+#   PGD and MFC (YGOrganization, "Labyrinth of Who 2", ygorganization.com/labyrinth-of-who-2-electric-bogaloo; Konami's
+#   press release, bastion-uk.mynewsdesk.com; icv2.com/articles/news/view/52919; cardsets.json's "(25th Anniversary
+#   Edition)" sets, tcg_date 2023-04-20, which list only the cards whose rarity changed).
+#   LOB, MRD, SRL, PSV: the 2002 printings used region-less codes (MRD-069) and E codes (MRD-E069), so every EN code is
+#   the 2023 reprint. DCR and IOC have no E codes in the data, so a European printing of 2003-04 would share its EN row
+#   with the 2023 reprint; each EN row is dated as the reprint (it carries the current text), and only a DCR or IOC
+#   booster gives the first printing (packs date pulls by the pack's set). LON and LOD also have EN rows whose
+#   rarities differ from the region-less ones, but neither set was reprinted: those are European printings of the time.
+#   Duelist Pack: Yugi (DPYG, 2009) and Duelist Pack: Kaiba (DPKB, 2010) were reprinted under their own codes with
+#   Problem-Solving Card Text in Duelist Pack: Yugi & Kaiba Special Edition (2013-10-25) and Yugi's Collector Box
+#   (2017-09-15) (Yugipedia's Duelist Pack: Kaiba and Yugi's Collector Box pages; campaign/texts.txt's Stronghold row).
+#   cardinfo.json has one row for both printings, so a row whose card's text changed between them is dated as the
+#   first reprint with the current text. Only the DPYG/DPKB cards with a texts.txt row whose `until` falls in between
+#   are listed. A Duelist Pack's own booster still gives its first printing.
+LOB-EN*     2023-04-20   # Legend of Blue Eyes White Dragon (25th Anniversary Edition)
+MRD-EN*     2023-04-20   # Metal Raiders (25th Anniversary Edition): Sangan, Catapult Turtle, Witch of the Black Forest
+SRL-EN*     2023-04-20   # Spell Ruler (25th Anniversary Edition): Toon World, Darkness Approaches
+PSV-EN*     2023-04-20   # Pharaoh's Servant (25th Anniversary Edition): Imperial Order, Inspection
+DCR-EN*     2023-04-20   # Dark Crisis (25th Anniversary Edition)
+IOC-EN*     2023-04-20   # Invasion of Chaos (25th Anniversary Edition): Chaos Emperor Dragon, Dark Magician of Chaos
+DPYG-EN009  2013-10-25   # Big Shield Gardna: errata'd 2012-05 (BP01); the 2013 Special Edition reprint is current
+DPYG-EN030  2013-10-25   # Stronghold the Moving Fortress: the 2013 Special Edition reprint is the errata printing
+DPYG-EN006  2017-09-15   # Catapult Turtle: errata'd 2014-06 (DL18); Yugi's Collector Box is current
+DPYG-EN024  2017-09-15   # Brain Control: errata'd 2017-03 (DUSA); Yugi's Collector Box is current
+DPKB-EN011  2017-09-15   # Y-Dragon Head: errata'd 2016-10 (SDKS)
+DPKB-EN012  2017-09-15   # Z-Metal Tank: errata'd 2016-10 (SDKS)
+DPKB-EN036  2017-09-15   # Ring of Destruction: errata'd 2015-03 (PGL2)
+DPKB-EN039  2017-09-15   # Crush Card Virus: errata'd 2015-03 (PGL2)

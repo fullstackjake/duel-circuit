@@ -1,0 +1,100 @@
+diff --git a/containers_fwd.h b/containers_fwd.h
+index 32fc094..41ee2c4 100644
+--- a/containers_fwd.h
++++ b/containers_fwd.h
+@@ -36,12 +36,16 @@ struct effect_sort_by_id {
+ struct effect_sort_by_initial_id {
+ 	bool operator()(effect* e1, effect* e2) const;
+ };
++// Orders effects by creation, so sets that the duel walks through give the same order in every run.
++struct effect_sort_by_serial {
++	bool operator()(const effect* e1, const effect* e2) const;
++};
+ 
+ struct chain;
+ using chain_array = std::vector<chain>;
+ using chain_list = std::list<chain>;
+ 
+-using instant_f_list = std::map<effect*, chain>;
++using instant_f_list = std::map<effect*, chain, effect_sort_by_serial>;
+ 
+ struct tevent;
+ using event_list = std::list<tevent>;
+diff --git a/duel.cpp b/duel.cpp
+index d58294b..30d0b6d 100644
+--- a/duel.cpp
++++ b/duel.cpp
+@@ -83,6 +83,7 @@ card* duel::new_card(uint32_t code) {
+ }
+ effect* duel::new_effect() {
+ 	effect* peffect = new effect(this);
++	peffect->serial = ++effect_serial;
+ 	effects.insert(peffect);
+ 	lua->register_effect(peffect);
+ 	return peffect;
+diff --git a/duel.h b/duel.h
+index 35926aa..b53b57a 100644
+--- a/duel.h
++++ b/duel.h
+@@ -69,6 +69,7 @@ public:
+ 	std::unordered_set<group*> groups;
+ 	std::unordered_set<effect*> effects;
+ 	std::unordered_set<effect*> uncopy;
++	uint32_t effect_serial{ 0 };
+ 
+ 	std::unordered_map<uint32_t, card_data> data_cache;
+ 	
+diff --git a/effect.cpp b/effect.cpp
+index 7b316c3..9f6efb1 100644
+--- a/effect.cpp
++++ b/effect.cpp
+@@ -20,6 +20,9 @@ bool effect_sort_by_id::operator()(effect* e1, effect* e2) const {
+ bool effect_sort_by_initial_id::operator()(effect* e1, effect* e2) const {
+ 	return e1->initial_id < e2->initial_id;
+ }
++bool effect_sort_by_serial::operator()(const effect* e1, const effect* e2) const {
++	return e1->serial < e2->serial;
++}
+ int32_t effect::is_disable_related() {
+ 	if (code == EFFECT_IMMUNE_EFFECT || code == EFFECT_DISABLE || code == EFFECT_CANNOT_DISABLE || code == EFFECT_FORBIDDEN)
+ 		return TRUE;
+diff --git a/effect.h b/effect.h
+index e2ef45e..7771679 100644
+--- a/effect.h
++++ b/effect.h
+@@ -41,6 +41,8 @@ public:
+ 	uint32_t flag[2]{};
+ 	uint32_t id{};
+ 	uint32_t initial_id{};
++	// Creation order within the duel: unique, and the same every time the duel is played (unlike the effect's address).
++	uint32_t serial{};
+ 	uint32_t reset_flag{};
+ 	uint32_t count_code{};
+ 	uint32_t hint_timing[2]{};
+diff --git a/field.h b/field.h
+index 3a573c2..1988357 100644
+--- a/field.h
++++ b/field.h
+@@ -114,8 +114,8 @@ struct player_info {
+ 	}
+ };
+ struct field_effect {
+-	using oath_effects = std::unordered_map<effect*, effect*>;
+-	using effect_collection = std::unordered_set<effect*>;
++	using oath_effects = std::map<effect*, effect*, effect_sort_by_serial>;
++	using effect_collection = std::set<effect*, effect_sort_by_serial>;
+ 	using gain_effects = std::unordered_map<card*, effect*>;
+ 	struct grant_effect_container {
+ 		std::unordered_map<effect*, gain_effects> unsorted;
+@@ -282,9 +282,9 @@ struct processor {
+ 	effect_set_v disfield_effects;
+ 	effect_set_v extra_mzone_effects;
+ 	effect_set_v extra_szone_effects;
+-	std::set<effect*> reseted_effects;
++	std::set<effect*, effect_sort_by_serial> reseted_effects;
+ 	std::unordered_map<card*, uint32_t> readjust_map;
+-	std::unordered_set<card*> unique_cards[2];
++	card_set unique_cards[2];
+ 	effect_count_map effect_count_code;
+ 	effect_count_map effect_count_code_duel;
+ 	effect_count_map effect_count_code_chain;

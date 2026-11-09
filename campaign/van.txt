@@ -1,0 +1,90 @@
+# Moth's van, Under the Counter (docs/dev/ALLEY-STORY-2026-11-01.md section 5; hooks from ALLEY-SPEC section 12).
+# shop.txt's format: pool:, after:/before: (story scenes), speaker: text. Checked by ShopVoice.Problems with the van's
+# hooks (BackAlley.VanHooks). Text can use {card}, {grade}, {price} (a rail tag) and {left} (rail duels left): see
+# MothsVan.RailFill. Moth is "he"; he never says "stolen", and ends a deal with "As-is."
+
+pool: van:hello
+moth: Hatch is open. Browse with your eyes first.
+
+pool: van:footer
+moth: Evening. Everything's as-is, including me.
+moth: No receipts. Receipts are for people who plan to bring things back.
+moth: Cards come in, cards go out. I don't ask, and they don't say.
+moth: Mind the freezer. It hasn't held ice cream in years. It holds slabs.
+moth: The chime's broken. It plays three notes and stops. So do I.
+
+pool: van:footer
+after: vera-ante
+moth: Your friend in red came by. Paid the tag and said a word I won't repeat.
+
+pool: van:held-paid
+# Plays once, on the first van visit after held-card-home.
+after: held-card-home
+moth: Claim's paid. Exact change. Of course it was.
+moth: Tell her the tag's off. Tell him... no. Don't tell him anything. He knows.
+
+pool: van:rail
+moth: {card}. {left} duels left on the clock. Tag's {price}.
+moth: Still hanging. Still yours, for {left} more.
+moth: Everybody means to come back for theirs. Most do.
+
+pool: van:empty
+# Nothing of yours on the rail.
+moth: Nothing of yours on the hooks. Good night for you.
+moth: Rail's empty of yours. Keep it that way.
+
+pool: van:buyback
+moth: Back where it belongs. The tag goes in the drawer.
+moth: Claimed. As-is. It missed you, if cards do that.
+
+pool: van:held
+before: held-card
+moth: Held. Not for sale, not for trade, not for asking about.
+moth: That one's waiting on somebody. It's more patient than they are.
+moth: The tag's older than the van's paint.
+
+pool: van:held-gone
+after: held-card-home
+moth: The hook's empty. I keep looking at it anyway.
+moth: Took the tag with me. It's pinned over my sink.
+
+pool: van:shelf
+moth: Every card on that shelf got banned somewhere, sometime, for doing its job too well.
+moth: Slabbed by the Loupe. Priced by me. Neither of us haggles.
+moth: That one came out of a collection. The collection didn't come with a name.
+moth: Look all you like. Looking's free. The light costs me.
+
+pool: van:pack
+# A won Contraband Pack's reveal (packs are bracket prizes only; none are sold here).
+moth: Sealed this afternoon. Don't ask what's in it. I didn't look.
+moth: Five cards, every one banned somewhere. The odds are on the wrapper.
+
+pool: van:used
+moth: Used. Loved. Some of them loved hard. The grade tells you how hard.
+moth: Every one of these was somebody's. Now they're between binders. Fix that.
+
+pool: van:sell
+moth: I don't pay what it's worth. I pay what it'll sit for.
+moth: Sold. It'll be on a hook by Friday. Somebody's always looking.
+moth: Cash, no questions. Mine or yours.
+
+pool: van:sell-refused
+# Won at ante: sells for 0 (SellDesk.AnteRefusal says so too).
+moth: That one came off a table. I don't buy what the table gave you.
+moth: If I bought those back, I'd be paying the tables twice.
+
+# ---- No Limits (docs/dev/NO-LIMITS-STORY-2026-11-02.md section 5): stock off the depot, and the restored cards Moth won't buy ----
+
+pool: van:shelf
+after: nl-wall-opens
+moth: New stock off the depot. Newer than the van. Newer than me.
+moth: These came out of last year's lists. Still warm. As-is.
+
+pool: van:sell-refused:restored
+# A restored card won at No Limits sells for 0, like any won card (NO-LIMITS-SPEC section 10.3).
+moth: Not that one. That one's got somewhere to be, and it's your binder.
+moth: Somebody carried that for a year to lose it fair. I'm not buying the end of that.
+
+pool: van:footer
+after: nl-wall-opens
+moth: Lantern's up most Fridays now. Business is good. Don't tell Nyx I said business.

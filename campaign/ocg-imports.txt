@@ -1,0 +1,415 @@
+# Written by `--ocg-imports` (src/Ygo.Harness/OcgImports.cs): the card shop's OCG import packs.
+# Cards the OCG printed and the TCG never did, in themed packs (see OcgImports.cs for how rarities are given).
+# pack: <code> | <name>, then its cards as "card: <id> <rarity>".
+
+pack: OCG-RAISEM | OCG Import: Raise Moon
+card: 100458022 UltraRare  # Cielo, the Night Sky of Raise Moon - No More Bets!
+card: 100458023 UltraRare  # Raise Moon Hope Squeeze - Jackpot
+card: 100458016 SuperRare  # Cielo, the Veil of Raise Moon
+card: 100458019 SuperRare  # Raise Moon Blade Shayna
+card: 100458017 SuperRare  # Raise Moon Elegance Carol
+card: 100458020 SuperRare  # Raise Moon Lamp Croucier
+card: 100458021 SuperRare  # Raise Moon Starter Squeeze
+card: 100458018 SuperRare  # Raise Moon Wings Rapi
+card: 100458025 Common  # "Raise Moon" the City that Never Sleeps
+card: 100458026 Common  # The Glitter of Raise Moon
+card: 100458024 Common  # The Stars of Raise Moon
+
+pack: OCG-XENOVA | OCG Import: Xenovader
+card: 100458037 SuperRare  # Mad Tempest Trirealm Rift Ploutonion
+card: 100458038 SuperRare  # Trirealm Rift Darkness
+card: 100458036 Rare  # Burial Summit Trirealm Rift Helheim
+card: 100458035 Rare  # Sky Thunder Trirealm Rift Yomi
+card: 100458040 Common  # Trirealm Rift Gospel
+card: 100458041 Common  # Trirealm Rift Judgment
+card: 100458033 Common  # Trirealm Rift of Blue Tuonela
+card: 100458031 Common  # Trirealm Rift of Emptiness Gehenna
+card: 100458034 Common  # Trirealm Rift of Scarlet Naraka
+card: 100458032 Common  # Trirealm Rift of Sky Sheol
+card: 100458039 Common  # Trirealm Rift Territory - Valvols
+
+pack: OCG-ZENET | OCG Import: Zenet
+card: 100458004 SuperRare  # Tauzenet Wadjet
+card: 100458003 SuperRare  # Zenetnakht Sphinx
+card: 100458011 Rare  # Zenet Thunderfall
+card: 100458005 Rare  # Zenetmes Nekhbet
+card: 100458008 Common  # A Journey Back to the Light - "Zenet"
+card: 100458009 Common  # Am Duazenet
+card: 100458006 Common  # Pere-Zenet Em Heru
+card: 100458010 Common  # Zenet Cataract
+card: 100458007 Common  # Zenet Per Akh
+card: 100458002 Common  # Zenet Prophet - Amenhotep
+card: 100458001 Common  # Zenet Prophet - Nefertari
+
+pack: OCG-REINDS | OCG Import: Reindsurm
+card: 101403027 SuperRare  # Reindsurm Gigalovendra
+card: 101403028 SuperRare  # Reindsurm Giriakarma
+card: 101403076 Rare  # Reindsurm Encounter
+card: 101403024 Common  # Reindsurm Amurusa
+card: 101403057 Common  # Reindsurm Butterfly
+card: 101403026 Common  # Reindsurm Carcasas
+card: 101403056 Common  # Reindsurm Carnation
+card: 101403055 Common  # Reindsurm Conquest
+card: 101403025 Common  # Reindsurm Luvian
+card: 101403058 Common  # Reindsurm Practice
+
+pack: OCG-SUNGOD | OCG Import: Sun God
+card: 101403030 UltraRare  # The Sun God of Darkness - The Winged Dragon of Ra
+card: 101403031 UltraRare  # The Sun God's Steelcage - Lava Golem
+card: 101403051 Rare  # The Immortal Sun God
+card: 101403001 Rare  # The Sun God's Poet - Helpoemer
+card: 101403072 Common  # Sun God Domination
+card: 101403052 Common  # The Sun God Leading Down into Darkness
+card: 101403002 Common  # The Sun God's Destructor - Makyura
+card: 101403073 Common  # The Sun God's Protector - Egyptian God Slime
+card: 101403003 Common  # The Sun God's Terror Machine - Gil Garth
+card: 101403004 Common  # The Sun God's Torture Device - Viser Des Shock
+
+pack: OCG-WHITEC | OCG Import: White Crow
+card: 101403038 UltraRare  # Aitvaras the White Crow Knight
+card: 101403037 UltraRare  # Zaltys the White Crow Knight
+card: 101403011 Common  # Ann the White Crow Knight
+card: 101403009 Common  # Fire Fiend of the White Crow Forest
+card: 101403078 Common  # Illusion of the White Crow Witch
+card: 101403010 Common  # Maluth the White Crow Knight
+card: 101403077 Common  # Splendor of the White Crow Witch
+card: 101403059 Common  # The Deep Forest of the White Crow
+
+pack: OCG-WITCHC | OCG Import: Witchcrafter
+card: 33475154 UltraRare  # Witchcrafter Madame Rilliona
+card: 69964858 UltraRare  # Witchcrafter Pupils
+card: 6958567 Rare  # Witchcrafter Celebration
+card: 69748261 Rare  # Witchcrafter Distortion
+card: 6071005 Rare  # Witchcrafter Marka
+card: 59106048 Common  # Witchcrafter Seed
+card: 70686400 Common  # Witchcrafter Terracottan
+card: 32353566 Common  # Witchcrafter Walpurgis
+
+pack: OCG-ARCHET | OCG Import: Archetype Support
+card: 100460003 UltraRare  # Abyss Vagrada the Abyssal Cubic Lord
+card: 100460002 UltraRare  # Alditia Hell Blaze the Burning Cubic Lord
+card: 101403032 UltraRare  # Amazoness Swordmaster
+card: 101403045 UltraRare  # Ars Magna Artmage
+card: 101403046 UltraRare  # Ars Magna DoomZ
+card: 101403047 UltraRare  # Ars Magna Elfnote
+card: 71808988 UltraRare  # Blue-Eyes Toon Ultimate Dragon
+card: 100459004 UltraRare  # Blue-Eyes Ultimate Dragon, the God-Surpassing Servant
+card: 100459009 UltraRare  # Dark Paladin - Wave-Motion
+card: 101403034 UltraRare  # Diabellze the Mistress of the White Crow Forest
+card: 100460004 UltraRare  # Divine Anima Infinity the Creation Cubic Overlord
+card: 65424481 UltraRare  # Ekhajar, Descendant Dragon of the Ice Barrier
+card: 8593259 UltraRare  # Elemental HERO Clay Guardian
+card: 100462002 UltraRare  # Invoked Magistus Heruvim
+card: 3287359 UltraRare  # Magical Musket Mastermind Caspar
+card: 100460030 UltraRare  # Marincess Truth Heart
+card: 101403050 UltraRare  # Necromancer of Dragon Magic
+card: 2419596 UltraRare  # Number 101: Silent Honor ARK - Soul Asylum
+card: 101403035 UltraRare  # Omega Vidolium the Power Patron of Heaven's End
+card: 101403042 UltraRare  # Rikka Empress Strenna
+card: 101403041 UltraRare  # Teardrop the Rikka Empress
+card: 101403033 UltraRare  # Triangle Ecstasy Harpie Lady Sisters
+card: 100462001 UltraRare  # Trinitas Magistus
+card: 94014327 UltraRare  # Unchained Enma Lord Yama
+card: 21419436 UltraRare  # Unchained Soul Rage Abominator
+card: 100460028 SuperRare  # Aqua Leviathan @Marincess
+card: 79621896 SuperRare  # Archfiend's Origin
+card: 46985799 SuperRare  # Black Rose Dragon/Assault Mode
+card: 100461001 SuperRare  # Buster Blader, the One Who Surpasses the Limits
+card: 8315896 SuperRare  # Candelato, the Beast of Light
+card: 41424250 SuperRare  # Chaos End Ruler - Ruler of the Beginning and the End
+card: 39030883 SuperRare  # Dark Armed Dragon Punisher
+card: 15141103 SuperRare  # Dark Tuner Catastrogue
+card: 51546708 SuperRare  # Dark Tuner Nightmare Hand
+card: 100461000 SuperRare  # Diabellstar, the Seeker of Sinful Spoils
+card: 100459001 SuperRare  # Exodia the Obliterator
+card: 100463002 SuperRare  # Gandora-X the Blackmetal Rampaging Dragon
+card: 58330108 SuperRare  # Gigarays Gandora the Dragon of Destruction
+card: 100459018 SuperRare  # King of Yamimado
+card: 100462004 SuperRare  # Magistus Witchcrafter Aruru
+card: 45700805 SuperRare  # Plasma Warrior Eitom
+card: 101403015 SuperRare  # Primrose the Twin Rikka Fairy
+card: 100459010 SuperRare  # Silent Magician, the Silent Fighter
+card: 101403012 SuperRare  # Sinful Spoils of the White Crow Forest
+card: 68625623 SuperRare  # Unchained Malevolent Magistrate Kamura
+card: 14732294 SuperRare  # White Knight Lord
+card: 72321198 Rare  # Arcana Force XII - The Hangman
+card: 100459022 Rare  # Archfiend of Gilfer - Flame Attack
+card: 100200298 Rare  # Counter Spell "Negate Attack"
+card: 11250655 Rare  # Emperor of the Land and Sea
+card: 100459014 Rare  # Evil Dragon Cards - Metal Dragon
+card: 101403054 Rare  # Harpie & Amazoness Rakshasa Formation
+card: 100459003 Rare  # Harpie Lady - Elegant Egotist
+card: 15725501 Rare  # Makourai, the Lightning Strike
+card: 100460027 Rare  # Marincess Ulpis
+card: 101403016 Rare  # Rikka Black Princess
+card: 101403005 Common  # Amazoness Chain Master - Brink of Death Chain Dance
+card: 101403074 Common  # Amazoness Dramatic Rescue
+card: 101403006 Common  # Amazoness Fighter - Instant Kill Dance
+card: 101403007 Common  # Amazoness Spellcaster - Forbidden Spell Dance
+card: 36821538 Common  # Ancient Sorcerer
+card: 595626 Common  # Ankuriboh
+card: 15150371 Common  # Archfiend Mirror
+card: 100200297 Common  # Armor Wizard Pazoo
+card: 100459017 Common  # Aroma Strategy
+card: 101403061 Common  # Ars Magna Academic Arcane Apparition Acropolis
+card: 101403066 Common  # Bunnillin Extract
+card: 101403080 Common  # Bunnillin Soft
+card: 101403020 Common  # Bunnillin: Mocha MOD
+card: 101403070 Common  # Castle of Vampire
+card: 100460006 Common  # Cubic Bodhi
+card: 65302903 Common  # Dominusteer Rosepamela
+card: 100459013 Common  # Evil Dragon Cards - Earth Dragon
+card: 101403008 Common  # Harpie Lady - Alluring Dance
+card: 87818869 Common  # Hyper-Rank-Up-Magic Ultimate Force
+card: 14425515 Common  # Infernity Doom Slinger
+card: 100460026 Common  # Marincess Azuri
+card: 100460031 Common  # Marincess Reef Lagoon
+card: 101403060 Common  # Power Patron Portal Plugging -Sword of Mutual Destruction-
+card: 100460001 Common  # Pritima the Infinity Cubic Vessel
+card: 67803035 Common  # Reincarnation of the Unchained
+card: 100459006 Common  # Relinquished the Wicked Eye of Illusion
+card: 101403064 Common  # Rikka June Moon
+card: 101403014 Common  # Salamangreat Bastella
+card: 101403063 Common  # Salamangreat Gearblade
+card: 101403013 Common  # Salamangreat Markhor
+card: 10449150 Common  # Shuttleroid
+card: 101403079 Common  # Theorealize Ephemeral Lull
+card: 90615639 Common  # Time Dimension Hole
+card: 7293697 Common  # Toon World the Perfect World
+card: 37984331 Common  # True Exodia
+card: 95136979 Common  # Unchained Ogre Shara
+card: 31531914 Common  # Unchained Ogre Shma
+card: 93898740 Common  # Unchained Syncretism
+
+pack: OCG-MONSTE | OCG Import: Monsters
+card: 101403044 UltraRare  # Karin the Celestial Sage of the Highest Heights
+card: 101403040 UltraRare  # Lethargisaurus
+card: 10000030 UltraRare  # Magi Magi ☆ Magician Gal
+card: 13203964 UltraRare  # Perfectron Hydradrive Dragon
+card: 36608728 UltraRare  # Saiba the Fighting Swordsmith
+card: 100200293 SuperRare  # Assault Lion
+card: 100459005 SuperRare  # Barrel Dragon the Machine Dragon
+card: 91337277 SuperRare  # Big Inflate Dragon
+card: 52768390 SuperRare  # Dark Creator
+card: 100459007 SuperRare  # Dark Necrofear, the Ruler of Demise
+card: 46826483 SuperRare  # Dark Tyranno
+card: 26364381 SuperRare  # Demiurge Ema
+card: 3635138 SuperRare  # Emissaries from Darkness
+card: 73320394 SuperRare  # Evil Lord - Zorc
+card: 100459008 SuperRare  # Gilford the Lightning, the Warrior of Thunderbolts
+card: 101403021 SuperRare  # Heretic Eradicator
+card: 10000040 SuperRare  # Holactie the Creator of Light
+card: 101403029 SuperRare  # Javelin Beetle of the Alliance
+card: 100459002 SuperRare  # Perfect Eclosion - Perfectly Ultimate Great Moth
+card: 23923758 SuperRare  # Steam Knight - Hamburk
+card: 100350263 SuperRare  # The Dark Dragon Lord of Ultum
+card: 11714098 Rare  # 30,000-Year White Turtle
+card: 27553701 Rare  # Absolute King - Megaplunder
+card: 8353769 Rare  # Air Eater
+card: 36904469 Rare  # Akihiron
+card: 89832901 Rare  # B. Dragon Jungle King
+card: 29616941 Rare  # Beautiful Beast Trainer
+card: 12146024 Rare  # Bolt Escargot
+card: 9540040 Rare  # Boulder Tortoise
+card: 77998771 Rare  # Crow Goblin
+card: 44865098 Rare  # Cyber Soldier
+card: 32344688 Rare  # Dark Chimera
+card: 69893315 Rare  # Dice Armadillo
+card: 8915275 Rare  # Evil Box
+card: 69780745 Rare  # Garvas
+card: 81686058 Rare  # Ill Witch
+card: 71108540 Rare  # Invincible Demise Lord
+card: 75850803 Rare  # LaMoon
+card: 55343172 Rare  # Legendary Dueling Field
+card: 4392470 Rare  # Leo Wizard
+card: 21251800 Rare  # Light Bringer Lucifer
+card: 98795934 Rare  # Mabarrel
+card: 38116136 Rare  # Machine Attacker
+card: 50176820 Rare  # Mech Bass
+card: 35712107 Rare  # Monstrous Bird
+card: 2971090 Rare  # Orion the Battle King
+card: 49858495 Rare  # Power Pro Lady Sisters
+card: 29402771 Rare  # Rainbow Marine Mermaid
+card: 82818645 Rare  # Rock Spirit
+card: 39239728 Rare  # Royal Guard
+card: 23659124 Rare  # Sea King Dragon
+card: 34690519 Rare  # Spirit of the Mountain
+card: 54615781 Rare  # Spirit of the Winds
+card: 47922711 Rare  # Tatsunootoshigo
+card: 33878931 Rare  # Togex
+card: 47319141 Rare  # Wing Eagle
+card: 42418084 Rare  # Winged Egg of New Life
+card: 30090452 Rare  # Zanki
+card: 40387124 Common  # Abyss Flower
+card: 77568553 Common  # Acid Crawler
+card: 38035986 Common  # Akakieisu
+card: 81492226 Common  # Ancient Jar
+card: 86421986 Common  # Ancient Tree of Enlightenment
+card: 12436646 Common  # Aqua Snake
+card: 14708569 Common  # Arlownay
+card: 36151751 Common  # Arma Knight
+card: 16246527 Common  # Armored Rat
+card: 67841515 Common  # Barrel Lily
+card: 10476868 Common  # Barrel Rock
+card: 72076281 Common  # Bat
+card: 6103114 Common  # Beaked Snake
+card: 8058240 Common  # Binding Chain
+card: 7670542 Common  # Bio Plant
+card: 21239280 Common  # Bone Mouse
+card: 68963107 Common  # Boo Koo
+card: 80222045 Common  # Breeze the Electrovore of Rkunas
+card: 47695416 Common  # Candle of Fate
+card: 72921536 Common  # Comic Cat
+card: 6400512 Common  # Cyber Commander
+card: 13193642 Common  # Dark Plant
+card: 40196604 Common  # Dark Shade
+card: 34314989 Common  # Dark-Eyes Illusionist Faceless Mage
+card: 20240828 Common  # Decoy
+card: 97843505 Common  # Djinn the Watcher of the Wind
+card: 25882881 Common  # Dokuroizo the Grim Reaper
+card: 84916669 Common  # Doriado
+card: 756652 Common  # Doron
+card: 24194033 Common  # Dorover
+card: 9197735 Common  # Dragon Statue
+card: 6367785 Common  # Eldeen
+card: 64154377 Common  # Embryonic Beast
+card: 64511793 Common  # Eyearmor
+card: 81563416 Common  # Fairy of the Fountain
+card: 37160778 Common  # Fairywitch
+card: 68870276 Common  # Fiend Reflection #1
+card: 22855882 Common  # Fiend Sword
+card: 52800428 Common  # Fiend's Hand
+card: 88435542 Common  # Fire Eye
+card: 51083544 Common  # Frost Tiger
+card: 53830602 Common  # Fungi of the Musk
+card: 45536531 Common  # Funny Dark Rabbit
+card: 34536276 Common  # Ganigumo
+card: 49258578 Common  # Gate Deeg
+card: 88931417 Common  # Gatling Ogre
+card: 100459023 Common  # Gearfried the Steel Knight
+card: 49370026 Common  # Genin
+card: 95265975 Common  # Ghoul with an Appetite
+card: 41403766 Common  # Giant Scorpion of the Tundra
+card: 11793047 Common  # Gorgon Egg
+card: 27094595 Common  # Graveyard and the Hand of Invitation
+card: 18905769 Common  # Guivre
+card: 46718686 Common  # Hitodenchak
+card: 10859908 Common  # Holograh
+card: 69669405 Common  # Horn Imp
+card: 15042735 Common  # Hurricail
+card: 38982356 Common  # Hyo
+card: 20848593 Common  # Ice Water
+card: 19438484 Common  # Ilios the Black Sun Dragon
+card: 55337339 Common  # Job-Change Mirror
+card: 68928540 Common  # Kamakiriman
+card: 84103702 Common  # Kanikabuto
+card: 48109103 Common  # Kappa Avenger
+card: 81179446 Common  # Kattapillar
+card: 100459020 Common  # Knight of Twin Swords
+card: 32569498 Common  # Korogashi
+card: 76512652 Common  # Krokodilus
+card: 9430387 Common  # LaLa Li-oon
+card: 42591472 Common  # Laughing Flower
+card: 55210709 Common  # Lisark
+card: 34320307 Common  # Living Vase
+card: 81618817 Common  # Lord of Zemia
+card: 3985011 Common  # Lucky Trinket
+card: 62210247 Common  # Lunar Queen Elzaim
+card: 43905751 Common  # Madjinn Gunn
+card: 49127943 Common  # Man-Eating Plant
+card: 77581312 Common  # Masked Clown
+card: 63545455 Common  # Mech Mole Zombie
+card: 94412545 Common  # Mechaleon
+card: 23032273 Common  # Megirus Light
+card: 83678433 Common  # Midnight Fiend
+card: 46864967 Common  # Minomushi Warrior
+card: 7225792 Common  # Mon Larvas
+card: 15820147 Common  # Monsturtle
+card: 4931562 Common  # Mountain Warrior
+card: 69992868 Common  # Muse-A
+card: 62793020 Common  # Mystery Hand
+card: 63515678 Common  # Mystical Capture Chain
+card: 78402798 Common  # Night Lizard
+card: 88643173 Common  # Nightmare Scorpion
+card: 3606209 Common  # One Who Hunts Souls
+card: 77603950 Common  # Phantom Dewan
+card: 61201220 Common  # Phantom Ghost
+card: 55567161 Common  # Pot the Trick
+card: 54112932 Common  # Potato & Chips
+card: 68075840 Common  # Power Pro Knight Girls
+card: 62193699 Common  # Rock Ogre Grotto #2
+card: 82742611 Common  # Serpent Marauder
+card: 84794011 Common  # Solitude
+card: 98075147 Common  # Spiked Snail
+card: 98588427 Common  # Steam Knight - BULLauncher
+card: 72269672 Common  # Stone Ghost
+card: 41422426 Common  # Supporter in the Shadows
+card: 75646173 Common  # Synchar
+card: 46247516 Common  # Tao the Chanter
+card: 57935140 Common  # Tenderness
+card: 60715406 Common  # Tentacle Plant
+card: 24348204 Common  # The Bewitching Phantom Thief
+card: 8944575 Common  # The Drdek
+card: 42026772 Common  # The Magical King of Dimension Zeta
+card: 98898173 Common  # The Melting Red Shadow
+card: 101403023 Common  # The Secret Crane Princess Who Returns A Favor
+card: 18180762 Common  # The Thing That Hides in the Mud
+card: 93788854 Common  # The Wandering Doomed
+card: 100200292 Common  # Thoroughbred Elf
+card: 62671448 Common  # Toad Master
+card: 80813021 Common  # Torike
+card: 17441953 Common  # Turtle Raccoon
+card: 60589682 Common  # Twin Long Rods #1
+card: 28736826 Common  # Ultimate Baseball Homerun King
+card: 78556320 Common  # Vishwar Randi
+card: 3732747 Common  # Water Element
+card: 55014050 Common  # Water Girl
+card: 66836598 Common  # Waterdragon Fairy
+card: 37243151 Common  # Weather Control
+card: 92409659 Common  # White Dolphin
+card: 2957055 Common  # Wicked Dragon with the Ersatz Head
+card: 98582704 Common  # Wing Egg Elf
+card: 17511156 Common  # Wood Clown
+card: 17733394 Common  # Wood Remains
+card: 76704943 Common  # Yamatano Dragon Scroll
+card: 41061625 Common  # Yashinoki
+card: 17115745 Common  # Yormungarde
+card: 10598400 Common  # Zarigun
+card: 100459012 Common  # Zombyra
+
+pack: OCG-SPELLS | OCG Import: Spells and Traps
+card: 100459019 Rare  # Attribute Rejection
+card: 100459021 Rare  # Flashforce Sword
+card: 101403067 Rare  # Power of the Duelist
+card: 10086952 Rare  # Quick Summon
+card: 100459024 Rare  # Spell Card "Enemy Controller"
+card: 38817295 Rare  # Ultimate Sky
+card: 30752324 Common  # Ancient Secrets
+card: 101403071 Common  # Autumn
+card: 24056179 Common  # Capsule Monster Chess
+card: 101403069 Common  # Card Crawl
+card: 47471667 Common  # D - Burst
+card: 48128081 Common  # Destined Duel
+card: 44088353 Common  # Doll Hammer
+card: 101403053 Common  # Elegant Tri-Mirror
+card: 101403075 Common  # Eyelluring Mirror Wall
+card: 27001740 Common  # Farm Delivery
+card: 100459016 Common  # Field Power Bonus
+card: 100459025 Common  # Final Journey of the Soul
+card: 44857722 Common  # Full Moon Mirror
+card: 100461003 Common  # Hope for the Future
+card: 89753095 Common  # Lightning Crash
+card: 66247039 Common  # Mind Mirror Force
+card: 34298391 Common  # Mind Scan
+card: 98931003 Common  # Nanana
+card: 100459011 Common  # Penalty Game "GREED, the Illusion of Avarice"
+card: 100200294 Common  # Power Connection
+card: 90506641 Common  # Soul Unseal
+card: 42232157 Common  # Stage of Destiny
+card: 100459015 Common  # Super Critical
+card: 54120521 Common  # The Legend of Tickets
+card: 101403068 Common  # The Pyramid of Kepher
+card: 100463005 Common  # Time Chain
+card: 212652 Common  # Trap of the Poisonous Scorpion
+card: 100463008 Common  # Warrior's Devotion
+card: 100461002 Common  # Wicked Canon

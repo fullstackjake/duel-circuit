@@ -1,0 +1,1740 @@
+# Duel Circuit story: short scenes, each shown once when its trigger happens.
+#   scene: <id>          starts a scene
+#   when: <trigger>      start | firstloss (the save's first loss, circuit or guest) | clear:<circuit> | open:<tag cup>
+#                        | cupclear:<tag cup> | partner | partner:<character> | guest:<character> (before your first duel
+#                        against that guest) | guestbeat:<character> (your first one-on-one win against that guest, on its
+#                        results; beat:<character> is the signature gift's, already paid for one you met in the circuits)
+#                        | level:<n> | ngplus | library | open:<Library cup> | cupclear:<Library cup> | table:<Library cup> | stamp:<Library cup>
+#                        | stamp (the first Format Master stamp, at any cup) | final | open:Every Era | round:<n> | cupclear:Every Era
+#                        | locals (your first Library Locals entry) | bracketwin (your first bracket title) | bracketwin:<bracket name>
+#                        | beat:<character> (your first win against them; {card} is their gift, their signature card)
+#                        | bond:<character>:3 (a trade is offered) | bond:<character>:5 (they give you their signature, {card})
+#                        | setcomplete (the first set you complete: {set} is its name, {card} the card it pays)
+#                        | setcomplete:<set code> (that set completed)
+#                        | the Back Alley's (docs/dev/ALLEY-SPEC-2026-11-01.md section 12): alley | alleyvisit | open:<table> | alleyclear:<table>
+#                        | headliner:<id> | headlinerbeat:<id> | combobreaker:<id> | encore | fence | antewin | antelose | rail
+#                        | buyback | railgone | turncap | firstturn | unlisted | brawl | midnight | bracketwin:Alley Brawl
+#                        | bracketwin:Midnight Open | pennywin | heldcard (alley titles never raise plain bracketwin)
+#                        | No Limits' (docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 10.3): outoftowner | outoftowner:<id> | nolimits
+#                        | open:No Limits | pilot:<id> | pilotbeat:<id> | restored | alleyclear:No Limits | invitational
+#                        | bracketwin:No Limits Invitational ("opponent" speaks for the pilot you just beat, in nl-restored)
+#                        | the Champion's Ladder's (docs/dev/CHAMPIONS-LADDER-SPEC-2026-11-06.md section 6): ladder (it opens)
+#                        | ladderseat:<character> (before your first ladder duel against them) | ladderbeat:<character> (your
+#                        first ladder win against them; Ilse's: her rung falls) | ladderrung:<n> | laddertop (the top reached)
+#                        | finale (the post-game's strands closed: the Every Era corkboard and alley-closing, plus the
+#                        Invitational once No Limits is ready; so the finale's text never mentions No Limits)
+#   place: <key>         where it plays, the backdrop behind it (optional): shop-floor | shop-night (the shop after closing)
+#                        | corkboard (out front) | back-room | library | every-era (the final's long table) | hall
+#                        | alley | basement | van | depot. Without one, the trigger's family picks: the alley's the alley
+#                        (fence the van), No Limits' the depot (outoftowner the alley), the Library's the library (its
+#                        final's opening and rounds every-era), everything else the shop floor (src/Ygo.Engine/Campaign/Story.cs)
+#   after: <scene id>    gates (optional, any number, all must hold), as in shop.txt: the scene plays only once that scene
+#   before: <scene id>   has been seen / only while it hasn't. Read when the trigger fires, counting the scenes ahead of it
+#                        in the same batch as seen. A gate that fails skips the scene and leaves it unseen, and it never
+#                        plays later unless its trigger fires again. So two variants on one trigger, one "before: X" and one
+#                        "after: X", play exactly one; the "after: X" one also takes "before: <the other variant>", so a
+#                        trigger that fires again, or an old save that saw the first, never gets both. Gates name scene ids
+#                        in this file only (not the generic partner scene).
+#   <speaker>: <text>    a line: a character id (personalities/), "partner", or "-" for narration
+#   <speaker> [era]: ... a line only for era-limited play (your team answers to the ban lists); [open]: only outside it
+# Text can use {partner}, {partnerdeck}, {partnerline} (the partner's own partner: line from their profile, for the generic
+# "partner" scene), {you}, {level}, {card} and {set} (the alley's add {table}, {handle}, {nick},
+# {grade}, {price}, {left}, {step} and {sold}: the card Moth sold off the rail, for railgone). Every character is fictional.
+# Scenes on the same event play in file order. Any line in a scene that can play while its speaker is your partner
+# (Tag Cup clears, the generic "partner" scene) must still read right when that character is the partner.
+# A beat, gift or clear scene never repeats the speaker's lose line, and an entrance scene (headliner:, pilot:,
+# outoftowner:) never repeats their versus intro or Baz's tell: the screen just showed it. Start one step after the loss,
+# and let the scene say who someone is while the versus says what they'll do. Lines stay under about 105 characters.
+
+scene: welcome
+when: start
+-: A bell rings as the door swings shut behind you. Card sleeves, coffee, and the clack of shuffling.
+old-gus: Well, a new face. Welcome to the shop. Name's Gus.
+old-gus: I've been dueling since before your deck had a rulebook.
+old-gus: Every week there's a circuit: a few duelists, a few matches, and a prize for whoever wins them all.
+old-gus: Win, earn Duel Points, buy packs over there. Lose, and you still learn something. Usually.
+old-gus [era]: You picked the history way. Each circuit plays by the list of its year, like it really was.
+old-gus [era]: A professor friend, Hollis, keeps track of the lists. I just keep score.
+old-gus [open]: Around here, nobody fusses over ban lists. Bring what you've got.
+old-gus [open]: Want the history way someday? Pick it when you start a new game.
+vera: Gus, is this the new one? Hm. Nice deck. Let's see if you can keep up with it.
+old-gus: That's Vera. She thinks attacking is a personality. She's not wrong, exactly.
+vera: First circuit's tonight. Don't make it boring.
+
+scene: first-loss
+when: firstloss
+-: Gus pours you a coffee and slides it across the counter.
+old-gus: Nobody takes a card off you for losing, kid. Not up here. Winners get one, you'll see.
+old-gus: I said you'd learn something when you lost. So. What was it?
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Card unlocks (docs/dev/CARD-UNLOCKS-SPEC-2026-11-01.md): rival gifts, bond trades and gifts, the first set completed.
+# These sit near the top on purpose: a gift is the loser's own reaction, so it plays before the clear scenes of the
+# same duel (Tink at the Rookie Cup, Vera at the Town Tournament, Hollis before the regional circuit opens).
+# The shop rule (Ryo says it first): the first time someone beats you, they get a card. Outsiders have their own reasons.
+# Never "a {card}": card names need no article. The bounty board is introduced in gus-lessons.
+# ---------------------------------------------------------------------------------------------------------------------
+
+scene: gift-rookie-ryo
+when: beat:rookie-ryo
+rookie-ryo: You beat me! Okay. Okay! Shop rule: the first time someone beats you, they get a card.
+rookie-ryo: {card}. First dragon I ever pulled. It should be in a deck that wins. ...For now!
+
+scene: gift-brask
+when: beat:brask
+brask: At ease, soldier. You broke my line, and a shop rule is an order.
+-: He pulls {card} from behind his breastplate. Its corners are dented, like the armor.
+brask: Led my first squad into every duel I ever won. Now it marches with you. No retreating!
+
+scene: gift-old-gus
+when: beat:old-gus
+old-gus: Shop rule's a shop rule. I made it up, so I'd better keep it.
+old-gus: {card}, out of the first booster box I ever opened. Two bucks a pack, back then.
+old-gus: Never won me a tournament. Maybe it'll win you one.
+
+scene: gift-tink
+when: beat:tink
+tink: You took the whole machine apart! Okay, fair. Engineers swap parts.
+-: She drops {card} into your palm. It smells faintly of machine oil.
+tink: My favorite part. When your field's empty and everything else is down, it still starts.
+
+scene: gift-vera
+when: beat:vera
+vera: Fine. You earned it. Take this.
+-: She slides {card} across the table, its sleeve worn soft, the same red as her jacket.
+vera: It's why there's a sword on my keychain. In my binder since I was nine. Don't make me regret it.
+
+scene: gift-hollis
+when: beat:hollis
+hollis: Well argued. A professor ought to pay for a good lesson, not only charge for one.
+-: He takes {card} from between the pages of his rulebook, flat as a pressed flower.
+hollis: It grows stronger every turn you leave it alone. Patience, you see, is also a weapon.
+
+scene: gift-ines
+when: beat:ines
+ines: Gus said you could count. Gus can't, so I checked.
+-: She sets {card} down face up, square to the table edge.
+ines: Gus has hated this card since 2005. Ask him about 2005. He won't answer. That's the answer.
+
+scene: gift-frog-ftk
+when: beat:frog-ftk
+frog-ftk: Shop rule, huh? Fine. Frogs pay up. Eventually.
+-: He pops a bubble of gum and flicks {card} across the table.
+frog-ftk: It hops back out of my Graveyard every turn anyway. Let's see if it follows you home.
+
+scene: gift-six-samurai
+when: beat:six-samurai
+six-samurai: Your shop has a good custom. My clan keeps the same one.
+-: He bows, then sets {card} down with both hands.
+six-samurai: My teacher's card. When it falls, it brings a samurai home. Let it bring you home too.
+
+scene: gift-geargia
+when: beat:geargia
+geargia: Engineers pay their debts in parts. Here's mine.
+geargia: {card}. The first gear I ever built a machine around. Nothing personal. Start yours with it.
+
+scene: gift-blackwing
+when: beat:blackwing
+blackwing: Couriers pay on delivery. You delivered.
+-: Kestrel digs {card} out of the messenger bag and holds it out without looking.
+blackwing: Nothing gets through its armor in a fight. You flew around it. Keep it.
+
+scene: gift-lightsworn
+when: beat:lightsworn
+lightsworn: Even the dawn pays what it owes. Here.
+-: Her windmill charm stops spinning. She presses {card} into your hand.
+lightsworn: It comes when the Graveyard is full of light. Fill yours, and it will come for you instead.
+
+scene: gift-infernity
+when: beat:infernity
+infernity: ...Fine. I'll give it away instead. That's almost like keeping nothing.
+-: Ash turns out an empty pocket. {card} was the only thing in it.
+infernity: It shows up when you've got nothing left. Everyone needs one of those.
+
+scene: gift-goat-control
+when: beat:goat-control
+goat-control: Here, before I change my mind. I won't. It's only polite to say so.
+-: From her cardigan pocket comes {card}, its sleeve smelling faintly of tea.
+goat-control: It flew in the deck that beat your Gus. It's earned a younger pilot.
+
+scene: gift-true-draco
+when: beat:true-draco
+true-draco: Tribute, then. A king who won't pay it isn't one.
+-: Without rising from his seat, he holds out {card}.
+true-draco: My first knight, sworn to whoever sits on the throne. Today, that's you. Enjoy it.
+
+scene: gift-plant-synchro
+when: beat:plant-synchro
+plant-synchro: Gardeners share cuttings with people they respect. You've earned one.
+-: She tucks {card} into an empty seed packet and hands it over.
+plant-synchro: It gives itself up so something else can grow. Plant it early.
+
+scene: gift-shaddoll
+when: beat:shaddoll
+shaddoll: Don't look so pleased. I'm only giving you the one that kept trying to leave.
+-: She snips a thread from one of her rings, and {card} drops into your hand.
+shaddoll: Be gentle with it. Puppets remember who pulled their strings.
+
+scene: gift-drytron
+when: beat:drytron
+drytron: Fleet custom: the victor keeps the flagship's colors. Take them.
+drytron: {card}. The first star I ever charted. It leads my fleet. Now it can lead yours.
+
+scene: gift-kozmo
+when: beat:kozmo
+kozmo: Pilots' rules, then. You shot it down, you keep it.
+kozmo: {card}. Biggest ship in the hangar. I built the fleet just to launch it. Fly it for me.
+
+scene: gift-tearlaments
+when: beat:tearlaments
+tearlaments: I don't know what to do with my hands. ...Oh. This. Here.
+-: She gives you {card}. It's still a little damp.
+tearlaments: It rises after everything else has sunk. I always thought of it as me.
+tearlaments: Keep it dry. I never could.
+
+scene: gift-snake-eye
+when: beat:snake-eye
+snake-eye: Here. Something to keep you warm.
+-: Nell holds out {card}. The sleeve is warm, as if it just came out of a fire.
+snake-eye: The last spark in my deck. It burned for me all year. Your turn.
+
+scene: gift-mitsurugi
+when: beat:mitsurugi
+mitsurugi: A blade belongs to whoever dulls it. Hold out your hands.
+-: She unwinds the ritual cord from her hair and binds it around {card}.
+mitsurugi: The first blade I was trusted with. Keep it sharp. Sheathe it only when you've won.
+
+# Bond scenes: your 3rd win against someone offers one trade (a spare of yours for a card from their deck, worth no
+# more); your 5th brings their signature card at its rarest printing. Kit has no bond.
+
+scene: bond-vera-3
+when: bond:vera:3
+vera: Three times now. Okay. Rivals trade. It keeps them honest.
+vera: One card from my deck for one of your spares. Something that hits just as hard. I'll check.
+
+scene: bond-vera-5
+when: bond:vera:5
+vera: Five. I stopped calling it luck around three.
+-: She sets down {card} again. Not the soft old copy: this one shines, sleeved in red.
+vera: Traded a whole summer for it. You'll hit harder with it than I did. Don't get a big head.
+
+scene: bond-old-gus-3
+when: bond:old-gus:3
+old-gus: Three wins. That earns you the counter price, kid. One swap, from my deck.
+old-gus: Bring me a spare worth as much as what you take. I don't do discounts. I do fair.
+
+scene: bond-old-gus-5
+when: bond:old-gus:5
+-: Gus unlocks the glass case behind the counter. Nobody's seen it open in years.
+old-gus: The good {card}. Kept it through two bad winters. Never once put a price on it.
+old-gus: A card that good shouldn't sit in a case. Somebody ought to play it. Go on.
+
+scene: bond-hollis-3
+when: bond:hollis:3
+hollis: Three results, one conclusion. The evidence is in your favor.
+hollis: An exchange, then: a card from my deck for a spare of equal worth. Scholars trade notes.
+
+scene: bond-hollis-5
+when: bond:hollis:5
+hollis: Five. I'd grade it, but you've outgrown my rubric.
+-: From the rulebook's back cover, he takes {card}: the rarest printing, never once played.
+hollis: I kept it for a student who'd outgrow me. I'd expected to wait rather longer.
+
+scene: bond-tink-3
+when: bond:tink:3
+tink: Third time! That makes you a member of the workshop. Members swap parts.
+tink: Pick any part from my deck and give me a spare that's worth as much. Fair's fair, gears are gears.
+
+scene: bond-tink-5
+when: bond:tink:5
+tink: Five! That's a whole machine's worth of wins.
+-: She pries open a toolbox marked DO NOT TOUCH and lifts out {card}, polished to a shine.
+tink: My showroom copy. It never leaves the box. ...It does now. Go make it run.
+
+scene: bond-rookie-ryo-3
+when: bond:rookie-ryo:3
+rookie-ryo: Three! Not in a row. Three total. I wrote every one down.
+rookie-ryo: Want to trade? One of mine for one of your spares. Something just as good, okay? I'm learning.
+
+scene: bond-rookie-ryo-5
+when: bond:rookie-ryo:5
+rookie-ryo: Five times. That's... a lot of notebook pages.
+-: Ryo opens the brand-new deck box. Inside, alone in a hard sleeve, is the shiny {card}.
+rookie-ryo: I saved up all year for this one. You should have it. You're who I want to be when I'm good.
+
+scene: bond-ines-3
+when: bond:ines:3
+ines: Three. I counted. Gus would have rounded it up to ten.
+ines: A trade: one card from my deck for one of your spares, of equal value. I check values.
+
+scene: bond-ines-5
+when: bond:ines:5
+ines: Five. That's enough data.
+ines: {card}. The best printing there is. Gus still crosses the room when he sees one.
+ines: Now it can sit across your table from him.
+old-gus: I don't cross the room. I respect it. From a distance.
+
+scene: first-set
+when: setcomplete
+old-gus: Every card in {set}? Every last common? Most folks sell the commons. You kept them all.
+old-gus: That earns the best copy in my case: {card}, the rarest printing. Don't sleeve it with the commons.
+old-gus: And a set like that gets a frame. I'll hang it where you can see it.
+
+scene: beginner-clear
+when: clear:Beginner Circuit
+vera: So you actually won something. Fine.
+vera: The Rookie Cup is next. I'll be watching. Closely.
+old-gus: She says that to everyone she's worried about.
+
+scene: gus-lessons
+when: clear:Beginner Circuit
+old-gus: Before the Rookie Cup, a word about chains. Every duelist trips over them sooner or later.
+old-gus: I keep three little lessons behind the counter, under Lessons at the top of the screen.
+vera: He made me do those. Twice. ...The second time was on purpose.
+old-gus: And my bounty board: three odd jobs a band. Win a duel the way the card says, and I pay.
+old-gus: The pay's a card your Recipe still needs. No Recipe yet? Then a Card Token.
+old-gus: Cards, not Duel Points. Points get spent, kid. Cards keep.
+
+scene: rookie-cup-clear
+when: clear:Rookie Cup
+old-gus: Beat my dragons, kid. ...That's the first lesson I didn't have to teach.
+vera: Town Tournament's next. I signed up the second you won.
+
+scene: tag-night
+when: open:Card Shop Tag Night
+old-gus: Fridays, we do things differently: tag duels. Two of you, two of them.
+old-gus: Partners share one field and one set of Life Points.
+old-gus: You take your turn, they take theirs, then your partner, then their partner. Round and round.
+old-gus: Anyone you've beaten can partner you.
+old-gus: Beat someone and you learn a lot about them. Around here, that's how friendships start.
+kit: Or there's me. I'm Kit. Fridays, I'll partner anybody who asks, with any deck they lend me.
+vera: I'm not partnering with you. Yet.
+
+scene: first-partner
+when: partner
+-: {partner} pulls up the chair beside yours and sets down {partnerdeck}.
+partner: {partnerline}
+
+scene: partner-kit
+when: partner:kit
+kit: Finally! Hand me a deck, any deck. I'll play it the way you would. ...Mostly.
+kit: Today it's {partnerdeck}. I've watched you from the next table since your first night.
+kit: I'm here every Friday anyway. Might as well win something.
+
+scene: partner-vera
+when: partner:vera
+vera: You picked me? Of course you did. I hit the hardest.
+vera: Rules: I attack, you clean up. Don't set a single trap while I'm watching.
+vera: ...Okay, set one. Just one.
+
+scene: partner-hollis
+when: partner:hollis
+hollis: A tag duel. Splendid. Two minds, one board: it's half chess, half conversation.
+hollis: I'll be slow and careful. You be the part of the team that wins quickly.
+
+scene: partner-old-gus
+when: partner:old-gus
+old-gus: Partner with the old man? Ha. Haven't done that since the shop had carpet.
+old-gus: You've seen my dragons. Today I brought the walls.
+old-gus: Let them run out of patience before we run out of Life Points.
+
+scene: partner-ines
+when: partner:ines
+ines: Partners. Gus will hate this. Good.
+ines: I count, you attack. When I say wait, you wait.
+old-gus: Twenty years, and she never once asked me that.
+ines: You never once waited, Gus.
+
+scene: tag-night-clear
+when: cupclear:Card Shop Tag Night
+old-gus: Not bad. Know what tag duels teach? That your deck isn't the only one on the table.
+old-gus: Keep the people you've beaten close. Some of them will make you better than winning ever did.
+old-gus: Win enough of these and Rhea comes calling. Tag champion. She counts your wins before she sits.
+
+scene: novice
+when: clear:Regional Qualifier
+old-gus [era]: The regional circuit. Bigger tables, bigger decks, and one thing you haven't dealt with yet.
+old-gus [open]: The regional circuit. Bigger tables, bigger decks, and a whole new era of cards.
+hollis [era]: The Forbidden and Limited List. Every era has one. From here on, the March 2011 list applies.
+hollis [era]: Pot of Greed, Raigeki, Heavy Storm: wonderful cards, and quite banned.
+hollis [era]: Check your deck; the editor's Auto-fix can help.
+hollis [era]: Your opponents are exhibitors: they play their decks as they won with them.
+hollis [era]: You're registered, so you play by the list.
+hollis [era]: Three waivers, signed: Ban Passes. Each lets one card past it.
+hollis [era]: Spend them like you'd spend my patience.
+hollis [open]: The Forbidden and Limited List. Every era has one; this era's is from March 2011.
+hollis [open]: At this shop's tables, though, nobody plays by it. Bring your deck as you built it; everyone else does.
+hollis: Every step up the circuit map brings a newer era: newer packs in the shop, and a newer list.
+vera: Translation: the easy wins are over. Good.
+vera: Twice. You beat me twice. ...Next time I'm waiting on a trap. Actually waiting.
+
+scene: novice-tag
+when: open:Novice Tag Cup
+-: A flyer is taped to the regional circuit's door.
+-: NOVICE TAG CUP. Odd couples welcome. Frogs strongly discouraged.
+frog-ftk: The flyer's about me. I'm flattered.
+hollis [era]: A partner's own deck is an exhibition deck: it plays as built, whatever the list.
+hollis [era]: Edit it, and it's registered to your team. Then the list applies.
+
+scene: novice-tag-clear
+when: cupclear:Novice Tag Cup
+partner: Odd couple, were we? Not by the end.
+partner: If you need a partner again, you know where to find me.
+
+scene: intermediate
+when: clear:Small Engines Invitational
+blackwing: You're the one from the little card shop? Hm. The Synchro era is a different sky.
+blackwing: Tuners, levels adding up, monsters out of the Extra Deck every turn. Feathers fly fast here.
+hollis [era]: The April 2015 list applies from now on, and the shop now stocks sets up to 2015.
+hollis [open]: A new era: the shop now stocks sets up to 2015.
+vera: I'm going to Synchro Summon so hard.
+
+scene: intermediate-tag-clear
+when: cupclear:Intermediate Tag Cup
+partner: That was a real tag duel. They chained into each other like they'd rehearsed it.
+partner: We didn't rehearse. We just trusted each other's turns. Let's keep doing that.
+
+scene: advanced
+when: clear:Link Age Open
+goat-control: Sit. Have some tea. The Golden Age Championship isn't in a hurry, and neither am I.
+goat-control: Old champions, new champions. Formats people still play years after the lists changed.
+hollis [era]: The October 2019 list now. And a reminder: a card being old doesn't make it slow.
+hollis [open]: The 2019 era now. And a reminder: a card being old doesn't make it slow.
+old-gus: Shepherd Wren beat me in a final once. Took four hours. I've never forgiven the goats.
+
+scene: golden-age-clear
+when: clear:Golden Age Championship
+goat-control: One hour. Your Gus and I took four, and he still talks about it.
+old-gus: I talk about it because she cheated. With patience. Same thing.
+old-gus: Second-best Goat player I ever sat across from. Ines is the best. Don't tell either of them.
+goat-control: From here up, nobody asks which shop you're from. They ask whether you belong at their table.
+vera: Halfway up the map. ...They're going to ask me that too, aren't they.
+
+scene: advanced-tag-clear
+when: cupclear:Advanced Tag Cup
+before: champion
+place: corkboard
+old-gus: Champions of their eras, and you sent them home. That goes on the corkboard.
+partner: Your name first. I'll take the line under it.
+-: The new card goes on the bottom row. Near the top hangs an old one, signed in gold ink.
+old-gus: That's the Duchess's. Mine's under it. Has been for years.
+
+# The same cup cleared after the champion title: your name's already up (Tag Cups block nothing).
+scene: advanced-tag-clear-late
+when: cupclear:Advanced Tag Cup
+after: champion
+before: advanced-tag-clear
+place: corkboard
+old-gus: Champions of their eras, and you sent them home. That goes on the corkboard.
+partner: Your name first. I'll take the line under it.
+-: The new card goes up beside yours. You've got most of a row by now.
+old-gus: Getting crowded up there. I'm not complaining.
+
+scene: expert
+when: clear:Hybrid Engines Invitational
+shaddoll: You've come a long way. Now you'll find out how far "long" really is.
+shaddoll: Expert players interrupt. Hand traps, negations, floodgates. Your turn will not always be yours.
+hollis [era]: The June 2023 list from here.
+hollis [era]: Read your opponents' graveyards. That's where expert decks keep their plans.
+goat-control [era]: I judged once, you know. Here's a waiver from my old stack: a fourth Ban Pass. Nobody ever revoked me.
+hollis [open]: The 2023 era from here. Read your opponents' graveyards; that's where expert decks keep their plans.
+vera: I lost there twice last year. Go get it for both of us.
+
+scene: expert-tag
+when: open:Expert Tag Cup
+vera: Expert Tag Cup. Two of them now, and neither one lets you finish a turn.
+vera: Pick your partner carefully. Not me. I mean, unless you want to win.
+
+scene: expert-tag-clear
+when: cupclear:Expert Tag Cup
+partner: That one I'll remember.
+partner: When anybody asks who you are, tell them about this.
+
+scene: fall-format
+when: clear:Expert Series: The New Wave
+lunalight: You beat the favorites. Cute. Autumn belongs to the rogue decks.
+dracotail: Nobody preps for us. That's the whole trick.
+vera: Rogue decks. My favorite kind of problem.
+
+scene: fall-tag
+when: open:Fall Format Tag Cup
+power-patron: Maestra Vellum and I have an arrangement. You'll find it... expensive.
+magistus-fairy-tail: And I have a story to tell. You're in it, I'm afraid.
+
+scene: master
+when: clear:Expert Series: Fall Format
+eldlich: So the card shop sends us a challenger. How quaint. The Master League is where eras end.
+eldlich: Every deck here once ruled a format. Some of them still would.
+hollis [era]: The September 2026 list, and every set the shop has. Only October's list is newer, and it's coming.
+vera [era]: My last waiver. I never used it. That's your fifth Ban Pass; use it on something that hits.
+hollis [open]: Today's format, and every set the shop has. Only October's list is newer, and it's coming.
+old-gus: Win or lose, kid, the shop's proud of you. ...Win, though.
+
+scene: master-tag-clear
+when: cupclear:Master Tag Cup
+place: hall
+-: The hall goes quiet when the last Life Points hit zero.
+partner: Master Tag Cup champions. Say it out loud. It sounds even better.
+vera: Fine. FINE. You're good.
+
+scene: graveyard-kings-clear
+when: clear:Master League: Graveyard Kings
+place: corkboard
+-: Out front, Gus takes one card off the corkboard, dusts it, and pins it back at the top.
+old-gus: Signed in gold ink. Been up there since before Vera could shuffle.
+vera: Whose is it?
+old-gus: The Duchess's. White coat. Held the title, then stopped coming in to defend it.
+old-gus: Best I ever saw. Played her own way, never the year's.
+old-gus: Three more circuits, kid. Then you'll be close enough to read the signature.
+
+scene: october-list
+when: clear:Master League: Houston 2026
+-: A printout goes up on the shop wall: the October 19 Forbidden and Limited List.
+hollis: Albion, Called by the Grave, Triple Tactics Talent: gone. A new list means a new format.
+chaos-ritual: Houston's champions are yesterday's news. The regionals are ours now.
+old-gus [era]: Check your deck against the new list, kid. Theirs were built for it.
+old-gus [open]: Nobody here checks your deck against it, kid. Theirs were built for it anyway.
+
+scene: gauntlet
+when: clear:Master League: October 2026
+ishizu-tearlaments: Three of us you've beaten once. I'm the fourth. The Gauntlet asks for all four, in a row.
+ishizu-tearlaments: No circuit after this one. Just the question of whether you belong here.
+hollis [era]: The Gauntlet plays the champions' own list, September's. One night only.
+old-gus: Everyone who's ever taught you something is watching. No pressure.
+
+scene: champion
+when: clear:Tier 0 Gauntlet
+place: hall
+-: The last card resolves, and the hall erupts.
+ishizu-tearlaments: ...Then you belong here.
+vera: I knew it. I said it. I definitely said it at some point.
+hollis [era]: Every era, every list, and you beat the best of each. Remarkable.
+hollis [open]: Every era, and you beat the best of each. Remarkable.
+hollis: Last one to clear that Gauntlet wore a white coat.
+old-gus: Your name's going on the corkboard, right under mine. Mine's been under the Duchess's for years.
+old-gus: First day, I said you learn something when you lose. You stopped giving me the chance.
+
+scene: champion-after
+when: clear:Tier 0 Gauntlet
+old-gus: The shop's open tomorrow, same as always. Come by. Bring your deck.
+old-gus: Hollis has a back room he's been itching to show you.
+vera: Or start over at the first table, with everything you've got. New Game+. I'd watch that.
+
+scene: new-game-plus
+when: ngplus
+old-gus: Back at the first table? With that collection? The rookies are going to cry.
+vera: Good. Go again. This time, I'm keeping up.
+tink: Same machine, all new parts! That's my favorite kind of rebuild.
+
+# New Game+ (a second cycle): Seen survives Profile.NewGamePlus, so the first cycle's scenes never replay, and these play
+# on the same triggers once new-game-plus is seen. In the first cycle their gate fails and they stay unseen. Once each.
+scene: ngplus-beginner-clear
+when: clear:Beginner Circuit
+after: new-game-plus
+rookie-ryo: You came back to the first table? I'm starting a new notebook. Page one: you. Again.
+vera: Beginner Circuit, with a binder that size. Nobody's impressed. ...I'm a little impressed.
+old-gus: Same tables, kid. I didn't move them. Thought you'd like that.
+
+scene: ngplus-rookie-cup-clear
+when: clear:Rookie Cup
+after: new-game-plus
+old-gus: Beat my dragons twice now. First time it was a lesson. This time you were just showing off.
+vera: Town Tournament's next. I signed up. Obviously.
+
+scene: ngplus-tag-night
+when: open:Card Shop Tag Night
+after: new-game-plus
+kit: Friday again. You know the deal. I still partner anybody.
+kit: I kept your seat. Nobody else wanted the one by the radiator.
+
+scene: ngplus-champion
+when: clear:Tier 0 Gauntlet
+after: new-game-plus
+-: Gus goes out front with a pushpin and comes back with it still in his hand.
+old-gus: Nowhere left to pin you, kid. You're already up there.
+vera: Twice. I said it both times. You heard me.
+
+# ---------------------------------------------------------------------------------------------------------------------
+# The Format Library (post-game): Hollis's back room, 12 cups, one binder per year. All 12 open at once, so no cup
+# scene assumes another was played first. Cup names match campaign/library.txt; each cup's intro and clear is voiced
+# by its boss (the last match). Clausolas, Pepe and Helix appear only here. Narrative threads planted for later:
+# the card Ines lost in 2005 (paid off by the Back Alley scenes), and "this year's binder" (the Every Era epilogue).
+# The stamp scenes sit after every cup's scenes, so a stamp always plays after its cup's clear.
+# ---------------------------------------------------------------------------------------------------------------------
+
+scene: library-opens
+when: library
+place: library
+-: The next morning.
+-: The shop's back room smells of old sleeves. Binders line the shelves, one per year, back to 2004.
+old-gus: Morning, champ. Nothing left in the case you don't own, huh?
+hollis: Then you're ready for this.
+hollis: Every Forbidden and Limited List since 2004, and the decks that ruled under each.
+hollis: The circuits sent you each era's champions. The Library sends you their whole formats.
+hollis [era]: You played every circuit by its year's list. In here, so does everyone.
+hollis [open]: You never played by the lists. In here, everyone does.
+hollis: Each cup brings its own list and card pool.
+hollis: Twelve binders hold a cup. Win one with a deck you built yourself, and I'll stamp it.
+vera: So it's old decks. Old, slow decks.
+old-gus: Old, slow decks beat me plenty. Go on. I'm out of lessons, kid. These binders aren't.
+vera: ...Dibs on the 2009 shelf.
+
+scene: cup-goat
+when: open:Goat Cup
+-: The 2005 binder is the most worn on the shelf. Someone wrote GOAT on the spine in marker.
+ines: Goat Format. Gus and I played this at a folding table for one whole summer.
+ines: Scapegoat is a turn, not a card. Four tokens, one Metamorphosis, and a Thousand-Eyes Restrict.
+old-gus: She's not wrong. She's never once been wrong. It's exhausting.
+hollis: I'm entered too. Take your time. Everyone else at this table will.
+
+scene: cup-goat-clear
+when: cupclear:Goat Cup
+ines: Hm. You waited better than I did. That doesn't happen.
+ines: I lost a card in 2005 and never got it back. Losing a cup to you, I don't mind.
+-: Behind the counter, Gus suddenly finds something to tidy.
+vera: Ines beat me at Goat last night. She never attacked. I counted.
+vera: ...Show me how you waited.
+
+scene: cup-teledad
+when: open:TeleDAD Cup
+vera: 2009. I called dibs. ...Fine, you go first. I'm taking notes.
+teledad: Pick a card, any card. It's Dark Armed Dragon. It's always Dark Armed Dragon.
+teledad: Emergency Teleport for a Tuner, Destiny Draw for the discards, and the discards feed the dragon. Simple.
+hollis: I'm entered with something louder than usual. Even I wanted to play in 2009.
+
+scene: cup-teledad-clear
+when: cupclear:TeleDAD Cup
+teledad: The dragon missed its cue. Bad night for magic. Good night for you.
+vera: I'm building one. Don't look at me like that. Every table had one.
+
+scene: cup-synchro-peak
+when: open:Synchro Peak Cup
+six-samurai: Six blades, one will. In 2012, they bowed to no one.
+six-samurai: Six Samurai United gathers them. Gateway of the Six counts them. Shi En stands in front.
+hollis [era]: The March 2011 list. You met it at the regional. It hasn't mellowed.
+hollis [open]: The March 2011 list. You ignored it at the regional. In here, nobody does.
+frog-ftk: Frogs are back too. Frogs never really leave.
+
+scene: cup-synchro-peak-clear
+when: cupclear:Synchro Peak Cup
+six-samurai: The clan trains again at dawn. When we meet next, it will be at a longer table.
+frog-ftk: Ribbit. That's frog for "nice."
+
+scene: cup-rabbits-rulers
+when: open:Rabbits & Rulers Cup
+dragon-ruler: Fire, water, wind, earth. 2013 belonged to them.
+dragon-ruler: Banish two to summon a Ruler. Banish the Ruler, and it fetches a friend. They always come back.
+dino-rabbit: She's not the only reason that binder's so thick. Laggia says hi.
+hollis: The September 2012 list. Rank 7s, Rank 4s, and very long turns.
+
+scene: cup-rabbits-rulers-clear
+when: cupclear:Rabbits & Rulers Cup
+dragon-ruler: They didn't come back. Not one of them. Huh.
+dragon-ruler: Fine. Next time I'm bringing a fifth element.
+
+scene: cup-hat-shaddoll
+when: open:HAT & Shaddoll Cup
+shaddoll: 2014. Everyone summoned from the Extra Deck, and my Winda let them do it once.
+shaddoll: When you do, Shaddoll Fusion borrows from my Deck. Thank you in advance.
+hat: And if you don't summon, you'll attack. I have holes for that.
+vera: Strings and holes. I hate this year already.
+
+scene: cup-hat-shaddoll-clear
+when: cupclear:HAT & Shaddoll Cup
+shaddoll: I'll restring them tonight.
+shaddoll: Construct will want a rematch. Puppets hold grudges.
+
+scene: cup-nekroz-pepe
+when: open:Nekroz & PePe Cup
+-: A hippo plushie sits on the 2016 shelf. Then it's on a shoulder, under a top hat.
+performapal: Ladies, gentlemen, champion! In 2016, every table was my stage. Scales up, monsters down, every turn!
+nekroz: Every table but mine, Ringmaster. The mirror goes first.
+kozmo: And everybody preps for you two and forgets the fleet. Kozmotown's open. Strap in.
+
+scene: cup-nekroz-pepe-clear
+when: cupclear:Nekroz & PePe Cup
+kozmo: Next year's fleet is already in the hangar. You'll see it.
+performapal: Same time next season, champion! I'll bring a bigger hippo.
+
+scene: cup-abc-spyral
+when: open:ABC to SPYRAL Cup
+spyral: Agent Helix. My Super Agent and I worked 2017 together. You don't have clearance.
+spyral: ...Never mind. Sit down.
+abc: Mind the grease. A, B, C and Union Hangar. Dragon Buster's assembled before you've shuffled.
+abc: Take it apart and it comes back together. That's the job.
+
+scene: cup-abc-spyral-clear
+when: cupclear:ABC to SPYRAL Cup
+abc: Back to the hangar. Rebuild, retest, and next time it doesn't come apart.
+spyral: Your file's been upgraded. Don't ask what it said before.
+
+scene: cup-link-dawn
+when: open:Link Dawn Cup
+thunder-dragon: Storm season. 2019, and the whole sky was Thunder Dragons.
+thunder-dragon: Batteryman Solar, Thunder Dragonroar, then Colossus. While it stands, nobody searches. Nobody.
+hollis: The September 2018 list. Links were new, and every Extra Deck monster had to find a place to stand.
+
+scene: cup-link-dawn-clear
+when: cupclear:Link Dawn Cup
+thunder-dragon: Clear skies, for now. Storms always come back around.
+vera: Okay. That one I'd have lost. Don't tell anyone.
+
+scene: cup-toss-eldlich
+when: open:TOSS & Eldlich Cup
+eldlich: The card shop's champion, in my old year. How charming.
+eldlich: Golden Land Forever!, Skill Drain, and a Conquistador waiting among the traps. Gold never hurries.
+hollis: A patient deck. He'll enjoy this more than you will. I rather approve of him.
+
+scene: cup-toss-eldlich-clear
+when: cupclear:TOSS & Eldlich Cup
+eldlich: I shall polish the Conquistadors and wait. Gold is very good at waiting.
+eldlich: Keep the binder. I've had my year.
+
+scene: cup-tearlaments
+when: open:Tearlaments Cup
+-: The 2022 binder is warped, as if someone left it out in the rain.
+tearlaments: 2022. Everyone cried that year. Mostly into their Graveyards.
+tearlaments: Mill my Tearlaments and they Fuse on the way down. Scheiren, Reinoheart... then Kitkallos. Then me.
+vera: She wants you to mill her? That's not a strategy. That's a cry for help.
+
+scene: cup-tearlaments-clear
+when: cupclear:Tearlaments Cup
+tearlaments: Shuffle me back in. I'm better the second time through the Graveyard.
+vera: Can we put that binder somewhere dry now?
+
+scene: cup-kashtira-snake-eye
+when: open:Kashtira & Snake-Eye Cup
+snake-eye: I brought fire. She brought a mountain. Guess which one I lost to.
+kashtira: Sit. Keep your hands steady. Your cards will be leaving, face-down.
+kashtira: Fenrir takes one. Each card that leaves face-down, Shangri-Ira shuts a zone. Then, quiet.
+
+scene: cup-kashtira-snake-eye-clear
+when: cupclear:Kashtira & Snake-Eye Cup
+kashtira: Good route. I didn't see that one from the top.
+kashtira: Coil the rope, check the gear, climb it again tomorrow. That's all a summit ever is.
+
+scene: cup-ryzeal
+when: open:Ryzeal Cup
+ryzeal: Newest binder on the shelf...
+ryzeal: ...which makes it ours. Ice Ryzeal, Node Ryzeal, two at a time.
+ryzeal: Rank 4s every turn, and a Mitsurugi Ritual when we feel fancy.
+hollis: The December 2024 list. The shelf ends there, for now. This year's binder is still empty.
+
+scene: cup-ryzeal-clear
+when: cupclear:Ryzeal Cup
+fire-king-snake-eye: Burned all year to get here. Fine. The binder's yours.
+ryzeal: Not so fast...
+ryzeal: ...the Champion's table is ours. Sit down if you dare. Nobody has to.
+hollis: The cup is cleared. That table is optional. Only the stamp asks for it.
+
+scene: cup-ryzeal-table
+when: table:Ryzeal Cup
+ryzeal: Two at a time, and you still...
+ryzeal: ...took both. Next time, it's three.
+hollis: The newest binder, all of it. Nobody else has signed that table yet.
+
+scene: first-stamp
+when: stamp
+-: Hollis presses a stamp onto the binder's first page. FORMAT MASTER, in red ink.
+hollis: Your own deck, no loaners, nothing waived. The format, won the way it was played.
+hollis: One duelist asked me for this stamp and wouldn't earn it with a year's own cards.
+hollis: White coat. She'll hear about you.
+old-gus: He doesn't hand those out. Don't let it go to your head. Maybe a little.
+
+scene: stamp-goat
+when: stamp:Goat Cup
+ines: Red ink on the 2005 binder. Gus and I played that whole summer and never earned one.
+old-gus: We were too busy beating each other.
+
+# ---------------------------------------------------------------------------------------------------------------------
+# The "Every Era" final (post-game, once all 12 cups are cleared): six rounds, each under its own binder's list and
+# pool, against that binder's boss: Ines, Isamu, Captain Mae, Volta, Aurum, the Castell twins. Duchess Ilse hosts and never
+# duels here (her four house decks belong to no year). Any cup can be the 12th, so `final` names none of them. Pays off
+# "this year's binder" (cup-ryzeal), Ilse's white coat (champion) and the corkboard (champion, advanced-tag-clear);
+# Ilse's "ladder" line leads to the Champion's Ladder (below, after her guest scenes).
+# ---------------------------------------------------------------------------------------------------------------------
+
+scene: every-era-final
+when: final
+place: shop-night
+-: After closing, the shop bell rings.
+-: A tall woman in a long white coat waits in the doorway, a gold sash at her waist.
+old-gus: ...Well. That coat hasn't been through my door in years.
+ilse: Gus. Hollis. You kept the binders.
+hollis: Every one, Duchess. All twelve cleared, as of about a minute ago.
+ilse: I know. I watched the last one from the doorway.
+vera: Gus. Who is that?
+old-gus: Duchess Ilse. She held the title before you could hold a deck.
+vera: ...Oh. That Ilse.
+ilse: Twelve binders, one at a time. Now six of them, back to back, each played by its own year.
+ilse: Hollis will lay them out. I'll sit at the end, not across from you.
+
+scene: every-era-rules
+when: open:Every Era
+place: every-era
+-: Hollis lays six binders down the long table, from the most worn to the newest.
+ilse: The Every Era final. Six rounds, six years, a champion from each, in order.
+ilse: Every round plays by its binder. Its list, its cards. Nothing from a later year sits down early.
+ilse: Every deck you bring is one you built. No loaners. Nothing waived.
+hollis: I'll check each one against its year. I've been looking forward to it.
+ilse: Lose a round and nothing is taken. You shuffle up and sit down again, at the same binder.
+vera: Aren't you playing?
+ilse: I play four decks, and none of them belong to a year. This table belongs to the years.
+ilse: Ines first. The twins last. Show me none of it was luck.
+
+scene: every-era-round-2
+when: round:2
+before: held-card-home
+ines: The Goat Cup, and now this. I'm starting to take it personally.
+old-gus: Don't let her fool you. She hasn't had this much fun since that summer.
+ines: Gus.
+
+# The same round once Ines has her 2005 card back (held-card-home): she played it.
+scene: every-era-round-2-scapegoat
+when: round:2
+after: held-card-home
+before: every-era-round-2
+ines: Played my own Scapegoat. Bent corner and all. Still lost.
+ines: ...Best card I ever lost. Don't tell him I said that.
+old-gus: Don't let her fool you. She hasn't had this much fun since that summer.
+ines: Gus.
+
+scene: every-era-round-4
+when: round:4
+-: Three binders closed. Three still open.
+vera: Halfway. Don't speed up. ...I can't believe I just said that.
+ilse: Halfway is where most people start playing the last round instead of this one.
+thunder-dragon: Storm's next. Hope your deck doesn't need to search.
+
+scene: every-era-round-6
+when: round:6
+eldlich: Gold yields, for once. Mind the twins. They never learned to wait.
+ryzeal: Last binder...
+ryzeal: ...and last time, our table was optional.
+ryzeal: Not this time.
+ilse: One year left. Take your time. They won't.
+
+scene: every-era-clear
+when: cupclear:Every Era
+place: back-room
+-: The last Rank 4 leaves the field. For a moment, nobody in the back room says anything.
+ryzeal: That's...
+ryzeal: ...every binder. Back to back.
+ilse: Every era, on its own terms. I held the title for years. I never once beat a year with its own cards.
+hollis: Which leaves one shelf. This year's binder has sat empty since January.
+hollis: Every binder starts with the deck that won its year. I'd like this one to start with yours.
+-: Hollis writes the year on a new spine and copies down the deck you just won with, card by card.
+
+scene: every-era-corkboard
+when: cupclear:Every Era
+place: corkboard
+-: Out front, Gus stands at the corkboard with a pushpin between his teeth.
+ines: Gus. Say something. You've been insufferable for six rounds without saying a word.
+old-gus: Moved the kid's name. It goes above mine now.
+old-gus: Took my glasses off to do it. Don't ask.
+vera: So that's the name to beat now. ...Good.
+ilse: Past the binders there's a ladder. Nobody on it plays for a year. Only for the next rung.
+ilse: I'm near the top. Before you start climbing, come and sit across from me.
+old-gus: Shop's open tomorrow. Bring a deck. Any year you like.
+
+# Duchess Ilse as a guest (docs/dev/ILSE-GUEST-SPEC-2026-11-06.md): unlocked by the Every Era final. One deck a duel, and a
+# win brings the next (a loss brings the same one back). No tag duel. ilse-table plays before your first duel with her;
+# gift-ilse on the first win ({card} is a new Mirror Force, not the signed card on the board). The corkboard's last move.
+scene: ilse-table
+when: guest:ilse
+-: Ilse hangs the white coat on Gus's coat rack. It's the first time it's come off in this shop.
+old-gus: ...Huh. I'd started to think it was sewn on.
+ilse: Four decks. No year. This one's only between us.
+ilse: One deck a duel. Beat it, and I bring the next. Lose, and I bring the same one back.
+
+scene: gift-ilse
+when: beat:ilse
+place: corkboard-top
+-: Out front, Ilse unpins the gold-signed card from the top of the corkboard.
+-: She pins it in the row under yours, then steps back to look.
+ilse: Under yours. I've wanted to see what that's like.
+old-gus: Took my glasses off for the last one. Not doing it twice.
+-: From the pocket of the white coat on Gus's rack, she takes {card}, new, still in its sleeve.
+ilse: Not the signed one. That stays on the board. This one goes in your deck.
+ilse: It's from no year either. Play it in all of them.
+
+# The other guests, at their tables: before the first duel (guest:) or after the first win (guestbeat:).
+scene: rhea-table
+when: guest:rhea
+-: The tag champion is waiting at the long table, jacket covered in patches, two decks out.
+rhea: Gus told me your number. I checked it anyway. Okay. You've earned a seat.
+
+scene: seraph-table
+when: guest:seraph
+-: The traveling pro in the violet cloak is at the window table, still not buying anything.
+seraph: Your Gus doesn't sell tea. I asked twice.
+seraph: One stop, then the next town. Let's make this one worth the fare.
+
+scene: nocturne-beat
+when: guestbeat:nocturne
+-: Nocturne straightens the mask and doesn't get up yet.
+nocturne: My name? Not here. Not yet. I'll know the place when I hear it.
+
+# Vera's rematch (a post-final guest, one on one, her circuit warriors): the rival's last match. guest:vera before the
+# first duel; guestbeat:vera on her first guest loss (beat:vera stays gift-vera's).
+scene: vera-rematch
+when: guest:vera
+-: Vera's at the window table, deck cut, one card already face down on the mat.
+vera: I set one. Before you even sat down. I'm going to wait for it.
+vera: Don't laugh. I practiced on Gus all week. He fell asleep twice.
+old-gus: Once. The second time I was thinking.
+vera: Rival rules, one more time. After this I'm just your friend who hits hard.
+
+scene: vera-rematch-beat
+when: guestbeat:vera
+vera: I waited. I actually waited. The trap was perfect, and you walked right around it.
+vera: Call it a draw. ...It isn't. I know it isn't.
+old-gus: First time I've seen her wait for anything. Took her long enough.
+vera: Same time next week? Not a rematch. Just cards.
+
+# ---------------------------------------------------------------------------------------------------------------------
+# The Champion's Ladder (docs/dev/CHAMPIONS-LADDER-SPEC-2026-11-06.md): "past the binders", a plaque below the Every Era
+# plaque. Ten rungs, one duel a rung; Ilse holds the ninth (all four decks, one sitting) and Ada Quill, "This Week", the
+# top (new: planted unnamed in ladder-opens and ladder-ilse). Opens after the final and a first win over Ilse, maybe
+# long after, so ladder-opens assumes nothing just played. No scene here mentions No Limits but the visitors' (they
+# arrive only after the Invitational). Gus never comes into the back room for it; he hears.
+# ---------------------------------------------------------------------------------------------------------------------
+
+scene: ladder-opens
+when: ladder
+place: library
+-: Under the Every Era plaque, a new one has gone up on the shelf: PAST THE BINDERS.
+hollis: Ilse left this with me. A ladder, she calls it. Ten rungs, one duel a rung.
+hollis: Nobody on it plays for a year. I find that very difficult to file.
+hollis: Rhea's on the bottom rung. Ilse's on the ninth. The tenth, I've never met.
+hollis: Ilse says they play this week's list. Only this week's. I asked which week. She said, "This one."
+hollis: The Gauntlet's rules, your own decks, no loaners. Climb when you like.
+
+scene: ladder-halfway
+when: ladderrung:5
+place: library
+kashtira: Halfway. The air's thinner from here. Take the next pitch slowly.
+hollis: Five rungs. I've started a page for it. I've no idea what to call the page.
+
+scene: ladder-ilse
+when: ladderseat:ilse
+place: library
+-: Ilse has her four decks in a row down the long table, rubber bands off.
+ilse: At my table, it's one deck a duel. Here, it's all four in one sitting.
+ilse: Lose one, and we start again from the first.
+ilse: The rung above mine has had the same name on it for years. I sit across from them every season.
+ilse: They play this week. I play no year. So far, this week wins.
+
+scene: ladder-ilse-beat
+when: ladderbeat:ilse
+place: back-room
+-: The last of her four decks goes back in its box. Ilse snaps the rubber band around it.
+ilse: All four, one sitting. Nobody's done that to me before.
+ilse: Go on up. Tell them I sent you. They'll pretend not to be pleased.
+
+scene: ladder-holder
+when: ladderseat:ladder-top
+place: library
+-: At the long table sits someone in a grey cardigan, a deck box held shut with a binder clip.
+ladder-top: Ada Quill. You're the one Ilse sent.
+ladder-top: The list in my pocket came out on Monday. I rebuilt the same night.
+ladder-top: She's very good. She plays as if the week doesn't matter. It does.
+ladder-top: Sit. The next rung is the only one.
+
+scene: ladder-top
+when: laddertop
+place: library
+-: Ada takes the binder clip off her deck box and clips it to yours instead.
+ladder-top: The top. This week, it's yours.
+ladder-top: A new list comes out soon. I'm on the rung below, reading it.
+hollis: I'm told to write the week, not the year. ...I've written both.
+
+scene: ladder-top-home
+when: laddertop
+place: shop-floor
+-: Upstairs, Gus is restocking the case. He doesn't look round.
+old-gus: Top of Ilse's ladder. Heard it from Hollis, who heard it from Ilse, who never tells me anything.
+old-gus: Your name's at the top of everything I've got, kid. I'm out of board.
+old-gus: Shop's open tomorrow. Bring whatever's legal this week.
+
+# The visitors (after the No Limits Invitational): one at a time, each takes the rung above yours. They play their
+# upstairs decks, by the list.
+scene: ladder-visit-rue
+when: ladderseat:rue
+place: library
+-: Someone has come up the alley stairs. Rue reads the shelves like a patient's chart.
+rue: Day shift, for once. Up here smells of paper. I like it.
+rue: Your list, the deck it let me keep. I'll just borrow the rung above yours.
+
+scene: ladder-visit-sasha
+when: ladderseat:sasha
+place: library
+-: Sasha waits at the foot of the ladder board until you've walked past it.
+sasha: Your stairs are very steep. I let everyone else go up first.
+sasha: Upstairs, I play by your list. It's only polite. The rung above yours, if you wouldn't mind.
+
+scene: ladder-visit-augie
+when: ladderseat:augie
+place: library
+augie: Load-in up the stairs, kid. Dogs stayed in the van. Hollis said no dogs in the stacks.
+augie: Upstairs deck, the one the list let me keep. I'll be on the rung above yours.
+
+scene: ladder-visit-junia
+when: ladderseat:junia
+place: library
+-: Sunglasses, at night, indoors. Junia has found the back room.
+junia: Told you the road had other doors. This one opens onto a library.
+junia: Upstairs rules. Your list, and my deck the way it was before the week they took it.
+junia: It's September up here too. I checked.
+
+scene: ladder-visit-junia-beat
+when: ladderbeat:junia
+place: library
+junia: There. Every door I know of, and you've been through all of them.
+junia: I'll tell them about you at the next one. I won't say Local.
+-: She leaves her sunglasses on the long table. Hollis, after some thought, files them under July.
+
+# ---------------------------------------------------------------------------------------------------------------------
+# The Back Alley (post-game, docs/dev/ALLEY-STORY-2026-11-01.md, ALLEY-SPEC section 12): behind the shop's back door, under
+# string lights. Opens with the first Library cup clear, whichever cup it is, so no scene here names a cup. Gus, Hollis,
+# Ines and Ilse never come down. Moth never says "stolen", and nobody calls Moth a fence. Kit is they/them.
+# Threads paid off: Ines's lost 2005 card (cup-goat-clear; shop.txt's arrival:2005 and cup-goat-clear footer), Kit's
+# bottomless binder (shop.txt footer), Nocturne's name (nocturne.profile lose line).
+# ---------------------------------------------------------------------------------------------------------------------
+# Phase A (docs/dev/ALLEY-SPEC-2026-11-01.md section 16): the alley's opening, the three regular tables, the two ready
+# headliners and the ante moments. Phase B: Moth's van, Orvel's Table and the rail, the Unlisted binder, Penny's loss and
+# the held card. Phase C: Baz's chalkboard (the Alley Brawl, the Midnight Open) and Nyx's Table.
+# ---------------------------------------------------------------------------------------------------------------------
+
+scene: alley-rumor
+when: alley
+place: back-room
+-: On your way out of the back room, you pass the stockroom door. Someone has chalked a bracket on it.
+-: Eight names, none of them real. Underneath, in smaller chalk: FRIDAYS. SPARES ONLY.
+kit: You saw that. I didn't chalk it. I know who did.
+kit: Hollis keeps every list since 2004. Out back, past the bins, there's a place that keeps none.
+hollis: "Place" is generous. It's an alley with opinions. I'm told it's very lively. I've never checked.
+vera: A place with no list? And nobody told me?
+kit: Because Gus is standing right there.
+-: Gus is standing right there. He goes on pricing sleeves.
+
+scene: alley-kit
+when: alleyvisit
+place: alley
+-: Friday, after close. Kit holds the shop's back door open with one foot. It sticks.
+kit: Watch the step. And the bins. And Baz.
+-: String lights zigzag between the fire escapes. Crates for chairs, chalk on the bricks.
+-: An ice-cream van is parked by the bins, its hatch open.
+kit: That's Moth's van. Don't buy anything yet. Don't sell anything ever.
+kit [era]: No list down here. One copy of anything.
+kit [open]: Upstairs nobody checks your deck. Down here, one copy of anything, yours too.
+kit: You put up Duel Points, they put up a card. Win, and the card's yours.
+kit: Nobody touches your binder. Except at one table, the one with a tablecloth. You'll know it.
+
+scene: alley-baz
+when: alleyvisit
+-: A brass bell rings. A man in a chalk-dusted waistcoat climbs onto a crate.
+baz: Spares! You brought somebody! Name? No, don't tell me. I'll only get it wrong on purpose.
+baz: Came down from the shop, did you? Then you're Upstairs. Chalk it!
+-: He writes UPSTAIRS at the bottom of the board and underlines it twice.
+kit: That's Baz. Baz names everybody. I've been Spares for three years.
+baz: Everybody but the man upstairs. He doesn't get a name. He knows why.
+vera: What am I?
+baz: Red. Obviously.
+
+scene: dumpster-row
+when: open:Dumpster Row
+place: alley
+-: The first tables are crates by the bins. The contraband here is old.
+-: Most of it was banned before half the crowd could shuffle.
+baz: Dumpster Row! Street stakes! Three hundred on the crate, and their card goes up against it.
+baz: Everybody shows what they're carrying. Down here, that's manners.
+kit: The fourth seat isn't splashing a few cards. The fourth seat has a whole act.
+penny: Evening, Upstairs. This is my card. It likes the fresh air.
+baz: That's Lucky! Same Common, eleven years, and nobody's ever taken it off her!
+
+scene: first-ante-win
+when: antewin
+-: Your opponent slides {card} across the crate without a word. It's yours now.
+kit: The first one's always strange. You get used to it. ...Mostly.
+vera: You won their CARD? Out of their actual deck? Okay. I'm anteing. Tonight.
+kit: Vera. You know the rule.
+vera: Sure. Spares. Totally.
+
+# Gus hears about it: after your first ante win, not on the first visit (the first night was long enough).
+scene: alley-upstairs
+when: antewin
+place: shop-night
+-: Later, upstairs. Gus is counting the register. He doesn't look up.
+old-gus: Chalk on your sleeve, kid.
+old-gus: Spares only. That's the whole speech.
+
+scene: first-stake-lost
+when: antelose
+kit: That's only points. The crate keeps them, you keep your binder. That's the deal out here.
+penny: I lost my first stake in about four turns. Then I found the right card.
+
+scene: dumpster-row-clear
+when: alleyclear:Dumpster Row
+baz: The closer's down! Wipe the crate! Upstairs, you're not Upstairs anymore.
+baz: You cleaned out the curb. That makes you Curbside. Chalk it!
+baz: My chalkboard's open too. Alley Brawl: eight seats, one bell, a thousand to enter.
+kit: The Basement's next. Different crowd. They count their outs.
+
+scene: vera-ante
+when: open:The Basement Game
+place: van
+-: Vera's at Moth's hatch, counting Duel Points into a paper cup.
+vera: Don't. Don't say anything.
+vera: I anted Marauding Captain. He's in my deck. He's always in my deck.
+vera: One Change of Heart, and my own captain walked me off the crate. In my own colors.
+moth: Claimed inside two duels. Tag price. As-is.
+vera: Half again. I paid half again for my own card.
+baz: HALF-AGAIN! Chalk it!
+vera: Do NOT chalk it. ...I'm still coming Fridays. I'm just never anteing again.
+
+scene: basement
+when: open:The Basement Game
+place: basement
+-: Down a stairwell under the laundromat. Dryers thump through the ceiling. The decks run from 2010 to 2014.
+baz: The Basement Game! Den stakes! A thousand on the table, and the cards against it get serious.
+kit: Synchros, Xyz, and the cards that made them unfair. Everybody down here keeps a Tuner in a pocket.
+
+scene: basement-clear
+when: alleyclear:The Basement Game
+place: basement
+baz: The Basement's cleared! Somebody tell the dryers!
+baz: Curbside went underground. You're Downstairs now. Chalk it!
+kit: The Black Market's next. Newer cards, faster turns, and a tarp for the rain.
+
+scene: black-market
+when: open:The Black Market
+place: alley
+-: Past the van, a row of hatchbacks with their boots open under a blue tarp.
+-: It's a car-boot sale, and every deck in it is from 2015 to 2019.
+baz: The Black Market! Everything under this tarp got banned for doing its job too well!
+kit: Hand traps, Links, one-card turns. Keep something in hand for their turn.
+-: Under the tarp, a woman in a headset is talking quietly to the phone in her hand.
+baz: Headset! Tell your chat it's raining!
+mika: Chat's asking who Downstairs is. I told them to stay and find out.
+
+scene: black-market-clear
+when: alleyclear:The Black Market
+baz: The tarp is yours! Downstairs, take a bow. You're Boots now. Chalk it!
+baz: The Midnight Open's on my board. Sixteen seats, best of three in the final, and the champ's defending.
+radiant-typhoon: I've held the top of that board all season. Come and take the weather off it.
+-: Under the brightest bulb, someone smooths a white tablecloth over a folding table.
+-: At the far end of the alley, under the one lantern, someone sets out four chairs.
+
+# Moth's van (Phase B): the first visit. The HELD toploader hangs at the end of the rail from here on.
+scene: van-first
+when: fence
+place: van
+-: The van's hatch is propped open with a broom handle.
+-: Inside: a rail of toploaders on bulldog clips, and one lit glass shelf.
+moth: Under the Counter. Used cards, graded cards, cards between binders.
+moth: The rail's for claims. Lose a card down here, it hangs five duels. Claim it at the tag.
+moth: The shelf's the good stuff. Every card on it got banned somewhere, sometime. Slabbed, and as-is.
+-: At the far end of the rail hangs one toploader, face down, with a pencil tag gone grey: HELD.
+moth: That one's not for sale. Never has been.
+
+# Orvel's Table (Phase B): the House table, the rail and its claims.
+scene: orvel-table
+when: open:Orvel's Table
+place: alley
+-: A folding table under the brightest bulb, a white tablecloth over it. One of its legs is taped straight.
+power-patron: The House table. Three thousand on the cloth. I stake slabs, nine and ten.
+power-patron: You stake one spare card. Never a card a deck of yours needs.
+power-patron: That rule came with the table. I kept both.
+power-patron: Lose, and your card goes on Moth's rail. Claim it at the tag, or it finds another binder.
+nocturne: Your Gus set this table up in 2004. He folded it in 2005, after one bad night.
+nocturne: He left it out here when he went back inside. He left the rule on it too.
+odile: I'm only here for the slabs. Gauge & Gilt checks every one the House puts down.
+
+scene: orvel-first-loss
+when: rail
+-: Orvel writes {card} in the ledger, in ink, and hands it to Moth.
+moth: On the rail. Five duels. The tag's on it.
+kit: Everybody loses one at that table. That's why it's spares only.
+power-patron: A temporary position. Most people buy back in.
+
+scene: first-claim
+when: buyback
+place: van
+moth: Claimed inside the window. The tag goes in the drawer.
+-: The drawer is full of old tags. At the end of the rail, one hook still has its tag on.
+moth: Most people claim. One never did.
+
+scene: first-railgone
+when: railgone
+place: van
+moth: The clock ran out on {sold}. It's between binders now. Not yours. As-is.
+kit: It happens. It happened to me, once.
+
+scene: orvel-table-clear
+when: alleyclear:Orvel's Table
+power-patron: The House pays. It always does, eventually. Your slab, and my compliments.
+power-patron: People have beaten this table before. Never anyone from upstairs.
+-: Orvel closes the ledger on its ribbon and stands up from the table for the first time all night.
+baz: THE HOUSE IS DOWN! Somebody hold my chalk, I'm ringing this with both hands!
+
+# Ines's card (docs/dev/ALLEY-STORY-2026-11-01.md section 3): heldcard fires once Orvel's Table is cleared and cup-goat-clear
+# has been seen, whichever comes second (BackAlley.HeldCardDue). held-card is place-neutral: it can play upstairs.
+scene: held-card
+when: heldcard
+place: van
+-: That Friday, Moth is waiting at the van's hatch, holding the toploader from the end of the rail.
+moth: August 2005. This came off the House table, and it's been held since.
+moth: The one who lost it wouldn't claim it. The one who won it wouldn't take the claim.
+moth: So I made a rule for it. It goes up the stairs with the next one from that shop to take that table.
+moth: Twenty-one years. The shop finally sent somebody. As-is.
+-: You turn it over. Scapegoat. One corner is soft, the way a card gets when someone holds it all summer.
+odile: Raw. I'd call it a six, Excellent. Honest wear, and all of it from one summer.
+
+scene: held-card-home
+when: heldcard
+place: shop-floor
+-: Upstairs, Ines is at the counter. Gus is pricing sleeves that already have prices on them.
+-: You set the toploader down between them.
+ines: ...That's my corner. I bent it in August.
+old-gus: Moth kept it. Course Moth kept it.
+ines: You won it fair, Gus. That was the whole trouble.
+old-gus: And if I'd handed it back, you'd have called it charity. You'd have been right.
+ines: I still have the claim. Half again on the tag. I counted it out that week.
+-: She takes an envelope from her coat. Its corners are soft too.
+ines: Take this down to Moth. It's the right amount. It was always the right amount.
+old-gus: Best year. I keep telling people.
+-: Ines tears open the 2005 pack she's been carrying around. Commons, every one. She laughs anyway.
+-: Later, on your way out back, the door swings open at a touch. It doesn't stick.
+old-gus: Oiled it. Don't read into it.
+
+# The Unlisted binder (Phase B): the first page.
+scene: unlisted
+when: unlisted
+place: library
+-: Next morning, there's a decklist on Hollis's desk, chalk-smudged, on the back of a bracket sheet.
+hollis: Kit brought this up. Kit wouldn't say from where. Kit is an appalling liar.
+hollis: A deck that answers to no list. I've no year to file it under.
+-: He takes an empty binder from the bottom shelf and writes on the spine: UNLISTED.
+hollis: I won't be coming down. Someone should keep the lists. But I'd like a copy of every deck you beat.
+hollis: Purely for scholarship. ...And the combos. I would very much like to see the combos.
+
+# Penny's cameo (Phase B): her Common changes hands.
+scene: penny-lost
+when: pennywin
+-: Penny looks at the Kuriboh for a long moment, then slides it across the crate.
+penny: Eleven years. It had a good run.
+penny: Look after it. It likes the top of the deck.
+baz: Lucky's lost the Common! Somebody check the sky!
+
+# The alley's rules, the first time each one bites.
+scene: first-turncap
+when: turncap
+baz: TURN FORTY! Cards down! Down here we don't play till sunrise. Higher Life Points takes it.
+
+scene: first-firstturn
+when: firstturn
+baz: Lost before your first turn? Nobody charges for that down here. Pick your stake back up.
+moth: Didn't get to draw, didn't get to pay. Fair's fair.
+
+scene: first-encore
+when: encore
+baz: An ENCORE! Same act, same crate, same chalk! Encore!
+
+# Headliners (HEADLINERS-2026-11-01): before the first duel (headliner:), the first win (headlinerbeat:) and the Combo
+# Breaker poster (combobreaker:). Baz's tells also play on the versus (tell:<id> in alley-voice.txt); these play once.
+
+scene: hl-yata-mags
+when: headliner:yata-mags
+baz: Tonight's act! Yata Mags! She's been emptying hands on this row since the first string of lights!
+yata-mags: Pull up a crate. You'll want to be sitting down for this.
+
+scene: hl-yata-mags-beat
+when: headlinerbeat:yata-mags
+yata-mags: Nobody's got past that crow in a long time. Go on, take a bow.
+baz: The crow's grounded! Chalk it!
+
+scene: hl-yata-mags-breaker
+when: combobreaker:yata-mags
+baz: Stopped before the wipe! That goes on a poster!
+
+scene: hl-return-rook
+when: headliner:return-rook
+baz: Return Rook! Sends his whole board on holiday and throws a welcome-home party!
+return-rook: Don't mind the empty field. They're only away for a bit.
+
+scene: hl-return-rook-beat
+when: headlinerbeat:return-rook
+return-rook: I sent them all away for that comeback, and you were still standing when they came home.
+baz: Rook's comeback is cancelled!
+
+scene: hl-return-rook-breaker
+when: combobreaker:return-rook
+baz: Nothing came home! Poster!
+
+scene: hl-mass-driver-moss
+when: headliner:mass-driver-moss
+baz: Mass Driver Moss! Quietest man in the Basement, loudest clicker!
+mass-driver-moss: Don't mind the clicking. It's how I keep score.
+
+scene: hl-mass-driver-moss-beat
+when: headlinerbeat:mass-driver-moss
+mass-driver-moss: Lost count. First time in years. ...I'll start again from one.
+baz: The Mass Driver's out of ammo!
+
+scene: hl-mass-driver-moss-breaker
+when: combobreaker:mass-driver-moss
+baz: The loop's broken before the first shot! Poster!
+
+scene: hl-trishula-trish
+when: headliner:trishula-trish
+baz: Trishula Trish! Grows a garden in the Basement, where nothing's supposed to grow!
+trishula-trish: The dryers keep it warm down here. Good for seedlings.
+
+scene: hl-trishula-trish-beat
+when: headlinerbeat:trishula-trish
+trishula-trish: Nine stars, three cards gone, and you still had an answer. I'll prune harder.
+baz: The garden's been weeded!
+
+scene: hl-trishula-trish-breaker
+when: combobreaker:trishula-trish
+baz: Not one petal! Poster!
+
+scene: hl-gateway-gwen
+when: headliner:gateway-gwen
+baz: Gateway Gwen! Three keys on a cord, and every one of them opens something!
+gateway-gwen: Keys stay on. The gates open on my turn.
+
+scene: hl-gateway-gwen-beat
+when: headlinerbeat:gateway-gwen
+gateway-gwen: Three gates open and you still walked through. Fine. Take the key.
+baz: The gates are shut! Chalk it!
+
+scene: hl-gateway-gwen-breaker
+when: combobreaker:gateway-gwen
+baz: Not one counter on the gate! Poster!
+
+scene: hl-master-plan-marlo
+when: headliner:master-plan-marlo
+baz: Master Plan Marlo! Nobody's ever seen page two of the plan!
+master-plan-marlo: Sit. The plan has a chair for you. Page nine.
+
+scene: hl-master-plan-marlo-beat
+when: headlinerbeat:master-plan-marlo
+master-plan-marlo: You read the plan. Nobody reads the plan.
+baz: Marlo's plan is declassified! Chalk it!
+
+scene: hl-master-plan-marlo-breaker
+when: combobreaker:master-plan-marlo
+baz: The plan never left the briefing! Poster!
+
+scene: hl-gumblar-gail
+when: headliner:gumblar-gail
+baz: Gumblar Gail! Champ of the arrows under the tarp! Hands where she can see them!
+gumblar-gail: Shake hands now. You won't have any later.
+
+scene: hl-gumblar-gail-beat
+when: headlinerbeat:gumblar-gail
+gumblar-gail: Nothing left to rip. You planned that. ...I'm keeping the belt anyway.
+baz: Gail's links are snapped!
+
+scene: hl-gumblar-gail-breaker
+when: combobreaker:gumblar-gail
+baz: The chain snapped before the rip! Poster!
+
+scene: hl-scientist-turtle
+when: headliner:scientist-turtle
+nyx: The third seat burns. It never attacks. It doesn't need to.
+baz: Lab Coat Lyle! Nyx's third seat, and a clipboard full of sums!
+scientist-turtle: Sign here. And here. It's a waiver for the catapult.
+
+scene: hl-scientist-turtle-beat
+when: headlinerbeat:scientist-turtle
+scientist-turtle: Inconclusive. I'll need a bigger grant. And a bigger catapult.
+nyx: Rest, Lyle.
+
+scene: hl-scientist-turtle-breaker
+when: combobreaker:scientist-turtle
+baz: Not one shot left the catapult! Poster!
+
+# Baz's chalkboard (Phase C): the first entry to each alley bracket and the first title in each. Plain bracketwin stays
+# the Locals' (first-bracket-title, below).
+scene: alley-brawl
+when: brawl
+-: Baz chalks eight names onto the board. None of them are real.
+baz: Alley Brawl! Eight seats, single elimination, one ring of the bell between rounds!
+baz: A thousand to enter. The prize is contraband, sealed by Moth and opened by you.
+-: A woman in a headset props her phone against the bell's crate and starts talking to it.
+baz: That's Headset! Wave to her chat! Everybody wave!
+mika: I'm streaming it. Don't look at the camera. ...Okay, look a little.
+
+scene: alley-brawl-win
+when: bracketwin:Alley Brawl
+baz: {nick} takes the Brawl! Ring it twice!
+-: Baz rings the bell twice, and the crates applaud by thumping.
+mika: Chat says lucky. Chat is wrong. That was three clean lines.
+moth: Sealed this afternoon. As-is.
+
+scene: midnight-open
+when: midnight
+-: Midnight. Sixteen names on the board.
+-: Some are chalked. Some are signed properly, by people down from the circuits and the Library.
+baz: The Midnight Open! Circuit champs, Library bosses, alley regulars, and {nick}!
+baz: Best of three in the final. The champ starts in the top seat. {nick} starts in the other one.
+radiant-typhoon: Defending. The wind's been at my back all season. Let's see if it turns.
+nocturne: I've played every Midnight since the first one. This one, I'm watching you.
+
+scene: midnight-open-win
+when: bracketwin:Midnight Open
+-: Baz wipes the top of the board and chalks a new name over the old one.
+baz: MIDNIGHT! That's the name now. Earned at two in the morning, best of three!
+radiant-typhoon: The weather turned. It does that. I'll be back for the top seat.
+nocturne: Come here. I promised someone my name once.
+-: Nocturne leans close and says it. Baz rings the bell right over the last syllable.
+baz: Sorry! Habit!
+
+# Nyx's Table (Phase C): the far end of the alley, under the one lantern. Its clear closes the night.
+scene: nyx-table
+when: open:Nyx's Table
+place: alley
+-: A lantern hangs on a nail over a card table.
+-: Beside it sits a crate of decks, each one held shut with a rubber band.
+nyx: The cards at this table say what they said when they were printed. Before anyone changed a word.
+nyx: Witch, Sangan, the Pot. I keep them the old way. Somebody has to.
+nyx: Four seats. Mine is the last. The second one asked to sit.
+thunder-dragon: My storm's younger than her words. She lets it stay. Nobody searches while it blows.
+baz: Nyx's Table. Even I use my inside voice here.
+
+scene: nyx-table-clear
+when: alleyclear:Nyx's Table
+nyx: Back in the crate, then. They've rested before.
+nyx: Old words don't end when they lose. They wait for someone who'll read them properly.
+-: Nyx turns the lantern down a notch, and the far end of the alley goes back to being a wall.
+baz: Nobody clears Nyx's Table! ...Somebody just did! Big letters!
+
+scene: alley-closing
+when: alleyclear:Nyx's Table
+-: Two in the morning. Baz wipes the board clean, then chalks one name back, bigger than the rest.
+baz: {nick}. Not your real one. I don't do real ones.
+penny: Same time tomorrow? The card likes a routine.
+nocturne: That bell used to hang over a shop door, Baz.
+baz: It rings better out here.
+kit: Gus is going to smell the chalk on you again. ...Worth it.
+-: Upstairs, the light's still on in the shop. Somebody waited up.
+
+# ---------------------------------------------------------------------------------------------------------------------
+# No Limits (post-game, docs/dev/NO-LIMITS-STORY-2026-11-02.md, docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 10.3): the old bus
+# depot behind Nyx's wall. The wall opens on the first alley visit after alley-closing has been seen (nolimits), never
+# the same night, so Nyx's clear stays the alley's last word. The out-of-towners are met first at the Alley Brawl, after
+# The Black Market's clear, on Alley-legal decks; no scene assumes you met them. Every pilot is fictional: lines name
+# what a deck did, never who played it. Kit doesn't go through the door. Gus, Hollis, Ines and Ilse never come down.
+# Nobody behind the wall says "champion": seat 4 is "the end chair". "Local" is the out-of-towners' word for you.
+# Wave 2's pilots (remy, margo, lux, inka) have their scenes here already; they play when their builds first sit.
+# ---------------------------------------------------------------------------------------------------------------------
+
+# The out-of-towners at the Alley Brawl: the first field that shows one, then each before your first match against them.
+scene: nl-outoftowners
+when: outoftowner
+-: Four of tonight's chalk names are in a smaller hand, squeezed in at the edge of the board.
+baz: Out-of-towners! In for one night, they say. They always say that.
+kit: They come through every few months. Never for more than a night. They always ask about the lantern.
+-: Each of them wears a toploader on a cord around the neck. Nobody opens theirs.
+junia: Street rules tonight. One of everything. The rest stays in the toploader.
+rue: She means the rest stays warm. She thinks it's still summer.
+junia: It is still summer.
+
+scene: nl-oot-junia
+when: outoftowner:junia
+baz: Spoils! Started a game somewhere with no list at all. Nobody's seen it. Everybody's heard of it.
+junia: Evening, Local. Where I usually play, it's three of everything. Remember I said that.
+
+scene: nl-oot-rue
+when: outoftowner:rue
+baz: Lacrima! Carries a card around their neck and won't play it on my street! I respect a mystery!
+rue: Just passing through. Night shift's long. You'll do for the first hour.
+
+scene: nl-oot-sasha
+when: outoftowner:sasha
+baz: Sangen! Holds the door for everybody, goes second every time, and ends it in one swing!
+sasha: Only passing through. Please, you first. I insist. I always insist.
+
+scene: nl-oot-augie
+when: outoftowner:augie
+baz: Noroi! Brought the dogs! ...He brought the lead. There are no dogs. I checked.
+augie: Load-in's quick tonight, kid. Street rules, so half the kennel stays in the van.
+
+# No Limits: the wall opens (nolimits). Fires on the next Back Alley visit after alley-closing; catches up older saves.
+scene: nl-wall-opens
+when: nolimits
+place: alley
+-: Friday again. At the far end of the alley, the lantern is turned all the way up.
+-: In its light the wall has a door in it: steel, painted brick-red, a padlock hanging open on the hasp.
+nyx: You read the old words properly. There are newer ones behind this door.
+nyx: The old ones rest. These were put down too young. They don't rest yet.
+nyx: Every few months, people bring the cards the list took last year. They play them here.
+nyx: Until they can let them go. Some never can.
+radiant-typhoon: I've sailed against them on the circuits. Whatever I play, they played a year ago.
+radiant-typhoon: Lists are weather. You trim your sails. They'd rather sail straight into it.
+penny: That's the old bus depot. I drove the number nine out of there for thirty years.
+penny: Lovely echo. The card won't like it.
+
+scene: nl-wall-kit
+when: nolimits
+place: alley
+-: Kit stops a step short of the door and puts one foot against it.
+kit: This is where I get off. Nobody behind there is carrying spares.
+kit: I put up a card out here once that wasn't really a spare. I still look for it in other binders.
+kit: Three of anything, no list, and every card on the table is somebody's whole deck.
+kit: I'll hold the door. Tell me everything after. ...Leave out the parts I'd hate.
+
+scene: nl-first-visit
+when: open:No Limits
+place: depot
+-: The depot is one long shed. The inspection pits are boarded over. One table runs down the middle.
+-: Three chairs down the sides. At the far end, one chair with its back to the wall.
+junia [era]: Welcome to No Limits, Local. No list. Three of anything, and that goes for your deck too.
+junia [open]: Welcome to No Limits, Local. You've never played under a list. We did, until it took our cards.
+junia: One rule, and it isn't a limit. Everybody gets to play. No card that stops the other one.
+junia: We put up the cards the list took. You put up points. Beat us, and the card goes with you.
+junia: A list can't beat anybody. It just takes things. A duel can beat you. That's the difference.
+-: A brass bell rings behind you. Baz has followed you in, chalk and all.
+baz: A bell's a bell! It rings anywhere! Somebody find me a wall for my board!
+junia: I took the end chair the week they took Spoils. Whoever's in it tonight, come and get it.
+
+# Before your first No Limits duel against each pilot (pilot:<id>). Baz reads the act; the pilot answers.
+scene: nl-junia
+when: pilot:junia
+baz: Spoils! Started all this! Three of the card the list took, and two years of not letting go!
+junia: I started this game in a car park, the week they took it. It's had a good long summer since.
+
+scene: nl-remy
+when: pilot:remy
+-: Someone at the long table has headphones on, one cup taped, nodding to a beat nobody else can hear.
+baz: Rotary! New in town! This year's deck, and it plays on your turn as well as its own!
+remy: Local. Heard you on the way in. One, two. You're the warm-up act.
+junia: Every summer thinks it's the only one.
+remy: Every summer's right.
+
+scene: nl-anselm
+when: pilot:anselm
+baz: Habakiri! Top of the room for a whole year, and the list didn't lay a finger on it till after!
+anselm: You'll forgive me if I don't stand. Nobody in my year ever made me.
+
+scene: nl-tova
+when: pilot:tova
+baz: Detonator! One winter, half the top tables were her deck! The other half wished they were!
+tova: I'd rather not know your deck. I haven't been surprised in a year.
+
+scene: nl-augie
+when: pilot:augie
+baz: Noroi! Cards taken, cards given back, cards taken again! The man's stopped unpacking!
+augie: Set list's short tonight, kid. You, me and the dogs.
+
+scene: nl-sasha
+when: pilot:sasha
+baz: Sangen! Lets you build the whole board, then takes it apart in one Battle Phase! Hold one back!
+sasha: Please, sit first. I'd like to see what you build. Then I'd like to see it come down.
+
+scene: nl-imogen
+when: pilot:imogen
+baz: Albion! Good notices all year, never the opening night! Tonight she wants top billing!
+imogen: House lights down. Tonight the understudy goes on. Try not to upstage me.
+
+scene: nl-rue
+when: pilot:rue
+baz: Lacrima! Won the biggest weekend of the year, and the list took it that same week!
+rue: Long shift. You're my last one before breakfast. Sit where I can see you.
+
+scene: nl-lux
+when: pilot:lux
+baz: Dragoon! Won a big room on a Saturday, lost four cards on the Monday! Freshest chalk on the board!
+lux: Don't ask me how my week was. Deal. Let's just go.
+
+scene: nl-margo
+when: pilot:margo
+baz: Dormouse! Patched four times in one year, and it kept working! Bring something for the banished!
+margo: Margo, on call. You're my last ticket tonight. Be an easy one.
+
+scene: nl-inka
+when: pilot:inka
+baz: Bookmark! From further out of town than anybody! Her deck got limited here before it landed!
+inka: Don't mind the pencil. You've got a good face for a panel. Let's see the rest of you.
+
+# Your first win against each pilot (pilotbeat:<id>). Written to fit whatever card changed hands. A beat plays before
+# nl-restored and nl-clear when they share a night (file order).
+scene: nl-junia-beat
+when: pilotbeat:junia
+junia: ...Huh. It's cooler in here than I remembered.
+junia: Two years I kept the end chair warm. Go and sit in it a minute, Local. It's earned a new face.
+rue: Told you. Summers end. Usually on a weekend.
+baz: SPOILS IS DOWN! Somebody fetch her a jumper! Ring it!
+
+scene: nl-remy-beat
+when: pilotbeat:remy
+remy: You played on my turn. Nobody plays on my turn. ...New track for the set list, then.
+rue: First loss of the season, Rotary. Rest it. There's always another summer.
+baz: Rotary's needle's off the record! Chalk it!
+
+scene: nl-anselm-beat
+when: pilotbeat:anselm
+anselm: Note the date, Tova. I'd like a witness.
+tova: File that one under Mitsurugi, Anselm. Everything else is.
+
+scene: nl-tova-beat
+when: pilotbeat:tova
+tova: Eleven mirrors a day, one winter. Then you.
+tova: I'd forgotten what losing to somebody else feels like. ...I'll take it.
+baz: The Detonator's defused! Everybody can uncover their ears!
+
+scene: nl-augie-beat
+when: pilotbeat:augie
+augie: Dogs, heel. ...They won't. They've taken a liking to you.
+augie: Takes a lot to win a roadie over, kid. You did it in one set.
+
+scene: nl-sasha-beat
+when: pilotbeat:sasha
+sasha: You kept one card for my turn. I saw it. I didn't believe it.
+sasha: ...Well. I'll go second to you any time.
+baz: Sangen's seated! Somebody hold a door for them for once!
+
+scene: nl-imogen-beat
+when: pilotbeat:imogen
+imogen: Beaten by the lead. Of course. Still, a better notice than second. It's a matter of billing.
+sasha: Don't. She gives that speech after every final. I've heard it from the second seat.
+imogen: It's a good speech. I've had practice.
+
+scene: nl-rue-beat
+when: pilotbeat:rue
+rue: Pressure on the wound. Good. You'd make a decent nurse.
+rue: That's my shift done for the night. Go on, the rest of them are yours.
+junia: One weekend, Rue.
+rue: The one that counted. ...Tonight it counted for somebody else.
+
+scene: nl-lux-beat
+when: pilotbeat:lux
+lux: Okay. Okay. That one I can't blame on the list. ...That helps, weirdly.
+nyx: Rest a little. It doesn't mean stopping.
+
+scene: nl-margo-beat
+when: pilotbeat:margo
+margo: Root cause: you. Filing it as a feature. Resolved by user.
+tova: One winter there were two decks in every room, hers and mine. Neither of us lost to a third.
+margo: We do now.
+
+scene: nl-inka-beat
+when: pilotbeat:inka
+inka: Wrong ending. ...Better ending. Hang on, I'm fixing the last panel.
+-: She tears a page out of her sketchbook and hands it over: you, mid-duel, scowling at your hand.
+baz: Bookmark's lost the plot! She's handing it out! Chalk it!
+
+# The first restored card you win, from any pilot (restored). {card} is the card the list took; "opponent" is the pilot.
+scene: nl-restored
+when: restored
+-: Your opponent holds {card} a moment longer than they need to. Then they slide it down the long table.
+opponent: The list took this. The list never beat me. You just did.
+opponent: That's different. I'd forgotten how different.
+nyx: Lost fair. Now it can rest.
+-: In the doorway, Kit lets the door swing a little wider.
+kit: First one of theirs I've seen leave that table. ...Look after it.
+
+# The same night's coda, upstairs (the same trigger plays in file order).
+scene: nl-restored-hollis
+when: restored
+place: library
+-: Next morning, you tell Hollis about {card}. He has a pencil out before you've finished.
+hollis: This one has two dates. The month it was the deck to beat, and the month they took it.
+hollis: I've filed both. Purely for scholarship.
+hollis: A list is a promise that everybody gets to play. Sometimes it breaks one to keep it.
+hollis: ...I can see why they couldn't let it go.
+
+scene: nl-clear
+when: alleyclear:No Limits
+-: The end chair is empty. Nobody at the long table says anything for a while.
+baz: NO LIMITS IS CLEARED! Four chairs! No list! I'm ringing this till the roof comes down!
+junia: We've played this game in a dozen towns. Nobody local ever cleared the table.
+junia: So we'll do it properly. Sixteen seats. Best of three in the final. Both sides of the wall.
+baz: An Invitational! On MY board! I'm going to need more board!
+nyx: I'll bring the old words. Somebody should read them to this lot.
+nocturne: That door is older than their game. Ask Nyx who kept the key before her.
+nyx: ...
+nocturne: She won't say. I've asked.
+
+# The No Limits Invitational (NL-2, docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 9): first entry and first title.
+scene: nl-invitational
+when: invitational
+-: Baz has propped three chalkboards against the depot wall. Sixteen names, all in chalk.
+-: Most of them are in the smaller hand.
+baz: The No Limits Invitational! Out-of-towners against the alley! And {nick}, who's a bit of both!
+power-patron: The House doesn't usually travel. Fifty yards is a long way for a ledger.
+nocturne: I've played every Midnight since the first one. Never stayed up past it. Until tonight.
+nyx: Old words, at a new table. Mind them.
+radiant-typhoon: Same weather. Bigger sea.
+-: In the doorway, Kit has turned a crate over to sit on. On the alley side of the door. Just.
+mika: Streaming from the doorway. The signal's bad. The decks aren't.
+
+scene: nl-invitational-win
+when: bracketwin:No Limits Invitational
+-: Baz climbs onto the long table, which nobody has ever let him do, and rings the bell twice.
+baz: {nick} takes the Invitational! No list, no limits, and nobody left to beat!
+junia: A dozen towns, and a Local takes the room. I'll be telling that one at the next door.
+junia: Local's the wrong word now. {nick}, then. Baz had it right first.
+junia: Feels like September. I'd forgotten September.
+junia: The road's long, and it has other doors. You'll hear from us.
+nyx: The lantern stays up for you. Whenever you like.
+-: In the doorway, Kit is on their feet. Kit has been on their feet for the whole final.
+kit: I didn't come in. I want that noted. ...That was the best thing I've ever not been in.
+
+scene: nl-invitational-home
+when: bracketwin:No Limits Invitational
+place: shop-floor
+-: Upstairs, Gus is pricing sleeves. There's depot dust on your coat, and he notices.
+old-gus: Bus depot. Smells like diesel and arguments.
+old-gus: Penny used to drive the nine out of there. Don't tell Penny I remember that.
+-: He goes back to pricing. Then he slides one sleeve across the counter, with no price on it.
+old-gus: For whatever you won down there that somebody couldn't let go of. Look after it.
+
+# The finale (finale: the Library, the alley and No Limits all closed): the three strands meet at the shop's back step.
+# Gus stands at the top and doesn't come down. Baz names him for the first time (planted in alley-baz). Order-neutral:
+# nothing here assumes the held card has gone home or which name Baz last chalked for you.
+scene: finale
+when: finale
+place: alley
+-: Friday, after close. The shop's back door is propped open, and light falls down the step.
+-: Gus stands at the top of the step with a mug of coffee. He doesn't come down.
+-: Below him the alley goes quiet: the crates, the van's hatch, the lantern at the far end.
+kit: Don't mind me. I'll sit in the middle. It's where I sit.
+-: Kit takes the middle step. Baz looks up at the doorway for a long moment, then turns to his board.
+baz: I've never once chalked the man upstairs. He knows why. ...Tonight he gets one.
+-: At the very top of the board, above every other name, Baz chalks UPSTAIRS.
+baz: I only ever lent it out. It was always his.
+old-gus: Shop's open tomorrow, kid. Both doors.
+-: Somebody rings the bell. It used to hang over a shop door. Out here, it rings just fine.
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Level scenes come last: a level-up arrives with a cup or circuit clear, and should play after that clear's scenes.
+# ---------------------------------------------------------------------------------------------------------------------
+
+scene: first-locals
+when: locals
+place: library
+hollis: Locals night. Eight duelists, one binder's rules, single elimination. Lose once and you're watching.
+hollis: You're the cup's champion, so you're seeded first.
+hollis: The rest are whatever that year had left to throw at you.
+old-gus: Entry's a thousand. The prize is a pack Hollis puts together himself.
+old-gus: Watching's free. Hollis tried charging once.
+rookie-ryo: I came to watch! I brought a notebook. I brought two notebooks.
+
+scene: first-bracket-title
+when: bracketwin
+place: corkboard
+-: Gus pins a fresh bracket sheet to the corkboard, your name circled at the top in red marker.
+old-gus: Three in a row, nobody's second chance. That's how the old regionals felt.
+hollis: The prize packs are sealed in my back room. Open them here, where I can watch.
+
+scene: level-10
+when: level:10
+old-gus: Level 10. You've been spending your Card Tokens wisely, I hope. The Card Trader is in the shop.
+
+scene: level-25
+when: level:25
+vera: Level 25. I checked. You're ahead of me. Don't get used to it.

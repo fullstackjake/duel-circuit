@@ -1,0 +1,25 @@
+# Cards a Ban Pass can never cover: they win, loop or lock the opponent out on their own, so a pass would skip the
+# hurdle instead of helping clear it. Every other Forbidden or Limited card can be passed (one copy per pass).
+# One card name per line; edit freely.
+
+# Wins or loops by itself
+Last Turn
+Victory Dragon
+Self-Destruct Button
+Butterfly Dagger - Elma
+Magical Scientist
+Cyber-Stein
+Dark Strike Fighter
+Card of Safe Return
+Mass Driver
+Wind-Up Hunter
+Wind-Up Carrier Zenmaity
+Firewall Dragon
+
+# Locks the opponent out of the game
+Mystic Mine
+Kaiser Colosseum
+Dimensional Barrier
+Barrier Statue of the Stormwinds
+Barrier Statue of the Inferno
+Barrier Statue of the Drought

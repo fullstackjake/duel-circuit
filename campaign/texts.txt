@@ -1,0 +1,98 @@
+# Card text timeline (docs/dev/CARD-VERSIONS-SPEC-2026-11-03.md). One line per original printed TCG text:
+#   <version id> until <yyyy-mm> [set <prefix>] [cpu] [dup <id>]   # card name
+#   until: the month the TCG text changed (the first printing with the new text, or the database change).
+#          A printing dated before it carries this text; a table whose AsOf is before it plays it.
+#   never: no TCG printing carries it (an OCG or anime text): CPUs may play it, players can't own it.
+#   cpu:   playable by CPUs, not collectible (the second of two texts no TCG printing carries).
+#   dup:   an identical entry; the canonical id is collectible, this one only loads.
+# Rows for one card are read oldest first. GOAT entries need no row (they are the 2005 ruling, section 5).
+#
+# Sources (researched 2026-11-03): Yugipedia "Card Errata:<card>" pages (each printing's text) and the "Errata" page's
+# major-mechanical-changes table; Konami's TCG card database via the Wayback Machine where the database changed before
+# any printing ("db" below); set months from data/ygoprodeck/cardsets.json by set name. A `set` is given only when the
+# card's earliest printing under that prefix is the errata printing (so a 2002 prefix date can't stand in for it).
+
+# --- Konami's official major-errata list (the 2014-2026 functional errata) ---
+511000228 until 2014-06 set DL18     # Catapult Turtle: DL18-EN001
+511000229 until 2014-10 set LC5D     # Dark Strike Fighter: LC5D-EN234
+511000868 until 2015-10 set AP08     # Twin-Headed Behemoth: AP08-EN016 (optional revive)
+511000822 until 2015-03 set PGL2     # Crush Card Virus: PGL2-EN070
+511000823 dup 511000822              # Crush Card Virus (same text; script checks ATK slightly differently)
+511000825 until 2015-03 set PGL2     # Ring of Destruction: PGL2-EN063 (three decks use 511000825)
+511000824 dup 511000825              # Ring of Destruction (identical script)
+511000820 until 2015-03 set PGL2     # Exchange of the Spirit: PGL2-EN066
+511000821 until 2015-03 set PGL2     # Temple of the Kings: PGL2-EN056
+511000818 until 2015-03 set PGL2     # Sinister Serpent: PGL2-EN027
+511000819 until 2018-11 set JUMP     # Chaos Emperor Dragon: JUMP-EN086, WSJ November 2018 promo (2018-11-21)
+511001039 until 2015-11 set YGLD     # Dark Magician of Chaos: YGLD-ENC02
+511002631 until 2016-09 set DPRP     # Sangan: DPRP-EN038 (MRD 25th Anniversary 2023 reprint carries the current text)
+511002997 until 2017-03 set DUSA     # Future Fusion: DUSA-EN062
+511002996 until 2017-03 set DUSA     # Imperial Order: DUSA-EN049 (PSV 25th Anniversary 2023 reprint: current text)
+511002995 until 2017-03 set DUSA     # Brain Control: DUSA-EN046
+511002994 until 2017-03 set DUSA     # Goyo Guardian: DUSA-EN075
+511002993 until 2017-03 set DUSA     # Brionac, Dragon of the Ice Barrier: DUSA-EN073
+511002992 until 2017-03 set DUSA     # Rescue Cat: DUSA-EN072
+511003012 until 2017-07 set BLLR     # Witch of the Black Forest: BLLR-EN046 (MRD 25th Anniversary 2023: current text)
+511003062 until 2018-03              # Grandsoil the Elemental Lord: db 2018-03-08; first print FLOD-ENSE1 2018-06-07
+511003116 until 2018-10 set LEHD     # Destiny HERO - Disk Commander: LEHD-ENA08
+88264988  until 2020-07 set LDS1     # Red-Eyes Darkness Metal Dragon: LDS1-EN004
+21593987  until 2020-09 set LED7     # Makyura the Destructor: db 2020-09-16, LED7-EN008 2020-09-24
+70583996  until 2021-02 set SDFC     # Dewloren, Tiger King of the Ice Barrier: SDFC-EN042
+5043020   until 2021-04 set GFTP     # Firewall Dragon: GFTP-EN131
+16226796  until 2022-05              # Night Assailant: db 2022-05-19; first print OP19-EN016 2022-06-15
+25862691  until 2023-03 set MAZE     # Ancient Fairy Dragon: MAZE-EN050
+71525242  never                      # Gandora-X: OCG text; the TCG text always had "original ATK" (Yugipedia Errata)
+61665255  until 2025-08 set BLMM     # Summon Sorceress: BLMM-EN157
+7563589   until 2024-08              # Performage Plushfire: db ~2024-08-30 (Wayback); first print OP27-EN013 2025-02
+17412731  until 2026-09              # Elder Entity Norden: db 2026-09-28 (Wayback: old 05:49 UTC, new 09:45 UTC)
+511003019 cpu                        # Mind Master: OCG TDGS-JP016 text (no "except Mind Master"), never a TCG print
+96782896  until 2026-09              # Mind Master: TDGS-EN016 text (2008, its only TCG print); db once per turn 2026-09
+511004007 never                      # Toon World: OCG pre-TCG text (maintenance cost); every TCG print is "pay 1000 LP"
+
+# --- Wording and translation errata ---
+511006010 until 2005-03 set DR1      # Amazoness Fighter: MFC-060 printed ATK 1300; DR1-EN115 1500
+                                     #   Collectible, unlike the BEUD/Cipher Soldier/Metalmorph misprints below
+                                     #   (`never`): ATK 1300 was the card's original printing (MFC, its only print
+                                     #   for 17 months), not a one-off in a later reprint.
+511003023 until 2006-04 set TP8      # Ultimate Offering: TP8-EN012 (2006-04-28) already reads "You can only activate this
+                                     #   effect during your Main Phase or your opponent's Battle Phase" (card image
+                                     #   UltimateOffering-TP8-EN-C-UE.jpg on Yugipedia, read 2026-11-03); Yugipedia's
+                                     #   errata table cites the later SD7-EN027 (2006-05).
+511002991 until 2022-03 set SGX1     # Cyber Blader: SGX1-ENE21 "activated card effects"; db old as of 2021-05
+65240394  until 2012-05 set BP01     # Big Shield Gardna: BP01-EN176 "(and no other cards)", negate as an effect
+511003022 until 2013-10              # Stronghold the Moving Fortress: "gains 3000 ATK" from DPYG-EN030 in
+                                     #   Duelist Pack: Yugi & Kaiba Special Edition (2013-10-25); BP02 still "becomes"
+511003020 until 2014-06 set SDLI     # Wulf, Lightsworn Beast: SDLI-EN010 "Must be Special Summoned by a card effect"
+511002998 until 2017-03 set DUSA     # Necrovalley: DUSA-EN050 (drops "other than itself", adds Types/Attributes)
+511003008 until 2017-04 set SR04     # Swords of Concealing Light: SR04-EN026 (monsters controlled at resolution)
+511003006 until 2017-04 set SR04     # Gilasaurus: SR04-EN012 (no target; "Activate this effect")
+511003009 until 2017-04 set SR04     # Ultimate Tyranno: SR04-EN006 (can attack all; others can't attack)
+511003007 until 2017-07 set YS17     # Ryko, Lightsworn Hunter: YS17-EN017 (non-targeting, simultaneous)
+511003054 until 2018-01 set SR05     # Splendid Venus: SR05-EN012 ("activated on your field")
+511003071 until 2018-08 set SHVA     # Mermail Abyssteus: SHVA-EN039 (search becomes optional)
+511003028 until 2023-04              # Darkness Approaches: SRL-EN040 in Spell Ruler (25th Anniversary Edition),
+                                     #   2023-04-20: face-down Defense Position (OCG 2017-03-25)
+511003026 never                      # Mind Crush: "and look at your opponent's hand" is in no TCG or OCG print
+511003018 never                      # Dragon Seeker: OCG Booster 5 text; TCG TP2 was already "when Summoned"
+511003021 never                      # Spiritual Energy Settle Machine: OCG MA-34 text; TCG LOD already had the return clause
+511002982 never                      # Inspection: every TCG print reads as today; the entry only drops once per turn
+511002983 never                      # Recycle: every TCG print reads as today; the entry only drops once per turn
+511003027 never                      # Emissary of the Afterlife: the entry adds the 2005 failed-search Deck reveal, a ruling
+511006007 never                      # Blue-Eyes Ultimate Dragon: DEF 3000 is the GLD1-EN028 (2008) misprint only
+511006006 never                      # Cipher Soldier: LIGHT is the CP04-EN010 (2007) misprint only; WC4 and SDMM are EARTH
+511006005 never                      # Metalmorph: Continuous Trap is the PP01-EN014 (2007) misprint only; FMR and SDMM Normal
+
+# --- Union monsters (the old shared Union text; changed print by print) ---
+511003055 until 2014-02 set SDCR     # Armored Cybern: SDCR-EN011
+511002851 until 2014-10 set SDGR     # Heavy Mech Support Platform: SDGR-EN019
+511002852 until 2016-10 set SDKS     # Y-Dragon Head: SDKS-EN006
+511002853 until 2016-10 set SDKS     # Z-Metal Tank: SDKS-EN007
+511002901 until 2018-03 set LCKC     # W-Wing Catapult: LCKC-EN083
+
+# --- The Main Monster Zone wave (OCG 2017-03-25) ---
+9995776   until 2020-07 set SDSA     # Imperial Custom: SDSA-EN038 "by battle or card effect"
+63394882  until 2022-08 set TAMA     # Senet Switch: TAMA-EN042 (Main Monster Zone, zone chosen on activation)
+33900658  until 2025-03 set MZTM     # Clear World: MZTM-EN098 "Once per turn"; db old as of 2024-09
+76573257  never                      # Alien Infiltrator: same text as today (CDIP only); OCG 2017 zone-choice ruling only
+3784444   never                      # Rampaging Rhynos: same text as today (CDIP only); OCG 2017 zone-choice ruling only
+39188549  never                      # Storm Shooter: same text as today (CDIP only); OCG 2017 zone-choice ruling only

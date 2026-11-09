@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Installing, card pictures, saves and more
+    url: https://github.com/fullstackjake/duel-circuit#install-and-play
+    about: "Questions about installing, card pictures, saves and more: check the README first."
+  - name: Report a security problem
+    url: https://github.com/fullstackjake/duel-circuit/security/advisories/new
+    about: Please report security problems privately, not in a public issue.

@@ -1,0 +1,461 @@
+# The Back Alley's tables and brackets (docs/dev/ALLEY-SPEC-2026-11-01.md). Contraband per event: alley.txt.
+#   table: <name>                  starts a table
+#   id: <slug>                     saves and keys
+#   tier: street | den | orvel | nyx | nolimits
+#   event: <Alley.Events name>     the splash knobs: era cap, splash size, skill, Elo range
+#   opens: alley | <table name>    with the alley, or once that table is cleared
+#   gate: <key>                    a profile.Seen key the table also needs (No Limits: "nolimits", the wall)
+#   bases: <deck>, <deck>, ...     the base decks regulars are built from (fixed; the harness checks them)
+#   splash-elo: <n>                the measured splash gain, for bracket odds and the panel's Elo
+#   headliners: <id>, <id>         the table's two headliners, in order
+#   closer: <base>                 the 4th seat while no headliner of the table is ready: this base, a full splash, skill 1.0
+#   pool: <build>, <build>, ...    No Limits: the builds its seats 1-3 rotate through (every build sits once before any twice)
+#   champions: <build>, <build>    No Limits: the end chair (the first ready unbeaten closes; the next one wildcards)
+#   elo: <min>-<max>               No Limits: the window its ready builds must rate in (AlleyData.Problems)
+#   seat: <n> <kind> ...           an authored seat (orvel, nyx and nolimits tiers): kind regular | headliner | authored | pool |
+#                                  champion; "| as-built": a rated roster deck seated as built (exempt from the exclusion check,
+#                                  shown at its own Elo)
+#   ready: no                      the table stays locked ("Coming soon") until its authored decks are built
+#   mat: <mats.txt key>            music: <Sfx theme>
+#   headliner: <id>                starts a headliner: handle:, deck:, table:, list:, over:, pieces:, stakes:, ready:
+#   build: <pilot id>              starts a No Limits peak build (docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 10.1): the headliner's
+#                                  keys plus base: (its decks/history base), family: (tags; no two sharing one sit at seats 1-3
+#                                  together), wave:, restored: (its own banned cards back at 3; over: holds the picks and any
+#                                  restored card above its list). A name holding a comma ("Blaster, Dragon Ruler of Infernos") is read whole.
+#   bracket: <name>                starts a bracket: kind:, size:, opens:, entry:, pay:, packs:, tokens:, final:, field:
+#                                  a field line "| after: <table>" sits once that table is cleared; before, it's one more regular
+#                                  from the "splash ... cleared" line (CPUs count the same both ways)
+#   handle: <card name> | <prefix> a regular's handle prefix when that card is its best splash
+#   names: <name>, <name>, ...     first names for handles (names: lines add up)
+
+# ---- Tables ----------------------------------------------------------------------------------------------------------
+# closer: each table's highest-rated base (chaos-yata 1414, six-samurai 1491, kozmo 1613), until --alley-study measures them.
+# Dumpster Row's is warriors (Phase D difficulty pass, docs/dev/ALLEY-DIFFICULTY-2026-11-03.md): against goat-control, the deck a
+# player has when the alley opens, the closest to the 75% target (57%; chaos-yata 53%, a goat-control mirror 40% with turn-40
+# duels and a draw), and a little kinder to the starter (17% against chaos-yata's 13%).
+
+table: Dumpster Row
+id: dumpster-row
+tier: street
+event: Dumpster Row
+opens: alley
+bases: goat-control, chaos-yata, warriors
+splash-elo: 52
+headliners: yata-mags, return-rook
+closer: warriors
+mat: alley-dumpster-row
+music: alley
+
+table: The Basement Game
+id: basement
+tier: den
+event: The Basement Game
+opens: Dumpster Row
+bases: inzektor, plant-synchro, warriors, blackwing, dino-rabbit, teledad, six-samurai, shaddoll
+splash-elo: 57
+headliners: mass-driver-moss, gateway-gwen            # gateway-gwen: the reserve in Trishula Trish's slot (HEADLINERS phase 3: Trish finished 29%)
+closer: six-samurai
+mat: alley-basement
+music: alley
+
+table: The Black Market
+id: black-market
+tier: den
+event: The Black Market
+opens: The Basement Game
+bases: shaddoll, kozmo, danger-dark-world
+splash-elo: 50
+headliners: master-plan-marlo, gumblar-gail
+closer: kozmo
+mat: alley-black-market
+music: alley
+
+# Orvel's Table (Phase B): one seat, Patron Orvel's house deck (decks/alley/orvels-house.ydk: power-patron plus The Black
+# Market's contraband), measured toward 55-60% for your best deck (decision O1).
+table: Orvel's Table
+id: orvels-table
+tier: orvel
+opens: The Black Market
+seat: 1 authored power-patron orvels-house | skill 1.0
+mat: power-patron
+music: orvel
+
+# Nyx's Table (Phase C, decision O2): Den stakes, four seats the same every night but seat 1 (and seat 3's stand-in):
+# a Black Market regular, an era-true roster deck as built, the burn-kill headliner (Lab Coat Lyle; until it's ready, a
+# Black Market regular), and Nyx's own Gravekeeper's Contraband (decks/alley/gravekeepers-contraband.ydk), measured
+# toward 55% for your best deck. Difficulty pass (Phase D, docs/dev/ALLEY-DIFFICULTY-2026-11-03.md): seat 2 is Volta Kask's
+# Thunder Dragon (2018, 1693) for Baron Corvus's chaos-yata (1414; 93% for the best deck), and the regular seats play at
+# full strength (META-DECKS decision 5: older decks, never a weaker CPU).
+table: Nyx's Table
+id: nyx
+tier: nyx
+opens: The Black Market
+seat: 1 regular | event: The Black Market | skill 1.0
+seat: 2 authored thunder-dragon thunder-dragon | skill 1.0 | as-built
+seat: 3 headliner scientist-turtle | else regular 1.0
+seat: 4 authored nyx gravekeepers-contraband | skill 1.0 | allow:
+mat: nyx
+music: nyx
+
+# No Limits (docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 4): no list for you, the pilots' peak builds as written at skill 1.0,
+# 2,500 DP held against a restored card. Opens with the "nolimits" wall event after Nyx's Table and the alley-closing scene.
+# Seats 1-3 rotate through pool:, seat 4 is the end chair (the first ready unbeaten champion; Junia until Remy is ready).
+table: No Limits
+id: no-limits
+tier: nolimits
+opens: Nyx's Table
+gate: nolimits
+elo: 1840-1990                  # the builds' rating window (section 4.7); AlleyData.Problems checks ready builds
+pool: anselm, tova, augie, sasha, imogen, rue, lux, margo, inka
+champions: remy, junia          # the end chair: the first ready unbeaten closes, the other wildcards
+seat: 1 pool | skill 1.0
+seat: 2 pool | skill 1.0
+seat: 3 pool | skill 1.0
+seat: 4 champion | skill 1.0
+mat: no-limits
+music: no-limits
+ready: no                       # yes once the ship gate holds (section 14)
+
+# ---- Headliners (docs/dev/HEADLINERS-2026-11-01.md) -----------------------------------------------------------------------
+# A headliner plays its deck as authored, under its era's list plus the owner-approved over: copies. ready: no until it
+# passes the Headliners go/no-go; a headliner that isn't ready never sits.
+
+headliner: yata-mags
+handle: Yata Mags
+deck: yata-mags
+table: Dumpster Row
+list: TCG April 2004
+over: Chaos Emperor Dragon - Envoy of the End
+pieces: Chaos Emperor Dragon - Envoy of the End, Yata-Garasu, Witch of the Black Forest
+stakes: Yata-Garasu, Chaos Emperor Dragon - Envoy of the End, Sangan, Witch of the Black Forest
+ready: yes
+
+headliner: mass-driver-moss
+handle: Mass Driver Moss
+deck: mass-driver-moss
+table: The Basement Game
+list: TCG March 2010           # the deck's own #banlist (the spec's draft said September 2010)
+over: Treeborn Frog            # the deck runs 3 and the March 2010 list allowed 2: for the Headliners author and the owner to confirm
+pieces: Mass Driver, Substitoad, Ronintoadin
+stakes: Ronintoadin, Fishborg Blaster              # Mass Driver is only a Common: under the Den floor, so never a stake
+ready: yes
+
+headliner: return-rook
+handle: Return Rook
+deck: return-rook
+table: Dumpster Row
+list: TCG April 2005
+pieces: Return from the Different Dimension, Dimension Fusion, Dimensional Fissure
+stakes: Return from the Different Dimension, Dimension Fusion
+ready: yes                     # the smaller show (the owner, 2026-11-05): two monsters home is the payoff; finishes 51-55% of goldfish games
+
+headliner: trishula-trish
+handle: Trishula Trish
+deck: trishula-trish
+table: The Basement Game
+list: TCG March 2011
+pieces: Dandylion, Debris Dragon, Glow-Up Bulb    # Trishula, Dragon of the Ice Barrier leads the pieces once a name may hold a comma here
+stakes: Dandylion, Glow-Up Bulb
+ready: no                      # no-go (HEADLINERS phase 3): its route finishes 29% of goldfish games; Gateway Gwen, the reserve, has its slot
+
+headliner: gateway-gwen
+handle: Gateway Gwen
+deck: gateway-gwen
+table: The Basement Game
+list: TCG March 2010
+pieces: Gateway of the Six, Legendary Six Samurai - Kageki, Legendary Six Samurai - Shi En
+stakes: Gateway of the Six, Legendary Six Samurai - Shi En, Shien's Smoke Signal
+ready: yes
+
+headliner: master-plan-marlo
+handle: Master Plan Marlo
+deck: master-plan-marlo
+table: The Black Market
+list: TCG November 2017
+pieces: SPYRAL Master Plan, SPYRAL Double Helix, SPYRAL Super Agent
+stakes: SPYRAL Master Plan, PSY-Framelord Omega, Blackwing - Gofu the Vague Shadow
+ready: yes
+
+headliner: gumblar-gail
+handle: Gumblar Gail
+deck: gumblar-gail
+table: The Black Market
+list: TCG September 2018
+pieces: Topologic Gumblar Dragon, Gouki Suprex, Gouki Re-Match
+stakes: Topologic Gumblar Dragon, Knightmare Mermaid, Soul Charge
+ready: yes
+
+headliner: scientist-turtle
+handle: Lab Coat Lyle
+deck: scientist-turtle
+table: Nyx's Table
+list: TCG April 2004             # the 2004 texts: Catapult Turtle (no limit), Sangan, Witch
+pieces: Magical Scientist, Catapult Turtle, Dark Flare Knight
+stakes: Magical Scientist, Catapult Turtle
+ready: no
+
+# ---- No Limits (docs/dev/NO-LIMITS-SPEC-2026-11-02.md): peak builds. The id is the pilot's (personalities/<id>.profile). ----
+# Section 5.3 as written; where the deck author had to deviate, the coordinator reconciles these lines (AlleyData.Problems
+# is the check). Every build and the table start ready: no; --alley-study and --endless-test decide ready: yes.
+
+build: junia
+handle: Spoils
+deck: nl-snake-eye
+table: No Limits
+base: snake-eye
+family: snake-eye, fiendsmith
+wave: 1
+list: TCG April 2024
+over: Union Carrier, Card of Safe Return, Soul Charge, Blaster, Dragon Ruler of Infernos
+restored: Original Sinful Spoils - Snake-Eye, Snake-Eye Ash, Snake-Eyes Poplar, Fiendsmith's Lacrima
+pieces: Original Sinful Spoils - Snake-Eye, Fiendsmith's Lacrima, Union Carrier
+stakes: Original Sinful Spoils - Snake-Eye, Fiendsmith's Lacrima
+ready: no
+
+build: anselm
+handle: Habakiri
+deck: nl-mitsurugi
+table: No Limits
+base: ryzeal
+family: mitsurugi, ryzeal
+wave: 1
+list: TCG April 2025
+over: Mass Driver, Pharaonic Advent, Sinister Serpent, King of the Feral Imps
+restored: Ame no Habakiri no Mitsurugi
+pieces: Ame no Habakiri no Mitsurugi, Mass Driver, Pharaonic Advent
+stakes: Ame no Habakiri no Mitsurugi
+ready: no
+
+build: tova
+handle: Detonator
+deck: nl-ryzeal
+table: No Limits
+base: ryzeal
+family: ryzeal, fiendsmith
+wave: 1
+list: TCG December 2024
+over: Fairy Tail - Snow, Lavalval Chain, Daigusto Emeral
+restored: Ryzeal Detonator, Ext Ryzeal, Ice Ryzeal, Sword Ryzeal
+pieces: Ryzeal Detonator, Ext Ryzeal, Lavalval Chain
+stakes: Ryzeal Detonator
+ready: no
+
+build: augie
+handle: Noroi
+deck: nl-vanquish-soul
+table: No Limits
+base: k9-vanquish-soul
+family: k9
+wave: 1
+list: TCG October 2025
+over: Confiscation, Trap Dustshoot, Outer Entity Azathot, Vanquish Soul Razen, Stake your Soul!
+restored: K9-04 Noroi, Vanquish Soul Razen, Stake your Soul!, Vanquish Soul Hollie Sue, K9-66a Jokul, "A Case for K9"
+pieces: K9-04 Noroi, Confiscation, Outer Entity Azathot
+stakes: K9-04 Noroi
+ready: no
+
+build: sasha
+handle: Sangen
+deck: nl-tenpai
+table: No Limits
+base: tenpai-dragon
+family: tenpai
+wave: 1
+list: TCG April 2024
+over: Giant Trunade, Raigeki, Blaster, Dragon Ruler of Infernos, Burner, Dragon Ruler of Sparks
+restored: Sangen Summoning, Tenpai Dragon Chundra, Sangen Kaimen
+pieces: Sangen Summoning, Tenpai Dragon Chundra, Giant Trunade
+stakes: Giant Trunade                # no Tenpai card fits the 2,500 floor (NO-LIMITS-ECONOMY 1.2)
+ready: no
+
+build: imogen
+handle: Albion
+deck: nl-branded
+table: No Limits
+base: branded-despia
+family: branded
+wave: 1
+list: TCG May 2026
+over: Eclipse Wyvern, Chaos Sorcerer, Branded Fusion, Branded Expulsion
+restored: Albion the Branded Dragon, Branded Fusion, Branded in High Spirits, Branded Opening, Branded Expulsion
+pieces: Albion the Branded Dragon, Branded Expulsion, Eclipse Wyvern
+stakes: Albion the Branded Dragon    # Expulsion is Common only and never fits
+ready: no
+
+build: rue
+handle: Lacrima
+deck: nl-yubel
+table: No Limits
+base: yubel
+family: yubel, fiendsmith
+wave: 1
+list: TCG September 2024
+over: Sangan, Witch of the Black Forest, Fiendsmith's Lacrima, Opening of the Spirit Gates
+restored: Fiendsmith's Lacrima, Phantom of Yubel, Opening of the Spirit Gates
+pieces: Fiendsmith's Lacrima, Phantom of Yubel, Sangan
+stakes: Fiendsmith's Lacrima
+ready: no
+
+# Wave 2 (section 14.4): the deck files don't exist yet; a build that isn't ready never sits and skips its deck checks.
+build: remy
+handle: Rotary
+deck: nl-kewl-tune
+table: No Limits
+base: kewl-tune
+family: kewl-tune
+wave: 2
+list: TCG May 2026
+over: Naturia Rosewhip, Glow-Up Bulb, Jet Synchron, Destrudo the Lost Dragon's Frisson, Synchro Overtake
+restored: Kewl Tune Rotary, Synchro Overtake
+pieces: Kewl Tune Rotary, Naturia Rosewhip, Glow-Up Bulb
+stakes: Kewl Tune Rotary
+ready: no
+
+build: margo
+handle: Dormouse
+deck: nl-maliss
+table: No Limits
+base: maliss
+family: maliss
+wave: 2
+list: TCG April 2025
+over: Return from the Different Dimension, Link Decoder, Protectcode Talker, Maliss in Underground
+restored: Maliss <P> Dormouse, Maliss <P> White Rabbit, Maliss in Underground, Maliss <Q> White Binder
+pieces: Maliss <Q> White Binder, Maliss <P> Dormouse, Return from the Different Dimension
+stakes: Maliss <Q> White Binder
+ready: no
+
+build: lux
+handle: Dragoon
+deck: nl-ladr
+table: No Limits
+base: light-and-darkness
+family: ladr
+wave: 2
+list: TCG September 2026
+over: Black Luster Soldier - Envoy of the Beginning, Dark Magician of Chaos, Eclipse Wyvern
+restored: Magicians' Souls, Azamina Ilia Silvia, Red-Eyes Dark Dragoon, Zenna's Deceiving Doll Maidens, Griffoh
+pieces: Magicians' Souls, Red-Eyes Dark Dragoon, Black Luster Soldier - Envoy of the Beginning
+stakes: Magicians' Souls, Red-Eyes Dark Dragoon
+ready: no
+
+build: inka
+handle: Bookmark
+deck: nl-toon
+table: No Limits
+family: toon
+wave: 2
+list: TCG October 2026
+over: Grinder Golem, Witch of the Black Forest, Change of Heart, Harpie's Feather Duster, Toon Table of Contents, Toon Bookmark
+restored: Toon Table of Contents, Toon Bookmark, Toon World the Perfect World
+pieces: Toon World the Perfect World, Toon Bookmark, Grinder Golem
+stakes: Toon Bookmark, Change of Heart    # Perfect World has no printing yet (NO-LIMITS-ECONOMY 1.5)
+ready: no
+
+# ---- Brackets (docs/dev/ALLEY-SPEC-2026-11-01.md section 11; AlleyEconomy holds the numbers, these must match) ------------------
+
+bracket: Alley Brawl
+kind: brawl
+size: 8
+opens: Dumpster Row
+entry: 1000
+pay: 900 650 400 150
+packs: 2 1 0 0
+field: you 1
+field: splash 3 cleared                                   # before The Black Market's clear the four lines below are four more of these
+# The out-of-towners (NO-LIMITS-SPEC section 8): one per round, on their 2024-25 bases made Alley-legal plus a Basement splash.
+field: junia nl-snake-eye-brawl 8 | after: The Black Market
+field: augie nl-vanquish-soul-brawl 5 | after: The Black Market
+field: rue nl-yubel-brawl 2 | after: The Black Market
+field: sasha nl-tenpai-brawl 3 | after: The Black Market
+
+bracket: Midnight Open
+kind: midnight
+size: 16
+opens: The Black Market
+entry: 2500
+final: bo3
+pay: 1500 1000 600 300 100
+packs: 4 2 1 0 0
+tokens: 1 first
+field: radiant-typhoon radiant-typhoon 1
+field: you 2
+field: mitsurugi mitsurugi
+field: angelechy angelechy
+field: branded-despia branded-despia
+field: nocturne hat
+field: six-samurai six-samurai
+field: ryzeal ryzeal
+field: thunder-dragon thunder-dragon
+field: eldlich eldlich
+field: kashtira kashtira
+field: splash 5 The Black Market
+
+# The No Limits Invitational (docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 9.1): the eleven peak builds on their builds and four
+# alley names, No Limits rules, No Limits Packs. It opens with No Limits' first clear and only once every build below is
+# ready: yes (Brackets.Opening); until then Baz's chalkboard shows it as "Coming soon".
+bracket: No Limits Invitational
+kind: invitational
+size: 16
+opens: No Limits
+entry: 3000
+final: bo3
+pay: 1500 1000 600 300 100
+packs: 4 3 2 1 0
+tokens: 2 first
+field: remy nl-kewl-tune 1
+field: you 2
+field: junia nl-snake-eye
+field: anselm nl-mitsurugi
+field: tova nl-ryzeal
+field: augie nl-vanquish-soul
+field: sasha nl-tenpai
+field: imogen nl-branded
+field: rue nl-yubel
+field: lux nl-ladr
+field: margo nl-maliss
+field: inka nl-toon
+field: radiant-typhoon radiant-typhoon
+field: power-patron orvels-house
+field: nyx gravekeepers-contraband
+field: nocturne hat
+
+# ---- Chalk handles (docs/dev/ALLEY-STORY-2026-11-01.md section 6) ----------------------------------------------------------
+# A regular's handle: the prefix of its most valuable added card that has a line here, plus a first name nobody has that
+# night ("Three-Pot Teddy"); no line: "<Base title> Regular".
+
+handle: Pot of Greed | Three-Pot
+handle: Raigeki | Thunder
+handle: Harpie's Feather Duster | Duster
+handle: Graceful Charity | Charity
+handle: Change of Heart | Heartbreak
+handle: Monster Reborn | Reborn
+handle: Snatch Steal | Snatch
+handle: Dark Hole | Dark Hole
+handle: Premature Burial | Early
+handle: Heavy Storm | Heavy Storm
+handle: Black Luster Soldier - Envoy of the Beginning | Envoy
+handle: Chaos Sorcerer | Sorcerer
+handle: Brain Control | Brainy
+handle: Witch of the Black Forest | Witch
+handle: Sangan | Sangan
+handle: Solemn Judgment | Solemn
+handle: Blackwing - Steam the Cloak | Cloak
+handle: Goyo Guardian | Goyo
+handle: Glow-Up Bulb | Glow-Up
+handle: Level Eater | Level Eater
+handle: Artifact Scythe | Scythe
+handle: Evilswarm Exciton Knight | Exciton
+handle: Crush Card Virus | Crush Card
+handle: Maxx "C" | Roach
+handle: Call of the Haunted | Haunted
+handle: Elder Entity Norden | Norden
+handle: That Grass Looks Greener | Greener
+handle: Mirage of Nightmare | Mirage
+handle: Morphing Jar | Morphing
+handle: Called by the Grave | Called-It
+handle: Cyber Jar | Cyber-Jar             # spec F10 / O7: not in alley.txt yet, so it never shows until it is
+
+# No "Fen": Firewall Fen is retired (HEADLINERS). Every name avoids the roster's 88 characters.
+names: Teddy, Wick, Rosa, Dutch, Sal, Juno, Pike, Dee, Chuck, Hal, Ruth, Sully, Del, Perry, Hugo, Vic, Saul, Brody
+names: Winnie, Sam, Sol, Cleo, Gwen, Gilly, Lou, Sid, Ike, Cruz, Rocco, Hank, Nils, Greer, Mo, Joss, Cal, Bram
