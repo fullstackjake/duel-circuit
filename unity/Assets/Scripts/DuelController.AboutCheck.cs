@@ -101,7 +101,7 @@ namespace YgoCampaign.Game
                 "free software", "GNU Affero General Public License", "version 3 or (at your option) any later version", "build it with Unity",
                 "NO WARRANTY", "CC BY-SA 4.0", "The name \"Duel Circuit\" and the logo aren't covered",
                 "unofficial fan game", "not made, approved or supported by Konami or Shueisha", "card names and card text belong to their owners",
-                "No card pictures ship", "ygopro-core", "edo9300 and contributors", "Card scripts, card database and ban lists: Project Ignis (EDOPro)",
+                "No card pictures ship", "ygopro-core", "Rules engine (ygopro-core), card scripts, card database and ban lists: Project Ignis (EDOPro)",
                 "Card-set data: YGOPRODeck", "Historic decks and ban lists: Format Library and yugiohmeta.com", "Made with Unity",
                 "github.com/fullstackjake/duel-circuit",
             }.Concat(AboutScreen.ButtonLabels).ToList();

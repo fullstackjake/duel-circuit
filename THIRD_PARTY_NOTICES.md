@@ -28,7 +28,18 @@ The game ships ygopro-core and CardScripts (both AGPL-3.0-or-later) inside a gam
 source. Our own code has an [extra permission](LICENSES/UNITY-PERMISSION.md) for this, but we can't give one for
 other people's code.
 
-**Status (2026-11-08): We are asking edo9300 (ygopro-core) and Project Ignis (CardScripts, BabelCDB, LFLists) for permission to ship their work this way.** The answer will be recorded here.
+**ygopro-core: answered (2026-11-08).** edo9300, ygopro-core's author, replied in
+[edo9300/ygopro-core#179](https://github.com/edo9300/ygopro-core/issues/179):
+
+- No separate permission is needed to use the library. When the game is distributed, its source has to be available
+  under the AGPL-3.0, which it is.
+- Changes to the core itself must be under the AGPL from the start. Ours are: [patches/ygopro-core/](patches/ygopro-core/),
+  and every release includes the patched core's source.
+- On the Unity runtime: "you can be assured I won't go after someone linking to the unity runtime."
+- He's happy to be credited under the Project Ignis name.
+
+**CardScripts, BabelCDB, LFLists: we are asking Project Ignis** (a ticket on their Discord server, opened 2026-11-08).
+Their answer will be recorded here.
 
 ## ygopro-core
 

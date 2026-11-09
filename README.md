@@ -199,8 +199,7 @@ To change the game, start with [docs/DEVELOPING.md](docs/DEVELOPING.md). All gui
 
 ## Credits
 
-- [ygopro-core](https://github.com/edo9300/ygopro-core), the rules engine, by edo9300 and contributors.
-- [Project Ignis](https://github.com/ProjectIgnis): card scripts, card database and ban lists.
+- [Project Ignis](https://github.com/ProjectIgnis) (EDOPro): the rules engine ([ygopro-core](https://github.com/edo9300/ygopro-core)), card scripts, card database and ban lists.
 - [YGOPRODeck](https://ygoprodeck.com/api-guide/): card-set data and six YCS Houston 2026 deck lists.
 - [Format Library](https://www.formatlibrary.com): most historic decks and the historic ban lists.
 - [yugiohmeta.com](https://www.yugiohmeta.com): 11 of the newest historic deck lists. All deck sources: [decks/history/SOURCES.md](decks/history/SOURCES.md).

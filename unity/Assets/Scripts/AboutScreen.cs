@@ -32,8 +32,7 @@ namespace YgoCampaign.Game
             + "It's free, so please don't sell it.";
 
         public const string Credits =
-            "• Rules engine: ygopro-core, by edo9300 and contributors.\n"
-            + "• Card scripts, card database and ban lists: Project Ignis (EDOPro).\n"
+            "• Rules engine (ygopro-core), card scripts, card database and ban lists: Project Ignis (EDOPro).\n"
             + "• Card-set data: YGOPRODeck.\n"
             + "• Historic decks and ban lists: Format Library and yugiohmeta.com.\n"
             + "• Made with Unity.";
