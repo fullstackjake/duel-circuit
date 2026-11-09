@@ -13,7 +13,7 @@ out="$root/build/release"
 win="$root/build/windows"
 mac="$root/build/unity/Duel Circuit.app"
 
-if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+if [ -n "$(git status --porcelain --untracked-files=no --ignore-submodules=dirty)" ]; then
   echo "The working tree has changes: commit them, build, then pack." >&2; exit 1
 fi
 commit=$(git rev-parse HEAD)

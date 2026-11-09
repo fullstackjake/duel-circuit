@@ -212,7 +212,7 @@ public static class ProjectSetup
         foreach (var name in new[] { "CC-BY-SA-4.0.txt", "UNITY-PERMISSION.md" })
             File.Copy(Path.Combine(RepoRoot, "LICENSES", name), Path.Combine(to, name), true);
         var commit = Git("rev-parse HEAD");
-        bool changed = Git("status --porcelain --untracked-files=no").Length > 0;
+        bool changed = Git("status --porcelain --untracked-files=no --ignore-submodules=dirty").Length > 0;
         File.WriteAllText(Path.Combine(to, "SOURCE.txt"),
             $"Duel Circuit {PlayerSettings.bundleVersion}\n" +
             $"Built from commit {(commit.Length > 0 ? commit : "unknown")}{(changed ? " with local changes (not a release build)" : "")}\n\n" +
