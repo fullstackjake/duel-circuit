@@ -86,23 +86,26 @@ report and contribute, the content rules: no card art, no Konami assets, origina
 or likenesses; CPUs stay at full strength), CODE_OF_CONDUCT.md (Contributor Covenant), and issue templates (a bug
 report asking for platform, version, `Player.log` and the replay code; a rule against attaching card images).
 
-## 2. Not in this pass: before flipping the repo public
+## 2. Before flipping the repo public
 
-Each is its own task; this pass writes them into the README plan so nothing is forgotten.
+Status after the go-public prep (2026-11-08):
 
-1. **Card-art screenshots in git history**: 17 JPGs under docs/qa/2026-10-25 and 2026-10-26 show official card art.
-   They were deleted from the tree on 2026-11-08 (owner), but that isn't enough: they're still in the history; the cleanest route is a fresh public repo whose first commit is the cleaned
-   tree (the private repo stays as the archive), which also sets the public commit email.
-2. **Release v0.1.0** has no license or notices in the zip and was built before its setup was committed: rebuild from a
-   tag with COPYING, the notices, a "source" note and a patched-core source tarball, or take the asset down.
-3. **An About / Licenses screen in the game** (AGPL section 5(d) asks interactive programs to show the license notice).
-4. **Ask edo9300 for permission** to ship the core inside a Unity build (decision 3); I can draft the message.
-5. **Portrait review**: Kelda Amin's portrait (`art/portraits/ishizu-tearlaments.png`) looks close to an anime
-   character; check all 128 art files for likeness.
-6. **Trim internal notes** (a home-folder path in docs/OVERNIGHT-2026-11-06.md, notes about the owner's picture folder),
-   and decide whether STORY-BIBLE.md (marked private) and the agent handoffs go public.
-7. **GitHub settings**: issues with templates, private vulnerability reporting, secret scanning, branch protection, an
-   "unofficial fan project" description, no sponsor button.
+1. [x] **Card-art screenshots in git history**: done by a fresh repo. The old repo is now the private
+   `fullstackjake/duel-circuit-archive` (full history, release v0.1.0); `fullstackjake/duel-circuit` starts from one
+   commit of the cleaned tree, signed with the owner's GitHub private email.
+2. [x] **Release**: v0.1.1 (pre-release) on the new repo, built from a commit by `tools/make_release.sh`: Windows and
+   Mac zips with a Licenses folder (SOURCE.txt names the commit) and the patched ygopro-core source tarball.
+3. [x] **About / Licenses screen** in the game (main menu → About), `-aboutcheck`.
+4. [ ] **Ask edo9300 and Project Ignis** (draft: docs/dev/PERMISSION-REQUEST-DRAFT.md). Owner sends it; record the
+   answer in THIRD_PARTY_NOTICES.md.
+5. [~] **Portrait review**: Kelda Amin's portrait removed (stand-in until new art, docs/dev/TODO.md). The other art
+   files haven't been checked one by one for likeness.
+6. [x] **Internal notes** trimmed (home path, the owner's picture folder); the story bible is marked as spoilers.
+7. [~] **GitHub settings**: description, topics, issues with forms, wiki and projects off, vulnerability alerts on.
+   Private vulnerability reporting, secret scanning with push protection and branch protection on `main` need a
+   public repo on the free plan: turn them on right after flipping it. The owner's account setting "Block command line
+   pushes that expose my email" is the owner's to switch on (github.com → Settings → Emails).
+8. [ ] **Try the Windows build on a real PC** before announcing it.
 
 ## 3. Screenshots
 
