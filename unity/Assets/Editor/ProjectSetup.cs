@@ -54,14 +54,16 @@ public static class ProjectSetup
 
     /// <summary>
     /// Marks the Windows rules engine (built on the Mac with `tools/build_core.sh --windows`) as usable in 64-bit Windows
-    /// builds only: the editor runs on the Mac and loads the dylib.
+    /// builds and in the editor on Windows. The editor on a Mac loads the dylib instead (each is limited to its own OS).
     /// </summary>
     [MenuItem("YgoCampaign/Configure Windows Plugin")]
     public static void ConfigureWindowsPlugin()
     {
         var importer = (PluginImporter)AssetImporter.GetAtPath(WindowsPluginPath);
         importer.SetCompatibleWithAnyPlatform(false);
-        importer.SetCompatibleWithEditor(false);
+        importer.SetCompatibleWithEditor(true);
+        importer.SetEditorData("OS", "Windows");
+        importer.SetEditorData("CPU", "x86_64");
         importer.SetCompatibleWithPlatform(BuildTarget.StandaloneOSX, false);
         importer.SetCompatibleWithPlatform(BuildTarget.StandaloneWindows, false);
         importer.SetCompatibleWithPlatform(BuildTarget.StandaloneWindows64, true);
@@ -73,7 +75,8 @@ public static class ProjectSetup
     /// <summary>Batch-mode check that the editor can load the native engine.</summary>
     public static void VerifyEngineInEditor()
     {
-        ConfigureNativePlugin();
+        if (Application.platform == RuntimePlatform.WindowsEditor) ConfigureWindowsPlugin();
+        else ConfigureNativePlugin();
         Debug.Log($"ocgcore loaded in editor: version {Ygo.Engine.Duel.CoreVersion}");
     }
 
@@ -85,9 +88,16 @@ public static class ProjectSetup
     [MenuItem("YgoCampaign/Build macOS App")]
     public static void BuildMac()
     {
+#if UNITY_EDITOR_OSX
         ConfigureNativePlugin();
-        // libocgcore.dylib is built for Apple silicon only.
+        // libocgcore.dylib is built for Apple silicon only. (UnityEditor.OSXStandalone exists only where Mac build
+        // support is installed: always in the Mac editor, so the Mac app is built on a Mac.)
         UnityEditor.OSXStandalone.UserBuildSettings.architecture = UnityEditor.Build.OSArchitecture.ARM64;
+#else
+        Debug.LogError("The macOS app is built on a Mac (docs/BUILDING.md); this editor builds the Windows game.");
+        if (Application.isBatchMode) EditorApplication.Exit(1);
+        return;
+#endif
         // The log goes to ~/Library/Logs/YgoCampaign/Duel Circuit/Player.log. Saves and mods stay in ~/Library/Application
         // Support/YgoCampaign/YgoCampaign/mods whatever the name (DuelController pins that folder).
         var output = Build(BuildTarget.StandaloneOSX, Path.Combine("build", "unity", "Duel Circuit.app"));

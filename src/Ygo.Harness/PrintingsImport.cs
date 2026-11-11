@@ -15,6 +15,9 @@ public static class PrintingsImport
         var index = new PrintingIndex();
         var rarities = new Dictionary<Rarity, int>();
         int cards = 0;
+        // How many printings of each set name use each code prefix: the set table can file a set under another code
+        // than its cards carry (e.g. Dark Beginning 2 listed as "DB" while its cards are DB2-...).
+        var prefixesByName = new Dictionary<string, Dictionary<string, int>>();
         foreach (var card in doc.RootElement.GetProperty("data").EnumerateArray())
         {
             if (!card.TryGetProperty("card_sets", out var sets)) continue;
@@ -22,8 +25,12 @@ public static class PrintingsImport
             foreach (var set in sets.EnumerateArray())
             {
                 var rarity = Rarities.Parse(set.GetProperty("set_rarity").GetString() ?? "");
-                printings.Add(new Printing(set.GetProperty("set_code").GetString() ?? "",
-                    set.GetProperty("set_name").GetString() ?? "", rarity));
+                var setCode = set.GetProperty("set_code").GetString() ?? "";
+                var setName = set.GetProperty("set_name").GetString() ?? "";
+                printings.Add(new Printing(setCode, setName, rarity));
+                if (!prefixesByName.TryGetValue(setName, out var counts)) prefixesByName[setName] = counts = new Dictionary<string, int>();
+                var prefix = PrintingIndex.SetPrefix(setCode);
+                counts[prefix] = counts.GetValueOrDefault(prefix) + 1;
                 rarities[rarity] = rarities.GetValueOrDefault(rarity) + 1;
             }
             if (printings.Count == 0) continue;
@@ -39,6 +46,9 @@ public static class PrintingsImport
         if (File.Exists(setsPath))
         {
             using var setsDoc = JsonDocument.Parse(File.ReadAllBytes(setsPath));
+            var tableCodes = new HashSet<string>(setsDoc.RootElement.EnumerateArray()
+                .Select(s => s.TryGetProperty("set_code", out var c) ? c.GetString() ?? "" : ""));
+            var aliased = new List<string>();
             foreach (var set in setsDoc.RootElement.EnumerateArray())
             {
                 var code = set.TryGetProperty("set_code", out var c) ? c.GetString() ?? "" : "";
@@ -53,10 +63,22 @@ public static class PrintingsImport
                 // Several sets can share a prefix (e.g. reprint editions); keep the earliest dated one's details.
                 if (!index.Sets.TryGetValue(code, out var existing) || string.CompareOrdinal(info.Date, existing.Date) < 0 && info.Date.Length > 0)
                     index.Sets[code] = info;
+                // The table files this set under another code than most of its printings carry, and no set in the table
+                // has that code: file it under the printings' code too, so the set isn't lost.
+                if (prefixesByName.TryGetValue(info.Name, out var counts) && counts.Count > 0)
+                {
+                    var main = counts.OrderByDescending(p => p.Value).ThenBy(p => p.Key, StringComparer.Ordinal).First().Key;
+                    if (main != code && main.Length > 0 && !tableCodes.Contains(main) && !index.Sets.ContainsKey(main))
+                    {
+                        index.Sets[main] = new SetInfo { Code = main, Name = info.Name, Date = info.Date, CardCount = info.CardCount };
+                        aliased.Add($"{info.Name} ({code} in the set table, {main} on its cards)");
+                    }
+                }
                 // A printing is dated by its set's name (F3): every name's date, the earliest when a name repeats.
                 if (info.Name.Length > 0 && info.Date.Length >= 7 && (!index.NameDates.TryGetValue(info.Name, out var had) || string.CompareOrdinal(info.Date, had) < 0))
                     index.NameDates[info.Name] = info.Date;
             }
+            foreach (var line in aliased) Console.WriteLine($"  filed under its cards' code: {line}");
         }
         // Reprints the source files under an older set's name and code (campaign/printing-dates.txt; the json is in data/ygoprodeck/).
         var reprintsPath = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Path.GetFullPath(jsonPath))))!, "campaign", ReprintsFile);

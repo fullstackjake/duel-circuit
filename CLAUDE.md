@@ -46,8 +46,10 @@ Unity front end (unity/Assets/Scripts)     Harness (src/Ygo.Harness)
 
 ## Build and check
 
-Official builds need an Apple-silicon Mac (the Windows game is built there too). The harness runs anywhere with the
-.NET 7 runtime; a prebuilt Windows `ocgcore.dll` is in `unity/Assets/Plugins/Windows/x86_64/`.
+An Apple-silicon Mac builds both games; a Windows PC builds the Windows game (docs/BUILDING.md#build-on-windows).
+On Windows, the harness and the Unity editor use the prebuilt `unity/Assets/Plugins/Windows/x86_64/ocgcore.dll`; the
+harness runs on .NET 7 or newer (`RollForward`). Text files must keep LF endings (`.gitattributes`): campaign code and
+tests match on `"\n"`, so CRLF checkouts break them. Fetch submodules with `-c core.autocrlf=false`.
 
 ```bash
 dotnet build src/Ygo.Harness -c Release            # -> build/bin/Ygo.Harness/Release/net7.0/

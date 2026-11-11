@@ -4,14 +4,16 @@ This guide takes you from an empty folder to the game running in the Unity edito
 you can share. You don't need to have built a game before: every step is a command to copy, with a line on what it
 does and what you should see.
 
-Building works on a **Mac with Apple silicon** (M1 or newer). The Windows game is built on the Mac too. Building on an
-Intel Mac, on Windows or on Linux isn't supported yet.
+Building works on a **Mac with Apple silicon** (M1 or newer), which builds both games, or on a **64-bit Windows PC**,
+which builds the Windows game ([Build on Windows](#build-on-windows)). Building on an Intel Mac or on Linux isn't
+supported yet.
 
 - [What you need](#what-you-need)
 - [Build from a fresh clone](#build-from-a-fresh-clone)
 - [Play in the Unity editor](#play-in-the-unity-editor)
 - [Build the Mac app](#build-the-mac-app)
 - [Build the Windows game](#build-the-windows-game)
+- [Build on Windows](#build-on-windows)
 - [Share a build as a GitHub release](#share-a-build-as-a-github-release)
 - [Update to the newest cards](#update-to-the-newest-cards)
 - [Troubleshooting](#troubleshooting)
@@ -23,7 +25,7 @@ Intel Mac, on Windows or on Linux isn't supported yet.
 | A Mac with Apple silicon | The rules engine is built for it |
 | Xcode's command line tools | The C++ compiler for the rules engine |
 | [Homebrew](https://brew.sh), then meson and ninja | The rules engine's build tools |
-| The [.NET 7 SDK](https://dotnet.microsoft.com/download/dotnet/7.0) | Builds and runs the harness (the console app the game's tools run from) |
+| The [.NET 7 SDK](https://dotnet.microsoft.com/download/dotnet/7.0) or newer | Builds and runs the harness (the console app the game's tools run from) |
 | [Unity Hub](https://unity.com/download) with Unity **6000.3.27f1** | Runs and builds the game |
 | Unity's **Windows Build Support (Mono)** module | Only if you build the Windows game |
 | mingw-w64 | Only if you rebuild the Windows rules engine (rarely: see [step 3](#3-build-the-rules-engine)) |
@@ -238,6 +240,48 @@ Copy the whole folder to a PC (zip it: see the next section).
 Building for Windows switches the Unity project to Windows. The Mac build command above passes
 `-buildTarget OSXUniversal`, which switches it back, so always keep that part.
 
+## Build on Windows
+
+A 64-bit Windows 10 or 11 PC can build and play the Windows game. It uses the prebuilt
+`unity/Assets/Plugins/Windows/x86_64/ocgcore.dll`, so you don't build the rules engine (skip step 3), and the Unity
+editor loads that DLL when you press Play.
+
+You need [Git for Windows](https://git-scm.com/download/win) (its **Git Bash** runs the commands in this guide), the
+[.NET SDK](https://dotnet.microsoft.com/download) 7 or newer, and [Unity Hub](https://unity.com/download) with
+**6000.3.27f1** (installed as in [What you need](#what-you-need); the Windows editor builds Windows games without an
+extra module). Python 3 runs the deck checks: on Windows the command is `python` (or `py`), not `python3`. If
+`python` opens the Microsoft Store instead, turn off the **python.exe** and **python3.exe** entries in **Settings →
+Apps → Advanced app settings → App execution aliases**.
+
+1. Do steps 1, 2 and 4 to 8 of [Build from a fresh clone](#build-from-a-fresh-clone) in Git Bash. The repository's
+   `.gitattributes` keeps text files with Unix line endings; the data files and the checks expect them. Fetch the
+   submodules the same way, and keep them that way:
+
+```bash
+git -c core.autocrlf=false submodule update --init && git submodule foreach git config core.autocrlf false
+```
+
+2. [Play in the Unity editor](#play-in-the-unity-editor) works as on the Mac.
+3. Build from the editor's menu **YgoCampaign → Build Windows Game**, or from Git Bash with the editor closed:
+
+```bash
+"/c/Program Files/Unity/Hub/Editor/6000.3.27f1/Editor/Unity.exe" -batchmode -quit -projectPath unity -buildTarget Win64 -executeMethod ProjectSetup.BuildWindows -logFile build/windows/build.log
+```
+
+That's Unity Hub's default folder. If you set another **Installs location** in Hub's Preferences (for example on a
+bigger drive), use the `Unity.exe` there instead, such as `/g/Unity/hub/editor/6000.3.27f1/Editor/Unity.exe`.
+
+The game lands in `build/windows/`; zip that folder to share it. `tools/make_release.sh` needs both builds, so a
+release with the Mac app is still made on the Mac. The macOS menu item only works in the Mac editor.
+
+The [app checks](DEVELOPING.md#app-checks) run on Windows too: build a check copy with
+`-buildout "build/qa-win/Duel Circuit.exe"`, then run `build/qa-win/Duel Circuit.exe` with the same flags as on the
+Mac, passing Windows paths (in Git Bash, `cygpath -w` turns a path into one). Don't add `-batchmode` or
+`-nographics`: the screenshots come out black and the sound checks fail.
+
+If a clone made before `.gitattributes` has Windows line endings (`git ls-files --eol | grep w/crlf` lists files),
+check out the files again with your changes committed or stashed: `git rm -rq --cached . && git reset -q --hard`.
+
 ## Share a build as a GitHub release
 
 A release is made from one commit, so its source is easy to find (the license asks for that).
@@ -305,8 +349,9 @@ cards sometimes change ids).
 **`DllNotFoundException: Unable to load shared library 'ocgcore'`** from the harness: the harness was built before the
 rules engine, so it has no copy of it. Run `tools/build_core.sh`, then `dotnet build src/Ygo.Harness -c Release` again.
 
-**`You must install or update .NET to run this application`** (it names version 7.0): the harness needs the .NET 7
-runtime, which comes with the .NET 7 SDK. A newer .NET alone isn't enough. Install the .NET 7 SDK and try again.
+**`You must install or update .NET to run this application`** (it names version 7.0): the harness runs on .NET 7 or
+any newer .NET. Install a .NET SDK from [dotnet.microsoft.com](https://dotnet.microsoft.com/download), rebuild the
+harness and try again.
 
 **`Build stopped: Assets/StreamingAssets/cards.bin is missing`** (or `printings.bin`) in `build/unity/build.log`: run
 [step 5](#5-export-the-card-data) or [step 7](#7-export-the-printings), then build again.

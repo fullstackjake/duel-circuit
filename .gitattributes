@@ -1,0 +1,11 @@
+# Keep text files with Unix (LF) line endings on every platform, so a checkout on Windows matches the Mac's byte for
+# byte (campaign data, decks, profiles, patches and shell scripts are read or applied as-is).
+* text=auto eol=lf
+
+# Binary files: never touch.
+*.png binary
+*.jpg binary
+*.dll binary
+*.dylib binary
+*.bin binary
+*.cdb binary

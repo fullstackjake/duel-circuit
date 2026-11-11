@@ -6,6 +6,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Ygo.Harness</RootNamespace>
+    <!-- Run on a newer .NET when 7 isn't installed (.NET 7 is out of support). -->
+    <RollForward>Major</RollForward>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,11 +15,19 @@
     <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.20" />
   </ItemGroup>
 
-  <!-- The native rules engine built from vendor/ygopro-core (see README). -->
-  <ItemGroup>
+  <!-- The native rules engine: on a Mac, built from vendor/ygopro-core by tools/build_core.sh (see docs/BUILDING.md). -->
+  <ItemGroup Condition="!$([MSBuild]::IsOSPlatform('Windows'))">
     <None Include="..\..\vendor\ygopro-core\build\libocgcore.dylib" Condition="Exists('..\..\vendor\ygopro-core\build\libocgcore.dylib')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>libocgcore.dylib</Link>
+    </None>
+  </ItemGroup>
+
+  <!-- On Windows, the prebuilt 64-bit DLL the game ships (rebuilt by tools/build_core.sh with its windows option). -->
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <None Include="..\..\unity\Assets\Plugins\Windows\x86_64\ocgcore.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>ocgcore.dll</Link>
     </None>
   </ItemGroup>
 
