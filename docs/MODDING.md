@@ -56,9 +56,10 @@ What goes where inside it:
 | `decks/` | Your decks (`.ydk`) | The game and you |
 | `replays/` | Saved replays; `replays/recent` keeps the last 30 duels | The game |
 | `settings.txt` | Card picture folders | You |
-| `cards/images/` | Your card pictures | You |
+| `cards/images/` | Your card pictures | You, or **Import Cards** in the main menu |
+| `cards/hd/` | Bigger (HD) card pictures | You, or **Import Cards** |
 | `cards/styles/<style>/` | Other art styles of cards | You |
-| `cards/back.png` | A card back | You |
+| `cards/back.png` (or `back.jpg`) | A card back | You, or **Import Cards** |
 | `cards/art-styles.txt` | Which style each card shows | The game |
 | `lflists/` | Extra ban lists (`.conf`) | You |
 | `portraits/` | Portraits and expressions that replace or add to the game's | You |

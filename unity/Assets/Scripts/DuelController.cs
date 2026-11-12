@@ -57,6 +57,7 @@ namespace YgoCampaign.Game
         private MainMenu _menu = null!;
         private SettingsScreen _settings = null!;
         private AboutScreen _about = null!;
+        private ImportScreen _import = null!;
         private int _ticks;          // redraws so far in this duel (a replay position)
         private bool _sawNewTurn;
         private bool _shownReplayEnd;
@@ -141,7 +142,7 @@ namespace YgoCampaign.Game
             _view.SettingsClicked += () => { _settingsFromDuel = true; _pausedBeforeSettings = _paused; _paused = true; UpdateControls(); _settings.Open(); };
             _view.IsPaused = () => _paused;
             // Screens over the board (a story, the menu, Settings): the board's keys (Space, P, B, E) are theirs then.
-            _view.KeysElsewhere = () => _storyScreen.IsOpen || _menu.IsOpen || _settings.IsOpen || _about.IsOpen || _editor.IsOpen || _shop.IsOpen;
+            _view.KeysElsewhere = () => _storyScreen.IsOpen || _menu.IsOpen || _settings.IsOpen || _about.IsOpen || _import.IsOpen || _editor.IsOpen || _shop.IsOpen;
             _view.CanConcede = () => _runner != null && !_runner.IsFinished && _human != null && _watching == null && _lessonJudge == null;
             _view.Concede = ConcedeDuel;
             _view.CanSkipTurn = CanSkipTurn;
@@ -439,6 +440,10 @@ namespace YgoCampaign.Game
             _about = gameObject.AddComponent<AboutScreen>();
             _about.Init();
             _about.Closed += () => _menu.Open();
+            // Import Cards (card pictures and the card back, into mods/cards), from the menu and back to it.
+            _import = gameObject.AddComponent<ImportScreen>();
+            _import.Init();
+            _import.Closed += () => _menu.Open();
             _title.Continue += () => { _title.Close(); _paused = true; UpdateControls(); _menu.Open(); };
             _title.Attract += on =>
             {
@@ -529,6 +534,7 @@ namespace YgoCampaign.Game
                     case MainMenu.Choice.Replays: _menu.Close(); _browserFromMenu = true; _browser.Open(); break;
                     case MainMenu.Choice.Settings: _menu.Close(); _settings.Open(); break;
                     case MainMenu.Choice.About: _menu.Close(); _about.Open(); break;
+                    case MainMenu.Choice.ImportCards: _menu.Close(); _import.Open(); break;
                     // Over a campaign duel the save has it live (since its Duel!): the next launch settles it as a loss, as
                     // after Cmd-Q or a crash (CampaignState.LiveDuel). Nothing is recorded here, so it's never counted twice.
                     case MainMenu.Choice.Quit: Application.Quit(); break;
@@ -692,9 +698,13 @@ namespace YgoCampaign.Game
             // `-aboutcheck <folder> [-aboutlicenses <folder>]` (absolute): the About screen from the menu (DuelController.AboutCheck).
             var aboutCheck = Arg("-aboutcheck");
             if (aboutCheck != null) StartCoroutine(AboutCheck(aboutCheck, Arg("-aboutlicenses")));
+            // `-importcheck <folder>` (absolute; with -mods <empty folder>): Import Cards from the menu, with test pictures it
+            // makes itself (DuelController.ImportCheck).
+            var importCheck = Arg("-importcheck");
+            if (importCheck != null) StartCoroutine(ImportCheck(importCheck));
 
             // Players start on the title screen; automated checks go straight to what they test.
-            var checks = new[] { "-autoshot", "-autoshot-end", "-editor", "-fxshots", "-replaycheck", "-campaigncheck", "-finalcheck", "-laddercheck", "-themecheck", "-shopcheck", "-alleycheck", "-tagcheck", "-boardcheck", "-matcheck", "-foilshowcase", "-gradeshowcase", "-slabreveal", "-artcheck", "-autoclick", "-p0", "-p1", "-layoutcheck", "-pilecheck", "-controlscheck", "-qaplay", "-qareplay", "-ordercheck", "-musiccheck", "-stylecheck", "-clickcheck", "-ydkcheck", "-searchcheck", "-aboutcheck" };
+            var checks = new[] { "-autoshot", "-autoshot-end", "-editor", "-fxshots", "-replaycheck", "-campaigncheck", "-finalcheck", "-laddercheck", "-themecheck", "-shopcheck", "-alleycheck", "-tagcheck", "-boardcheck", "-matcheck", "-foilshowcase", "-gradeshowcase", "-slabreveal", "-artcheck", "-autoclick", "-p0", "-p1", "-layoutcheck", "-pilecheck", "-controlscheck", "-qaplay", "-qareplay", "-ordercheck", "-musiccheck", "-stylecheck", "-clickcheck", "-ydkcheck", "-searchcheck", "-aboutcheck", "-importcheck" };
             PromptTiming = checks.Any(c => Array.IndexOf(args, c) >= 0); // checks log decisions left waiting
             // A check that throws stops its coroutine; without this the app would sit there forever. Fail and quit instead.
             if (PromptTiming)
@@ -706,7 +716,7 @@ namespace YgoCampaign.Game
                 };
             // Checks skip the coin toss (you go first) so their duels stay as they were; QA play tosses like a player.
             _autoToss = PromptTiming && Array.IndexOf(args, "-qaplay") < 0;
-            if (menuCheck != null || aboutCheck != null || !checks.Any(c => Array.IndexOf(args, c) >= 0))
+            if (menuCheck != null || aboutCheck != null || importCheck != null || !checks.Any(c => Array.IndexOf(args, c) >= 0))
             {
                 _paused = true;
                 UpdateControls();
@@ -2336,7 +2346,7 @@ namespace YgoCampaign.Game
         private void UpdateMusic()
         {
             bool menus = _editor.IsOpen || _browser.IsOpen || _campaignScreen.IsOpen || _shop.IsOpen || _menu.IsOpen || _settings.IsOpen || _about.IsOpen
-                         || _trader.IsOpen || _recipeBook.IsOpen || _structures.IsOpen || _scenes.IsOpen || _tagSetup.IsOpen || _storyScreen.IsOpen || (_title.IsOpen && !_title.InAttract)
+                         || _import.IsOpen || _trader.IsOpen || _recipeBook.IsOpen || _structures.IsOpen || _scenes.IsOpen || _tagSetup.IsOpen || _storyScreen.IsOpen || (_title.IsOpen && !_title.InAttract)
                          || _van.IsOpen;
             Sounds.Music(menus ? "menu" : _runner != null ? "duel" : "menu");
             // The alley's rain bed, under whatever plays, while the Back Alley tab or Moth's van is shown (or a story scene
@@ -2388,7 +2398,7 @@ namespace YgoCampaign.Game
             WatchChainLesson();
             UpdateMusic();
             if (_runner == null || _duel == null || _runner.IsFinished || _editor.IsOpen || _browser.IsOpen
-                || _campaignScreen.IsOpen || _shop.IsOpen || _menu.IsOpen || _settings.IsOpen || _about.IsOpen || _tagSetup.IsOpen || _van.IsOpen
+                || _campaignScreen.IsOpen || _shop.IsOpen || _menu.IsOpen || _settings.IsOpen || _about.IsOpen || _import.IsOpen || _tagSetup.IsOpen || _van.IsOpen
                 || _storyScreen.IsOpen // a story scene holds the duel until it's read
                 || (_title.IsOpen && !_title.InAttract)) return;
             if (SkipStep()) return; // skipping the opponent's turn: it runs the duel itself
@@ -5851,6 +5861,7 @@ namespace YgoCampaign.Game
         private void ControllerBack()
         {
             if (_about.IsOpen) _about.Back();
+            else if (_import.IsOpen) _import.Back();
             else if (_editor.IsOpen) _editor.ControllerBack();
             else if (_bracketScreen.IsOpen || _bracketScreen.EntryOpen) _bracketScreen.ControllerBack();
             else if (_view.ReaderOpen) _view.CloseReader();

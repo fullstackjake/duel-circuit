@@ -215,7 +215,7 @@ namespace YgoCampaign.Game
     /// </summary>
     public sealed class MainMenu : MonoBehaviour
     {
-        public enum Choice { Campaign, FreeDuel, TagDuel, DeckEditor, Replays, Settings, Quit, BackToDuel, Concede, About }
+        public enum Choice { Campaign, FreeDuel, TagDuel, DeckEditor, Replays, Settings, Quit, BackToDuel, Concede, About, ImportCards }
 
         private sealed class Item
         {
@@ -223,8 +223,29 @@ namespace YgoCampaign.Game
             public string Label = "";
             public Image Background = null!;
             public Text Title = null!, Subtitle = null!;
+            public RectTransform Box = null!;
             public bool Locked;
         }
+
+        /// <summary>
+        /// For checks: each option's box, title box and subtitle box in the 1920x1080 layout from its top-left, with its texts,
+        /// and where the notice line at the bottom starts.
+        /// </summary>
+        public (List<(Choice choice, Rect box, Rect title, Rect subtitle, Text titleText, Text subtitleText)> items, float noticeTop) DebugGeometry()
+        {
+            var corners = new Vector3[4];
+            Rect Of(RectTransform rt)
+            {
+                rt.GetWorldCorners(corners);
+                var a = _root.InverseTransformPoint(corners[0]);
+                var b = _root.InverseTransformPoint(corners[2]);
+                var size = _root.rect.size;
+                return Rect.MinMaxRect(a.x + size.x / 2, size.y / 2 - b.y, b.x + size.x / 2, size.y / 2 - a.y);
+            }
+            var list = _items.Select(i => (i.Choice, Of(i.Box), Of(i.Title.rectTransform), Of(i.Subtitle.rectTransform), i.Title, i.Subtitle)).ToList();
+            return (list, Of(_notice).yMin);
+        }
+        private RectTransform _notice = null!;
 
         private RectTransform _root = null!, _showcase = null!;
         private readonly List<Item> _items = new List<Item>();
@@ -273,6 +294,7 @@ namespace YgoCampaign.Game
                 () => "Build with every card. Your campaign decks are here too, as recipes to copy.",
                 () => "Watch and share recorded duels.",
                 () => "Foils, animation speed, window mode, card pictures.",
+                () => "Add your own card pictures: a zip or image files.",
                 () => "Licenses, credits and the source code.",
                 () => "",
             };
@@ -303,7 +325,7 @@ namespace YgoCampaign.Game
                             item.Locked = !CanConcede();
                             subtitle = item.Locked ? "You're watching this duel: it plays to the end." : "Give up this duel. It counts as a loss.";
                             break;
-                        case Choice.TagDuel: case Choice.DeckEditor: case Choice.Replays:
+                        case Choice.TagDuel: case Choice.DeckEditor: case Choice.Replays: case Choice.ImportCards:
                             item.Locked = true;
                             subtitle = "Finish or concede your duel first.";
                             break;
@@ -348,30 +370,31 @@ namespace YgoCampaign.Game
             }
 
             var labels = new[] { ("Campaign", Choice.Campaign), ("Free Duel", Choice.FreeDuel), ("Tag Duel", Choice.TagDuel), ("Deck Editor", Choice.DeckEditor),
-                ("Replays", Choice.Replays), ("Settings", Choice.Settings), ("About", Choice.About), ("Quit", Choice.Quit) };
+                ("Replays", Choice.Replays), ("Settings", Choice.Settings), ("Import Cards", Choice.ImportCards), ("About", Choice.About), ("Quit", Choice.Quit) };
             float y = 210;
             for (int i = 0; i < labels.Length; i++)
             {
                 var (label, choice) = labels[i];
                 bool big = i == 0;
-                // Eight options: the small ones 88 apart (76 tall), so the last ends clear of the notice at the bottom.
-                var h = big ? 150f : 88f;
+                // Nine options: the small ones 80 apart (68 tall), so the last ends at 1006, clear of the notice at 1040.
+                var h = big ? 150f : 80f;
                 var rt = Ui.Box(_root, 110, y, 760, h - 12);
                 var bg = Ui.Image(rt, Ui.Hex("#1A2030"));
-                var text = Ui.Text(Ui.Box(rt, 36, big ? 14 : 6, 700, big ? 70 : 44), label.ToUpperInvariant(), big ? 46 : 30, Color.white, TextAnchor.MiddleLeft);
+                var text = Ui.Text(Ui.Box(rt, 36, big ? 14 : 4, 700, big ? 70 : 40), label.ToUpperInvariant(), big ? 46 : 30, Color.white, TextAnchor.MiddleLeft);
                 text.fontStyle = FontStyle.Bold;
-                var sub = Ui.Text(Ui.Box(rt, 38, big ? 86 : 50, 700, big ? 44 : 24), "", big ? 19 : 15, new Color(0.72f, 0.76f, 0.86f), TextAnchor.UpperLeft);
+                var sub = Ui.Text(Ui.Box(rt, 38, big ? 86 : 44, 700, big ? 44 : 22), "", big ? 19 : 15, new Color(0.72f, 0.76f, 0.86f), TextAnchor.UpperLeft);
                 sub.supportRichText = true;
                 int index = i;
                 Ui.Clickable(rt, () => Choose(index), hover: () => Focus(index));
-                _items.Add(new Item { Home = choice, Choice = choice, Label = label, Background = bg, Title = text, Subtitle = sub });
+                _items.Add(new Item { Home = choice, Choice = choice, Label = label, Background = bg, Title = text, Subtitle = sub, Box = rt });
                 y += h + (big ? 18 : 0);
             }
 
             _showcase = Ui.Placed("Showcase", _root, new Vector2(470, 40), new Vector2(380, 554));
             _stats = Ui.Text(Ui.Placed("Stats", _root, new Vector2(470, -300), new Vector2(700, 90)), "", 17, new Color(0.8f, 0.83f, 0.9f));
             _stats.supportRichText = true;
-            Ui.Text(Ui.Box(_root, 30, 1040, 1860, 30), $"{GameInfo.Version}   ·   {GameInfo.Notice}", 14, new Color(1, 1, 1, 0.6f));
+            _notice = Ui.Box(_root, 30, 1040, 1860, 30);
+            Ui.Text(_notice, $"{GameInfo.Version}   ·   {GameInfo.Notice}", 14, new Color(1, 1, 1, 0.6f));
         }
 
         private void ShowCard()

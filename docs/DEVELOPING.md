@@ -209,6 +209,7 @@ than one game (`--games N`) runs quietly and prints totals. Pass two `.ydk` path
 | `--ui-test` | The human seat played with random clicks through the same choice lists the game shows; reports every prompt type and rejected answers. `--responses auto\|on\|off` picks the Chain prompt mode |
 | `--deckbuilding-test` | The deck editor's engine pieces: search, ban lists, validation, odds, codes, the tester; historic decks legal under their lists |
 | `--campaign-test` | The shop, pack odds, circuit payouts and unlocks, the copy cap, collection rules, saving, the story's triggers and speakers |
+| `--import-test` | The card picture importer (Import Cards) on stand-in files in a temp folder: names, zips, existing pictures with both answers, size limits, unsafe names, cancel, the card back. Uses no card pictures |
 | `--copies-test` | Each card keeps its copy's look through a duel; old replays still deal the same |
 | `--profile-check <save>` | Loads a save (migrating an old one), reports its copies by grade; only reads the file |
 | `--replay-test` | Bot duels round-tripped through replay codes, every core message compared |
@@ -317,6 +318,7 @@ A check that stops on an exception logs `check: FAIL the check stopped on an exc
 | `-searchcheck <folder>` | The deck editor's card search |
 | `-aboutcheck <folder> [-aboutlicenses <folder>]` | The About screen: every notice, the license and third-party readers, missing files, keys, controller and mouse; it never opens a browser or Finder |
 | `-ydkcheck <folder> -ydkfile <.ydk> -ydkfixture <.ydk>` | Importing `.ydk` files from paths |
+| `-importcheck <folder>` | The Import Cards screen: the menu and screen layout, a zip, loose pictures and bad names, Keep mine and Replace them, HD, the card back, Cancel. It makes its own flat-colour pictures and never opens the file dialog |
 | `-artcheck <folder>` | Card picture load times and memory (needs an HD picture folder) |
 | `-editor <deck> -versioncheck <folder>` | Switching card versions in the editor |
 

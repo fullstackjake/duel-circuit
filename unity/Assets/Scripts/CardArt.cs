@@ -14,8 +14,8 @@ namespace YgoCampaign.Game
     /// <item>mods/cards/images/ (your own pictures)</item>
     /// <item>an EDOPro "pics" folder: set "edopro_pics: /path/to/pics" in mods/settings.txt, pass -pics &lt;path&gt;,
     /// or keep EDOPro in a common place (~/ProjectIgnis, ~/Applications/ProjectIgnis, ~/Downloads/ProjectIgnis).</item>
-    /// <item>HD picture folders: an "hd_pics: /path/to/pics" line in mods/settings.txt for each (or -hdpics &lt;path&gt;,
-    /// comma-separated for several, "off" for none this run).</item>
+    /// <item>HD picture folders: mods/cards/hd (filled by Import Cards), and an "hd_pics: /path/to/pics" line in
+    /// mods/settings.txt for each other (or -hdpics &lt;path&gt;, comma-separated for several, "off" for none this run).</item>
     /// </list>
     /// When a card has a picture in more than one of them, the biggest wins (by pixel size, read from the files' headers).
     /// Alternate artworks fall back to their base card's picture. Cards without a picture keep the text look. Pictures are
@@ -61,6 +61,16 @@ namespace YgoCampaign.Game
         private string _preferred = Standard;
 
         public string StylesRoot => Path.Combine(ModsRoot, "cards", "styles");
+        /// <summary>The player's own card pictures (mods/cards/images): Import Cards' Card Images.</summary>
+        public string ImagesFolder => Path.Combine(ModsRoot, "cards", "images");
+        /// <summary>The game's own HD folder (mods/cards/hd), always read: Import Cards' High Resolution Card Images.</summary>
+        public string HdFolder => Path.Combine(ModsRoot, "cards", "hd");
+        /// <summary>mods/cards, where the card back (back.png or back.jpg) goes.</summary>
+        public string CardsFolder => Path.Combine(ModsRoot, "cards");
+        /// <summary>Folder names compare without case on Windows (E:\Mods and e:\mods are one folder), exactly elsewhere.</summary>
+        private static StringComparison PathCase =>
+            Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor
+                ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
         public string ChoicesFile => Path.Combine(ModsRoot, "cards", "art-styles.txt");
 
         /// <summary>A card's art style changed (its id), or 0 when the preferred style changed (every card).</summary>
@@ -101,15 +111,16 @@ namespace YgoCampaign.Game
         {
             _cards = cards;
             ModsRoot = modsRoot;
-            var own = Path.Combine(modsRoot, "cards", "images");
+            var own = ImagesFolder;
             Directory.CreateDirectory(own); // so players can find where to put pictures
             _folders.Add(own);
 
             var settings = Path.Combine(modsRoot, "settings.txt");
             var edopro = picsOverride ?? ReadSetting(settings, "edopro_pics") ?? FindEdoproPics();
             if (!string.IsNullOrEmpty(edopro) && Directory.Exists(edopro)) _folders.Add(_edopro = edopro!);
+            bool hdOff = hdOverride != null && hdOverride.Any(h => h.Trim().Equals("off", StringComparison.OrdinalIgnoreCase));
             var hd = hdOverride == null ? ReadSettings(settings, "hd_pics")
-                : hdOverride.Any(h => h.Trim().Equals("off", StringComparison.OrdinalIgnoreCase)) ? new List<string>()
+                : hdOff ? new List<string>()
                 : new List<string>(hdOverride);
             foreach (var folder in hd)
             {
@@ -120,6 +131,19 @@ namespace YgoCampaign.Game
                 {
                     _folders.Add(path);
                     _hd.Add(path);
+                }
+            }
+            // The game's own HD folder (Import Cards fills it), read as an hd_pics: line would be: not twice when a line
+            // names it already (the same Normal() comparison), and not with -hdpics off.
+            if (!hdOff)
+            {
+                try { Directory.CreateDirectory(HdFolder); }
+                catch (Exception e) when (e is IOException || e is UnauthorizedAccessException) { Debug.LogWarning($"Couldn't make {HdFolder}: {e.Message}"); }
+                var ownHd = Normal(HdFolder);
+                if (Directory.Exists(ownHd) && !_folders.Any(f => string.Equals(Normal(f), ownHd, PathCase)))
+                {
+                    _folders.Add(ownHd);
+                    _hd.Add(ownHd);
                 }
             }
             // Kept in ~/Library/Caches on a Mac (the temporary folder is emptied every few days).
@@ -134,6 +158,8 @@ namespace YgoCampaign.Game
         /// <summary>The EDOPro pictures folder in use (null: none), and the HD folders, as given to a new lookup (style check).</summary>
         public string? EdoproFolder => _edopro;
         public IReadOnlyList<string> HdFolders => _hd;
+        /// <summary>Whether the game's own HD folder is read on this run (not with -hdpics off).</summary>
+        public bool ReadsHdFolder => _hd.Any(f => string.Equals(Normal(f), Normal(HdFolder), PathCase));
         private readonly List<string> _hd = new List<string>();
 
         /// <summary>A folder's full path without a trailing separator, so "pics" and "pics/" are one folder.</summary>
@@ -457,6 +483,39 @@ namespace YgoCampaign.Game
                             if (uint.TryParse(Path.GetFileNameWithoutExtension(file), out var code)) set.Add(code);
                 return _installed = new List<uint>(set);
             }
+        }
+
+        /// <summary>Card pictures in one folder ("&lt;card id&gt;.jpg / .png / .jpeg", a card counted once): Import Cards' counts.</summary>
+        public int CountIn(string folder)
+        {
+            var codes = new HashSet<uint>();
+            try
+            {
+                if (!Directory.Exists(folder)) return 0;
+                foreach (var file in Directory.EnumerateFiles(folder))
+                    if (Array.IndexOf(Extensions, Path.GetExtension(file).ToLowerInvariant()) >= 0
+                        && uint.TryParse(Path.GetFileNameWithoutExtension(file), out var code)) codes.Add(code);
+            }
+            catch (Exception e) when (e is IOException || e is UnauthorizedAccessException) { }
+            return codes.Count;
+        }
+
+        /// <summary>
+        /// Pictures changed on disk (Import Cards): forgets the file lookups, the installed list, art keys, loaded pictures and
+        /// the card back, reads the style folders again, and raises <see cref="Changed"/>(0) so open views redraw. The disk
+        /// cache needs nothing: an entry whose source file's length or write time changed is made again (ArtLoader.ReadCache),
+        /// and one for a deleted file is never read and goes when the cache trims. Textures a view may still show aren't
+        /// destroyed here (see <see cref="Drop"/> and <see cref="FreeRetired"/>).
+        /// </summary>
+        public void Refresh()
+        {
+            _installed = null;
+            // The old back may still be on screen (a pile, a preview): retired, destroyed once nothing shows it.
+            if (_back != null) _retired.Add(_back);
+            _back = null;
+            _backLoaded = false;
+            ScanStyles(); // also forgets art keys, loaded pictures and file lookups (ForgetAll)
+            Changed?.Invoke(0);
         }
 
         /// <summary>How many cards have a Standard picture (a card with pictures in several folders counts once).</summary>

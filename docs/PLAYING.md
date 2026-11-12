@@ -28,6 +28,7 @@ This guide covers duels, the deck editor, controls and settings. For the campaig
 | **Deck Editor** | Build decks with every card. |
 | **Replays** | Watch, keep and share your past duels. |
 | **Settings** | Sound, speed, motion, foils, card pictures and controller buttons. |
+| **Import Cards** | Add your own card pictures from a zip or picture files ([CARD-PICTURES.md](CARD-PICTURES.md#import-from-the-game)). Shut during a campaign duel. |
 | **About** | Licenses, credits and where to get the source code. |
 | **Quit** | Close the game. |
 
@@ -194,7 +195,7 @@ The top row has **Save**, **New**, **Delete**, **Decks...** (open another deck),
 | **Clear** | Empties the deck |
 | **Test hand** | Draws a test opening hand (5 or 6 cards) |
 | **Import** | Reads a deck you've copied: a YDKE link or a `.ydk` file's text |
-| **Import .ydk** | Opens a `.ydk` file (Mac only for now) |
+| **Import .ydk** | Opens a `.ydk` file |
 | **Export** | Copies the deck as a YDKE link, to paste anywhere |
 
 A **YDKE link** is the deck-sharing link that EDOPro and deck websites make. A **`.ydk` file** is a deck file in the
@@ -204,6 +205,10 @@ In the campaign, **Import** and **Export** are replaced by **Auto-fix**, **Build
 [CAMPAIGN.md](CAMPAIGN.md#your-decks-in-the-campaign)).
 
 **Bringing in an EDOPro deck:**
+1. In the deck editor, click **Import .ydk**.
+2. Pick the `.ydk` file in the window that opens.
+
+Or copy the file's text instead:
 1. Open the `.ydk` file in a text editor (Notepad on Windows, TextEdit on a Mac).
 2. Select all the text and copy it.
 3. In the deck editor, click **Import**.
@@ -469,10 +474,8 @@ ones most likely to affect you.
 - The game has no publisher signature, so Windows and macOS warn you the first time you open it. See
   [Install and play](../README.md#install-and-play).
 
-### Things that only work on a Mac for now
+### Things that work better on a Mac for now
 
-- **Import .ydk** (picking a deck file). On Windows, open the file in Notepad, copy all of its text, and click
-  **Import** in the deck editor instead.
 - On Windows, when the game window isn't in front, your first click only brings it to the front.
 - On Windows, the window can be made very small. (The game still remembers the window's size on both.)
 - On Windows, the game may not find your EDOPro pictures by itself.

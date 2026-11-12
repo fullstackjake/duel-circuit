@@ -45,7 +45,7 @@ namespace YgoCampaign.Game
         /// <summary>Whether the results of the duel that ended at <paramref name="serial"/> can show now.</summary>
         private bool ResultsDue(int serial) =>
             serial == _duelSerial && !_editor.IsOpen && !_shop.IsOpen && !_menu.IsOpen && !_browser.IsOpen && !_settings.IsOpen && !_about.IsOpen
-            && !_storyScreen.IsOpen;
+            && !_import.IsOpen && !_storyScreen.IsOpen;
 
         /// <summary>
         /// A results screen's way out other than Continue (Rematch, the Card Shop): its scenes go back in the queue, for the

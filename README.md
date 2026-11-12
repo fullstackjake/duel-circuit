@@ -78,7 +78,8 @@ Windows warns you because the game has no publisher signature (that costs money)
 ## Card pictures
 
 The game ships with **no card pictures**: they belong to Konami. Until you add some, each card shows its name, stats
-and text, and the game plays fine. If you have card pictures or EDOPro, see [docs/CARD-PICTURES.md](docs/CARD-PICTURES.md).
+and text, and the game plays fine. If you have card pictures, choose **Import Cards** in the main menu to add them from
+a zip or picture files. Other ways, and how to use EDOPro's pictures: [docs/CARD-PICTURES.md](docs/CARD-PICTURES.md).
 Keep them to yourself: never share them.
 
 ## Your save
@@ -142,7 +143,8 @@ This is an early version (0.1.1).
   [open a bug report](https://github.com/fullstackjake/duel-circuit/issues/new/choose).
 - Macs need Apple silicon. Intel Macs and Linux aren't supported.
 - With no publisher signature, Windows and macOS warn you the first time (see [Install and play](#install-and-play)).
-- A few things work only on a Mac for now, like picking a `.ydk` deck file.
+- A few small things work better on a Mac for now. On Windows, when the game window isn't in front, your first click
+  only brings it to the front, and the window can be made very small.
 
 **Things that affect your game**
 - In the shop's way, the **Warrior's Charge** starter has 3 Reinforcement of the Army, but the Back Alley allows 1.
@@ -168,7 +170,7 @@ No. It's single-player and offline.
 
 **Do my EDOPro decks work?**
 Yes. Copy a YDKE link (the deck-sharing link EDOPro and deck sites make) or the text of a `.ydk` deck file (the
-format EDOPro uses), then click **Import** in the deck editor. Your decks are `.ydk` files in `mods/decks`, so EDOPro
+format EDOPro uses), then click **Import** in the deck editor. Or click **Import .ydk** and pick the file. Your decks are `.ydk` files in `mods/decks`, so EDOPro
 can open them too.
 
 **It's too hard, or too easy.**
@@ -176,7 +178,8 @@ Difficulty isn't tuned yet. Lose a match three times in a row and the game offer
 and decks you can borrow. Tell us where it felt wrong.
 
 **Can I add my own duelists, decks or pictures?**
-Yes. See [docs/MODDING.md](docs/MODDING.md).
+Yes. For pictures, choose **Import Cards** in the main menu ([docs/CARD-PICTURES.md](docs/CARD-PICTURES.md)). For
+duelists and decks, see [docs/MODDING.md](docs/MODDING.md).
 
 **I think a card works wrong.**
 Please [report it](#everyones-welcome) with the replay code. If EDOPro gets it wrong too, it may need fixing there.

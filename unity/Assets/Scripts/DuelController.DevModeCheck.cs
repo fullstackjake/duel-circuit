@@ -46,22 +46,24 @@ namespace YgoCampaign.Game
             DebugDeveloperMode(devBefore);
             yield return null;
 
-            // The duel's Menu: Back to the duel, Concede, Settings, About, Quit; Tag Duel, the Deck Editor and Replays shut.
+            // The duel's Menu: Back to the duel, Concede, Settings, About, Quit; Tag Duel, the Deck Editor, Replays and Import Cards shut.
             OpenMenuFromDuel();
             yield return new WaitForSecondsRealtime(0.3f);
             yield return shot("menu-mid-duel");
             var items = _menu.DebugItems;
             var shut = items.Where(i => i.locked).Select(i => i.choice).ToList();
             report($"the Menu over a campaign duel: {string.Join(", ", items.Select(i => i.locked ? $"({i.title})" : i.title))}",
-                items.Count == 8 && items[0].choice == MainMenu.Choice.BackToDuel && items[1].choice == MainMenu.Choice.Concede
-                && shut.Count == 3 && shut.Contains(MainMenu.Choice.TagDuel) && shut.Contains(MainMenu.Choice.DeckEditor) && shut.Contains(MainMenu.Choice.Replays)
+                items.Count == 9 && items[0].choice == MainMenu.Choice.BackToDuel && items[1].choice == MainMenu.Choice.Concede
+                && shut.Count == 4 && shut.Contains(MainMenu.Choice.TagDuel) && shut.Contains(MainMenu.Choice.DeckEditor) && shut.Contains(MainMenu.Choice.Replays)
+                && shut.Contains(MainMenu.Choice.ImportCards)
                 && items.Any(i => i.choice == MainMenu.Choice.Settings && !i.locked) && items.Any(i => i.choice == MainMenu.Choice.About && !i.locked)
                 && items.Any(i => i.choice == MainMenu.Choice.Quit && !i.locked));
             _menu.DebugChoose(MainMenu.Choice.DeckEditor);
             _menu.DebugChoose(MainMenu.Choice.Replays);
             _menu.DebugChoose(MainMenu.Choice.TagDuel);
+            _menu.DebugChoose(MainMenu.Choice.ImportCards);
             yield return null;
-            report("its shut options stay shut (the Deck Editor, Replays, Tag Duel)", _menu.IsOpen && !_editor.IsOpen && !_browser.IsOpen && !_tagSetup.IsOpen && DuelUntouched());
+            report("its shut options stay shut (the Deck Editor, Replays, Tag Duel, Import Cards)", _menu.IsOpen && !_editor.IsOpen && !_browser.IsOpen && !_tagSetup.IsOpen && !_import.IsOpen && DuelUntouched());
             _menu.DebugChoose(MainMenu.Choice.BackToDuel);
             yield return null;
             report("Back to the duel returns to it as it was", !_menu.IsOpen && DuelUntouched() && _paused == pausedBefore && _view.Prompt.Current == decision);

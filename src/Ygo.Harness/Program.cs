@@ -196,6 +196,7 @@ for (int i = 0; i < args.Length; i++)
         case "--removal-timing-test": break; // see below (RemovalTimingTest)
         case "--forced-attack-test": break; // see below (ForcedAttackTest)
         case "--shuffle-test": break; // see below (ShuffleTest)
+        case "--import-test": break; // see below (ImportTest)
         case "--ydk-test": if (i + 1 < args.Length && !args[i + 1].StartsWith("--")) i++; break; // see below (YdkImportTest)
         case "--card-search-test": case "--write-baseline": break; // see below (CardSearchTest)
         case "--battle-misplay-test": break; // see below (BattleMisplayTest)
@@ -266,6 +267,9 @@ for (int i = 0; i < args.Length; i++)
         default: deckPaths.Add(args[i]); break;
     }
 }
+
+// `--import-test`: the card picture importer (PictureImport, docs/dev/CARD-IMPORT-SPEC-2026-11-12.md Part A), on stand-in files in a temp folder.
+if (args.Contains("--import-test")) return ImportTest.Run();
 
 var root = FindProjectRoot();
 if (deckPaths.Count == 0)

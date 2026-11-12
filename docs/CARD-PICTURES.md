@@ -3,7 +3,8 @@
 Duel Circuit ships with **no card pictures**. This page shows you how to add pictures you already have.
 
 - [Why there are no pictures](#why-there-are-no-pictures)
-- [Add your own pictures](#add-your-own-pictures)
+- [Import from the game](#import-from-the-game)
+- [Add pictures by hand](#add-pictures-by-hand)
 - [Use EDOPro's pictures](#use-edopros-pictures)
 - [Bigger (HD) pictures](#bigger-hd-pictures)
 - [Art styles](#art-styles)
@@ -18,9 +19,62 @@ Card pictures are © Konami. We can't include them, so the game doesn't.
 Without pictures, every card shows its name, stats and text in a clean card frame. You can play the whole game this
 way. Pictures only change how cards look.
 
-## Add your own pictures
+## Import from the game
 
-The game reads pictures from a folder inside your `mods` folder (where your save lives).
+This is the easy way. You pick the pictures you have, and the game puts them in the right folders for you.
+
+You need one of these:
+- A `.zip` file of pictures. Folders inside the zip are fine.
+- One or more picture files (`.jpg`, `.jpeg` or `.png`).
+
+Each picture must be named after its card number (the 8-digit passcode on the card, at the bottom left). For example,
+`89631139.jpg` is Blue-Eyes White Dragon.
+
+1. In the main menu, choose **Import Cards**. It sits between **Settings** and **About**.
+2. Find the section you want. Each section shows how many pictures it holds and the folder they live in.
+
+   | Section | What goes in it | Where it goes |
+   |---|---|---|
+   | **Card Images** | The normal pictures for your cards | `mods/cards/images` |
+   | **High Resolution Card Images** | Bigger pictures, used when a card is shown large. Optional. | `mods/cards/hd` |
+   | **Card Back** | The picture on the back of every card | `mods/cards/back.png` or `back.jpg` |
+
+3. Click **Import...** in that section. A file window opens in your Downloads folder.
+4. Pick a `.zip`, or one or more pictures, and confirm. (To pick several files, hold **Ctrl** on Windows or **Cmd** on
+   a Mac while you click.) For **Card Back**, pick one picture.
+5. The game reads your files, then copies the pictures. A bar shows how far it has got. Click **Cancel** to stop. Nothing
+   half-copied is left behind.
+6. When it's done, a line under the sections tells you what happened, for example "Card Images: 13,585 added, 3 skipped."
+
+Your pictures show at once. You don't need to restart the game. The game copies your files and never changes the
+originals.
+
+**If a picture is already there.** For **Card Images** and **High Resolution Card Images**, the game asks once, for
+example "1,204 of these pictures already exist." It shows how many are new and how many are already there. Then you
+choose:
+- **Replace them:** the new pictures take the place of the old ones.
+- **Keep mine:** only cards without a picture get one. The pictures you have stay as they are. This is the button
+  that is ready when the question opens, so pressing **Enter** never replaces anything.
+- **Cancel:** nothing changes.
+
+**The card back** always asks first. It shows the card back you have now next to the new one. Click **Use this back**
+to change it, or **Cancel**.
+
+**Good to know:**
+- Only files named by card number are taken. The game skips everything else and counts them ("3 skipped"). If it asks
+  you the question above, it also says why (for example "notes.txt: not a card number").
+- The game checks that each file really is a picture. A file that only looks like one by its name is skipped.
+- If the same card shows up twice in one import, the first one is used.
+- A picture bigger than 64 MB is skipped.
+- A card has one picture per folder. If you replace `89631139.png` with a `.jpg`, the old `.png` is deleted.
+- If the game can't read your zip, a box says **"That didn't work"** and tells you why. Click **OK**.
+- **Import Cards** is shut while you're in a campaign duel. Finish or concede the duel first.
+- **Open folder** opens the section's folder. It's the way to remove a picture: delete the file by hand.
+
+## Add pictures by hand
+
+You can also put the pictures in the folders yourself. The game reads pictures from a folder inside your `mods` folder
+(where your save lives).
 
 | | Your pictures folder |
 |---|---|
@@ -42,6 +96,7 @@ The game makes this folder the first time it starts.
 - Face-down cards never show their picture, so nothing gives away a hidden card.
 
 **Opening the folder:**
+- **In the game:** choose **Import Cards**, then click **Open folder**.
 - **Windows:** press **Windows key + R**, paste the folder path from the table above, and press **Enter**.
 - **Mac:** in Finder, choose **Go → Go to Folder** (Shift+Cmd+G), paste the folder path, and press **Return**.
 
@@ -93,13 +148,22 @@ line to a settings file:
 ## Bigger (HD) pictures
 
 EDOPro's pictures are small (177 × 254 pixels), and the game shows cards larger than that. Bigger pictures look much
-sharper. If you have a folder of bigger pictures, named by card number like EDOPro's, add it to `settings.txt`:
+sharper.
+
+**The easy way:** use **Import Cards → High Resolution Card Images** (see [Import from the game](#import-from-the-game)).
+
+**By hand:** the game has its own folder for bigger pictures. It is called `hd` and sits next to `images`, inside
+`mods/cards`. The game makes it for you and reads it by itself. Put bigger pictures in it, named by card number like
+EDOPro's, and start the game. You don't need to add anything to `settings.txt`.
+
+**A folder somewhere else:** if you already have a folder of bigger pictures, named by card number, add it to
+`settings.txt`:
 
 ```
 hd_pics: D:\Pictures\YugiohHD
 ```
 
-- Add one `hd_pics:` line for each folder. You can have several.
+- Add one `hd_pics:` line for each folder. You can have several. They work together with the `hd` folder.
 - On a Mac, use a Mac path, like `hd_pics: ~/Pictures/YugiohHD`.
 - When a card has a picture in more than one folder, **the biggest picture wins**.
 - So if you want your own picture of a card to be used instead of an HD one, make yours at least as big.
@@ -129,6 +193,13 @@ Face-down cards, decks and unopened packs use a card back. The game picks one in
 1. Your own: `mods/cards/back.png` (or `back.jpg`).
 2. EDOPro's card back, if the game found EDOPro.
 3. The game's own back: dark blue (navy), with a gold border and a gold star.
+
+**To use your own:** choose **Import Cards**, click **Import...** in the **Card Back** section and pick one picture
+(`.jpg`, `.jpeg` or `.png`). The game shows the old back next to the new one. Click **Use this back**. The new back
+shows at once. The game keeps one back: importing a `.png` deletes an old `back.jpg`, and the other way round.
+
+**By hand:** name your picture `back.png` or `back.jpg` and put it in the `cards` folder inside `mods` (next to
+`images`).
 
 ## The picture cache
 
