@@ -286,7 +286,7 @@ check out the files again with your changes committed or stashed: `git rm -rq --
 
 A release is made from one commit, so its source is easy to find (the license asks for that).
 
-1. Change the version number in `unity/Assets/Editor/ProjectSetup.cs` (`PlayerSettings.bundleVersion = "0.2.1";`) and
+1. Change the version number in `unity/Assets/Editor/ProjectSetup.cs` (`PlayerSettings.bundleVersion = "0.2.2";`) and
    `bundleVersion` in `unity/ProjectSettings/ProjectSettings.asset` (a build writes it there, and a build from a commit
    without it counts as having local changes).
 2. Commit everything. The release script refuses a working tree with changes.
@@ -310,7 +310,7 @@ It checks that both builds come from the current commit, then writes three files
    and notes):
 
 ```bash
-gh release create v0.2.1 build/release/* --target main --title "Duel Circuit 0.2.1" --prerelease --notes "What changed in this version."
+gh release create v0.2.2 build/release/* --target main --title "Duel Circuit 0.2.2" --prerelease --notes "What changed in this version."
 ```
 
 It prints the release's web address. Always attach the `ygopro-core-…-patched.tar.gz` file: it's the source of the

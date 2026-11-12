@@ -141,7 +141,7 @@ public static class ProjectSetup
         // The product name is the app's name and window title.
         PlayerSettings.companyName = "YgoCampaign";
         PlayerSettings.productName = "Duel Circuit";
-        PlayerSettings.bundleVersion = "0.2.1";
+        PlayerSettings.bundleVersion = "0.2.2";
         PlayerSettings.SetApplicationIdentifier(UnityEditor.Build.NamedBuildTarget.Standalone, BundleId);
         // A window you can drag to any size (every canvas scales with Expand, keeping the whole 1920x1080 layout in view).
         PlayerSettings.resizableWindow = true;
