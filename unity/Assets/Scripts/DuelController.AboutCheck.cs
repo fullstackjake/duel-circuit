@@ -103,6 +103,7 @@ namespace YgoCampaign.Game
                 "unofficial fan game", "not made, approved or supported by Konami or Shueisha", "card names and card text belong to their owners",
                 "No card pictures ship", "ygopro-core", "Rules engine (ygopro-core), card scripts, card database and ban lists: Project Ignis (EDOPro)",
                 "Card-set data: YGOPRODeck", "Historic decks and ban lists: Format Library and yugiohmeta.com", "Made with Unity",
+                "Thank you, Project Ignis", "It couldn't exist without EDOPro",
                 "github.com/fullstackjake/duel-circuit",
             }.Concat(AboutScreen.ButtonLabels).ToList();
             var missing = wanted.Where(w => !shown.Contains(w)).ToList();

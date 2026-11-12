@@ -38,8 +38,9 @@ other people's code.
 - On the Unity runtime: "you can be assured I won't go after someone linking to the unity runtime."
 - He's happy to be credited under the Project Ignis name.
 
-**CardScripts, BabelCDB, LFLists: we are asking Project Ignis** (a ticket on their Discord server, opened 2026-11-08).
-Their answer will be recorded here.
+**CardScripts, BabelCDB, LFLists: answered.** We asked Project Ignis in a ticket on their Discord server (opened
+2026-11-08). They are fine with the game using their card scripts, card database and ban lists this way (recorded
+2026-11-12). The game thanks them on its About screen.
 
 ## ygopro-core
 
@@ -181,7 +182,7 @@ Project Ignis' card database: every card's name, text, stats and IDs.
 - **License:** none stated in the repository. Card names and card text are Konami's.
 - **Changed:** converted by our tools into `cards.bin` (not committed; made from the database for each build).
 - **Ships as:** `cards.bin` in the game's data folder.
-- We are asking Project Ignis whether they are fine with this; see [the status above](#status-the-rules-engine-inside-a-unity-build).
+- Project Ignis has answered that they are fine with this; see [the status above](#status-the-rules-engine-inside-a-unity-build).
 
 ## LFLists
 
@@ -192,7 +193,7 @@ Project Ignis' ban lists (Forbidden and Limited Lists). The lists themselves are
 - **License:** none stated in the repository.
 - **Changed:** no.
 - **Ships as:** the `.conf` files, copied into the game's data folder (`StreamingAssets/lflists`).
-- We are asking Project Ignis whether they are fine with this; see [the status above](#status-the-rules-engine-inside-a-unity-build).
+- Project Ignis has answered that they are fine with this; see [the status above](#status-the-rules-engine-inside-a-unity-build).
 
 ## YGOPRODeck
 

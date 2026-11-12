@@ -37,6 +37,14 @@ namespace YgoCampaign.Game
             + "• Historic decks and ban lists: Format Library and yugiohmeta.com.\n"
             + "• Made with Unity.";
 
+        /// <summary>
+        /// Thanks to Project Ignis, under the credits (owner, 2026-11-12). It says what the game owes them and nothing
+        /// about them backing the game: they don't make or endorse it.
+        /// </summary>
+        public const string Thanks =
+            "Thank you, Project Ignis. Duel Circuit plays by your rules engine, card scripts, card database and ban "
+            + "lists. It couldn't exist without EDOPro.";
+
         /// <summary>The buttons along the bottom, left to right.</summary>
         public static readonly string[] ButtonLabels = { "Back", "View license", "Third-party notices", "Open licenses folder", "Source code" };
 
@@ -103,7 +111,8 @@ namespace YgoCampaign.Game
             Block("disclaimer", 110, 646, 900, 110, Disclaimer, 20, T.TextSoft);
 
             Heading("credits heading", 1080, 290, 730, "CREDITS");
-            Block("credits", 1080, 326, 730, 200, Credits, 20, T.TextSoft);
+            Block("credits", 1080, 326, 730, 140, Credits, 20, T.TextSoft);
+            Block("thanks", 1080, 480, 730, 110, Thanks, 20, T.Text);
             Heading("source heading", 1080, 610, 730, "SOURCE CODE");
             var built = LicenseFiles.BuiltFrom();
             Block("source", 1080, 646, 730, 150,
