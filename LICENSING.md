@@ -52,7 +52,7 @@ The game is built with Unity, which is not open source. The
 combined with the Unity runtime and shipped. It only covers our own code. Our patches in `patches/ygopro-core/` are
 changes to ygopro-core, so they follow ygopro-core's terms, without this permission. It can't give permission for the
 rules engine (ygopro-core) or the card scripts (CardScripts), which belong to their authors.
-ygopro-core's author has answered that the core may ship this way, as long as the source stays available under the AGPL ([edo9300/ygopro-core#179](https://github.com/edo9300/ygopro-core/issues/179)). Project Ignis has answered that they are fine with the game using CardScripts, BabelCDB and LFLists. Details: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+ygopro-core's author has answered that the core may ship this way, as long as the source stays available under the AGPL ([edo9300/ygopro-core#179](https://github.com/edo9300/ygopro-core/issues/179)). Project Ignis hasn't replied to our request about CardScripts, BabelCDB and LFLists; we take it they have no conditions and will change anything they ask, the moment they ask. Details: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## Art, story and characters: CC BY-SA 4.0
 

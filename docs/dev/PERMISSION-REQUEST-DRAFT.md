@@ -1,6 +1,6 @@
 # Permission request to edo9300 and Project Ignis (ready to post)
 
-**Status: edo9300 answered in edo9300/ygopro-core#179 (2026-11-08; recorded in THIRD_PARTY_NOTICES.md). Project Ignis ticket opened on Discord, waiting.** Owner decision 3 (docs/dev/README-PLAN-2026-11-08.md). Two pieces:
+**Status: edo9300 answered in edo9300/ygopro-core#179 (2026-11-08; recorded in THIRD_PARTY_NOTICES.md). Project Ignis ticket opened on Discord 2026-11-08; no reply as of 2026-11-12, recorded in THIRD_PARTY_NOTICES.md as no conditions, changed at once if they ask.** Owner decision 3 (docs/dev/README-PLAN-2026-11-08.md). Two pieces:
 
 1. **A GitHub issue on edo9300/ygopro-core**, the main question (he holds the rules engine).
    Post it at https://github.com/edo9300/ygopro-core/issues/new: paste the title and the body below.
