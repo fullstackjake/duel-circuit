@@ -464,7 +464,7 @@ you.
 
 ## Known issues (full list)
 
-This is an early version (0.2.0). Here is everything we know about. The [README](../README.md#known-issues) lists the
+This is an early version (0.2.1). Here is everything we know about. The [README](../README.md#known-issues) lists the
 ones most likely to affect you.
 
 ### Platforms

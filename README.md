@@ -56,7 +56,7 @@ Duel Circuit is a **free, fan-made, single-player** Yu-Gi-Oh! game for Windows a
 ### Windows
 
 1. Go to the [Releases page](https://github.com/fullstackjake/duel-circuit/releases).
-2. Under **Assets**, click the file that ends in `-win64.zip` (for example `DuelCircuit-0.2.0-win64.zip`) to download it.
+2. Under **Assets**, click the file that ends in `-win64.zip` (for example `DuelCircuit-0.2.1-win64.zip`) to download it.
 3. Right-click the zip and choose **Extract All**, then click **Extract**. (Don't run the game from inside the zip.)
 4. Open the new folder, then the `Duel Circuit` folder inside it.
 5. Double-click **Duel Circuit** (`Duel Circuit.exe`).
@@ -136,7 +136,7 @@ All the controls: [docs/PLAYING.md](docs/PLAYING.md#controls).
 
 ## Known issues
 
-This is an early version (0.2.0).
+This is an early version (0.2.1).
 
 **Platforms**
 - These are the first public builds, and the Windows one hasn't been tried on many PCs yet. Tell us how it went:
