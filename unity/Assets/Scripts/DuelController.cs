@@ -3870,7 +3870,13 @@ namespace YgoCampaign.Game
                     var theirDeck = _campaign.Circuits.All[0].Matches[0].Deck;
                     wantFirst = Ygo.Engine.AI.Playbooks.Playbooks.GoesFirst(theirDeck) ? 1 : 0;
                     Report("losing the toss shows their choice with Continue", _scenes.Buttons.ContainsKey("Continue") && !_scenes.Buttons.ContainsKey("Go first"));
-                    if (_scenes.Buttons.TryGetValue("Continue", out var cont)) cont();
+                    // Left alone, it carries on by itself, and the coin screen must close as the duel starts (it used to
+                    // stay up over the duel: the CPU played its turn behind it).
+                    FirstTurnPlayer = -1;
+                    var autoBy = Time.realtimeSinceStartup + 6;
+                    while (Time.realtimeSinceStartup < autoBy && FirstTurnPlayer < 0) yield return null;
+                    Report($"left alone, the lost toss starts the duel and closes ({(FirstTurnPlayer >= 0 ? "duel started" : "no duel")}, coin screen {(_scenes.IsOpen ? "still showing" : "closed")})",
+                        FirstTurnPlayer >= 0 && !_scenes.IsOpen);
                 }
                 // Who the engine gave turn 1 (recorded as the duel starts: without animations a whole turn can pass in a
                 // frame, or even before the first one).

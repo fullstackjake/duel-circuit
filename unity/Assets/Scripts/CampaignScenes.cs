@@ -405,8 +405,9 @@ namespace YgoCampaign.Game
                 detail.text = you != "You" ? "" : themFirst ? Second.Replace("Going second", "You go second") : First.Replace("Going first", "You go first");
                 Button(760, 700, 400, 80, "Continue", () => Choose(!themFirst), 28, T.Primary);
                 // On by itself after a moment, unless clicked (or another screen has replaced this one: the coin is gone).
+                // It closes the screen first, as the button does: without that the duel started under the coin screen.
                 yield return new WaitForSecondsRealtime(2.5f);
-                if (!chosen && IsOpen && flier != null) Choose(!themFirst);
+                if (!chosen && IsOpen && flier != null) { Close(); Choose(!themFirst); }
             }
         }
 
