@@ -40,7 +40,13 @@ other people's code.
 
 **CardScripts, BabelCDB, LFLists: answered.** We asked Project Ignis in a ticket on their Discord server (opened
 2026-11-08). They are fine with the game using their card scripts, card database and ban lists this way (recorded
-2026-11-12). The game thanks them on its About screen.
+2026-11-12). The game thanks them on its About screen. They set no conditions, and that can change: if they ever ask
+for something different, we follow it.
+
+**Our promise to the projects we build on.** Duel Circuit will never be sold, and no one makes money from it: no
+price, no ads, no paid extras, no donations. We will never pass their work off as our own: ygopro-core,
+Project Ignis's card scripts, card database and ban lists, and every other project in this file are credited by name,
+in this file and on the game's About screen.
 
 ## ygopro-core
 
