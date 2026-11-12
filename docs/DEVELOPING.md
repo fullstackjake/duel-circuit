@@ -331,6 +331,7 @@ Other launch options for checks and screenshots:
 | `-gosecond` | Checks skip the coin toss and give you turn 1; this gives it to the other side |
 | `-reducedmotion` | Reduced motion for this run |
 | `-dev` | Developer mode in a normal build (F12 panel) |
+| `-quitwatchdogtest`, `-quitwatchdogoff` | Windows: hang the quit on purpose, and leave out the timer that ends a hung quit after 10 seconds (`QuitWatchdog.cs`) |
 | `-p0 <id\|you> -p1 <id> -deck0 <deck> -deck1 <deck>` | Start straight into that matchup (`you` plays the seat yourself) |
 | `-autoclick` | Answers your prompts at random (human play end to end) |
 | `-editor <deck> [-editor-search <query>] [-editor-test] [-editor-hand] [-editor-dragtest] [-controllertest]` | Open the deck editor on a deck, with optional search, tester, test hand, drag test or simulated controller (results in Player.log) |
