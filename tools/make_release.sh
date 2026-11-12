@@ -5,7 +5,7 @@
 #   build/release/ygopro-core-<commit>-patched.tar.gz    the rules engine's full source with our patches (AGPL)
 # Build both games first (ProjectSetup.BuildWindows, then BuildMac), from the commit you're releasing. The script
 # refuses when the working tree has changes or a build's SOURCE.txt names another commit. Then, for example:
-#   gh release create v0.1.1 build/release/* --prerelease --title "Duel Circuit 0.1.1" --notes "..."
+#   gh release create v0.2.0 build/release/* --prerelease --title "Duel Circuit 0.2.0" --notes "..."
 set -e
 cd "$(dirname "$0")/.."
 root=$(pwd)

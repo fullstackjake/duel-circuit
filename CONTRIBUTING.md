@@ -31,7 +31,7 @@ what you'd like to do. We'll help you find something.
 ### What to put in a bug report
 
 - **Your computer:** Windows or Mac.
-- **The game's version:** it's at the bottom left of the title screen (for example `v0.1.1`).
+- **The game's version:** it's at the bottom left of the title screen (for example `v0.2.0`).
 - **What happened**, and **what you expected** to happen.
 - **The steps** to make it happen again, if you know them.
 - **The replay code**, for a bug in a duel (see below).
