@@ -40,6 +40,13 @@ what you'd like to do. We'll help you find something.
 Please don't attach card pictures or screenshots that show a whole card's picture. A screenshot of a menu, or of the
 board with small cards, is fine.
 
+### Card effects that seem wrong
+
+If a card does something it shouldn't, report it here, with a replay code. Please don't report it to Project Ignis
+(the EDOPro team, who write the card scripts): they've asked that only problems someone has tested and seen in EDOPro
+itself go to them. Most problems in this game come from our own code, not their scripts. If we find the same problem
+in EDOPro, we'll tell them ourselves.
+
 ### The replay code
 
 A replay code plays a duel back move for move, exactly as it happened. With it, we can see exactly what you saw.

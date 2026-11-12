@@ -38,11 +38,17 @@ other people's code.
 - On the Unity runtime: "you can be assured I won't go after someone linking to the unity runtime."
 - He's happy to be credited under the Project Ignis name.
 
-**CardScripts, BabelCDB, LFLists: no reply yet.** We opened a ticket on Project Ignis's Discord server on 2026-11-08
-to ask about the game using their card scripts, card database and ban lists, and waited more than 24 hours. As of
-2026-11-12 there has been no reply, so we're taking it that they have no conditions. If they ever ask for anything,
-we'll change it the moment they do, whether that's how they're credited, what the game uses, or removing their work
-from it. The game thanks them on its About screen.
+**CardScripts, BabelCDB, LFLists: answered (2026-11-12).** We asked Project Ignis in a ticket on their Discord server
+(opened 2026-11-08) about the game using their card scripts, card database and ban lists. A Project Ignis staff member
+replied on 2026-11-12:
+
+- edo9300's answer above applies to these as well.
+- If you find a problem with a card script in Duel Circuit, don't report it to Project Ignis unless you've tested it
+  and seen the same problem in EDOPro. Report it to us instead: most problems in this game are ours. See
+  [CONTRIBUTING.md](CONTRIBUTING.md#card-effects-that-seem-wrong).
+
+If they ever ask for anything else, we'll change it the moment they do, whether that's how they're credited, what the
+game uses, or removing their work from it. The game thanks them on its About screen.
 
 **Our promise to the projects we build on.** Duel Circuit will never be sold, and no one makes money from it: no
 price, no ads, no paid extras, no donations. We will never pass their work off as our own: ygopro-core,
@@ -189,7 +195,7 @@ Project Ignis' card database: every card's name, text, stats and IDs.
 - **License:** none stated in the repository. Card names and card text are Konami's.
 - **Changed:** converted by our tools into `cards.bin` (not committed; made from the database for each build).
 - **Ships as:** `cards.bin` in the game's data folder.
-- Project Ignis hasn't replied to our request; see [the status above](#status-the-rules-engine-inside-a-unity-build).
+- Project Ignis has answered our request; see [the status above](#status-the-rules-engine-inside-a-unity-build).
 
 ## LFLists
 
@@ -200,7 +206,7 @@ Project Ignis' ban lists (Forbidden and Limited Lists). The lists themselves are
 - **License:** none stated in the repository.
 - **Changed:** no.
 - **Ships as:** the `.conf` files, copied into the game's data folder (`StreamingAssets/lflists`).
-- Project Ignis hasn't replied to our request; see [the status above](#status-the-rules-engine-inside-a-unity-build).
+- Project Ignis has answered our request; see [the status above](#status-the-rules-engine-inside-a-unity-build).
 
 ## YGOPRODeck
 

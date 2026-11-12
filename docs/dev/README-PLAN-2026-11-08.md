@@ -96,8 +96,9 @@ Status after the go-public prep (2026-11-08):
 2. [x] **Release**: v0.1.1 (pre-release) on the new repo, built from a commit by `tools/make_release.sh`: Windows and
    Mac zips with a Licenses folder (SOURCE.txt names the commit) and the patched ygopro-core source tarball.
 3. [x] **About / Licenses screen** in the game (main menu → About), `-aboutcheck`.
-4. [~] **Ask edo9300 and Project Ignis** (draft: docs/dev/PERMISSION-REQUEST-DRAFT.md). edo9300 answered
-   (2026-11-08). Project Ignis: ticket opened 2026-11-08, no reply as of 2026-11-12; THIRD_PARTY_NOTICES.md says so.
+4. [x] **Ask edo9300 and Project Ignis** (draft: docs/dev/PERMISSION-REQUEST-DRAFT.md). edo9300 answered
+   (2026-11-08). Project Ignis answered (2026-11-12): edo9300's answer covers their projects too; card-script bugs go
+   to them only if they also happen in EDOPro. THIRD_PARTY_NOTICES.md says so.
 5. [~] **Portrait review**: Kelda Amin's portrait removed (stand-in until new art, docs/dev/TODO.md). The other art
    files haven't been checked one by one for likeness.
 6. [x] **Internal notes** trimmed (home path, the owner's picture folder); the story bible is marked as spoilers.

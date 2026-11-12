@@ -7,6 +7,7 @@ body:
       value: |
         Thanks for helping make the game better! Fill in what you can. Short answers are fine.
         Need help finding the replay code or `Player.log`? See [Report a bug](https://github.com/fullstackjake/duel-circuit/blob/main/CONTRIBUTING.md#report-a-bug).
+        A card effect that seems wrong goes here too, not to Project Ignis (EDOPro). See [why](https://github.com/fullstackjake/duel-circuit/blob/main/CONTRIBUTING.md#card-effects-that-seem-wrong).
   - type: dropdown
     id: platform
     attributes:

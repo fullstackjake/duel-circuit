@@ -37,7 +37,7 @@ Copyright (C) 2026 Jake Joseph (GitHub: fullstackjake) and the Duel Circuit auth
 - The permission only covers code the Duel Circuit authors wrote. Our patches in `patches/ygopro-core/` are changes
   to ygopro-core, so they follow ygopro-core's terms, without this permission. It does not cover the rules engine
   (ygopro-core) or the card scripts (CardScripts). Only their authors can give that permission.
-  ygopro-core's author has answered that the core may ship this way, as long as the source stays available under the AGPL ([edo9300/ygopro-core#179](https://github.com/edo9300/ygopro-core/issues/179)). Project Ignis hasn't replied to our request about CardScripts, BabelCDB and LFLists; we take it they have no conditions and will change anything they ask, the moment they ask. Details: [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md).
+  ygopro-core's author has answered that the core may ship this way, as long as the source stays available under the AGPL ([edo9300/ygopro-core#179](https://github.com/edo9300/ygopro-core/issues/179)). Project Ignis has answered that the same applies to CardScripts, BabelCDB and LFLists, and asks that card-script problems found in this game reach them only after they've been checked in EDOPro; we'll change anything else they ask, the moment they ask. Details: [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md).
 - If you change our code, AGPL section 7 lets you remove this permission from your version. If you remove it, your
   version can no longer be shipped as a Unity build.
 - Contributions to this repository are accepted under the same terms, including this permission
