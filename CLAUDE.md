@@ -85,3 +85,55 @@ can't break them.
 - Don't touch `build/play-alley`, `build/rework-economy` or `build/qa-night5` (read-only use of its `mods` is fine).
   The owner's real save and replays are read- or copy-only.
 - App runs need absolute paths for `-mods`, `-logFile` and check folders.
+
+## Delegating to agents
+
+For anything bigger than a small change, the session is the architect: it plans, briefs agents, checks their work and
+reports. It doesn't build the big pieces itself. A change of a few dozen lines, a lookup or a one-file fix is done
+directly, with no agent.
+
+**The pipeline** (how Import Cards was built; `docs/dev/CARD-IMPORT-SPEC-2026-11-12.md` is the worked example):
+
+1. **Read the code, then write a spec** in `docs/dev/<NAME>-SPEC-<date>.md`: what the player gets, each part's files
+   and its public interface (exact signatures), how to verify, and "Owner decisions". Fixed interfaces let the parts be
+   built at the same time.
+2. **Design first where it applies** (no code, the result goes in the shared notes or `docs/dev/`): Game Designer,
+   Economy Designer or Narrative Designer for rules, DP and story; UI Designer for a screen's exact layout and words.
+3. **Build in parallel on files that don't overlap.** Unity Architect for screens and wiring in `unity/`;
+   `general-purpose` for engine and harness C# and for native interop (the installed Senior Developer agent is for web
+   work, not this). Each part comes with a test that fails without it.
+4. **Code Reviewer**, independent: give it the diff and the spec, never an opinion of the code. Ask for ranked
+   findings with `file:line`, a concrete failure and CONFIRMED or PLAUSIBLE.
+5. **One fix round**, sent back to the agents that wrote the code (they keep their context).
+6. **Evidence Collector**, on the final code from a fresh build: it tests and reports, it doesn't fix. It reruns the
+   harness tests and app checks, looks at every screenshot, checks that each test would fail if the feature were
+   broken, and throws awkward inputs at the new code.
+7. **Technical Writer** for player and developer docs, from the code and the spec.
+
+If an agent type isn't installed on this machine (they live in `~/.claude/agents`, not in the repository), give the
+same brief to `general-purpose`.
+
+**Models.** Opus for design, building, review and the test pass; a cheaper model for docs and mechanical work. Tell
+the owner which model each agent got. If the owner says usage is tight, say what you'd cut before starting.
+
+**Every brief says:** the goal; the files the agent owns ("touch nothing else") and who is editing what beside it;
+what to read first (`CLAUDE.md`, the spec, the code to copy from); the traps you already know; the exact commands to
+verify with; and the report wanted (short, with real output, deviations from the spec, and what wasn't verified).
+Every brief also carries: no commit, stash, reset or branch switch; LF line endings; no card pictures, ever (tests
+make their own flat-colour or filler files).
+
+**Running side by side.**
+
+- Two agents never write the same file.
+- Only one Unity can have the project open: say who may run it. A compile error in another agent's file isn't yours:
+  wait and retry.
+- Harness builds go in `build/bin/<name>`, check copies of the game in `build/qa-<name>`. Never build over the game
+  the owner plays (`build/windows` on the PC, `build/unity` on the Mac) unless asked.
+- App checks run one at a time (they fight over focus), each with a fresh `-mods` folder.
+
+**A report isn't proof.** Before telling the owner a part is done: read the diff, rerun its test, open its
+screenshots. Try the owner's real data where it's safe: read it, write only to a scratch folder.
+
+**With the owner.** Start building without waiting on questions that have a sensible default: put those in "Owner
+decisions" with what you chose, and say so. Ask only what changes what gets built. Report after each stage: what's
+done, what you checked yourself, what's still running, what nobody has tested. Say plainly when you were wrong.
