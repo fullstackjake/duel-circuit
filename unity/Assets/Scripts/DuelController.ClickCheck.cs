@@ -60,6 +60,19 @@ namespace YgoCampaign.Game
 
             Report($"the virtual controller mouse is off while no controller is in use",
                 ControllerSupport.Instance == null || !ControllerSupport.Instance.IsActive && !InputSystem.devices.Any(d => d is Mouse && d.name == "ControllerCursor" && d.enabled));
+            // A check run doesn't answer the real keyboard either (ClickSupport.Start): a key pressed beside it, with the
+            // window in front, used to dismiss the title screen under a check. A key sent to it must not arrive.
+            {
+                var real = InputSystem.devices.OfType<Keyboard>().Where(k => k.native).ToList();
+                foreach (var k in real) InputSystem.QueueStateEvent(k, new KeyboardState(Key.RightShift));
+                yield return Frames(3);
+                var heard = real.Where(k => k.rightShiftKey.isPressed).Select(k => k.name).ToList();
+                foreach (var k in real) InputSystem.QueueStateEvent(k, new KeyboardState());
+                yield return Frames(2);
+                Report($"a check run doesn't answer the real keyboard ({(real.Count == 0 ? "none here" : string.Join(", ", real.Select(k => $"{k.name} {(k.enabled ? "on" : "OFF")}")))}"
+                       + $"; {(heard.Count > 0 ? "a key sent to it arrived on " + string.Join(", ", heard) : "a key sent to it didn't arrive")})",
+                    real.All(k => !k.enabled) && heard.Count == 0);
+            }
             var firstMouse = ClickSupport.FirstMouseReport;
             Report($"the first click on the window reaches the game (view classes: {firstMouse ?? "none yet"}; background behavior {InputSystem.settings.backgroundBehavior})",
                 !string.IsNullOrEmpty(firstMouse) && !firstMouse!.Contains("no view class") && !firstMouse.Contains("has its own")

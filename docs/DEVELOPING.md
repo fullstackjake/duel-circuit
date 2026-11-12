@@ -295,6 +295,9 @@ APP="$PWD/build/qa/Duel Circuit.app/Contents/MacOS/Duel Circuit"; for c in campa
 
 A check that stops on an exception logs `check: FAIL the check stopped on an exception` and quits.
 
+A check run answers only the test devices it adds: the computer's own mouse and keyboard are switched off for the
+run, so working beside it can't press anything in the check. Its window still comes to the front.
+
 | Check | What it covers |
 |---|---|
 | `-campaigncheck <folder>` | A fresh campaign: shop, a pack, collection deck building, a match with random clicks; checks it pays and saves |

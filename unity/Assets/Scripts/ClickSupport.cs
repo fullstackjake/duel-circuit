@@ -65,12 +65,19 @@ namespace YgoCampaign.Game
         {
             // A check run answers only its own test devices: the real mouse (the owner working beside it, the window in
             // the background) stays off, so a pointer that wanders over the window never hovers or clicks in a check.
+            // The real keyboard too: a key pressed while the check's window was in front dismissed the title screen under
+            // it. Only the machine's own keyboards (native): a check's test keyboard is added from script and stays on.
             if (DuelController.IsCheckRun)
                 foreach (var device in InputSystem.devices)
                     if (device is Mouse m && m.name != "ControllerCursor" && m.enabled)
                     {
                         InputSystem.DisableDevice(m);
                         Debug.Log($"clicks: check run, the real mouse ({m.name}) is off");
+                    }
+                    else if (device is Keyboard k && k.native && k.enabled)
+                    {
+                        InputSystem.DisableDevice(k);
+                        Debug.Log($"clicks: check run, the real keyboard ({k.name}) is off");
                     }
             Application.focusChanged += OnFocusChanged;
             InputSystem.onEvent += OnInputEvent;
