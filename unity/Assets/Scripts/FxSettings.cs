@@ -5,7 +5,7 @@ namespace YgoCampaign.Game
     /// <summary>
     /// How much spectacle a duel shows (saved settings). Big moments play in full the first time in a duel and shorter
     /// after; each kind of effect can be switched off; Reduced motion turns off shake, flashes, summon scenes, cut-ins
-    /// and drifting particles at once. Card text can be made larger, and the ▶ tabs on playable cards turned off. Only the presentation changes: the duel itself
+    /// and drifting particles at once. Card text can be made larger, and the ▶ tabs on playable cards turned on. Only the presentation changes: the duel itself
     /// plays the same.
     /// </summary>
     public static class FxSettings
@@ -43,8 +43,9 @@ namespace YgoCampaign.Game
 
         /// <summary>
         /// The gold ▶ tab above every card you can play right now, a second signal beside the gold border (not only color).
+        /// Off by default (owner, 2026-11-12): the gold border alone marks playable cards until the player turns the tab on.
         /// </summary>
-        public static bool PlayableTabs { get => PlayableTabsOverride ?? Get("playableTabs", true); set => Set("playableTabs", value); }
+        public static bool PlayableTabs { get => PlayableTabsOverride ?? Get("playableTabs", false); set => Set("playableTabs", value); }
         /// <summary>Launch option for checks (-noplaytabs).</summary>
         public static bool? PlayableTabsOverride;
 

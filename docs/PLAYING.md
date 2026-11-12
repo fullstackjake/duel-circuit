@@ -59,8 +59,8 @@ Duel Circuit plays like Master Duel: **click a card to act with it.**
    about columns, like Mekk-Knights.
 
 **More tips:**
-- Cards you can use right now have a gold border and a gold ▶ tab. (Turn the tab off with **Playable card tabs** in
-  Settings.)
+- Cards you can use right now have a gold border. For a gold ▶ tab above them too, turn on **Playable card tabs** in
+  Settings.
 - Click a Graveyard, your banished cards or your Extra Deck to look through them.
 - Point at any card to read it in the side column. Click its picture for a bigger view.
 
@@ -386,7 +386,7 @@ Open **Settings** from the main menu, or from the gear icon in a duel. Click a s
 | Slow down for combos | When a headliner (a duelist famous for one big combo) plays that combo, the duel slows to Normal speed so you can follow it |
 | Card text size | Bigger text for card effects, the log and dialogs |
 | Card term help | Card terms (Quick Effect, once per turn...) in blue; point at one to see what it means |
-| Playable card tabs | A gold ▶ tab above every card you can play now |
+| Playable card tabs | A gold ▶ tab above every card you can play now (off at first) |
 
 **Sound and screen**
 
