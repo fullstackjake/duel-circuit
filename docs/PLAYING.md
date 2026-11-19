@@ -172,17 +172,57 @@ The screen has three parts:
 | **Deck** | center | Your Main, Extra and Side Deck, with counts |
 | **Tools** | left | The selected card, opening-hand odds, and test games |
 
+Click a card to see it on the left: a white ring shows which card that is. Pointing at a card only lifts it a little,
+so the left side stays on the card you clicked while you move to its buttons. The editor opens with the first search
+result shown.
+
 ### Adding and removing cards
 
 | To do this | Do this |
 |---|---|
-| Add a card | Click it in the search results |
+| See a card on the left | Click it (in the search results, your deck or a test hand) |
+| Add a card | Click it in the search results, then click it again. **Shift+click** adds it at once. |
 | Add a card to the Side Deck | Right-click it in the search results |
-| Remove a card | Click it in your deck |
+| Take a card out | Click it in your deck, then click it again. **Shift+click** takes it out at once. |
 | Move a card between Main/Extra and Side | Right-click it in your deck |
-| Move a card anywhere | Drag it. Drag it back onto the search results to remove it. |
+| Move a card anywhere | Drag it. Drag it back onto the search results to take it out. |
 
-Extra Deck monsters always go to the Extra Deck.
+Extra Deck monsters always go to the Extra Deck. After you take a card out, the ring moves to another copy of it (or
+to its search result), never to the card that slides into the gap.
+
+"Click it again" only works on a card you clicked yourself, while it stays where it was. When the editor moved the ring
+for you (when it opens, after a card comes out, after the test hand closes), or the card has moved since (a card before
+it came out, a search put it elsewhere), the next click only picks it, and the click after that adds or takes it out.
+So one click too many never adds or takes out a card you didn't mean. If something changes by mistake, the message
+beside that part of the deck has an **Undo** button.
+
+Every change to the deck shows at once: the section's count shows **(+1)** or **(−1)**, and a message appears at the
+right of the section's title with an **Undo** button: "+ Pot of Greed", "Pot of Greed → Side", or for bigger changes
+"Sorted", "Cleared 40 cards", "Built from Stall Burn", "Imported my-deck.ydk", "Starter: Sangan". A new change replaces
+the message; quick adds of the same card to the same section become one ("+ Pot of Greed ×3"), and its Undo takes them
+all back. Point at the message to keep it open. When one card goes in, out or moves, it also flashes (green when it goes
+in, white when it moves; the gap closes when one comes out). A change the editor can't make (a fourth copy, a full Main
+Deck, a card you don't own yet) shakes the card and says why in red. The message hides while the test hand, More,
+the deck list or the bigger card view is open.
+
+**Keys** (they do nothing while you're typing in a box, and while the test hand or More filters is open: close it
+first). **Enter** in the search box shows the first result; **Enter** again adds it.
+
+| Key | In the search results | In your deck |
+|---|---|---|
+| **Enter** | Add the card with the ring | Add one more copy |
+| **Shift+Enter** | Add it to the Side Deck | Move that copy between Main and Side |
+| **Delete** or **Backspace** | Nothing | Take that copy out |
+| Arrow keys | Move the ring | Move the ring |
+| **Page Up** / **Page Down** | Turn the results page | Turn the results page |
+
+**The mouse wheel** scrolls the text of the card on the left from anywhere on the screen, except over the More filters
+panel, the row of active filters and the bigger view you get by clicking the card's picture. While the text runs on, it
+fades out with "▼ more" at the bottom.
+
+**With a controller:** **A** shows a card on the left; **A** again on the same card adds it (or takes that copy out).
+**X** sends a result to the Side Deck, or moves a deck card between Main and Side, at once. Hold **A** and move to
+drag. The right stick scrolls the card's text. **Y**, **B**, **LB** / **RB**, **View** and the d-pad work as everywhere.
 
 ### The main buttons
 
@@ -483,8 +523,6 @@ ones most likely to affect you.
 
 ### Things that affect your game
 
-- **Warrior's Charge** isn't legal at the Back Alley when you play the shop's way: it has 3 Reinforcement of the Army,
-  and the Alley allows 1. Edit the deck before you go. (Under Historic Rules you get the 2011 version, which has 1.)
 - **No Limits** in the Back Alley is locked ("Coming soon").
 - Two Back Alley opponents aren't in the game yet.
 - Difficulty isn't tuned yet. The early circuits are easy.

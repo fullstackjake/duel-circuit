@@ -1932,14 +1932,20 @@ namespace YgoCampaign.Game
         public void ClearLog()
         {
             _logLines.Clear();
+            _logOpening.Clear();
             _log.text = "";
         }
+
+        /// <summary>For checks: the duel log's first lines since it was cleared (who plays what, who says what), as appended.</summary>
+        public IReadOnlyList<string> LogOpening => _logOpening;
+        private readonly List<string> _logOpening = new List<string>();
 
         public void AppendLog(string line)
         {
             foreach (var part in line.Split('\n'))
             {
                 if (part.Length == 0) continue;
+                if (_logOpening.Count < 12) _logOpening.Add(part);
                 _logLines.Enqueue(LogStyled(part));
                 while (_logLines.Count > MaxLogLines) _logLines.Dequeue();
             }

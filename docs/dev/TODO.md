@@ -4,6 +4,16 @@ Open follow-ups noticed while building, not yet scheduled. Check one off (`[x]`)
 UI polish ideas live in [UI-ROADMAP.md](UI-ROADMAP.md); the post-game's phases in
 [POST-GAME-PLAN-2026-10-31.md](POST-GAME-PLAN-2026-10-31.md).
 
+## Deck editor (click to focus, 2026-11-19; docs/dev/EDITOR-CLICK-FOCUS-SPEC-2026-11-19.md)
+
+- [ ] **Leftovers from the final test pass (docs/dev/EVIDENCE-2026-11-19b.md), all small:** after Sort or Clear the
+  status line keeps the previous "Added ..." text (`Change` never sets it); a focused top-left deck card's ring draws
+  along the test hand overlay's edge; "▼ more" touches the last faded line at 1920x1080; Enter on a Side Deck copy adds
+  the new copy to Main (decide where); `-focuscheck`'s "closing the editor leaves no message" step can't fail (it clears
+  the signals itself first), and opening a deck from the list mid-feedback has no step.
+- [ ] **The rest of the editor review** (docs/dev/DECK-EDITOR-UX-REVIEW-2026-11-19.md): unsaved changes lost on a second
+  Back, "No limits" as the default list, small text at 1280x720, two-word search ranking, free play's "Not owned".
+
 ## Card looks (from the 2026-11-07 build; docs/dev/CARD-LOOKS-PLAN-2026-11-07.md)
 
 - [ ] **Frame time not measured.** The app has no fps or frame-time log. Measure the deck editor and a full board on
@@ -174,19 +184,26 @@ failed when a random lineup won on turn 2.
   - Done 2026-11-01: it names where the partner is really picked and only mentions an open Tag Cup.
 - [ ] **Early circuits are easy.** Apart from the guest wall, the only losses were two first matches, each won on the
   next try; 12 of 22 wins ended at full LP by turn 4-10. Vera's "the easy wins are over" is followed by a 4-0 circuit.
-- [ ] **Chain panel text clips**: a link-2 panel's text shows through link 1, and a two-target line ends in a comma
+- [x] **Chain panel text clips**: a link-2 panel's text shows through link 1, and a two-target line ends in a comma
   with the second target cut off.
-- [ ] **The "summon here" column hint shows when you can't summon** (the opponent's turn, your End Phase).
-- [ ] **Card names wrap mid-word on cards without a picture** ("Polymerizatio n"), and the editor's count badge covers
+  - Done before 2026-11-19 (opaque rows, two-line targets); confirmed by `-layoutcheck` (docs/dev/NEXT-BUILD-2026-11-19.md).
+- [x] **The "summon here" column hint shows when you can't summon** (the opponent's turn, your End Phase).
+  - Done before 2026-11-19; `-controlscheck` now also checks your End and Battle Phases.
+- [x] **Card names wrap mid-word on cards without a picture** ("Polymerizatio n"), and the editor's count badge covers
   part of the name.
-- [ ] **Partner intro lines don't fit the moment**: Ryo says "My first real duel!" when he joins as a partner; Kit says
+  - Done 2026-11-19: hyphenation keeps letter pairs and syllable starts whole ("Des-truction", "Knight-mare"); result
+    names end above their in-deck count. `-layoutcheck` checks 13 real names.
+- [x] **Partner intro lines don't fit the moment**: Ryo says "My first real duel!" when he joins as a partner; Kit says
   "I brought my Synchrons" while playing a Warriors loaner. The versus deck line can run into the < arrow.
+  - Done 2026-11-19: partners say their `partner:` line everywhere (`TagPartners.Greeting`); deck lines stop short of
+    the arrows.
 - [ ] **Cards without a picture.** Pictures come from the player's EDOPro install, and this machine's has 3,554; the
   rest (Axe of Despair, Water Dragon, most pack pulls) show the text look. Worth a one-time note telling players where
   pictures come from and how to get more.
   - 2026-11-07: the docs explain HD picture folders (`hd_pics:`, docs/CARD-PICTURES.md). An in-game note is still
     not done.
-- [ ] **The deck editor's "don't own enough of any recipe" message shows twice.**
+- [x] **The deck editor's "don't own enough of any recipe" message shows twice.**
+  - Done before 2026-11-19; `-campaigncheck` now checks it.
 - [ ] **QA tool nits**: story shots are taken mid-typewriter, `01-campaign.png` shows the first-duel offer, and every duel
   logs "turn 0 (you)" whoever starts.
 
@@ -331,9 +348,11 @@ art, no likeness to Yu-Gi-Oh! anime characters or other franchises. Their full l
   - Still to do: the mix at games 5, Nyx's remeasure, `--alley-gen`, `--campaign-test`, `--endless-test`, `--arbitrage`
     and a docs/BLACK-MARKET-DIFFICULTY doc.
   - Scratch roots and logs are in build/bm-roots/ (mkroot.sh, queue.sh). No shared file was changed.
-- [ ] **Starter decks are illegal in the alley as built:** Warrior's Charge runs 3 Reinforcement of the Army, which
+- [x] **Starter decks are illegal in the alley as built:** Warrior's Charge runs 3 Reinforcement of the Army, which
   Traditional limits to 1, so an unedited starter is refused at the versus. Check the other starters, and decide
   whether the deck screen should offer a one-click Alley fix.
+  - Done 2026-11-19: the versus offers **Make it Alley-legal** (a copy with owned cards; "(No Limits)" there); see
+    docs/dev/NEXT-BUILD-2026-11-19.md. The other starters weren't checked one by one.
 - [ ] **Yata Mags runs Fiber Jar and Magical Scientist**, both on the alley's exclusion lists (a reset, and a turn-1
   kill). Headliners play their own era's list at full strength, so the deck is unchanged. Watch for stalls in Phase D.
 - [ ] **Mass Driver Moss's list:** the deck says TCG March 2010 and runs 3 Treeborn Frog, where that list allows 2;

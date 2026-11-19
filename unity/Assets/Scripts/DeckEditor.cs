@@ -18,9 +18,10 @@ namespace YgoCampaign.Game
     /// Build and edit decks: one-box search with quick filters, Main / Extra / Side grids, ban list checks,
     /// opening-hand odds for marked starters, a background bot test, undo/redo, test hands, and .ydk / YDKE
     /// import-export. Decks are saved to mods/decks; built-in decks are read-only (saving makes your own copy).
-    /// Click a search result to add it (right-click: Side Deck); click a deck card to remove it
-    /// (right-click: move between Main/Extra and Side). Or drag: results onto a deck section, deck cards between
-    /// sections, or a deck card back onto the search panel to remove it. Hover anything for details.
+    /// Click a card to focus it (it shows on the left); click the focused card again to add it (a search result) or take
+    /// that copy out (a deck card); Shift+click does it at once; right-click: the Side Deck (DeckEditor.Focus). Or drag:
+    /// results onto a deck section, deck cards between sections, or a deck card back onto the search panel to remove it.
+    /// Every change shows on the card, the section's count and a message with Undo (DeckEditor.Feedback).
     /// </summary>
     public sealed partial class DeckEditor : MonoBehaviour
     {
@@ -114,7 +115,8 @@ namespace YgoCampaign.Game
         // State.
         private Deck _deck = new Deck { Name = "new deck" };
         private bool _dirty;
-        private readonly Stack<Deck> _undo = new Stack<Deck>(), _redo = new Stack<Deck>();
+        /// <summary>The decks before each change (and after each undo), with what the change was ("+ Pot of Greed").</summary>
+        private readonly Stack<(Deck deck, string what)> _undo = new Stack<(Deck, string)>(), _redo = new Stack<(Deck, string)>();
         private CardInfo? _selected;
         private List<CardInfo> _results = new List<CardInfo>();
         private int _page;
@@ -252,7 +254,7 @@ namespace YgoCampaign.Game
             if (!CanPass(key)) { SetStatus(NoPass?.Contains(key) == true ? $"{_selected.Name} can't be passed: it wins on its own." : $"{_selected.Name} isn't limited by this ban list."); return; }
             if (passes.Count >= Passes) { SetStatus($"All {Passes} Ban Passes are in use. Remove one first."); return; }
             if (_banlists[_banIndex].Allowed(key, _cards) + passes.Count(c => c == key) >= Collection.MaxCopies) { SetStatus($"{_selected.Name} is already allowed at 3."); return; }
-            Change(d => BanPasses.Set(d, passes.Append(key)));
+            Change(d => BanPasses.Set(d, passes.Append(key)), $"+ Pass on {_selected.Name}", $"Ban Pass: + {_selected.Name}");
             SetStatus($"Ban Pass on {_selected.Name}: one more copy allowed ({BanPasses.Of(_deck).Count} of {Passes} passes used).");
         }
 
@@ -264,7 +266,7 @@ namespace YgoCampaign.Game
             int at = passes.IndexOf(key);
             if (at < 0) return;
             passes.RemoveAt(at);
-            Change(d => BanPasses.Set(d, passes));
+            Change(d => BanPasses.Set(d, passes), $"− Pass on {_selected.Name}", $"Ban Pass: − {_selected.Name}");
         }
 
         public void Open(string? deckName, Collection? owned = null, string? banlist = null) => Open(deckName, owned, banlist, null);
@@ -332,11 +334,16 @@ namespace YgoCampaign.Game
                 RefreshDeck();
             }
             RunSearch();
+            // On open the first result is focused (shown on the left, ringed, not armed); searches and pages never move the focus.
+            _focusZone = FocusZone.None;
+            _stickRested = false;
+            if (_results.Count > 0) FocusResult(_results[0], viewed: false);
+            else { ShowRing(); }
             if (owned != null)
                 SetStatus($"Collection mode: you can use the {owned.Total} cards you own ({owned.Distinct} different). Buy packs in the Card Shop for more.");
             OfferRecovery();
 #if ENABLE_INPUT_SYSTEM
-            ControllerSupport.Legend = "A  add / remove  ·  X  to / from Side  ·  Y  favorite  ·  hold A  drag  ·  B  back  ·  LB / RB  page  ·  "
+            ControllerSupport.Legend = "A  look  ·  A again  add / remove  ·  X  to / from Side  ·  Y  favorite  ·  hold A  drag  ·  B  back  ·  LB / RB  page  ·  "
                                        + $"{ControllerBindings.Label(PadAction.Terms)}  more filters  ·  D-pad  jump";
 #endif
         }
@@ -350,17 +357,12 @@ namespace YgoCampaign.Game
         public void ControllerBack()
         {
             if (MoreOpen) CloseMore();
-            else if (_handOverlay.gameObject.activeSelf) _handOverlay.gameObject.SetActive(false);
+            else if (_handOverlay.gameObject.activeSelf) CloseTestHand();
             else Confirmed("back", Close);
         }
 
         /// <summary>Controller LB / RB: previous / next page of search results (the More panel covers them while it's open).</summary>
-        public void ControllerPage(int delta)
-        {
-            if (MoreOpen) return;
-            _page += delta;
-            ShowResults();
-        }
+        public void ControllerPage(int delta) => TurnPage(delta);
 
         /// <summary>Controller View (the hint bar's "more filters"): opens or closes the More filters panel.</summary>
         public void ControllerMore() => ToggleMore();
@@ -388,7 +390,6 @@ namespace YgoCampaign.Game
             if (query != null) _searchField.text = query; // triggers the search
             if (runTest) RunTest();
             if (testHand) ShowTestHand(true);
-            if (_results.Count > 0) ShowDetail(_results[0]);
         }
 
         private CardArt? _artAside;
@@ -413,13 +414,14 @@ namespace YgoCampaign.Game
         }
 
         /// <summary>
-        /// For checks: the drawn cards' names that break a word mid-word or sit under a card's limit badge, how many
-        /// text-look names were looked at, and how many of those wear a badge. Call a frame after drawing (the text is laid out when it's drawn).
+        /// For checks: the drawn cards' names that break a word mid-word (or hyphenate inside "gh", "th"...) or sit under a
+        /// card's limit badge or in-deck count, how many text-look names were looked at, how many of those wear a limit badge
+        /// and how many an in-deck count. Call a frame after drawing (the text is laid out when it's drawn).
         /// </summary>
-        public (List<string> problems, int names, int badges) DebugNameProblems()
+        public (List<string> problems, int names, int badges, int counts) DebugNameProblems()
         {
             var problems = new List<string>();
-            int names = 0, badges = 0;
+            int names = 0, badges = 0, counts = 0;
             var corners = new Vector3[4];
             foreach (var layer in new[] { _cardsLayer, _resultsLayer })
                 foreach (var view in layer.GetComponentsInChildren<CardView>())
@@ -427,6 +429,16 @@ namespace YgoCampaign.Game
                     if (view.transform.Find("Face/Name") is not RectTransform nameRt || nameRt.GetComponent<Text>() is not Text name) continue;
                     names++;
                     foreach (var broken in CardView.BrokenWords(name)) problems.Add(broken);
+                    foreach (var split in CardView.SplitDigraphs(name)) problems.Add(split);
+                    // The in-deck count ("x2", a result's bottom right): the name's box ends above it.
+                    if (view.transform.Find("InDeck") is RectTransform count)
+                    {
+                        counts++;
+                        count.GetWorldCorners(corners);
+                        float countTop = corners[1].y;
+                        nameRt.GetWorldCorners(corners);
+                        if (corners[0].y < countTop - 0.5f) problems.Add($"\"{name.text.Replace("\n", "/")}\" runs down behind its in-deck count");
+                    }
                     if (view.transform.Find("Limit") is RectTransform badge)
                     {
                         badges++;
@@ -436,7 +448,7 @@ namespace YgoCampaign.Game
                         if (corners[1].y > badgeBottom + 0.5f) problems.Add($"\"{name.text.Replace("\n", "/")}\" starts behind its limit badge");
                     }
                 }
-            return (problems, names, badges);
+            return (problems, names, badges, counts);
         }
 
         /// <summary>For automated checks: shows a card as a click does; what's selected, the CARD TEXT switch and the text note read.</summary>
@@ -553,9 +565,15 @@ namespace YgoCampaign.Game
             void Report(string what, bool ok) => Debug.Log($"drag test: {(ok ? "ok  " : "FAIL")} {what}");
 
             int main = _deck.Main.Count, extra = _deck.Extra.Count, side = _deck.Side.Count;
+            var dragged = _results.Count > _page * ResultsPerPage ? _cards.Get(Key(_results[_page * ResultsPerPage].Code))?.Name ?? "" : "";
+            // Focus elsewhere first (a deck card), so the drag has to move it.
+            if (_deckViews.Count > 0) FocusDeck(_deckViews[0].section, _deckViews[0].index, viewed: false);
             Drag(FirstResult(), ZoneCenter(Zone.Main));
             yield return null;
             Report($"result -> Main/Extra (main {main}->{_deck.Main.Count}, extra {extra}->{_deck.Extra.Count})", _deck.Main.Count + _deck.Extra.Count == main + extra + 1);
+            var focus = DebugFocus;
+            Report($"a drag focuses the dragged card (focus: {focus.zone} {focus.card}, ring on {focus.ring}; dragged {dragged})",
+                focus.zone == "Results" && focus.card == dragged && focus.ring == "result 0");
 
             side = _deck.Side.Count;
             Drag(FirstResult(), ZoneCenter(Zone.Side));
@@ -581,6 +599,8 @@ namespace YgoCampaign.Game
         {
             // Leaving on purpose (after the "unsaved changes" warning) drops the recovery copy; a crash or quit keeps it.
             if (_dirty) ClearRecovery();
+            ClearFeedback();
+            _dragging = false;
 #if ENABLE_INPUT_SYSTEM
             ControllerSupport.Legend = null;
 #endif
@@ -600,6 +620,8 @@ namespace YgoCampaign.Game
 #else
             if (MoreOpen && Input.GetKeyDown(KeyCode.Escape)) CloseMore();
 #endif
+            FocusInput(); // the focus's keys, the wheel, the right stick (DeckEditor.Focus)
+            AnimateFeedback(); // what a change shows (DeckEditor.Feedback)
             // The bot test runs on a background thread; show its progress here.
             if (_tester.Running || _wasTesting)
             {
@@ -633,6 +655,8 @@ namespace YgoCampaign.Game
             BuildDetail();
             BuildToolbar();
             BuildDeckArea();
+            _pillLayer = Box(_root, 0, 0, 1920, 1080); // the change messages: over the deck, under every overlay built or opened later
+            _pillLayer.name = "ChangeMessages";
             BuildSearch();
             BuildTestHand();
             BuildGhost();
@@ -676,6 +700,10 @@ namespace YgoCampaign.Game
             // The card, Master Duel style (name bar, Attribute, picture, stats with icons, type bar, text).
             _cardDetail = new CardDetail(Box(_root, 20, 20, 360, 420)) { StylePicker = true };
             _cardDetail.Clicked += ShowReading;
+            // Click to focus: the text says when it runs on, and the wheel scrolls it from anywhere (DeckEditor.Focus).
+            _cardDetail.ScrollHints = true;
+            _cardDetail.KeepScrollOnSameCard = true;
+            _cardDetail.EmptyHint = "Click a card to read it.";
             // Its genre chips and archetype chips search for more cards like it (in a duel they stay hover-only).
             _cardDetail.GenreClicked = SearchGenre;
             _cardDetail.ArchetypesOf = info => _search.ArchetypesOf(info);
@@ -762,8 +790,8 @@ namespace YgoCampaign.Game
 
             Button(410, 58, 58, 34, "Undo", Undo);
             Button(474, 58, 58, 34, "Redo", Redo);
-            Button(538, 58, 54, 34, "Sort", () => Change(d => { d.Main = DeckRules.Sorted(d.Main, _cards); d.Extra = DeckRules.Sorted(d.Extra, _cards); d.Side = DeckRules.Sorted(d.Side, _cards); }));
-            Button(598, 58, 56, 34, "Clear", () => Change(d => { d.Main.Clear(); d.Extra.Clear(); d.Side.Clear(); }));
+            Button(538, 58, 54, 34, "Sort", () => Change(d => { d.Main = DeckRules.Sorted(d.Main, _cards); d.Extra = DeckRules.Sorted(d.Extra, _cards); d.Side = DeckRules.Sorted(d.Side, _cards); }, "Sort", "Sorted"));
+            Button(598, 58, 56, 34, "Clear", ClearDeck);
             Button(660, 58, 86, 34, "Test hand", () => ShowTestHand(true));
             // Import: a YDKE link or .ydk text from the clipboard; Import .ydk: a .ydk file, picked in macOS's open panel.
             _freeTools = new[]
@@ -813,6 +841,7 @@ namespace YgoCampaign.Game
             var T = UiTheme.Current;
             _searchField = Ui.Input(Box(_root, 1410, 10, 406, 40), "search: name, text, lv8, atk>2000, @archetype...", 16,
                 v => { _query = v; RunSearch(); });
+            _searchField.onSubmit.AddListener(_ => SearchEntered());
             // Where the box's plain words look: Name + text, Name, Text (click: the next, right-click: the previous).
             var mode = Box(_root, 1820, 10, 90, 40);
             Ui.Image(mode, T.Inset);
@@ -899,8 +928,9 @@ namespace YgoCampaign.Game
             _searchLayout.Add(("Prev", (RectTransform)prev.transform));
             _searchLayout.Add(("page", _pageLabel.rectTransform));
             _searchLayout.Add(("Next", (RectTransform)next.transform));
-            var help = Label(1410, 980, 500, 90, "Click a card: add it.  Right-click: add to Side Deck.  Or drag it onto a section.\n"
-                + "Click a deck card: remove it.  Right-click: move to / from Side.\nPickers: click for the next option, right-click for the previous.",
+            var help = Label(1410, 980, 500, 90, "Click a card to see it on the left. Click it again to add it.\n"
+                + "Click a card in your deck, then again, to take it out. Shift+click does it at once.\n"
+                + "Right-click: Side Deck. Enter: add. Delete: remove. Drag cards anywhere.",
                 13, TextAnchor.UpperLeft);
             help.color = T.Caption.WithAlpha(0.55f);
             _searchLayout.Add(("help", help.rectTransform));
@@ -1358,6 +1388,7 @@ namespace YgoCampaign.Game
 
         private void BeginDrag(uint code, Vector2 screen)
         {
+            _dragging = true;
             var info = _cards.Get(code);
             var art = CardView.Art?.Get(code);
             _ghostArt.texture = art;
@@ -1382,6 +1413,7 @@ namespace YgoCampaign.Game
 
         private Zone EndDrag(Vector2 screen)
         {
+            _dragging = false;
             _ghost.gameObject.SetActive(false);
             foreach (var (zone, _, image) in _zones) image.color = zone == Zone.Search ? new Color(0, 0, 0, 0) : ZoneIdle;
             return ZoneAt(screen);
@@ -1404,12 +1436,7 @@ namespace YgoCampaign.Game
         /// <summary>A deck card dropped somewhere: move between Main/Extra and Side, or remove it on the search panel.</summary>
         private void DropDeckCard(DeckSection from, int index, Zone zone)
         {
-            if (zone == Zone.Search)
-            {
-                var name = _cards.Get(Section(_deck, from)[index])?.Name ?? "card";
-                Change(d => Section(d, from).RemoveAt(index));
-                SetStatus($"Removed {name}.");
-            }
+            if (zone == Zone.Search) RemoveAt(from, index);
             else if (zone == Zone.Side && from != DeckSection.Side) MoveSection(from, index);
             else if ((zone == Zone.Main || zone == Zone.Extra) && from == DeckSection.Side) MoveSection(from, index);
         }
@@ -1423,43 +1450,73 @@ namespace YgoCampaign.Game
             _handCards = Box(_handOverlay, 0, 50, 980, 280);
             Button(20, 360, 160, 40, "Draw again", () => ShowTestHand(false), _handOverlay);
             Button(190, 360, 220, 40, "Going first / second", () => { _testHandSecond = !_testHandSecond; ShowTestHand(false); }, _handOverlay);
-            Button(840, 360, 120, 40, "Close", () => _handOverlay.gameObject.SetActive(false), _handOverlay);
+            Button(840, 360, 120, 40, "Close", CloseTestHand, _handOverlay);
             _handOverlay.gameObject.SetActive(false);
         }
 
         // ------------------------------------------------------------------ Deck changes
 
-        /// <summary>Applies an edit with undo support.</summary>
-        private void Change(Action<Deck> edit)
+        /// <summary>
+        /// Applies an edit with undo support; <paramref name="what"/> names it for the Undo message ("+ Pot of Greed",
+        /// "Clear (40 cards)").
+        /// </summary>
+        /// <param name="words">The message's words (default <paramref name="what"/>): "Sorted", "Cleared 40 cards", "+ Pot of Greed".</param>
+        /// <param name="kind">What it is for the signals: Bulk (counts and the message), or an add, removal or move of one card.</param>
+        private void Change(Action<Deck> edit, string what = "Change", string? words = null, ChangeKind kind = ChangeKind.Bulk, uint key = 0, DeckSection? at = null)
         {
-            _undo.Push(_deck.Clone());
+            var before = _deck.Clone();
+            _undo.Push((before, what));
             _redo.Clear();
             edit(_deck);
             MarkDirty();
             RefreshDeck();
+            // Every change signals: its counts and a message (with Undo) that replaces the one before.
+            Signal(before, kind, words ?? what, at ?? ChangedSection(before), key);
         }
 
-        private void Add(CardInfo info, bool side)
+        /// <summary>Clear: the whole deck out (Undo puts it back: "Undone: Clear (40 cards)").</summary>
+        private void ClearDeck()
+        {
+            int n = _deck.Main.Count + _deck.Extra.Count + _deck.Side.Count;
+            Change(d => { d.Main.Clear(); d.Extra.Clear(); d.Side.Clear(); }, $"Clear ({n} card{(n == 1 ? "" : "s")})", $"Cleared {n} card{(n == 1 ? "" : "s")}");
+        }
+
+        /// <summary>For checks: the Clear button.</summary>
+        public void DebugClearDeck() => ClearDeck();
+
+        private static int MaxOf(DeckSection section) => section == DeckSection.Main ? DeckRules.MainMax : section == DeckSection.Extra ? DeckRules.ExtraMax : DeckRules.SideMax;
+
+        /// <summary>
+        /// One copy into the deck: Main/Extra, or the Side Deck. Refused (3 copies, not owned, all your copies in, the
+        /// section full): the tile <paramref name="from"/> (default: the card's search result) shakes and the reason shows.
+        /// </summary>
+        private void Add(CardInfo info, bool side, TileRef? from = null)
         {
             info = Resolve(info);
             Viewed(info); // picked, so it's one you looked at (Recently viewed)
+            var key = Banlist.BaseCode(info.Code, _cards);
             int copies = CopiesInDeck(info.Code);
-            if (copies >= 3) { SetStatus($"You already have 3 copies of {info.Name}."); return; }
-            if (OwnedCards != null && copies >= OwnedCards.Count(Banlist.BaseCode(info.Code, _cards)))
+            var section = side ? DeckSection.Side : DeckRules.HomeSection(info);
+            var tile = from ?? TileRef.Result(key);
+            if (copies >= 3) { SetStatus($"You already have 3 copies of {info.Name}."); Refuse("You already have 3.", section, tile); return; }
+            int own = OwnedCards?.Count(key) ?? 3;
+            if (OwnedCards != null && copies >= own)
             {
-                var own = OwnedCards.Count(Banlist.BaseCode(info.Code, _cards));
-                SetStatus(own == 0 ? $"You don't own {info.Name} yet. Get it {WhereToGet?.Invoke(Banlist.BaseCode(info.Code, _cards)) ?? "in the Card Shop"}."
+                SetStatus(own == 0 ? $"You don't own {info.Name} yet. Get it {WhereToGet?.Invoke(key) ?? "in the Card Shop"}."
                     : $"You own {own} {info.Name} and they're all in the deck.");
+                Refuse(own == 0 ? "You don't own it yet." : "All your copies are in.", section, tile);
                 return;
             }
-            var section = side ? DeckSection.Side : DeckRules.HomeSection(info);
-            var list = Section(_deck, section);
-            int max = section == DeckSection.Main ? DeckRules.MainMax : section == DeckSection.Extra ? DeckRules.ExtraMax : DeckRules.SideMax;
-            if (list.Count >= max) { SetStatus($"The {section} Deck is full ({max} cards)."); return; }
-            Change(d => Section(d, section).Add(info.Code));
-            SetStatus($"Added {info.Name} to the {section} Deck.");
+            int max = MaxOf(section);
+            if (Section(_deck, section).Count >= max) { SetStatus($"The {section} Deck is full ({max} cards)."); Refuse($"{section} Deck is full ({max}).", section, tile); return; }
+            Change(d => Section(d, section).Add(info.Code), $"+ {info.Name}", $"+ {info.Name}", ChangeKind.Add, key, section);
+            // Of how many this deck may hold: 3, the copies you own, and the ban list's allowance (with your Ban Passes).
+            int limit = Math.Min(Math.Min(3, own), EffectiveList.Allowed(info.Code, _cards));
+            SetStatus(copies + 1 <= limit ? $"Added {info.Name} ({copies + 1} of {limit})."
+                : $"Added {info.Name} ({copies + 1}; {_banlists[_banIndex].Name} allows {limit}).");
         }
 
+        /// <summary>The panel's Remove one: the last copy of the card in the deck (Main, then Extra, then Side).</summary>
         private void RemoveOne(uint code)
         {
             var key = Banlist.BaseCode(code, _cards);
@@ -1467,22 +1524,63 @@ namespace YgoCampaign.Game
             {
                 var index = Section(_deck, section).FindLastIndex(c => Banlist.BaseCode(c, _cards) == key);
                 if (index < 0) continue;
-                Change(d => Section(d, section).RemoveAt(index));
+                RemoveAt(section, index);
                 return;
             }
         }
 
-        /// <summary>Right-click on a deck card: Main/Extra -> Side, Side -> back to where the card belongs.</summary>
+        /// <summary>
+        /// One copy out of the deck (a click on the focused copy, Shift+click, Delete, Remove one, a drag onto the search
+        /// panel). The focused copy taken out moves the ring (<see cref="RefocusAfterRemoval"/>).
+        /// </summary>
+        private void RemoveAt(DeckSection section, int index)
+        {
+            var list = Section(_deck, section);
+            if (index < 0 || index >= list.Count) return;
+            var code = list[index];
+            var key = Key(code);
+            var name = _cards.Get(code)?.Name ?? code.ToString();
+            bool focused = FocusLeaving(section, index);
+            Change(d => Section(d, section).RemoveAt(index), $"− {name}", $"− {name}", ChangeKind.Remove, key, section);
+            if (focused) RefocusAfterRemoval(section, index, key);
+            SetStatus($"Took out {name}. Undo brings it back.");
+        }
+
+        /// <summary>
+        /// Right-click on a deck card (or Shift+Enter): Main/Extra -> Side, Side -> back to where the card belongs. The focus
+        /// follows the card. Refused when the other section is full.
+        /// </summary>
         private void MoveSection(DeckSection from, int index)
         {
-            var code = Section(_deck, from)[index];
+            var list = Section(_deck, from);
+            if (index < 0 || index >= list.Count) return;
+            var code = list[index];
             var info = _cards.Get(code);
+            var key = Key(code);
+            var name = info?.Name ?? code.ToString();
             var to = from == DeckSection.Side ? (info != null ? DeckRules.HomeSection(info) : DeckSection.Main) : DeckSection.Side;
+            int max = MaxOf(to);
+            if (Section(_deck, to).Count >= max)
+            {
+                SetStatus($"The {to} Deck is full ({max} cards).");
+                Refuse($"{to} Deck is full ({max}).", to, DeckTile(from, index));
+                return;
+            }
+            bool focused = FocusLeaving(from, index);
+            int copyThere = Section(_deck, to).Count(c => Key(c) == key);
             Change(d =>
             {
                 Section(d, from).RemoveAt(index);
                 Section(d, to).Add(code);
-            });
+            }, $"{name} → {SectionName(to)}", $"{name} → {SectionName(to)}", ChangeKind.Move, key, to);
+            if (focused)
+            {
+                _focusSection = to;
+                _focusCopy = copyThere;
+                _armedAt = null; // it moved: the next click on it arms it again
+                ShowRing();
+            }
+            SetStatus($"Moved {name} to the {to} Deck.");
         }
 
         private static List<uint> Section(Deck d, DeckSection s) => s == DeckSection.Main ? d.Main : s == DeckSection.Extra ? d.Extra : d.Side;
@@ -1493,29 +1591,74 @@ namespace YgoCampaign.Game
             return _deck.Main.Concat(_deck.Extra).Concat(_deck.Side).Count(c => Banlist.BaseCode(c, _cards) == key);
         }
 
-        private void Undo()
+        private void Undo() => UndoSteps(1);
+        private void Redo() => RedoSteps(1);
+
+        /// <summary>Undo, <paramref name="steps"/> times at once (the Undo of a merged "+ Pot of Greed ×3" message), with one signal.</summary>
+        private void UndoSteps(int steps)
         {
             if (_undo.Count == 0) { SetStatus("Nothing to undo."); return; }
-            _redo.Push(_deck.Clone());
-            _deck = _undo.Pop();
+            var was = _deck;
+            var whats = new List<string>();
+            for (int i = 0; i < steps && _undo.Count > 0; i++)
+            {
+                var (deck, what) = _undo.Pop();
+                _redo.Push((_deck.Clone(), what));
+                _deck = deck;
+                whats.Add(what);
+            }
             MarkDirty();
             RefreshDeck();
+            var label = StepsLabel(whats);
+            SetStatus($"Undone: {label}.");
+            Signal(was, ChangeKind.Undo, $"Undone: {label}", ChangedSection(was), 0, whats.Count);
         }
 
-        private void Redo()
+        private void RedoSteps(int steps)
         {
             if (_redo.Count == 0) { SetStatus("Nothing to redo."); return; }
-            _undo.Push(_deck.Clone());
-            _deck = _redo.Pop();
+            var was = _deck;
+            var whats = new List<string>();
+            for (int i = 0; i < steps && _redo.Count > 0; i++)
+            {
+                var (deck, what) = _redo.Pop();
+                _undo.Push((_deck.Clone(), what));
+                _deck = deck;
+                whats.Add(what);
+            }
             MarkDirty();
             RefreshDeck();
+            var label = StepsLabel(whats);
+            SetStatus($"Redone: {label}.");
+            Signal(was, ChangeKind.Redo, $"Redone: {label}", ChangedSection(was), 0, whats.Count);
+        }
+
+        /// <summary>"+ Pot of Greed", "+ Pot of Greed ×3", or the labels in a row when they differ.</summary>
+        private static string StepsLabel(List<string> whats) =>
+            whats.Count > 1 && whats.Distinct().Count() == 1 ? $"{whats[0]} ×{whats.Count}" : string.Join(", ", whats);
+
+        /// <summary>The section an undo or redo changed most (Main when none or all alike), for its message.</summary>
+        private DeckSection ChangedSection(Deck was)
+        {
+            var best = DeckSection.Main;
+            int most = 0;
+            foreach (var s in new[] { DeckSection.Main, DeckSection.Extra, DeckSection.Side })
+            {
+                var a = Section(was, s);
+                var b = Section(_deck, s);
+                int d = Math.Abs(a.Count - b.Count) + (a.Count == b.Count && !a.SequenceEqual(b) ? 1 : 0);
+                if (d > most) { most = d; best = s; }
+            }
+            return best;
         }
 
         private void ToggleStarter()
         {
             if (_selected == null) return;
             var key = Banlist.BaseCode(_selected.Code, _cards);
-            Change(d => { if (!d.Starters.Remove(key)) d.Starters.Add(key); });
+            bool off = _deck.Starters.Contains(key);
+            Change(d => { if (!d.Starters.Remove(key)) d.Starters.Add(key); }, off ? $"starter mark off {_selected.Name}" : $"starter mark on {_selected.Name}",
+                off ? $"Not a starter: {_selected.Name}" : $"Starter: {_selected.Name}");
             ShowDetail(_selected);
         }
 
@@ -1524,6 +1667,8 @@ namespace YgoCampaign.Game
         private void NewDeck()
         {
             _deck = new Deck { Name = OwnedCards != null ? "my campaign deck" : "new deck", Campaign = OwnedCards != null };
+            LeaveDeckFocus();
+            ClearFeedback();
             RememberVersions();
             _undo.Clear();
             _redo.Clear();
@@ -1532,7 +1677,13 @@ namespace YgoCampaign.Game
             ShowName(_deck.Name);
             _labelField.SetTextWithoutNotify("");
             RefreshDeck();
-            SetStatus("New deck. Search on the right and click cards to add them.");
+            SetStatus("New deck. Search on the right: click a card to see it, click it again to add it.");
+        }
+
+        /// <summary>Another deck: a focus on a copy (or a test hand card) of the one before means nothing in it.</summary>
+        private void LeaveDeckFocus()
+        {
+            if (_focusZone == FocusZone.Deck || _focusZone == FocusZone.Hand) _focusZone = FocusZone.None;
         }
 
         /// <summary>Shows a deck's name in the name field, small enough to read whole ("... (new)" isn't cut off).</summary>
@@ -1576,6 +1727,8 @@ namespace YgoCampaign.Game
         {
             _deck = _library.Load(name);
             _deck.Name = name;
+            LeaveDeckFocus();
+            ClearFeedback();
             RememberVersions();
             _undo.Clear();
             _redo.Clear();
@@ -1857,7 +2010,7 @@ namespace YgoCampaign.Game
                 // Named after the recipe ("Stall Burn"), which Save as new offers as the new deck's name.
                 if (!d.Notes.ContainsKey("title")) d.Notes["title"] = DeckTitle(recipe.Name);
                 d.Starters = recipe.Starters.ToList();
-            });
+            }, $"Recipe ({DeckTitle(recipe.Name)})", $"Built from {DeckTitle(recipe.Name)}");
             _rebuilt = true;
             var next = _recipes[_recipeIndex % _recipes.Count];
             int missing = AutoDeck.Missing(recipe, OwnedCards, list, _cards).Count;
@@ -1868,6 +2021,23 @@ namespace YgoCampaign.Game
                       + (missing > 0 ? $" Its {missing} missing cards are on your wishlist in the Card Shop." : "")
                       + $" Click Recipe again for {DeckTitle(next.recipe.Name)} ({Math.Round(next.owned * 100)}%).");
             if (PayOwed?.Invoke() is { Length: > 0 } paid) SetStatus(_status.text + "  " + paid);
+        }
+
+        /// <summary>
+        /// For automated checks: Recipe pressed twice with no recipe ready (none you own a quarter of): the status line after
+        /// each press. The Recipe list and what was said are put back after.
+        /// </summary>
+        public (string first, string second) DebugNoRecipeTwice()
+        {
+            var (keep, keepSaid) = (_recipes, _noRecipeSaid);
+            _recipes = new List<(Deck, double)>();
+            _noRecipeSaid = null;
+            NextRecipe();
+            var first = _status.text;
+            NextRecipe();
+            var second = _status.text;
+            (_recipes, _noRecipeSaid) = (keep, keepSaid);
+            return (first, second);
         }
 
         /// <summary>For automated checks: presses Recipe and reports the problems left.</summary>
@@ -2015,7 +2185,7 @@ namespace YgoCampaign.Game
             if (OwnedCards == null) return;
             var result = AutoDeck.Fix(_deck, OwnedCards, EffectiveList, _cards, Released);
             if (result.Changes.Count == 0) { SetStatus($"Nothing to fix: the deck is legal under {_banlists[_banIndex].Name} with cards you own."); return; }
-            Change(d => { d.Main = result.Deck.Main; d.Extra = result.Deck.Extra; d.Side = result.Deck.Side; });
+            Change(d => { d.Main = result.Deck.Main; d.Extra = result.Deck.Extra; d.Side = result.Deck.Side; }, "Auto-fix", "Auto-fixed for the list");
             SetStatus($"Auto-fix (Undo to revert): {string.Join("; ", result.Changes.Take(6))}{(result.Changes.Count > 6 ? "; ..." : "")}");
         }
 
@@ -2049,7 +2219,7 @@ namespace YgoCampaign.Game
                 // A new deck: the old one's name, story and combo starters don't describe it (its Ban Passes and label stay).
                 foreach (var key in StoryNotes) d.Notes.Remove(key);
                 d.Starters.Clear();
-            });
+            }, "Build", core != null ? $"Built around {_cards.Get(core.Value)?.Name}" : "Built from your collection");
             _rebuilt = true;
             var built = core != null ? $"Built around {_cards.Get(core.Value)?.Name}" : "Built from your collection";
             var loss = GivesUp(was, _deck);
@@ -2090,7 +2260,7 @@ namespace YgoCampaign.Game
             var text = GUIUtility.systemCopyBuffer ?? "";
             var deck = DeckCodes.Parse(text, _deck.Name);
             if (deck == null) { SetStatus("The clipboard doesn't hold a YDKE link or .ydk text."); return; }
-            Change(d => { d.Main = deck.Main; d.Extra = deck.Extra; d.Side = deck.Side; if (deck.Starters.Count > 0) d.Starters = deck.Starters; });
+            Change(d => { d.Main = deck.Main; d.Extra = deck.Extra; d.Side = deck.Side; if (deck.Starters.Count > 0) d.Starters = deck.Starters; }, "Import", "Imported from the clipboard");
             _rebuilt = true;
             SetStatus($"Imported {deck.Main.Count} / {deck.Extra.Count} / {deck.Side.Count} cards from the clipboard.");
         }
@@ -2161,7 +2331,7 @@ namespace YgoCampaign.Game
                 d.Starters = new List<uint>();
                 foreach (var key in StoryNotes) d.Notes.Remove(key); // the old deck's story isn't this one's
                 d.Name = deck.Name;
-            });
+            }, "Import .ydk", $"Imported {System.IO.Path.GetFileName(path)}");
             ShowName(_deck.Name);
             _rebuilt = true;
             SetStatus(read.Summary(System.IO.Path.GetFileName(path)) + " Save asks how to save it.");
@@ -2380,14 +2550,13 @@ namespace YgoCampaign.Game
         {
             var T = UiTheme.Current;
             for (int i = _cardsLayer.childCount - 1; i >= 0; i--) Destroy(_cardsLayer.GetChild(i).gameObject);
+            _deckViews.Clear();
+            _offHome.Clear();
             Grid(_deck.Main, DeckSection.Main, 152, 4);
             Grid(_deck.Extra, DeckSection.Extra, 564, 1);
             Grid(_deck.Side, DeckSection.Side, 688, 1);
 
-            _mainHeader.text = $"<b>Main {_deck.Main.Count}</b>   {DeckRules.Breakdown(_deck.Main, _cards)}";
-            _extraHeader.text = $"<b>Extra {_deck.Extra.Count}</b>   {DeckRules.ExtraBreakdown(_deck.Extra, _cards)}";
-            _sideHeader.text = $"<b>Side {_deck.Side.Count}</b>   {DeckRules.Breakdown(_deck.Side, _cards)}";
-            foreach (var t in new[] { _mainHeader, _extraHeader, _sideHeader }) t.supportRichText = true;
+            ShowHeaders(); // "Main 40" and what's in it, with a change's "(+1)" (DeckEditor.Feedback)
 
             var banlist = _banlists[_banIndex];
             _banLabel.text = Format != null && Format.Pool.Length > 0
@@ -2449,10 +2618,11 @@ namespace YgoCampaign.Game
                     Code = info.Code, Type = info.Type, Level = info.Level, Rank = info.Level, Attack = info.Attack,
                     Defense = info.Defense, LinkRating = info.Level, Position = Ygo.Engine.Position.FaceUpAttack, IsPublic = true,
                 };
+                // Click to focus (pointing only lifts it): DeckEditor.Focus.
                 var view = CardView.Create(_cardsLayer, new Vector2(x - 960, 540 - y), DeckCard, card, info, 0, true,
-                    ShowDetail, offField: true, onClick: () => Change(d => Section(d, section).RemoveAt(index)),
-                    onRightClick: () => MoveSection(section, index),
-                    highlight: _deck.Starters.Contains(Banlist.BaseCode(codes[index], _cards)));
+                    null, offField: true, highlight: _deck.Starters.Contains(Banlist.BaseCode(codes[index], _cards)));
+                view.EditorMode(button => ClickDeck(section, index, button));
+                _deckViews.Add((section, index, view, ((RectTransform)view.transform).anchoredPosition));
                 int allowed = limits.Allowed(codes[i], _cards);
                 // A card a Ban Pass lets in shows a gold P instead of its limit.
                 var baseCode = Banlist.BaseCode(codes[i], _cards);
@@ -2460,7 +2630,7 @@ namespace YgoCampaign.Game
                 else if (allowed < 3) Badge(view.transform, allowed == 0 ? "X" : allowed.ToString(), allowed == 0 ? Ui.Hex("#D9433F") : Ui.Hex("#E3A21A"));
                 var code = codes[i];
                 var drag = view.gameObject.AddComponent<DragSource>();
-                drag.Began = p => BeginDrag(code, p);
+                drag.Began = p => { FocusDeck(section, index, viewed: false); BeginDrag(code, p); }; // a drag focuses the dragged card (not "viewed")
                 drag.Moved = p => MoveDrag(p, fromDeck: true);
                 drag.Dropped = p => DropDeckCard(section, index, EndDrag(p));
             }
@@ -2634,6 +2804,7 @@ namespace YgoCampaign.Game
         {
             var T = UiTheme.Current;
             for (int i = _resultsLayer.childCount - 1; i >= 0; i--) Destroy(_resultsLayer.GetChild(i).gameObject);
+            _resultViews.Clear();
             int pages = Math.Max(1, (_results.Count + ResultsPerPage - 1) / ResultsPerPage);
             _page = Mathf.Clamp(_page, 0, pages - 1);
             _resultCount.text = $"{_results.Count}{(_results.Count >= 2000 ? "+" : "")} cards";
@@ -2668,8 +2839,10 @@ namespace YgoCampaign.Game
                     var rim = Ui.Placed("SlabRimHolder", _resultsLayer, new Vector2(cx, cy), ResultCard);
                     SlabView.Rim(rim, Vector2.zero, ResultCard);
                 }
-                var view = CardView.Create(_resultsLayer, new Vector2(cx, cy), ResultCard, card, shown, 0, true, ShowDetail, offField: true,
-                    onClick: () => Add(info, side: false), onRightClick: () => Add(info, side: true), highlight: copies > 0);
+                // Click to focus, the focused one again to add, right-click to the Side Deck (DeckEditor.Focus); pointing only lifts it.
+                var view = CardView.Create(_resultsLayer, new Vector2(cx, cy), ResultCard, card, shown, 0, true, null, offField: true, highlight: copies > 0);
+                view.EditorMode(button => ClickResult(info, i, button));
+                _resultViews.Add((Banlist.BaseCode(info.Code, _cards), view, Math.Max(0, Math.Min(2, (ownedCopies?.Count ?? 0) - 1)), new Vector2(cx, cy)));
                 if (ownedCopies is { Count: > 0 } && ownedCopies[0].IsSlab) SlabView.RimGlass(_resultsLayer, new Vector2(cx, cy), ResultCard, view);
                 if (allowed < 3) Badge(view.transform, allowed == 0 ? "X" : allowed.ToString(), allowed == 0 ? Ui.Hex("#D9433F") : Ui.Hex("#E3A21A"));
                 int ownCount = OwnedCards?.Count(Banlist.BaseCode(info.Code, _cards)) ?? 3;
@@ -2688,6 +2861,16 @@ namespace YgoCampaign.Game
                     var tag = Ui.Placed("InDeck", view.transform, new Vector2(ResultCard.x / 2 - 14, -ResultCard.y / 2 + 38), new Vector2(26, 22)); // above the stat strip
                     Ui.Image(tag, Ui.Hex("#13203A")).raycastTarget = false; // theme: kept, a badge on the card
                     Ui.Text(tag, $"x{copies}", 13, CardView.Actionable).fontStyle = FontStyle.Bold;
+                    // A card without a picture has its name above: it ends over the count (shrinking to fit), not behind it.
+                    if (view.transform.Find("Face/Name") is RectTransform nameBox)
+                    {
+                        var at = new Vector3[4];
+                        tag.GetWorldCorners(at);
+                        float countTop = at[1].y;
+                        nameBox.GetWorldCorners(at);
+                        if (at[0].y < countTop && nameBox.lossyScale.y > 0)
+                            nameBox.offsetMin = new Vector2(nameBox.offsetMin.x, nameBox.offsetMin.y + (countTop - at[0].y) / nameBox.lossyScale.y + 1);
+                    }
                 }
                 // Under the card: how many you own (campaign), or its kind.
                 var under = OwnedCards != null && allowed > 0
@@ -2706,10 +2889,11 @@ namespace YgoCampaign.Game
                 line.resizeTextMaxSize = 11;
                 line.raycastTarget = false;
                 var drag = view.gameObject.AddComponent<DragSource>();
-                drag.Began = p => BeginDrag(info.Code, p);
+                drag.Began = p => { FocusResult(info, viewed: false); BeginDrag(info.Code, p); }; // a drag focuses the dragged card (not "viewed")
                 drag.Moved = p => MoveDrag(p, fromDeck: false);
                 drag.Dropped = p => DropResult(info, EndDrag(p));
             }
+            ShowRing(); // the focused card's ring, if it's on this page (or in the deck)
         }
 
         private static Color ChipColor(int chip, bool on)
@@ -2791,7 +2975,7 @@ namespace YgoCampaign.Game
                             if (capped && AskedText(list[i]) != asked) { if (room <= 0) continue; room--; }
                             list[i] = code;
                         }
-                });
+                }, $"{info.Name}'s version", $"Version: {info.Name}");
             ShowDetail(info);
             ShowResults();
             var label = _versions.TextLabel(code);
@@ -2925,13 +3109,20 @@ namespace YgoCampaign.Game
             var starters = new HashSet<uint>(_deck.Starters);
             int hits = _testHand.Count(c => starters.Contains(Banlist.BaseCode(c, _cards)));
             _handLabel.text = $"Test hand, going {(_testHandSecond ? "second (6 cards)" : "first (5 cards)")}" + (starters.Count > 0 ? $"  ·  {hits} starter{(hits == 1 ? "" : "s")}" : "");
+            _handViews.Clear();
+            if (_focusZone == FocusZone.Hand) _focusZone = FocusZone.None; // a new hand: the old one's card isn't in it
             for (int i = 0; i < _testHand.Count; i++)
             {
+                int slot = i;
                 var info = _cards.Get(_testHand[i]);
                 var card = new FieldCard { Code = _testHand[i], Type = info?.Type ?? 0, Level = info?.Level ?? 0, Attack = info?.Attack ?? 0, Defense = info?.Defense ?? 0, Position = Ygo.Engine.Position.FaceUpAttack };
-                CardView.Create(_handCards, new Vector2((i - (_testHand.Count - 1) / 2f) * 150, 0), new Vector2(136, 196), card, info, 0, true,
-                    ShowDetail, offField: true, highlight: starters.Contains(Banlist.BaseCode(_testHand[i], _cards)));
+                // A click focuses it, to read (look only).
+                var view = CardView.Create(_handCards, new Vector2((i - (_testHand.Count - 1) / 2f) * 150, 0), new Vector2(136, 196), card, info, 0, true,
+                    null, offField: true, highlight: starters.Contains(Banlist.BaseCode(_testHand[i], _cards)));
+                view.EditorMode(button => ClickHand(slot, button));
+                _handViews.Add(view);
             }
+            ShowRing();
         }
 
         // ------------------------------------------------------------------ Bot test

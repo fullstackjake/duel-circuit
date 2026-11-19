@@ -56,6 +56,24 @@ namespace Ygo.Engine.Campaign
             return profile.PartnerDecks.TryGetValue(p.Id, out var picked) && choices.Contains(picked) ? picked : choices.FirstOrDefault() ?? "";
         }
 
+        /// <summary>
+        /// What a partner says beside you (the tag versus screen, the duel log, free play's tag setup): their "partner:" line,
+        /// not their intro, which is for meeting them across the table ("My first real duel!"); their intro only when they
+        /// have no partner line. Kit with her own deck says her intro (it's about her Synchrons); with a deck you lent her, a
+        /// line about piloting it ("Warrior's Charge? Good list. Your deck, my hands."); with anything else (a borrowed recipe,
+        /// a built-in deck in free play), her partner line. <paramref name="deckTitle"/>: the deck's name as she'd say it
+        /// (CampaignState.SpokenTitle); <paramref name="yours"/>: the deck is one of your campaign decks, lent to her.
+        /// </summary>
+        public static string Greeting(Personality p, string deck, string deckTitle, bool yours)
+        {
+            if (IsShopRegular(p))
+            {
+                if (deck.Length == 0 || p.Decks.Contains(deck)) return p.Intro;
+                if (yours && !Loaners.IsLoaner(deck) && deckTitle.Length > 0) return $"{deckTitle}? Good list. Your deck, my hands.";
+            }
+            return p.PartnerLine.Length > 0 ? p.PartnerLine : p.Intro;
+        }
+
         /// <summary>How the partner plays: at <see cref="SharpBond"/> wins (or the shop regular) at least <see cref="SharpSkill"/>.</summary>
         public static Personality Playing(Personality p, Profile profile)
         {

@@ -163,7 +163,9 @@ namespace YgoCampaign.Game
             _library.Save(pots);
             profile.Deck = pots.Name;
             _scenes.Close();
-            ShowAlleyVersus(dumpster, null);
+            // (A fresh visit opens on a legal deck of yours: picked here with the arrows, as a player would.)
+            _versusDeck = pots.Name;
+            ShowAlleyVersus(dumpster, null, cycled: true);
             yield return new WaitForSecondsRealtime(0.4f);
             int dpBefore = profile.Dp;
             if (_scenes.Buttons.TryGetValue("Duel!", out var refusedDuel)) refusedDuel();
@@ -174,6 +176,88 @@ namespace YgoCampaign.Game
             _scenes.Close();
             profile.Deck = deckBefore;
             _campaign.Save();
+
+            // ---- 4b. The starter as built (Warrior's Charge: 3 Reinforcement of the Army, the Alley allows 1) ----
+            // Refused only over copies, so the versus offers Make it Alley-legal: a new deck "<deck> (Alley)" with the extra
+            // copies swapped for cards you own. The starter, the built-in warriors deck and your collection stay as they are.
+            {
+                string Unmarked(string s) => System.Text.RegularExpressions.Regex.Replace(s, "<.*?>", "");
+                uint rota = Alley.CodeOf("Reinforcement of the Army", _cardPack!);
+                int Rota(Deck d) => d.Main.Concat(d.Extra).Concat(d.Side).Count(c => Banlist.BaseCode(c, _cardPack!) == rota);
+                var starterBefore = _library.Load(starterDeck);
+                var builtInBefore = _library.Contains("warriors") ? _library.Load("warriors") : new Deck();
+                int decksBefore = _library.Names.Count(), ownedBefore = profile.Collection.Total, dpFix = profile.Dp;
+                // The other starters as built, for the record (only the deck rules and the Alley list; not what you own).
+                Debug.Log("alley check: note the starters under the Alley list: " + string.Join("; ", CampaignState.Starters.Select(s =>
+                    $"{s.Title}: {(_library.Contains(s.Deck) ? DeckRules.Validate(_library.Load(s.Deck), _campaign.AlleyRules.List!, _cardPack!).FirstOrDefault()?.Message ?? "legal" : "missing")}")));
+                // A fresh visit with the starter refused and a legal deck of yours: the versus opens on the legal one.
+                profile.Deck = starterDeck;
+                _versusDeck = null;
+                ShowAlleyVersus(dumpster, null);
+                yield return new WaitForSecondsRealtime(0.4f);
+                Report($"4b. a fresh visit with the starter refused opens on a legal deck of yours ({DeckTitle(_versusDeck ?? "")}), with no fix to offer",
+                    _versusDeck == deckBefore && !_alleyFixOffered);
+                // The arrows back to the starter: refused only over copies, so the fix is offered.
+                var fixLabel = AlleyFixLabel(dumpster);
+                _versusDeck = starterDeck;
+                ShowAlleyVersus(dumpster, null, cycled: true);
+                yield return new WaitForSecondsRealtime(0.5f);
+                yield return Shot("4b-starter-refused");
+                bool offered = _alleyFixOffered && _scenes.Buttons.ContainsKey(fixLabel);
+                Report($"4b. the starter as built ({DeckTitle(starterDeck)}, {Rota(starterBefore)} Reinforcement of the Army) is refused only over copies, and the versus offers {fixLabel}: \"{Unmarked(_alleyLastNote)}\"",
+                    rota != 0 && Rota(starterBefore) == 3 && offered && fixLabel == "Make it Alley-legal" && _alleyLastNote.Contains("Reinforcement of the Army: the Alley allows 1, you have 3."));
+                // Your cards can't always fill it: with only the starter's own cards, it says what's missing and saves nothing.
+                var onlyStarter = new Collection();
+                foreach (var g in starterBefore.Main.Concat(starterBefore.Extra).Concat(starterBefore.Side).GroupBy(c => Banlist.BaseCode(c, _cardPack!)))
+                    onlyStarter.Add(g.Key, Rarity.Common, g.Count());
+                var cant = _campaign.MakeAlleyLegal(starterDeck, dumpster, onlyStarter);
+                Report($"4b. with only the starter's own cards it can't, and says what's missing: \"{cant.Missing}\"",
+                    cant.Deck == null && cant.Missing.Contains("Reinforcement of the Army") && cant.Missing.Contains("you'd need 2 more cards") && _library.Names.Count() == decksBefore);
+                // Copies only, by counts: a list with a pool names itself in "not released yet", and that isn't a copy limit.
+                var pooled = new FormatRules { List = _campaign.AlleyRules.List, Pool = "2000-01", Texts = _campaign.AlleyRules.Texts };
+                var legalDeck = _library.Load(deckBefore);
+                var pooledProblems = _campaign.Problems(legalDeck, pooled);
+                Report($"4b. a deck refused only for cards not out yet ({pooledProblems.Count}: \"{pooledProblems.FirstOrDefault()?.Message}\") isn't offered the fix",
+                    pooledProblems.Count > 0 && pooledProblems.Any(p => p.Message.Contains(pooled.List!.Name)) && !_campaign.AlleyRefusesOnlyCopies(legalDeck, pooled));
+                if (_scenes.Buttons.TryGetValue(fixLabel, out var makeLegal)) makeLegal();
+                yield return new WaitForSecondsRealtime(0.6f);
+                yield return Shot("4b-alley-legal");
+                var madeName = _versusDeck ?? "";
+                var made = madeName != starterDeck && _library.Contains(madeName) ? _library.Load(madeName) : new Deck();
+                var madeProblems = _campaign.AlleyProblems(made, dumpster);
+                Report($"4b. {fixLabel} saves \"{DeckTitle(madeName)}\" ({made.Main.Count} + {made.Extra.Count}, {Rota(made)} Reinforcement of the Army), legal in the alley "
+                       + $"({madeProblems.FirstOrDefault()?.Message ?? "no problems"}), and picks it on the versus: \"{Unmarked(_alleyLastNote)}\"",
+                    made.Main.Count >= DeckRules.MainMin && DeckTitle(madeName) == $"{DeckTitle(starterDeck)} (Alley)" && Rota(made) == 1 && madeProblems.Count == 0
+                    && _campaign.IsYours(madeName) && _campaign.AlleyDeckChoices().Contains(madeName) && _scenes.IsOpen && !_alleyFixOffered
+                    && _alleyLastNote.Contains("Saved") && _scenes.LastVersus?.you.Deck == DeckTitle(madeName));
+                var starterAfter = _library.Load(starterDeck);
+                var builtInAfter = _library.Contains("warriors") ? _library.Load("warriors") : new Deck();
+                Report($"4b. the starter, the built-in warriors deck and your collection are unchanged, nothing spent ({profile.Dp - dpFix:+#;-#;0} DP, {profile.Collection.Total - ownedBefore:+#;-#;0} cards)",
+                    starterAfter.Main.SequenceEqual(starterBefore.Main) && starterAfter.Extra.SequenceEqual(starterBefore.Extra) && Rota(starterAfter) == 3
+                    && builtInAfter.Main.SequenceEqual(builtInBefore.Main) && builtInAfter.Main.Count > 0 && profile.Dp == dpFix && profile.Collection.Total == ownedBefore);
+                // Leave and come back (your deck is still the starter): the versus opens on its Alley copy, nothing to fix.
+                _scenes.Close();
+                _versusDeck = null;
+                ShowAlleyVersus(dumpster, null);
+                yield return new WaitForSecondsRealtime(0.4f);
+                yield return Shot("4b-reopened");
+                Report($"4b. leaving and coming back opens on {DeckTitle(_versusDeck ?? "")}, with no fix offered (your deck is still {DeckTitle(profile.Deck)})",
+                    _versusDeck == madeName && !_alleyFixOffered && profile.Deck == starterDeck && _scenes.LastVersus?.you.Deck == DeckTitle(madeName));
+                // The fix pressed again on the starter: the copy you have, picked again, not "(Alley 2)".
+                _versusDeck = starterDeck;
+                ShowAlleyVersus(dumpster, null, cycled: true);
+                yield return new WaitForSecondsRealtime(0.3f);
+                if (_scenes.Buttons.TryGetValue(fixLabel, out var makeAgain)) makeAgain();
+                yield return new WaitForSecondsRealtime(0.4f);
+                var second = _campaign.MakeAlleyLegal(starterDeck, dumpster);
+                Report($"4b. pressing it again picks the copy you have (\"{Unmarked(_alleyLastNote)}\"); one deck in all ({_library.Names.Count() - decksBefore} new)",
+                    _versusDeck == madeName && _alleyLastNote.Contains("already have") && second.Existing && second.Deck == madeName && _library.Names.Count() == decksBefore + 1);
+                _scenes.Close();
+                if (madeName != starterDeck && _library.Contains(madeName)) _library.Delete(madeName);
+                profile.Deck = deckBefore;
+                _versusDeck = null;
+                _campaign.Save();
+            }
 
             // ---- 5. Start (held), then a forced loss ----
             string SaveText() => File.ReadAllText(_campaign.SavePath);
@@ -758,7 +842,7 @@ namespace YgoCampaign.Game
             while (open.YourMatch() >= 0 && open.YourMatch() != open.Final) Brackets.RecordYours(profile, lib, open, 0, false, _campaign.Matchups);
             var game1 = Brackets.RecordYours(profile, lib, open, 0, false, _campaign.Matchups);
             _campaign.Save();
-            var gamesLine = SaveText().Split('\n').FirstOrDefault(l => l.StartsWith("bracketgames ")) ?? "";
+            var gamesLine = SaveText().Split('\n').Select(l => l.TrimEnd('\r')).FirstOrDefault(l => l.StartsWith("bracketgames ")) ?? "";
             _campaign.DebugReload();
             profile = _campaign.Profile!;
             open = profile.Bracket!;
@@ -1187,7 +1271,8 @@ namespace YgoCampaign.Game
             string rowNote = "";
             if (BackAlley.NextSeat(profile, data, dumpster) >= 1)
             {
-                ShowAlleyVersus(dumpster, null);
+                _versusDeck = pots.Name; // (picked with the arrows: a fresh visit opens on a legal deck)
+                ShowAlleyVersus(dumpster, null, cycled: true);
                 yield return new WaitForSecondsRealtime(0.4f);
                 rowNote = _alleyLastNote;
                 _scenes.Close();
@@ -1196,8 +1281,8 @@ namespace YgoCampaign.Game
                 potsHere.Count == 0 && potsNote.Length == 0 && potsVersus && potsRow.Any(p => p.Message == "Pot of Greed: the Alley allows 1, you have 3.")
                 && (rowNote.Length == 0 || rowNote.Contains("Pot of Greed: the Alley allows 1, you have 3.")));
             profile.Deck = djinns.Name;
-            _versusDeck = null;
-            ShowAlleyVersus(nl, null);
+            _versusDeck = djinns.Name; // (picked with the arrows: a fresh visit opens on a legal deck)
+            ShowAlleyVersus(nl, null, cycled: true);
             yield return new WaitForSecondsRealtime(0.4f);
             int dpBefore = profile.Dp;
             if (_scenes.Buttons.TryGetValue("Duel!", out var refused)) refused();
@@ -1206,6 +1291,15 @@ namespace YgoCampaign.Game
             Report($"21. a deck with Djinn Releaser of Rituals is refused here (\"{Plain(_alleyLastNote)}\") and at Dumpster Row (\"{djinnRow.FirstOrDefault()?.Message}\"), nothing held",
                 djinnHere.Any(p => p.Message == "Djinn Releaser of Rituals: No Limits doesn't allow it (you have 1).") && djinnRow.Any(p => p.Message == "Djinn Releaser of Rituals: the Alley doesn't allow it (you have 1).")
                 && _alleyLastNote.Contains("isn't legal at No Limits") && _alleyLastNote.Contains("No Limits doesn't allow it") && profile.AnteLive == null && profile.Dp == dpBefore);
+            // Its fix here builds against the No Limits list, and says so: "Make it No Limits-legal", "<deck> (No Limits)".
+            {
+                bool nlOffered = _alleyFixOffered && _scenes.Buttons.ContainsKey("Make it No Limits-legal") && !_scenes.Buttons.ContainsKey("Make it Alley-legal");
+                var nlCopy = _campaign.MakeAlleyLegal(djinns.Name, nl);
+                var nlBuilt = nlCopy.Deck != null && _library.Contains(nlCopy.Deck) ? _library.Load(nlCopy.Deck) : null;
+                Report($"21. at No Limits the fix reads \"Make it No Limits-legal\" ({nlOffered}) and saves \"{nlCopy.Title}\"{(nlCopy.Deck == null ? $" (couldn't: {nlCopy.Missing})" : "")}, legal there",
+                    nlOffered && nlCopy.Deck != null && nlCopy.Title == $"{DeckTitle(djinns.Name)} (No Limits)" && nlBuilt != null && _campaign.AlleyProblems(nlBuilt, nl).Count == 0);
+                if (nlCopy.Deck != null && !nlCopy.Existing) _library.Delete(nlCopy.Deck);
+            }
             _scenes.Close();
             profile.Deck = deckBefore;
             _campaign.Save();

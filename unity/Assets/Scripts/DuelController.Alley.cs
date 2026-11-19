@@ -115,7 +115,15 @@ namespace YgoCampaign.Game
             }
             var choices = _campaign.AlleyDeckChoices();
             if (choices.Count == 0) { _campaignScreen.Open("Build a deck of your own first: the alley doesn't lend."); return; }
-            if (_versusDeck == null || !choices.Contains(_versusDeck) || !cycled) _versusDeck = choices.Contains(profile.Deck) ? profile.Deck : choices[0];
+            if (_versusDeck == null || !choices.Contains(_versusDeck) || !cycled)
+            {
+                // Your deck if it's legal at this table; else its legal copy for here ("<deck> (Alley)", Make it Alley-legal's),
+                // else the first legal one (as the Ladder picks); else your deck, refused, with the fix offered.
+                bool Legal(string d) => _campaign.AlleyProblems(_library.Load(d), table).Count == 0;
+                var mine = choices.Contains(profile.Deck) ? profile.Deck : choices[0];
+                _versusDeck = Legal(mine) ? mine
+                    : choices.FirstOrDefault(d => _campaign.IsAlleyCopyOf(d, mine, table) && Legal(d)) ?? choices.FirstOrDefault(Legal) ?? mine;
+            }
             var yourDeck = _library.Load(_versusDeck);
             yourDeck.Name = _versusDeck;
             // Your deck under the table's rules (BackAlley.RulesFor: No Limits' at No Limits, the Alley's elsewhere).
@@ -225,8 +233,13 @@ namespace YgoCampaign.Game
             _alleyNote = "";
             if (note.Length == 0 && orvel && theirs == null)
                 note = $"<color={T.BadHex}>“Nothing in my binder matches that.”</color> Pick another card with the stake arrows, or leave.";
+            // Refused only over copies (the starter's three Reinforcement of the Army): the versus offers a legal copy made from
+            // your own cards (owner decision 1, docs/dev/NEXT-BUILD-2026-11-19.md).
+            bool offerFix = problems.Count > 0 && _campaign.AlleyRefusesOnlyCopies(yourDeck, table);
+            _alleyFixOffered = offerFix;
             if (note.Length == 0 && problems.Count > 0)
-                note = $"<color={T.BadHex}>{DeckTitle(_versusDeck)} isn't legal here:</color> {problems[0].Message}";
+                note = $"<color={T.BadHex}>{DeckTitle(_versusDeck)} isn't legal here:</color> {problems[0].Message}"
+                       + (offerFix ? $" {AlleyFixLabel(table)}: a copy with cards you own instead." : "");
             _alleyLastNote = note;
             string match = (o.Seat == 0 ? "Encore" : $"Seat {o.Seat} of {t.SeatCount}")
                 + (noLimits ? " · turn 40, higher LP wins · no list, three of anything · leaving counts as a loss" : " · turn 40, higher LP wins · Alley list, no Ban Passes · leaving counts as a loss");
@@ -239,8 +252,45 @@ namespace YgoCampaign.Game
                 back: () => _campaignScreen.Open(),
                 cycleDeck: delta => { CycleVersusDeck(choices, delta); ShowAlleyVersus(table, encore, cycled: true); },
                 scouts: scouts, quiet: true, note: note, arrowsHint: "Arrows: switch between your own decks (the alley doesn't lend).",
-                texts: _campaign.TextsLine(yourDeck, _campaign.AlleyRulesFor(table)));
+                texts: _campaign.TextsLine(yourDeck, _campaign.AlleyRulesFor(table)),
+                action: offerFix ? ((string, Action)?)(AlleyFixLabel(table), () => MakeDeckAlleyLegal(table, encore)) : null);
             if (orvel) OrvelPicker(table, encore);
+        }
+
+        /// <summary>
+        /// The alley versus's button for a deck refused only over copies (also its key in the scenes' Buttons): "Make it
+        /// Alley-legal", at No Limits "Make it No Limits-legal" (its own list).
+        /// </summary>
+        private string AlleyFixLabel(int table) => $"Make it {_campaign.AlleyPlaceName(table)}-legal";
+        /// <summary>For the check: whether the last alley versus offered <see cref="AlleyFixLabel"/>.</summary>
+        private bool _alleyFixOffered;
+
+        /// <summary>
+        /// Make it Alley-legal: a copy of the deck on the versus saved as "&lt;deck&gt; (Alley)", its extra copies swapped for
+        /// cards you own (<see cref="CampaignState.MakeAlleyLegal"/>); the versus comes back with it picked and says what
+        /// changed. The deck itself, and the starter it came from, stay as they are. When your cards can't fill it, nothing is
+        /// saved and the versus says what's missing.
+        /// </summary>
+        private void MakeDeckAlleyLegal(int table, string? encore)
+        {
+            var deckName = _versusDeck ?? _campaign.Profile?.Deck ?? "";
+            var made = _campaign.MakeAlleyLegal(deckName, table);
+            var T = UiTheme.Current;
+            if (made.Deck == null)
+                _alleyNote = $"<color={T.BadHex}>Can't make {DeckTitle(deckName)} {_campaign.AlleyPlaceName(table)}-legal from your cards.</color> {made.Missing}";
+            else if (made.Existing)
+            {
+                _versusDeck = made.Deck;
+                _alleyNote = $"<color={T.GoodHex}>You already have {made.Title}:</color> picked, with the same cards. {DeckTitle(deckName)} is unchanged.";
+            }
+            else
+            {
+                _versusDeck = made.Deck;
+                var removed = made.Changes.Where(c => c.StartsWith("Removed ")).Select(c => c.Substring(8));
+                var added = made.Changes.Where(c => c.StartsWith("Added ")).Select(c => c.Substring(6));
+                _alleyNote = $"<color={T.GoodHex}>Saved {made.Title}:</color> out {string.Join(", ", removed)}; in {string.Join(", ", added)}. {DeckTitle(deckName)} is unchanged.";
+            }
+            ShowAlleyVersus(table, encore, cycled: true);
         }
 
         /// <summary>
@@ -309,7 +359,9 @@ namespace YgoCampaign.Game
             {
                 var why = _library.Contains(deckName) ? _campaign.AlleyProblems(_library.Load(deckName), table)[0].Message : "Build a deck first.";
                 var where = _campaign.IsNoLimitsTable(table) ? "at No Limits" : "in the alley";
-                _alleyNote = $"<color={UiTheme.Current.BadHex}>{DeckTitle(deckName)} isn't legal {where}:</color> {why} Switch decks with the arrows, or edit it.";
+                bool fixable = _library.Contains(deckName) && _campaign.AlleyRefusesOnlyCopies(_library.Load(deckName), table);
+                _alleyNote = $"<color={UiTheme.Current.BadHex}>{DeckTitle(deckName)} isn't legal {where}:</color> {why} "
+                             + (fixable ? $"{AlleyFixLabel(table)}, switch decks with the arrows, or edit it." : "Switch decks with the arrows, or edit it.");
                 ShowAlleyVersus(table, encore, cycled: true);
                 return;
             }

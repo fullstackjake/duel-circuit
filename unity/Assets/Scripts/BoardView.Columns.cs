@@ -36,6 +36,25 @@ namespace YgoCampaign.Game
         private bool CanSummonNow(BoardState board) =>
             board.TurnPlayer == (HumanSeat >= 0 ? HumanSeat : 0) && (board.Phase == Phase.Main1 || board.Phase == Phase.Main2);
 
+        /// <summary>
+        /// For checks: the column labels as they'd be drawn at <paramref name="turnPlayer"/>'s <paramref name="phase"/> (your End
+        /// Phase, say, which a check rarely stops in), the board then put back and the guides redrawn as they were.
+        /// </summary>
+        public System.Collections.Generic.List<string> DebugColumnLabelsAt(int turnPlayer, ushort phase)
+        {
+            if (_lastBoard == null) return new System.Collections.Generic.List<string>();
+            var (was, wasPhase) = (_lastBoard.TurnPlayer, _lastBoard.Phase);
+            _lastBoard.TurnPlayer = turnPlayer;
+            _lastBoard.Phase = phase;
+            _columnsDrawn = default;
+            UpdateColumnGuide();
+            var labels = new System.Collections.Generic.List<string>(ColumnLabels);
+            (_lastBoard.TurnPlayer, _lastBoard.Phase) = (was, wasPhase);
+            _columnsDrawn = default;
+            UpdateColumnGuide();
+            return labels;
+        }
+
         /// <summary>The column card in focus: the one you're placing, else the one you're pointing at, else the detail's.</summary>
         private CardInfo? ColumnCard()
         {

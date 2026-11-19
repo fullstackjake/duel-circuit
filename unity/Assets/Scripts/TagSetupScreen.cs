@@ -34,6 +34,8 @@ namespace YgoCampaign.Game
         private readonly System.Random _rng = new System.Random();
 
         public event Action<TagLineup>? Start;
+        /// <summary>What your partner says beside you with a deck (DuelController.PartnerQuote, the duel log's line too).</summary>
+        public Func<Personality, string, string>? PartnerQuote;
         public event Action? Back;
         public bool IsOpen => _root != null && _root.gameObject.activeSelf;
 
@@ -132,8 +134,13 @@ namespace YgoCampaign.Game
                 Ui.BoxButton(panel, L, 160, 44, 52, "<", () => CycleDeck(s, -1), 24);
                 Ui.Text(Ui.Box(panel, L + 50, 160, W - 100, 52), $"Deck: {CampaignState.SlugTitle(_lineup.Decks[slot])}", 21, Color.white);
                 Ui.BoxButton(panel, L + W - 44, 160, 44, 52, ">", () => CycleDeck(s, +1), 24);
-                if (c >= 0 && _roster[c].Intro.Length > 0)
-                    Ui.Text(Ui.Box(panel, L, 226, W, 60), $"“{_roster[c].Intro}”", 15, Ui.Hex("#F2E6B8")).fontStyle = FontStyle.Italic;
+                // Your partner says their partner line (the duel's own PartnerQuote: TagPartners.Greeting); everyone else, their intro.
+                var said = c < 0 ? "" : slot == 1 && _lineup.YouPlay && PartnerQuote != null
+                    ? PartnerQuote(_roster[c], _lineup.Decks[slot])
+                    : _roster[c].Intro;
+                _quotes[slot] = said;
+                if (said.Length > 0)
+                    Ui.Text(Ui.Box(panel, L, 226, W, 60), $"“{said}”", 15, Ui.Hex("#F2E6B8")).fontStyle = FontStyle.Italic;
             }
             _status.text = _lineup.YouPlay ? "You lead your team. When it's your partner's turn, they play it." : "Watching four duelists.";
         }
@@ -141,5 +148,8 @@ namespace YgoCampaign.Game
         /// <summary>For automated checks: the lineup and starting it.</summary>
         public TagLineup DebugLineup => _lineup;
         public void DebugStart() { Close(); Start?.Invoke(_lineup); }
+        /// <summary>For automated checks: each seat's quote as drawn ("" for none), after redrawing the lineup as it stands.</summary>
+        public string[] DebugQuotes() { Show(); return (string[])_quotes.Clone(); }
+        private readonly string[] _quotes = { "", "", "", "" };
     }
 }

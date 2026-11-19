@@ -501,6 +501,7 @@ namespace YgoCampaign.Game
             };
             _tagSetup = gameObject.AddComponent<TagSetupScreen>();
             _tagSetup.Init(_roster, IsFreeCharacter, c => c < 0 ? _allDecks : DeckChoices(_roster[c]));
+            _tagSetup.PartnerQuote = PartnerQuote;
             _tagSetup.Start += lineup =>
             {
                 seed++;
@@ -695,6 +696,11 @@ namespace YgoCampaign.Game
             if (Arg("-ydkcheck") is string ydkCheck) StartCoroutine(YdkCheck(ydkCheck, Arg("-ydkfile"), Arg("-ydkfixture")));
             // `-searchcheck <folder>` (absolute; with -mods <empty folder>): the deck editor's card search (DuelController.SearchCheck).
             if (Arg("-searchcheck") is string searchCheck) StartCoroutine(SearchCheck(searchCheck));
+#if ENABLE_INPUT_SYSTEM
+            // `-focuscheck <folder>` (absolute; with -mods <empty folder>): the deck editor's click to focus and its change
+            // signals, through a test mouse and keyboard (DuelController.FocusCheck).
+            if (Arg("-focuscheck") is string focusCheck) StartCoroutine(FocusCheck(focusCheck));
+#endif
             // `-aboutcheck <folder> [-aboutlicenses <folder>]` (absolute): the About screen from the menu (DuelController.AboutCheck).
             var aboutCheck = Arg("-aboutcheck");
             if (aboutCheck != null) StartCoroutine(AboutCheck(aboutCheck, Arg("-aboutlicenses")));
@@ -704,7 +710,7 @@ namespace YgoCampaign.Game
             if (importCheck != null) StartCoroutine(ImportCheck(importCheck));
 
             // Players start on the title screen; automated checks go straight to what they test.
-            var checks = new[] { "-autoshot", "-autoshot-end", "-editor", "-fxshots", "-replaycheck", "-campaigncheck", "-finalcheck", "-laddercheck", "-themecheck", "-shopcheck", "-alleycheck", "-tagcheck", "-boardcheck", "-matcheck", "-foilshowcase", "-gradeshowcase", "-slabreveal", "-artcheck", "-autoclick", "-p0", "-p1", "-layoutcheck", "-pilecheck", "-controlscheck", "-qaplay", "-qareplay", "-ordercheck", "-musiccheck", "-stylecheck", "-clickcheck", "-ydkcheck", "-searchcheck", "-aboutcheck", "-importcheck" };
+            var checks = new[] { "-autoshot", "-autoshot-end", "-editor", "-fxshots", "-replaycheck", "-campaigncheck", "-finalcheck", "-laddercheck", "-themecheck", "-shopcheck", "-alleycheck", "-tagcheck", "-boardcheck", "-matcheck", "-foilshowcase", "-gradeshowcase", "-slabreveal", "-artcheck", "-autoclick", "-p0", "-p1", "-layoutcheck", "-pilecheck", "-controlscheck", "-qaplay", "-qareplay", "-ordercheck", "-musiccheck", "-stylecheck", "-clickcheck", "-ydkcheck", "-searchcheck", "-focuscheck", "-aboutcheck", "-importcheck" };
             PromptTiming = checks.Any(c => Array.IndexOf(args, c) >= 0); // checks log decisions left waiting
             // A check that throws stops its coroutine; without this the app would sit there forever. Fail and quit instead.
             if (PromptTiming)
@@ -1023,13 +1029,12 @@ namespace YgoCampaign.Game
         }
 
         /// <summary>
-        /// A partner's line on the tag versus screen: their intro, or for Kit bringing a deck that isn't her own (yours, or
-        /// a recipe you lent her), a line about piloting it.
+        /// A partner's line beside you (a Tag Cup's or a guest tag duel's versus, the duel log): their partner line, not the
+        /// intro they say as an opponent; for Kit, her intro with her own deck, a line about piloting yours, her partner
+        /// line with a loaner (<see cref="TagPartners.Greeting"/>).
         /// </summary>
         private string PartnerQuote(Personality partner, string deck) =>
-            TagPartners.IsShopRegular(partner) && !partner.Decks.Contains(deck)
-                ? $"{_campaign.SpokenTitle(deck)}? Good list. Your deck, my hands."
-                : partner.Intro;
+            TagPartners.Greeting(partner, deck, deck.Length > 0 ? _campaign.SpokenTitle(deck) : "", _library.Contains(deck) && _library.IsCampaign(deck));
 
         /// <summary>Three cards for a team: two from the lead's deck and one from the partner's, never the same card twice.</summary>
         private List<uint> TeamShowcase(Deck lead, Deck partner)
@@ -1920,7 +1925,11 @@ namespace YgoCampaign.Game
                 ? $"Tag Duel {seed}: {TeamName(0)} ({decks[0].Name} + {partnerDecks[0].Name}) vs {TeamName(1)} ({decks[1].Name} + {partnerDecks[1].Name})"
                 : $"Duel {seed}: {_players[0].DisplayName} ({decks[0].Name}) vs {_players[1].DisplayName} ({decks[1].Name})");
             foreach (var p in _players.Concat(_partners))
-                if (p.Intro.Length > 0) _view.AppendLog($"{p.Name}: \"{p.Intro}\"");
+            {
+                // Your partner speaks as a partner (TagPartners.Greeting), not with the intro they'd say across the table.
+                var said = tag != null && tag.YouPlay && _partners.Length > 0 && ReferenceEquals(p, _partners[0]) ? PartnerQuote(p, tag.Decks[1]) : p.Intro;
+                if (said.Length > 0) _view.AppendLog($"{p.Name}: \"{said}\"");
+            }
             var starter = settings.FirstPlayer == 0 ? TeamName(0) : TeamName(1);
             _view.AppendLog($"{starter} {(starter == "You" ? "go" : "goes")} first.");
             Debug.Log($"duel {seed}: {TeamName(0)} vs {TeamName(1)}, {starter} first");
@@ -3504,6 +3513,14 @@ namespace YgoCampaign.Game
             Report($"Auto-fix makes the deck legal under {eraList.Name} from owned cards ({left} problems left): {fixStatus}", left == 0);
             yield return new WaitForSecondsRealtime(0.6f);
             yield return Shot("era-autofix");
+            // No recipe ready (TODO: "the don't own enough of any recipe message shows twice"): the paragraph once, then a
+            // short line on the next press, never the paragraph again or twice in one line.
+            var (noneFirst, noneSecond) = _editor.DebugNoRecipeTwice();
+            int Times(string s, string part) => (s.Length - s.Replace(part, "").Length) / Math.Max(1, part.Length);
+            var noneKey = noneFirst.Contains("No recipes yet") ? "No recipes yet" : "own enough of any unlocked recipe";
+            Report($"Recipe with none ready says it once (\"{noneFirst}\"), then a short line (\"{noneSecond}\")",
+                noneFirst.Length > 0 && noneSecond.Length > 0 && noneFirst != noneSecond && noneSecond.StartsWith("Still")
+                && Times(noneFirst, noneKey) == 1 && Times(noneSecond, "own enough of any unlocked recipe") <= 1 && !noneSecond.Contains(noneFirst));
             left = _editor.DebugRecipe(out var recipeStatus);
             Report($"Recipe builds a legal deck from owned cards ({left} problems left): {recipeStatus}", left == 0);
             // Next recipe (one you own less of), so the wishlist has cards on it; then the shop in wishlist order.
@@ -3578,6 +3595,13 @@ namespace YgoCampaign.Game
             ShowTagVersus(0, 0, partnerChoices[0].Id);
             yield return new WaitForSecondsRealtime(0.8f);
             yield return Shot("tag-versus");
+            // Your partner speaks as a partner (TODO: Ryo said "My first real duel!" beside you): their partner: line.
+            {
+                var p0 = partnerChoices[0];
+                var said = _scenes.LastVersus?.you.Quote ?? "";
+                Report($"the tag versus has {p0.Name} say their partner line, not their intro (\"{said}\")",
+                    p0.PartnerLine.Length > 0 && said == p0.PartnerLine && said != p0.Intro);
+            }
             _scenes.Buttons["Duel!"]();
             speedIndex = Speeds.Length - 1;
             UpdateControls();
@@ -3619,6 +3643,12 @@ namespace YgoCampaign.Game
             yield return new WaitForSecondsRealtime(0.4f);
             yield return Shot("tag-versus-loaner");
             Report($"the Tag Cup versus screen's deck arrows reach a loaner ({_versusDeck})", tagArrow != null && Loaners.IsLoaner(_versusDeck ?? ""));
+            // The deck line keeps well clear of the "<" arrow (TODO: it ran into it) and none of it is cut off.
+            {
+                var fit = _scenes.VersusDeckFit;
+                Report($"the deck line \"{fit?.text}\" ends {fit?.gap:0} px before the < arrow, whole at {fit?.size} px",
+                    fit is { } f && f.gap >= 40 && f.whole);
+            }
             bool scoutButton = _scenes.Buttons.TryGetValue("Scout", out var scoutTag);
             scoutTag?.Invoke();
             yield return new WaitForSecondsRealtime(0.4f);
@@ -3632,6 +3662,13 @@ namespace YgoCampaign.Game
             yield return new WaitForSecondsRealtime(1.2f);
             Report($"Duel! with a loaner in a Tag Cup plays the borrowed deck ({_tag?.Decks[0]}) and keeps your own ({profile.Deck})",
                 _tag != null && Loaners.IsLoaner(_tag.Decks[0]) && profile.Deck == deckKept && _recording?.DeckNames[0].EndsWith("(loaner)") == true);
+            // The duel log's opening lines: your partner's is their partner line too.
+            {
+                var partnerNow = _partners.ElementAtOrDefault(0);
+                var logged = string.Join("\n", _view.LogOpening);
+                Report($"the duel log has {partnerNow?.Name} say their partner line, not their intro",
+                    partnerNow != null && partnerNow.PartnerLine.Length > 0 && logged.Contains(partnerNow.PartnerLine) && !logged.Contains(partnerNow.Intro));
+            }
             ConcedeDuel();
             var concededTag = Time.realtimeSinceStartup + 8;
             while (!(_scenes.IsOpen && _scenes.Buttons.ContainsKey("Continue")) && Time.realtimeSinceStartup < concededTag) yield return null;
@@ -3640,6 +3677,37 @@ namespace YgoCampaign.Game
             _campaignScreen.Close();
             var kitChoices = _campaign.ShopRegular == null ? new List<string>() : _campaign.PartnerDeckChoices(_campaign.ShopRegular);
             Report($"Kit can bring a loaner ({kitChoices.Count(Loaners.IsLoaner)} recipes among {kitChoices.Count} decks)", kitChoices.Any(Loaners.IsLoaner));
+            // Kit with a loaner (TODO: she said "I brought my Synchrons" while playing one): her partner line. Here with the
+            // longest-titled loaner beside your longest-titled one, so the deck line is as long as it gets.
+            if (_campaign.ShopRegular is { } kitP && kitChoices.Where(Loaners.IsLoaner).OrderByDescending(d => DeckTitle(d).Length).FirstOrDefault() is string kitLoaner)
+            {
+                var keptPick = profile.PartnerDecks.TryGetValue(kitP.Id, out var kp) ? kp : null;
+                profile.PartnerDecks[kitP.Id] = kitLoaner;
+                var yourLong = CampaignDeckChoices().Where(Loaners.IsLoaner).OrderByDescending(d => DeckTitle(d).Length).FirstOrDefault() ?? profile.Deck;
+                _versusDeck = yourLong;
+                ShowTagVersus(0, 0, kitP.Id, cycled: true);
+                yield return new WaitForSecondsRealtime(0.5f);
+                yield return Shot("tag-versus-kit-loaner");
+                var kitSaid = _scenes.LastVersus?.you.Quote ?? "";
+                Report($"Kit with a loaner ({DeckTitle(kitLoaner)}) says her partner line (\"{kitSaid}\"), not her Synchrons intro",
+                    kitSaid.Length > 0 && kitSaid == kitP.PartnerLine && !kitSaid.Contains("Synchron"));
+                var longFit = _scenes.VersusDeckFit;
+                Report($"the longest tag deck line \"{longFit?.text}\" ends {longFit?.gap:0} px before the < arrow, whole at {longFit?.size} px",
+                    longFit is { } lf && lf.gap >= 40 && lf.whole);
+                // Kit with her own Synchrons keeps her intro; with a deck of yours, a line about piloting it.
+                var ownSaid = PartnerQuote(kitP, kitP.Decks.FirstOrDefault() ?? "");
+                var lentSaid = PartnerQuote(kitP, profile.Deck);
+                // A built-in deck (not one of yours) isn't "your deck": her partner line (review 2026-11-19).
+                var builtInSaid = PartnerQuote(kitP, "warriors");
+                Report($"Kit with her own deck says her intro (\"{ownSaid}\"), with yours a line about it (\"{lentSaid}\"), with a built-in deck her partner line (\"{builtInSaid}\")",
+                    ownSaid == kitP.Intro && lentSaid.Contains("Your deck, my hands") && lentSaid.StartsWith(_campaign.SpokenTitle(profile.Deck))
+                    && _library.Contains("warriors") && !_library.IsCampaign("warriors") && builtInSaid == kitP.PartnerLine);
+                if (_scenes.Buttons.TryGetValue("Back", out var kitBack)) kitBack();
+                yield return new WaitForSecondsRealtime(0.3f);
+                _campaignScreen.Close();
+                if (keptPick != null) profile.PartnerDecks[kitP.Id] = keptPick; else profile.PartnerDecks.Remove(kitP.Id);
+            }
+            else Report("Kit and a loaner to bring", false);
             _versusDeck = profile.Deck;
             profile.LossStreaks[Circuits.TagKey(0, 1)] = StuckAfter;
             ShowTagVersus(0, 1, tagPartner);
@@ -3819,6 +3887,35 @@ namespace YgoCampaign.Game
                 if (_scenes.Buttons.TryGetValue("Back", out var guestsBack)) guestsBack();
             }
             _campaignScreen.Close();
+            // A guest tag duel's versus: your partner says their partner line there too (it showed their intro).
+            if (_campaign.Guests.All.FirstOrDefault(g => g.HasTag && GuestList.IsUnlocked(g, _campaign.Circuits, profile)) is { } tagGuest)
+            {
+                var tagKey = GuestList.Key(tagGuest, true);
+                bool hadKey = profile.MatchWins.TryGetValue(tagKey, out var tagWins);
+                profile.MatchWins[tagKey] = Math.Max(1, tagWins); // its tag duel open for the look
+                GuestVersus(tagGuest, true, cycled: true);
+                yield return new WaitForSecondsRealtime(0.5f);
+                yield return Shot("guest-tag-versus");
+                var guestPartner = _campaign.TagPartnerChoices().Where(p => p.Id != tagGuest.Character.Id && p.Id != tagGuest.Partner.Id)
+                    .Select(p => (Personality?)p).FirstOrDefault(p => p!.Id == profile.TagPartner)
+                    ?? _campaign.TagPartnerChoices().FirstOrDefault(p => p.Id != tagGuest.Character.Id && p.Id != tagGuest.Partner.Id);
+                var guestSaid = _scenes.LastVersus?.you.Quote ?? "";
+                var expected = guestPartner == null ? "?" : PartnerQuote(guestPartner, _campaign.PartnerDeck(guestPartner));
+                Report($"the guest tag versus ({tagGuest.Character.Name}) has your partner {guestPartner?.Name} say \"{guestSaid}\" (their partner line, not their intro)",
+                    guestPartner != null && guestSaid == expected && (guestSaid != guestPartner.Intro || guestPartner.PartnerLine.Length == 0 || TagPartners.IsShopRegular(guestPartner)));
+                // Its detail runs two lines under the deck arrows: the arrows end above it ("last picked on a" was under the "<").
+                var arrowsClear = _scenes.VersusArrowsClear;
+                var guestFit = _scenes.VersusDeckFit;
+                Report($"the deck arrows end above the detail under them (arrows to {arrowsClear.arrowsBottom:0}, detail from {arrowsClear.detailTop:0}), the deck line {guestFit?.gap:0} px short of them",
+                    arrowsClear.arrowsBottom > 0 && arrowsClear.detailTop > 0 && arrowsClear.arrowsBottom <= arrowsClear.detailTop + 0.5f && guestFit is { } gf && gf.gap >= 40 && gf.whole);
+                if (!hadKey) profile.MatchWins.Remove(tagKey); else profile.MatchWins[tagKey] = tagWins;
+                if (_scenes.Buttons.TryGetValue("Back", out var guestTagBack)) guestTagBack();
+                yield return new WaitForSecondsRealtime(0.3f);
+                _scenes.Close();
+                _campaignScreen.Close();
+                _campaign.Save();
+            }
+            else Report("a guest with a tag duel, unlocked", false);
 
             // Structure decks: on sale for the shop's era; buying one adds its cards and saves it as a campaign deck.
             DebugAddDp(profile, 5000);
@@ -4286,6 +4383,40 @@ namespace YgoCampaign.Game
             _menu.Close();
             _tagSetup.Open();
             var lineup = _tagSetup.DebugLineup;
+            // While you play the lead, your partner's seat quotes their partner line, not their intro (Ryo's "My first real
+            // duel!" beside you); the other team's seats keep their intros.
+            {
+                bool Fits(int i) => IsFreeCharacter(i) && (Array.IndexOf(lineup.Characters, i) < 0 || lineup.Characters[1] == i)
+                    && _roster[i].PartnerLine.Length > 0 && _roster[i].PartnerLine != _roster[i].Intro && !TagPartners.IsShopRegular(_roster[i]);
+                int pick = _roster.FindIndex(p => p.Id == "rookie-ryo");
+                if (pick < 0 || !Fits(pick)) pick = Enumerable.Range(0, _roster.Count).FirstOrDefault(Fits);
+                lineup.Characters[1] = pick;
+                lineup.Decks[1] = DeckChoices(_roster[pick])[0];
+                var quotes = _tagSetup.DebugQuotes();
+                yield return new WaitForSecondsRealtime(0.3f);
+                yield return Shot("setup-partner");
+                Report($"with you leading, your partner {_roster[pick].Name} says their partner line (\"{quotes[1]}\"); the other seats their intros",
+                    lineup.YouPlay && quotes[1] == _roster[pick].PartnerLine && quotes[2] == _roster[lineup.Characters[2]].Intro && quotes[0] == "");
+                // Kit with a built-in deck that isn't hers: her partner line, as in the duel log (it said "<deck>? Good list.
+                // Your deck, my hands." for any deck); with her own deck, her intro.
+                int kitAt = _roster.FindIndex(p => TagPartners.IsShopRegular(p));
+                if (kitAt >= 0 && Array.IndexOf(lineup.Characters, kitAt) is int kitSeat && (kitSeat < 0 || kitSeat == 1))
+                {
+                    var kitP = _roster[kitAt];
+                    var builtIn = _allDecks.FirstOrDefault(d => !kitP.Decks.Contains(d) && !_library.IsCampaign(d)) ?? "";
+                    lineup.Characters[1] = kitAt;
+                    lineup.Decks[1] = builtIn;
+                    var withBuiltIn = _tagSetup.DebugQuotes()[1];
+                    lineup.Decks[1] = kitP.Decks.FirstOrDefault() ?? "";
+                    var withOwn = _tagSetup.DebugQuotes()[1];
+                    Report($"Kit as your partner with a built-in deck ({builtIn}) says her partner line (\"{withBuiltIn}\"), with her own her intro",
+                        builtIn.Length > 0 && withBuiltIn == kitP.PartnerLine && withOwn == kitP.Intro && withBuiltIn == PartnerQuote(kitP, builtIn));
+                    lineup.Characters[1] = pick;
+                    lineup.Decks[1] = DeckChoices(_roster[pick])[0];
+                    _tagSetup.DebugQuotes();
+                }
+                else Report("Kit free for the partner seat", false);
+            }
             // Four characters (no human seat), so the duel plays itself.
             lineup.Characters[0] = Enumerable.Range(0, _roster.Count).First(i => IsFreeCharacter(i) && Array.IndexOf(lineup.Characters, i) < 0);
             lineup.Decks[0] = DeckChoices(_roster[lineup.Characters[0]])[0];
@@ -4477,6 +4608,12 @@ namespace YgoCampaign.Game
                 // In your Main Phase the gold column says you can summon there.
                 Report($"in your Main Phase the gold column says \"summon here\" ({string.Join(" | ", _view.ColumnLabels)})",
                     _view.ColumnLabels.Count == 5 && _view.ColumnLabels[2].Contains("summon here") && _view.ColumnLabels.Count(c => c.Contains("summon here")) == 1);
+                // Not in your Battle Phase or End Phase (TODO: "summon here" showed when you couldn't summon): a check mark.
+                var atEnd = _view.DebugColumnLabelsAt(0, Phase.End);
+                var atBattle = _view.DebugColumnLabelsAt(0, Phase.Battle);
+                Report($"in your End Phase and Battle Phase the gold column shows a check mark, not \"summon here\" ({string.Join(" | ", atEnd)}; {string.Join(" | ", atBattle)})",
+                    atEnd.Count == 5 && atBattle.Count == 5 && atEnd[2].EndsWith("✓") && atBattle[2].EndsWith("✓") && !atEnd.Concat(atBattle).Any(c => c.Contains("summon here"))
+                    && _view.ColumnLabels.Count(c => c.Contains("summon here")) == 1);
                 // The controller's Card terms button steps through the explained words of the card being read.
                 _view.ShowInfo(nightfall);
                 yield return null;
@@ -4948,6 +5085,13 @@ namespace YgoCampaign.Game
             yield return new WaitForSecondsRealtime(0.5f);
             yield return Shot("free-duel");
             Report("the Free Duel screen offers Duel!, a random opponent and Back", _scenes.Buttons.ContainsKey("Duel!") && _scenes.Buttons.ContainsKey("Random opponent"));
+            // Its deck lines stop short of their deck arrows too (a 720-wide line ran under the "<").
+            {
+                var freeFit = _scenes.VersusDeckFit;
+                var freeArrows = _scenes.VersusArrowsClear;
+                Report($"the Free Duel deck line \"{freeFit?.text}\" ends {freeFit?.gap:0} px before its < arrow, whole; the arrows end above the detail ({freeArrows.arrowsBottom:0} / {freeArrows.detailTop:0})",
+                    freeFit is { } ff && ff.gap >= 40 && ff.whole && freeArrows.arrowsBottom <= freeArrows.detailTop + 0.5f);
+            }
             _scenes.Buttons["Duel!"]();
             speedIndex = 5;
             UpdateControls();
@@ -5161,7 +5305,21 @@ namespace YgoCampaign.Game
                 var deckName = _library.Names.FirstOrDefault(n => n.IndexOf("mekk", StringComparison.OrdinalIgnoreCase) >= 0) ?? _library.Names.FirstOrDefault();
                 _editor.Open(deckName);
                 yield return new WaitForSecondsRealtime(0.6f);
-                foreach (var query in new[] { "polymerization", "terraforming" })
+                // Hyphenation of real card-name words where a narrow card breaks them (the room each is given): the next
+                // syllable takes the longest start it can, never splitting "tr", "kn", "gl" or a digraph (review 2026-11-19).
+                var cuts = new[]
+                {
+                    ("Destruction", 5, "Des-truction"), ("Synchron", 5, "Syn-chron"), ("Electromagnetic", 7, "Elec-tromagnetic"),
+                    ("Construction", 6, "Con-struction"), ("Thunderstrike", 9, "Thunder-strike"), ("Airknight", 5, "Air-knight"),
+                    ("Afterglow", 6, "After-glow"), ("Knightmare", 6, "Knight-mare"), ("Blackwing", 6, "Black-wing"), ("Archfiend", 5, "Arch-fiend"),
+                    ("Transmigration", 5, "Trans-migration"), ("Transmigration", 7, "Transmi-gration"), ("Polymerization", 8, "Polymeri-zation"),
+                };
+                var wrongCuts = cuts.Select(k => (want: k.Item3, got: CardView.DebugHyphenate(k.Item1, k.Item2))).Where(k => k.got != k.want).ToList();
+                Report($"names hyphenate between syllables ({string.Join(", ", cuts.Select(k => CardView.DebugHyphenate(k.Item1, k.Item2)))})"
+                       + (wrongCuts.Count > 0 ? ": wanted " + string.Join("; ", wrongCuts.Select(k => $"{k.want}, got {k.got}")) : ""), wrongCuts.Count == 0);
+                // (2026-11-19: hyphens no longer split "gh", "th"... ("Knig-htmare" is "Knight-mare"), and a result's name ends
+                // above its in-deck count: "crusadia" lists cards the Mekk-Knight deck plays, each with its "x2".)
+                foreach (var query in new[] { "polymerization", "terraforming", "crusadia" })
                 {
                     // Terraforming under a list that limits it, so its badge shows (the Free Duel's default list limits nothing).
                     _editor.DebugTextLook(true, query, query == "terraforming" ? "Terraforming" : null);
@@ -5170,9 +5328,10 @@ namespace YgoCampaign.Game
                     ScreenCapture.CaptureScreenshot(Path.Combine(folder, $"layout-editor-names-{query}.png"));
                     yield return null;
                     yield return null;
-                    var (problems, names, badges) = _editor.DebugNameProblems();
-                    Report($"in the editor, {names} cards without a picture (search \"{query}\", deck {deckName}, {badges} with a limit badge) keep their words whole and clear of the badge"
-                           + (problems.Count > 0 ? ": " + string.Join("; ", problems.Take(6)) : ""), names >= 10 && problems.Count == 0 && (query != "terraforming" || badges > 0));
+                    var (problems, names, badges, counts) = _editor.DebugNameProblems();
+                    Report($"in the editor, {names} cards without a picture (search \"{query}\", deck {deckName}, {badges} with a limit badge, {counts} with an in-deck count) keep their words whole, hyphens off \"gh\"/\"th\", and clear of the badges"
+                           + (problems.Count > 0 ? ": " + string.Join("; ", problems.Take(6)) : ""),
+                        names >= 10 && problems.Count == 0 && (query != "terraforming" || badges > 0) && (query != "crusadia" || counts > 0));
                     _editor.DebugTextLook(false);
                 }
                 _editor.Close();
@@ -5268,17 +5427,42 @@ namespace YgoCampaign.Game
             var X = UnityEngine.InputSystem.LowLevel.GamepadButton.West;
             var B = UnityEngine.InputSystem.LowLevel.GamepadButton.East;
 
+            // Click to focus (docs/dev/EDITOR-CLICK-FOCUS-SPEC-2026-11-19.md): A looks, A again adds; X is the Side Deck at once.
+            // (The editor opens with the first result focused: the second one isn't.)
             int home = Home();
-            _controller.DebugMoveTo(_editor.FirstResultOnScreen());
+            var second = _editor.DebugResultOnScreen(1) ?? _editor.FirstResultOnScreen();
+            var secondName = _editor.DebugPageNames().ElementAtOrDefault(1) ?? "";
+            _controller.DebugMoveTo(second);
             yield return Frames(3);
             yield return Press(A);
-            Report($"A on a search result adds it (main+extra {home}->{Home()})", Home() == home + 1);
+            var focus = _editor.DebugFocus;
+            Report($"A on a search result focuses it and adds nothing (main+extra {home}->{Home()}; focus {focus.card}, ring on {focus.ring}, left panel {focus.panel})",
+                Home() == home && focus.card == secondName && focus.ring == "result 1" && focus.panel.Length > 0);
+            _controller.DebugMoveTo(_editor.DebugResultOnScreen(1) ?? second);
+            yield return Frames(3);
+            yield return Press(A);
+            Report($"A again on the focused result adds it (main+extra {home}->{Home()}; still focused: {_editor.DebugFocus.ring})", Home() == home + 1 && _editor.DebugFocus.ring == "result 1");
 
             int side = _editor.CardCount(DeckSection.Side);
             _controller.DebugMoveTo(_editor.FirstResultOnScreen());
             yield return Frames(3);
             yield return Press(X);
-            Report($"X on a search result adds it to the Side Deck (side {side}->{_editor.CardCount(DeckSection.Side)})", _editor.CardCount(DeckSection.Side) == side + 1);
+            focus = _editor.DebugFocus;
+            Report($"X on a search result adds it to the Side Deck at once, the focus staying put (side {side}->{_editor.CardCount(DeckSection.Side)}; ring on {focus.ring})",
+                _editor.CardCount(DeckSection.Side) == side + 1 && focus.ring == "result 1");
+
+            // The right stick scrolls the focused card's text.
+            var longText = _editor.DebugFocusLongText();
+            yield return Frames(2);
+            float before0 = _editor.DebugCardDetail.DebugScroll.offset;
+            UnityEngine.InputSystem.InputSystem.QueueStateEvent(pad, new UnityEngine.InputSystem.LowLevel.GamepadState { rightStick = new Vector2(0, -1f) });
+            yield return new WaitForSecondsRealtime(0.3f);
+            UnityEngine.InputSystem.InputSystem.QueueStateEvent(pad, new UnityEngine.InputSystem.LowLevel.GamepadState());
+            yield return Frames(2);
+            float after0 = _editor.DebugCardDetail.DebugScroll.offset;
+            Report($"the right stick (down) scrolls the focused card's text ({longText ?? "no card with long text"}: {before0:0} -> {after0:0} px)", longText != null && after0 > before0 + 5);
+            _editor.DebugPage(0);
+            yield return Frames(2);
 
             side = _editor.CardCount(DeckSection.Side);
             var from = _editor.FirstResultOnScreen();

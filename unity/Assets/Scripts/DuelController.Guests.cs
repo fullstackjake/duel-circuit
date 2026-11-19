@@ -173,7 +173,7 @@ namespace YgoCampaign.Game
                 Name = $"You & {partner.Name}", Title = partner.Title.Length > 0 ? $"with {partner.DisplayName}" : "",
                 Deck = $"{VersusDeckName(_versusDeck!)} + {DeckTitle(partnerDeck)}", DeckNote = VersusDeckNote(partnerDeck), Showcase = TeamShowcase(mine, PartnerDeckFor(partnerDeck, circuit)),
                 Portraits = { partner.Id }, Detail = "Tag duel: one field and 8,000 LP per team. Your partner is the one you last picked on a Tag Cup's screen (Campaign, then a Tag Cup)." + LoanerAdjustments(circuit) + notReady,
-                Quote = partner.Intro,
+                Quote = PartnerQuote(partner, partnerDeck),
             };
             BossSting(BossMusic.ForGuest(g), cycled);
             _scenes.ShowVersus("Special guest · Tag duel", $"You & {partner.Name} against {g.Character.Name} & {g.Partner.Name}", team, them,

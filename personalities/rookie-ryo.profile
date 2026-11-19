@@ -11,7 +11,7 @@ intro: My first real duel! I've been practicing all week!
 rematch: Round two! New deck, same me!
 win: I did it! Wait till everyone hears about this!
 lose: Aw man... okay, I'm adding more traps.
-partner: We're a team?! Okay. I'm writing this down. Team duel number one!
+partner: We're a team! Okay. I'm writing this one down, every turn of it!
 look: Eager teen in a school uniform with untied shoelaces, a brand-new deck box, and a notebook full of combos.
 ladder: 1   # campaign order (1 = first opponent)
 signature: Luster Dragon   # the first-win gift and the bond 5 gift (CardUnlocks)

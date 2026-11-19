@@ -82,6 +82,61 @@ namespace YgoCampaign.Game
         public (Side you, Side them)? LastVersus;
         public IReadOnlyList<GuestRow> LastGuestRows { get; private set; } = new List<GuestRow>();
 
+        /// <summary>The deck line's width beside the deck arrows: it ends 70 px short of the "&lt;" (at 700 on a 1920 screen).</summary>
+        private const float DeckLineWithArrows = 520;
+        /// <summary>Where a side's "&lt;" deck arrow starts, from the side's left edge (1920 x 1080 layout).</summary>
+        private const float DeckArrowAt = 620;
+        private Text? _arrowsDeckLine;
+        private float _arrowsDeckRight, _arrowsDeckGap;
+        /// <summary>The side arrows: drawn this far above the line they step, this tall.</summary>
+        private const float ArrowRise = 6, ArrowHeight = 44;
+        /// <summary>
+        /// For checks: where the lowest "&lt;" / "&gt;" button on the versus ends, as drawn, and where your side's detail (under the
+        /// deck line) starts, both from the screen's top in 1920 x 1080 layout px.
+        /// </summary>
+        public (float arrowsBottom, float detailTop) VersusArrowsClear
+        {
+            get
+            {
+                var corners = new Vector3[4];
+                _root.GetWorldCorners(corners);
+                float top = corners[1].y, scale = (corners[1].y - corners[0].y) / Mathf.Max(1f, _root.rect.height);
+                float Layout(float worldY) => (top - worldY) / Mathf.Max(0.0001f, scale);
+                float bottom = 0;
+                foreach (var rt in _arrowRects)
+                {
+                    if (rt == null) continue;
+                    rt.GetWorldCorners(corners);
+                    bottom = Mathf.Max(bottom, Layout(corners[0].y));
+                }
+                float detail = _youDetail != null ? Layout(WorldTop(_youDetail.rectTransform)) : -1;
+                return (bottom, detail);
+            }
+        }
+        private Text? _youDetail;
+        private readonly List<RectTransform> _arrowRects = new List<RectTransform>();
+        private static float WorldTop(RectTransform rt) { var c = new Vector3[4]; rt.GetWorldCorners(c); return c[1].y; }
+
+        /// <summary>
+        /// For checks: the last versus's deck line beside the arrows: its text, where its box ends and the room left to the
+        /// "&lt;" arrow (layout px), the size it came out at, and whether all of it fits its box (none cut off). Read a frame
+        /// after drawing. Null when that versus had no deck arrows.
+        /// </summary>
+        public (string text, float right, float gap, int size, bool whole)? VersusDeckFit
+        {
+            get
+            {
+                if (_arrowsDeckLine == null) return null;
+                var t = _arrowsDeckLine;
+                var plain = System.Text.RegularExpressions.Regex.Replace(t.text, "<.*?>", "");
+                int size = t.cachedTextGenerator.fontSizeUsedForBestFit > 0
+                    ? Mathf.RoundToInt(t.cachedTextGenerator.fontSizeUsedForBestFit / Mathf.Max(0.01f, t.pixelsPerUnit)) : t.fontSize;
+                var box = t.rectTransform.rect;
+                bool whole = CardView.TextHeight(t, plain, size, box.width) <= box.height + 0.5f;
+                return (plain, _arrowsDeckRight, _arrowsDeckGap, size, whole);
+            }
+        }
+
         /// <summary>The last results screen's EXP line under the bar, for automated checks.</summary>
         public string ExpLine { get; private set; } = "";
 
@@ -108,6 +163,9 @@ namespace YgoCampaign.Game
         {
             for (int i = _root.childCount - 1; i >= 0; i--) Destroy(_root.GetChild(i).gameObject);
             Buttons.Clear();
+            _arrowRects.Clear();
+            _youDetail = null;
+            _arrowsDeckLine = null;
             _scouting = null;
             _root.gameObject.SetActive(true);
             _root.SetAsLastSibling();
@@ -132,11 +190,12 @@ namespace YgoCampaign.Game
         /// </summary>
         public void ShowVersus(string circuit, string match, Side you, Side them, Action start, Action back, Action<int>? cycleDeck = null,
             List<Scout>? scouts = null, List<string>? stuck = null, bool quiet = false, StuckOffer? offer = null, string note = "", string arrowsHint = "",
-            string texts = "")
+            string texts = "", (string label, Action click)? action = null)
         {
             var root = Fresh();
             var T = UiTheme.Current;
             LastVersus = (you, them);
+            _arrowsDeckLine = null;
             Ui.Image(Ui.Box(root, 0, 0, 1920, 120), T.Base);
             Ui.Text(Ui.Box(root, 0, 18, 1920, 50), circuit.ToUpperInvariant(), 34, T.Sign).fontStyle = FontStyle.Bold;
             Ui.Text(Ui.Box(root, 0, 68, 1920, 34), match, 20, T.TextMuted);
@@ -160,11 +219,13 @@ namespace YgoCampaign.Game
 
             Button(760, 940, 400, 80, "Duel!", start, 32, T.Primary);
             Button(80, 960, 180, 56, "Back", back, 20);
+            // A fix the screen offers for your deck (the Alley's "Make it Alley-legal"), between Back and Duel!.
+            if (action is { } extra) Button(280, 960, 320, 56, extra.label, extra.click, 20);
             // Your deck: your own campaign decks, then the recipes you can borrow (loaners).
             if (cycleDeck != null)
             {
-                Arrow(80 + 620, 650, "<", () => cycleDeck(-1));
-                Arrow(80 + 700, 650, ">", () => cycleDeck(+1));
+                Arrow(80 + DeckArrowAt, 650, "<", () => cycleDeck(-1));
+                Arrow(80 + DeckArrowAt + 80, 650, ">", () => cycleDeck(+1));
                 // (After a purchase on the Stuck? panel, what it did, in its place.)
                 var hint = Ui.Text(Ui.Box(root, 110, 840, 700, 30), note.Length > 0 ? note : arrowsHint.Length > 0 ? arrowsHint : "Arrows: switch decks, or borrow a recipe you've unlocked (a loaner win pays half DP).", 15,
                     note.Length > 0 ? T.Good : T.TextFaint, TextAnchor.MiddleLeft);
@@ -466,8 +527,8 @@ namespace YgoCampaign.Game
             Ui.Text(Ui.Box(root, 0, 18, 1920, 50), "FREE DUEL", 34, T.Sign).fontStyle = FontStyle.Bold;
             Ui.Text(Ui.Box(root, 0, 68, 1920, 34), "Pick who plays and with which deck. The left side can be you, or a character to watch.", 20,
                 T.TextMuted);
-            DrawSide(left, 80, Ui.Hex("#4C8DFF"));
-            DrawSide(right, 1060, Ui.Hex("#FF5A5A"));
+            DrawSide(left, 80, Ui.Hex("#4C8DFF"), arrows: true); // (both sides have deck arrows here)
+            DrawSide(right, 1060, Ui.Hex("#FF5A5A"), arrows: true);
             var vs = Ui.Text(Ui.Box(root, 860, 360, 200, 160), "VS", 96, T.Text);
             vs.fontStyle = FontStyle.Bold;
             vs.gameObject.AddComponent<Outline>().effectColor = T.Scrim.WithAlpha(0.8f);
@@ -478,8 +539,8 @@ namespace YgoCampaign.Game
                 int s = seat;
                 Arrow(x + 620, 186, "<", () => character(s, -1));
                 Arrow(x + 700, 186, ">", () => character(s, +1));
-                Arrow(x + 620, 650, "<", () => deck(s, -1));
-                Arrow(x + 700, 650, ">", () => deck(s, +1));
+                Arrow(x + DeckArrowAt, 650, "<", () => deck(s, -1));
+                Arrow(x + DeckArrowAt + 80, 650, ">", () => deck(s, +1));
             }
             Button(760, 940, 400, 80, youPlay ? "Duel!" : "Watch", start, 32, T.Primary);
             Button(1200, 950, 300, 60, "Random opponent", random, 20);
@@ -489,9 +550,12 @@ namespace YgoCampaign.Game
         private void Arrow(float x, float y, string label, Action click)
         {
             var T = UiTheme.Current;
-            var b = Ui.BoxButton(_root, x, y, 64, 52, label, click, 26);
+            // Level with the line it steps (the deck line at 650 is 36 tall), and ending above the detail under it (at 690):
+            // a 52-tall arrow ran down over the detail's first line ("last picked on a" under the "<").
+            var b = Ui.BoxButton(_root, x, y - ArrowRise, 64, ArrowHeight, label, click, 26);
             b.targetGraphic.color = T.Button;
             Buttons[$"{label}@{x}:{y}"] = click;
+            _arrowRects.Add((RectTransform)b.transform);
         }
 
         /// <summary>One side of the versus screen; <paramref name="arrows"/>: the deck arrows sit at the end of its deck line.</summary>
@@ -548,14 +612,19 @@ namespace YgoCampaign.Game
                 else Ui.Text(slot, _cards.Get(side.Showcase[i])?.Name ?? "", 18, T.Text);
             }
 
-            // (Short of the deck arrows, shrinking to fit: a tag team's two deck names are long.)
-            var deck = Ui.Text(Ui.Box(panel, 30, 490, arrows ? 580 : 720, 36), $"Deck: <b>{side.Deck}</b>{(side.DeckNote.Length > 0 ? $"  <color={T.TextDimHex}>{side.DeckNote}</color>" : "")}",
+            // (Well short of the deck arrows, shrinking to fit: a tag team's two deck names are long, and a line that ran to
+            // the arrows read as running into the "<".)
+            float deckWidth = arrows ? DeckLineWithArrows : 720;
+            var deck = Ui.Text(Ui.Box(panel, 30, 490, deckWidth, 36), $"Deck: <b>{side.Deck}</b>{(side.DeckNote.Length > 0 ? $"  <color={T.TextDimHex}>{side.DeckNote}</color>" : "")}",
                 22, T.Text, TextAnchor.MiddleLeft);
             deck.supportRichText = true;
             deck.resizeTextForBestFit = true;
             deck.resizeTextMinSize = 15;
             deck.resizeTextMaxSize = 22;
+            // (For the checks: the first side drawn with arrows, yours.)
+            if (arrows && _arrowsDeckLine == null) { _arrowsDeckLine = deck; _arrowsDeckRight = x + 30 + deckWidth; _arrowsDeckGap = x + DeckArrowAt - _arrowsDeckRight; }
             var detail = Ui.Text(Ui.Box(panel, 30, 530, 720, 60), side.Detail, 18, T.TextMuted, TextAnchor.UpperLeft);
+            if (arrows && _youDetail == null) _youDetail = detail;
             detail.supportRichText = true;
             if (side.Quote.Length > 0)
             {

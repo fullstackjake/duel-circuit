@@ -304,11 +304,75 @@ namespace YgoCampaign.Game
             _printing.text = _copiesText.Length > 0 ? _copiesText : _printingFull;
             _type.text = TypeLine(info);
             BuildTags(info);
+            bool sameCard = _scrolledCode == info.Code;
+            _scrolledCode = info.Code;
             SetText(info.Text);
             _text.fontSize = FxSettings.Scaled(_reading ? 22 : 16);
             Layout();
-            _scroll.verticalNormalizedPosition = 1; // each card starts at the top of its text
+            // Each card starts at the top of its text; the editor's same card shown again (after an add) stays where it was read to.
+            if (!(KeepScrollOnSameCard && sameCard)) _scroll.verticalNormalizedPosition = 1;
         }
+
+        private uint _scrolledCode;
+
+        /// <summary>The deck editor: showing the card already shown (it redraws after every change) keeps its text's scroll.</summary>
+        public bool KeepScrollOnSameCard { get; set; }
+
+        /// <summary>The line shown while no card is (a duel: "Hover a card to read it.").</summary>
+        public string EmptyHint
+        {
+            get => _hint.text;
+            set => _hint.text = value;
+        }
+
+        private ScrollHint? _scrollHint;
+
+        /// <summary>
+        /// The deck editor's run-on hint on the card text (spec "The text hint"): a 24 px fade, "▼ more" and a 4 px scrollbar
+        /// while the text runs on past its box, and the box edge's glow when <see cref="ScrollBy"/> scrolls it from elsewhere.
+        /// </summary>
+        public bool ScrollHints
+        {
+            get => _scrollHint != null;
+            set
+            {
+                if (value && _scrollHint == null) _scrollHint = ScrollHint.Attach(_textView, _textContent, _scroll, () => NotchPixels);
+                else if (!value && _scrollHint != null) { _scrollHint.Remove(); _scrollHint = null; }
+            }
+        }
+
+        /// <summary>
+        /// With <see cref="ScrollHints"/> on, one wheel notch is three lines of the text, over the text (its ScrollRect, set
+        /// each frame against the UI module's scroll per tick) or from elsewhere (<see cref="ScrollBy"/>).
+        /// </summary>
+        public float NotchPixels => 3 * _text.fontSize * 1.15f * _text.lineSpacing;
+
+        /// <summary>
+        /// Scrolls the card text by wheel notches (positive: down the text), as the wheel over the text itself does
+        /// (<see cref="NotchPixels"/> each), from somewhere else: the box's edge glows. Returns the pixels it moved (0 at an
+        /// end, or when the text fits).
+        /// </summary>
+        public float ScrollBy(float ticks)
+        {
+            if (_shown == null || !_textView.gameObject.activeInHierarchy) return 0;
+            float room = Mathf.Max(0, _textContent.rect.height - _textView.rect.height);
+            var at = _textContent.anchoredPosition;
+            float to = Mathf.Clamp(at.y + ticks * NotchPixels, 0, room);
+            float moved = to - at.y;
+            if (Mathf.Abs(moved) < 0.01f) return 0;
+            _scroll.StopMovement();
+            _textContent.anchoredPosition = new Vector2(at.x, to);
+            _scrollHint?.Glow();
+            return moved;
+        }
+
+        /// <summary>For checks: how far the text is scrolled (px from its top), whether it runs on, and the hint's parts showing.</summary>
+        public (float offset, float room, bool runsOn, bool more, bool bar, float glow) DebugScroll =>
+            (_textContent.anchoredPosition.y, Mathf.Max(0, _textContent.rect.height - _textView.rect.height), _textContent.rect.height > _textView.rect.height + 1,
+             _scrollHint != null && _scrollHint.MoreShown, _scrollHint != null && _scrollHint.BarShown, _scrollHint?.GlowAlpha ?? 0);
+
+        /// <summary>For checks: the text box (screen pixels).</summary>
+        public RectTransform DebugTextView => _textView;
 
         /// <summary>The card's picture in its art style, and the Artwork button when it has more than one style.</summary>
         private CopyLook? ShowArt(CardInfo info)
@@ -822,6 +886,116 @@ namespace YgoCampaign.Game
                 if ((info.Type & bit) != 0) parts.Add(name);
             parts.Add((info.Type & 0x20) != 0 ? "Effect" : (info.Type & 0x10) != 0 ? "Normal" : "");
             return $"[{string.Join("/", parts.Where(p => p.Length > 0))}]";
+        }
+    }
+
+    /// <summary>
+    /// The card text's run-on hint (the deck editor's, <see cref="CardDetail.ScrollHints"/>): while the text runs on below its
+    /// box, a 24 px fade to the box's colour along the bottom with "▼ more" on it; a 4 px scrollbar at the right while there's
+    /// anything to scroll; and the box's edge glowing for a moment when the wheel scrolls it from elsewhere. Drawn inside the
+    /// box (its mask clips them), never taking the pointer.
+    /// </summary>
+    public sealed class ScrollHint : MonoBehaviour
+    {
+        private const float FadeHeight = 24, BarWidth = 4, GlowTime = 0.5f;
+        private RectTransform _view = null!, _content = null!, _fade = null!, _track = null!, _thumb = null!;
+        private ScrollRect _scroll = null!;
+        private Text _more = null!;
+        private FrameGraphic _glow = null!;
+        private float _glowAt = -10;
+        private Func<float> _notch = () => 30;
+        private static Texture2D? _ramp;
+
+        public bool MoreShown => _more != null && _more.gameObject.activeInHierarchy;
+        public bool BarShown => _track != null && _track.gameObject.activeInHierarchy;
+        public float GlowAlpha => _glow != null ? _glow.color.a : 0;
+
+        internal static ScrollHint Attach(RectTransform view, RectTransform content, ScrollRect scroll, Func<float> notchPixels)
+        {
+            var T = UiTheme.Current;
+            var h = view.gameObject.AddComponent<ScrollHint>();
+            h._notch = notchPixels;
+            h._view = view;
+            h._content = content;
+            h._scroll = scroll;
+            // The fade: the text box's own colour (black at 0.25 over the panel), clear at the top of the strip.
+            h._fade = Ui.Stretched("MoreFade", view, Vector2.zero, new Vector2(1, 0));
+            h._fade.offsetMax = new Vector2(0, FadeHeight);
+            var fade = h._fade.gameObject.AddComponent<RawImage>();
+            fade.texture = Ramp;
+            fade.color = Color.Lerp(T.Panel, Color.black, 0.25f);
+            fade.raycastTarget = false;
+            var more = Ui.Stretched("More", h._fade, Vector2.zero, Vector2.one);
+            more.offsetMax = new Vector2(-BarWidth - 6, 0);
+            h._more = Ui.Text(more, "▼ more", 12, T.TextSoft, TextAnchor.LowerRight);
+            h._more.fontStyle = FontStyle.Bold;
+            // The bar: a faint track and its thumb, at the box's right edge.
+            h._track = Ui.Stretched("Bar", view, new Vector2(1, 0), Vector2.one);
+            h._track.offsetMin = new Vector2(-BarWidth - 1, 2);
+            h._track.offsetMax = new Vector2(-1, -2);
+            Ui.Image(h._track, T.Text.WithAlpha(0.08f)).raycastTarget = false;
+            h._thumb = Ui.Rect("Thumb", h._track);
+            h._thumb.anchorMin = new Vector2(0, 1);
+            h._thumb.anchorMax = new Vector2(1, 1);
+            h._thumb.pivot = new Vector2(0.5f, 1);
+            Ui.Image(h._thumb, T.Text.WithAlpha(0.45f)).raycastTarget = false;
+            h._glow = FrameGraphic.Make("Glow", view, 0, 2, T.CardFocus.WithAlpha(0));
+            h.LateUpdate();
+            return h;
+        }
+
+        /// <summary>A vertical ramp, clear at the top to solid at the bottom.</summary>
+        private static Texture2D Ramp
+        {
+            get
+            {
+                if (_ramp != null) return _ramp;
+                const int n = 32;
+                var tex = new Texture2D(1, n, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear };
+                for (int y = 0; y < n; y++) tex.SetPixel(0, y, new Color(1, 1, 1, Mathf.SmoothStep(1, 0, y / (n - 1f))));
+                tex.Apply();
+                return _ramp = tex;
+            }
+        }
+
+        /// <summary>The edge glows (the text was scrolled from elsewhere).</summary>
+        public void Glow() => _glowAt = Time.unscaledTime;
+
+        internal void Remove()
+        {
+            foreach (var part in new Component[] { _fade, _track, _glow }) if (part != null) Destroy(part.gameObject);
+            Destroy(this);
+        }
+
+        private void LateUpdate()
+        {
+            if (_view == null || _content == null) return;
+            // The wheel over the text moves it one notch as the wheel from elsewhere does: the UI module scales a notch by
+            // its scroll per tick (6 by default), the ScrollRect by its sensitivity.
+            float perTick = 1;
+#if ENABLE_INPUT_SYSTEM
+            if (UnityEngine.EventSystems.EventSystem.current?.currentInputModule is UnityEngine.InputSystem.UI.InputSystemUIInputModule module && module.scrollDeltaPerTick > 0.001f)
+                perTick = module.scrollDeltaPerTick;
+#endif
+            float sensitivity = _notch() / perTick;
+            if (!Mathf.Approximately(_scroll.scrollSensitivity, sensitivity)) _scroll.scrollSensitivity = sensitivity;
+            float viewH = _view.rect.height, contentH = _content.rect.height;
+            float room = contentH - viewH;
+            bool scrolls = room > 1;
+            float offset = Mathf.Clamp(_content.anchoredPosition.y, 0, Mathf.Max(0, room));
+            bool runsOn = scrolls && offset < room - 1;
+            if (_fade.gameObject.activeSelf != runsOn) _fade.gameObject.SetActive(runsOn);
+            if (_track.gameObject.activeSelf != scrolls) _track.gameObject.SetActive(scrolls);
+            if (scrolls)
+            {
+                float trackH = _track.rect.height;
+                float thumbH = Mathf.Max(12, trackH * viewH / contentH);
+                _thumb.sizeDelta = new Vector2(0, thumbH);
+                _thumb.anchoredPosition = new Vector2(0, -(trackH - thumbH) * (offset / room));
+            }
+            float since = Time.unscaledTime - _glowAt;
+            float a = since >= GlowTime ? 0 : FxSettings.ReducedMotion ? 0.8f : 0.8f * (1 - since / GlowTime);
+            if (!Mathf.Approximately(_glow.color.a, a)) _glow.color = _glow.color.WithAlpha(a);
         }
     }
 }

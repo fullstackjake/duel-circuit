@@ -467,6 +467,117 @@ namespace YgoCampaign.Game
             return problems;
         }
 
+        /// <summary>
+        /// Whether the Alley refuses a deck of yours only over copies: every problem is a card over the table's list (Limited,
+        /// Semi-Limited or Forbidden there), none about its size or cards you don't own. That's when the versus offers
+        /// <see cref="MakeAlleyLegal"/> (docs/dev/NEXT-BUILD-2026-11-19.md, owner decision 1).
+        /// </summary>
+        public bool AlleyRefusesOnlyCopies(Deck deck, int table = -1) => AlleyRefusesOnlyCopies(deck, AlleyRulesFor(table));
+
+        /// <summary>The same under these rules (checks: an Alley list with a pool, whose "not released yet" names the list).</summary>
+        public bool AlleyRefusesOnlyCopies(Deck deck, FormatRules rules)
+        {
+            if (rules.List == null) return false;
+            var problems = Problems(deck, rules);
+            // By counts, not by the problems' words (a "not released yet in the <list> format" names the list too): the cards
+            // over the list, one problem each, and no other problem at all.
+            var list = ListForDeck(deck, rules);
+            var over = deck.Main.Concat(deck.Extra).Concat(deck.Side).GroupBy(c => Banlist.BaseCode(c, _cards))
+                .Where(g => g.Count() > Math.Min(Collection.MaxCopies, list.Allowed(g.Key, _cards))).Select(g => g.Key).ToHashSet();
+            return problems.Count > 0 && problems.Count == over.Count && problems.All(p => p.Code != 0 && over.Contains(p.Code));
+        }
+
+        /// <summary>What <see cref="MakeAlleyLegal"/> did: the deck it saved (null when it couldn't), what changed, and why not.</summary>
+        public sealed class AlleyLegalCopy
+        {
+            public string? Deck;
+            public string Title = "";
+            public List<string> Changes = new List<string>();
+            /// <summary>When it couldn't: what's missing, in a sentence ("You'd need 2 more cards of your own ...").</summary>
+            public string Missing = "";
+            /// <summary>The copy was already saved (the same cards): it's picked again, nothing new is saved.</summary>
+            public bool Existing;
+        }
+
+        /// <summary>The place a legal copy is named for: "No Limits" at its table, "Alley" everywhere else in the alley.</summary>
+        public string AlleyPlaceName(int table) => IsNoLimitsTable(table) ? "No Limits" : "Alley";
+
+        /// <summary>The longest deck title a legal copy's name starts with: a longer one is cut, so "&lt;title&gt; (No Limits 12)" stays a
+        /// file name Windows can save (255 characters).</summary>
+        public const int AlleyCopyTitleMax = 120;
+
+        /// <summary>The start of a legal copy's title: the deck's title, cut to <see cref="AlleyCopyTitleMax"/>.</summary>
+        private string AlleyCopyBase(string deckName)
+        {
+            var title = DeckTitle(deckName);
+            return title.Length <= AlleyCopyTitleMax ? title : title.Substring(0, AlleyCopyTitleMax).TrimEnd();
+        }
+
+        /// <summary>The copies of <paramref name="deckName"/> this makes for a table: "&lt;title&gt; (Alley)", "(Alley 2)"... (or "(No Limits)").</summary>
+        public bool IsAlleyCopyOf(string copy, string deckName, int table) =>
+            copy != deckName && _library.Contains(copy) && System.Text.RegularExpressions.Regex.IsMatch(DeckTitle(copy),
+                "^" + System.Text.RegularExpressions.Regex.Escape($"{AlleyCopyBase(deckName)} ({AlleyPlaceName(table)}") + @"( \d+)?\)$");
+
+        /// <summary>A deck's cards as one sorted list per section, to tell two decks with the same cards.</summary>
+        private string CardsKey(Deck d) =>
+            string.Join("|", new[] { d.Main, d.Extra, d.Side }.Select(section => string.Join(",", section.OrderBy(c => c))));
+
+        /// <summary>
+        /// "Make it Alley-legal": a copy of your deck saved as a new deck of yours, "&lt;deck&gt; (Alley)" ("(No Limits)" at No Limits:
+        /// <see cref="AlleyPlaceName"/>), with the copies over the
+        /// table's list taken out and the Main Deck topped back up to 40 from cards you own (the rule <see cref="Ygo.Engine.Campaign.Loaners.Adjust"/>
+        /// uses, but only your own cards: <see cref="AutoDeck.Fix"/> on your collection). The deck itself is left as it is.
+        /// When your cards can't fill it, nothing is saved and <see cref="AlleyLegalCopy.Missing"/> says what's missing. A copy of
+        /// it you already have with the same cards is returned instead of saving another (<see cref="AlleyLegalCopy.Existing"/>).
+        /// <paramref name="owned"/>: checks only, a collection to build from instead of yours.
+        /// </summary>
+        public AlleyLegalCopy MakeAlleyLegal(string deckName, int table = -1, Collection? owned = null)
+        {
+            var result = new AlleyLegalCopy();
+            if (Profile == null || !_library.Contains(deckName)) { result.Missing = "Build a deck first."; return result; }
+            var rules = AlleyRulesFor(table);
+            var source = _library.Load(deckName);
+            source.Name = deckName;
+            var collection = owned ?? CollectionFor(source);
+            Func<uint, bool>? released = rules.Pool.Length > 0 ? c => InPool(c, rules.Pool) : (Func<uint, bool>?)null;
+            var fix = AutoDeck.Fix(source, collection, rules.List ?? Banlist.None, _cards, released);
+            var deck = fix.Deck;
+            result.Changes = fix.Changes;
+            var removed = fix.Changes.Where(c => c.StartsWith("Removed ")).Select(c => c.Substring(8)).ToList();
+            if (deck.Main.Count < DeckRules.MainMin)
+            {
+                int gap = DeckRules.MainMin - deck.Main.Count;
+                result.Missing = $"Taking out {string.Join(", ", removed)} leaves {deck.Main.Count} cards, and your spare cards can't fill the other {gap}: "
+                    + $"you'd need {gap} more card{(gap == 1 ? "" : "s")} of your own (packs in the Card Shop), or edit the deck.";
+                return result;
+            }
+            // Checked as the Duel! button will check it (with your real collection), so what's saved is what plays.
+            var left = owned == null ? AlleyProblems(deck, rules) : new List<DeckProblem>(DeckRules.Validate(deck, rules.List ?? Banlist.None, _cards));
+            if (left.Count > 0) { result.Missing = $"It still wouldn't be legal: {left[0].Message}"; return result; }
+            // Pressed again for the same deck: the copy you already have, if it has the same cards, rather than another.
+            var key = CardsKey(deck);
+            var same = AlleyDeckChoices().FirstOrDefault(d => IsAlleyCopyOf(d, deckName, table) && CardsKey(_library.Load(d)) == key);
+            if (same != null) { result.Deck = same; result.Title = DeckTitle(same); result.Existing = true; return result; }
+            var place = AlleyPlaceName(table);
+            var baseTitle = AlleyCopyBase(deckName);
+            var title = $"{baseTitle} ({place})";
+            var name = DeckLibrary.SafeName(title);
+            for (int n = 2; _library.Contains(name); n++)
+            {
+                title = $"{baseTitle} ({place} {n})";
+                name = DeckLibrary.SafeName(title);
+            }
+            deck.Name = name;
+            deck.Campaign = true;
+            deck.Notes.Remove("loaner");
+            deck.Notes.Remove(Ygo.Engine.Campaign.Loaners.PartnerNote);
+            deck.Notes["title"] = title;
+            _library.Save(deck);
+            result.Deck = name;
+            result.Title = title;
+            return result;
+        }
+
         /// <summary>A voice line for a hook, its speaker named ("opponent" is <paramref name="opponent"/>); null when none.</summary>
         public (string speaker, string text)? AlleyLine(string hook, string opponent, IReadOnlyDictionary<string, string>? fill = null, int? showTurn = null)
         {

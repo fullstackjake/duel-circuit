@@ -319,6 +319,7 @@ run, so working beside it can't press anything in the check. Its window still co
 | `-musiccheck <folder>` | The duel music, including a real boss duel to the end (run it with `-mute`) |
 | `-stylecheck <folder>` | Card art styles; run twice to check the choices are kept |
 | `-searchcheck <folder>` | The deck editor's card search |
+| `-focuscheck <folder>` | The deck editor's click to focus and change signals, through a test mouse and keyboard: pointing, clicks, Shift and right clicks, a 3 px wobble, the ring after a removal, keys in every text field, Enter / Delete / arrows / Page keys, the wheel, a search keeping the focus, the test hand, the messages and their Undo, reduced motion, the sounds asked for (logged as `editor sound:`), a card not owned in the campaign |
 | `-aboutcheck <folder> [-aboutlicenses <folder>]` | The About screen: every notice, the license and third-party readers, missing files, keys, controller and mouse; it never opens a browser or Finder |
 | `-ydkcheck <folder> -ydkfile <.ydk> -ydkfixture <.ydk>` | Importing `.ydk` files from paths |
 | `-importcheck <folder>` | The Import Cards screen: the menu and screen layout, a zip, loose pictures and bad names, Keep mine and Replace them, HD, the card back, Cancel. It makes its own flat-colour pictures and never opens the file dialog |

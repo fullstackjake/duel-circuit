@@ -73,6 +73,8 @@ namespace YgoCampaign.Game
         public Color Highlight { get; private set; }
         /// <summary>Outline of the editor's card-detail modal. Was rgba(0.35, 0.6, 1, 0.6).</summary>
         public Color Focus { get; private set; }
+        /// <summary>The deck editor's focus ring round the card shown on the left (outside the card, a gap of the background between). <see cref="Text"/>.</summary>
+        public Color CardFocus { get; private set; }
 
         // ---------- Hover, pressed, disabled (UiHover; docs/dev/HOVER-DESIGN-2026-11-07.md) ----------
 
@@ -237,6 +239,7 @@ namespace YgoCampaign.Game
             ImportChip = H("#C8622F"),
             Highlight = H("#FFC940"),
             Focus = new Color(0.35f, 0.6f, 1f, 0.6f),
+            CardFocus = Color.white, // Text
 
             HoverMix = 0.10f,
             AccentHoverMix = 0.06f,
@@ -315,6 +318,7 @@ namespace YgoCampaign.Game
             ImportChip = H("#C8622F"),
             Highlight = H("#FFC940"),
             Focus = new Color(0.88f, 0.69f, 0.44f, 0.6f),
+            CardFocus = H("#EDE6DA"), // Text
 
             HoverMix = 0.10f,
             AccentHoverMix = 0.06f,

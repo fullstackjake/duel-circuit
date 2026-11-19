@@ -232,18 +232,76 @@ namespace YgoCampaign.Game
 
         /// <summary>
         /// Where to hyphenate <paramref name="word"/> at or before <paramref name="most"/> letters (three or more on each
-        /// side): between two consonants ("Bottom-less"), else after a vowel before a single consonant ("Polymeri-zation"),
-        /// else at <paramref name="most"/>.
+        /// side). First inside a run of consonants between two vowels, where the next syllable takes the longest start a word
+        /// can have (<see cref="Onsets"/>): "Des-truction", "Con-struction", "Thunder-strike", "Syn-chron", "After-glow",
+        /// "Air-knight", "Knight-mare", "Black-wing", "Arch-fiend"; never inside a <see cref="Digraph"/> ("Knig-htmare") or
+        /// before an r or l that belongs with the consonant before it ("Dest-ruction"). The latest such place that fits wins.
+        /// Else after a vowel before a single consonant ("Polymeri-zation"); else at <paramref name="most"/>, moved off a
+        /// digraph when it can be.
         /// </summary>
         private static int SyllableCut(string word, int most)
         {
             static bool Vowel(char c) => "aeiouyAEIOUY".IndexOf(c) >= 0;
             static bool Consonant(char c) => char.IsLetter(c) && !Vowel(c);
-            for (int c = Math.Min(most, word.Length - 3); c >= 3; c--)
-                if (Consonant(word[c - 1]) && Consonant(word[c]) && Vowel(word[c - 2])) return c;
-            for (int c = Math.Min(most, word.Length - 3); c >= 3; c--)
+            int hi = Math.Min(most, word.Length - 3), best = -1;
+            for (int s = 1; s < word.Length; s++)
+            {
+                if (!(Vowel(word[s - 1]) && Consonant(word[s]))) continue;
+                int e = s;
+                while (e + 1 < word.Length && Consonant(word[e + 1])) e++;
+                if (e == s || e + 1 >= word.Length || !Vowel(word[e + 1])) continue;
+                // The run word[s..e]: the first cut from its left whose right part can start a syllable (the longest start).
+                for (int c = s; c <= e; c++)
+                {
+                    if (c < 3 || Digraph(word[c - 1], word[c]) || !Onset(word.Substring(c, e + 1 - c))) continue;
+                    if (c <= hi) best = Math.Max(best, c);
+                    break;
+                }
+            }
+            if (best > 0) return best;
+            for (int c = hi; c >= 3; c--)
                 if (Vowel(word[c - 1]) && Consonant(word[c]) && c + 1 < word.Length && Vowel(word[c + 1])) return c;
+            if (most > 3 && most < word.Length && Digraph(word[most - 1], word[most])) return most - 1;
             return most;
+        }
+
+        /// <summary>
+        /// Letters that can start a syllable together (one consonant always can). Not "sm", "sn", "gn": "Trans-migration" and
+        /// "Electromag-netic", not "Tran-smigration" or "Electroma-gnetic".
+        /// </summary>
+        private static readonly string[] Onsets =
+        {
+            "bl", "br", "ch", "cl", "cr", "dr", "fl", "fr", "gl", "gr", "kn", "ph", "pl", "pr", "qu", "sc", "sh", "sk", "sl", "sp", "st", "sw",
+            "th", "tr", "tw", "wh", "wr", "chr", "phr", "shr", "thr", "scr", "spl", "spr", "str", "squ", "sch",
+        };
+
+        private static bool Onset(string s) =>
+            s.Length == 1 ? char.IsLetter(s[0]) && "aeiouyAEIOUY".IndexOf(s[0]) < 0 : Array.IndexOf(Onsets, s.ToLowerInvariant()) >= 0;
+
+        /// <summary>For checks: <paramref name="word"/> hyphenated where a card <paramref name="most"/> letters wide would break it ("Des-truction").</summary>
+        public static string DebugHyphenate(string word, int most)
+        {
+            int c = SyllableCut(word, most);
+            return word.Substring(0, c) + "-" + word.Substring(c);
+        }
+
+        /// <summary>Two letters read as one sound ("gh", "th", "ck", "qu"...): a hyphen never goes between them.</summary>
+        public static bool Digraph(char a, char b) =>
+            (char.ToLowerInvariant(a), char.ToLowerInvariant(b)) is ('c', 'h') or ('g', 'h') or ('p', 'h') or ('s', 'h') or ('t', 'h')
+                or ('w', 'h') or ('c', 'k') or ('q', 'u');
+
+        /// <summary>
+        /// For checks: hyphens this name was given that fall inside a digraph ("Knig-" / "htmare"). The word's own hyphens
+        /// ("Mekk-" / "Knight") don't count: they're between a letter and a capital.
+        /// </summary>
+        public static System.Collections.Generic.List<string> SplitDigraphs(Text t)
+        {
+            var problems = new System.Collections.Generic.List<string>();
+            var text = t.text ?? "";
+            for (int i = text.IndexOf("-\n", StringComparison.Ordinal); i > 0 && i + 2 < text.Length; i = text.IndexOf("-\n", i + 1, StringComparison.Ordinal))
+                if (char.IsLetter(text[i - 1]) && char.IsLower(text[i + 2]) && Digraph(text[i - 1], text[i + 2]))
+                    problems.Add($"\"{text.Replace("\n", "/")}\" hyphenates inside \"{text[i - 1]}{text[i + 2]}\"");
+            return problems;
         }
 
         /// <summary>The words with each one too wide broken onto lines: after its own hyphens first, then with a hyphen added.</summary>
@@ -563,8 +621,24 @@ namespace YgoCampaign.Game
         public void OnPointerClick(PointerEventData eventData)
         {
             if (eventData.dragging) return; // a drag that ends on the card isn't a click
+            if (_editorClick != null) { _editorClick(eventData.button); return; }
             if (eventData.button == PointerEventData.InputButton.Right) _onRightClick?.Invoke();
             else _onClick?.Invoke();
+        }
+
+        private Action<PointerEventData.InputButton>? _editorClick;
+
+        /// <summary>
+        /// The deck editor's cards (click to focus, docs/dev/EDITOR-CLICK-FOCUS-SPEC-2026-11-19.md): every click goes to
+        /// <paramref name="click"/> with its button (a drag that ends on the card still isn't one), and pointing at the card
+        /// only lifts it with a hairline (a Tile hover, its border's colour left alone). Make the view with no hover action,
+        /// so pointing never changes the card detail. Duel boards never call this: their cards keep hover as it is.
+        /// </summary>
+        public void EditorMode(Action<PointerEventData.InputButton> click)
+        {
+            _editorClick = click;
+            var hover = UiHover.Add((RectTransform)transform, HoverStyle.Tile);
+            hover.Fill = null; // lift and hairline only: the border keeps its meaning (gold, the owner's blue)
         }
 
         /// <summary>Cards narrower than this leave the Level / Rank out of their stat line (ATK/DEF come first).</summary>

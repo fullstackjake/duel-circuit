@@ -147,8 +147,6 @@ This is an early version (0.2.2).
   only brings it to the front, and the window can be made very small.
 
 **Things that affect your game**
-- In the shop's way, the **Warrior's Charge** starter has 3 Reinforcement of the Army, but the Back Alley allows 1.
-  Edit the deck before you go. (Historic Rules uses the deck's 2011 version, with 1 copy.)
 - **No Limits** in the Back Alley is locked ("Coming soon").
 - Difficulty isn't tuned yet. The early circuits are easy.
 - Every duel uses today's game rules (Master Rule 5), even in historic formats.

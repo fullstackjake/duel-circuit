@@ -298,6 +298,23 @@ namespace YgoCampaign.Game
                 if (_meshes[i] != null) _meshes[i].Dirty();
         }
 
+        /// <summary>
+        /// Graphics added under the visual after it started moving (the deck editor's focus ring, a changed card's edge): drawn
+        /// lifted or scaled with it at once, not from its next hover.
+        /// </summary>
+        public void Adopt(GameObject part)
+        {
+            part.GetComponentsInChildren(true, Buffer);
+            foreach (var g in Buffer)
+            {
+                if (!g.TryGetComponent<HoverMesh>(out var m)) m = g.gameObject.AddComponent<HoverMesh>();
+                if (!_meshes.Contains(m)) _meshes.Add(m.For(this));
+                m.Dirty();
+            }
+            Buffer.Clear();
+            _meshed = true;
+        }
+
         private void OnDisable()
         {
             _inside = _down = _focused = false;
@@ -383,6 +400,61 @@ namespace YgoCampaign.Game
             vh.AddVert(new Vector3(x1, y0), c, Vector2.zero);
             vh.AddTriangle(i, i + 1, i + 2);
             vh.AddTriangle(i + 2, i + 3, i);
+        }
+    }
+
+    /// <summary>
+    /// A frame of <see cref="Thickness"/> reference pixels inside its rect (one graphic, no sprite): the deck editor's focus
+    /// ring and its gap, a changed card's edge, the change message's edge, the card text's glow.
+    /// </summary>
+    public sealed class FrameGraphic : MaskableGraphic
+    {
+        private float _thickness = 1;
+
+        public float Thickness
+        {
+            get => _thickness;
+            set { _thickness = value; SetVerticesDirty(); }
+        }
+
+        protected override void OnPopulateMesh(VertexHelper vh)
+        {
+            vh.Clear();
+            var r = rectTransform.rect;
+            // Never thinner than a screen pixel: a 1 px line in the 1920x1080 layout is 2/3 of one in a 1280x720 window,
+            // and a side of it can drop out between pixels.
+            float scale = canvas != null && canvas.scaleFactor > 0 ? canvas.scaleFactor : 1;
+            float w = Mathf.Min(_thickness > 0 ? Mathf.Max(_thickness, 1 / scale) : 0, r.width / 2, r.height / 2);
+            if (w <= 0) return;
+            Quad(vh, r.xMin, r.yMax - w, r.xMax, r.yMax);
+            Quad(vh, r.xMin, r.yMin, r.xMax, r.yMin + w);
+            Quad(vh, r.xMin, r.yMin + w, r.xMin + w, r.yMax - w);
+            Quad(vh, r.xMax - w, r.yMin + w, r.xMax, r.yMax - w);
+        }
+
+        private void Quad(VertexHelper vh, float x0, float y0, float x1, float y1)
+        {
+            int i = vh.currentVertCount;
+            var c = (Color32)color;
+            vh.AddVert(new Vector3(x0, y0), c, Vector2.zero);
+            vh.AddVert(new Vector3(x0, y1), c, Vector2.zero);
+            vh.AddVert(new Vector3(x1, y1), c, Vector2.zero);
+            vh.AddVert(new Vector3(x1, y0), c, Vector2.zero);
+            vh.AddTriangle(i, i + 1, i + 2);
+            vh.AddTriangle(i + 2, i + 3, i);
+        }
+
+        /// <summary>A frame stretched over <paramref name="parent"/>, grown by <paramref name="outset"/> on every side (negative: inset).</summary>
+        public static FrameGraphic Make(string name, Transform parent, float outset, float thickness, Color color)
+        {
+            var rt = Ui.Stretched(name, parent, Vector2.zero, Vector2.one);
+            rt.offsetMin = new Vector2(-outset, -outset);
+            rt.offsetMax = new Vector2(outset, outset);
+            var f = rt.gameObject.AddComponent<FrameGraphic>();
+            f.raycastTarget = false;
+            f.Thickness = thickness;
+            f.color = color;
+            return f;
         }
     }
 

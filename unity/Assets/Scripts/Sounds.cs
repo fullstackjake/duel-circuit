@@ -112,8 +112,12 @@ namespace YgoCampaign.Game
         /// <summary>Whether an effect by this name can play (built in, or added).</summary>
         public static bool HasEffect(string name) => _instance != null && _instance._clips.ContainsKey(name);
 
-        /// <summary>Plays an effect by name (see <see cref="Sfx.Effects"/>), with a slight random pitch for variety.</summary>
-        public static void Play(string name, float volume = 1f, float pitch = 1f)
+        /// <summary>
+        /// Plays an effect by name (see <see cref="Sfx.Effects"/>), with a slight random pitch for variety. With
+        /// <paramref name="ui"/> it goes through the interface volume as click, hover and error do (the deck editor's place,
+        /// draw and move); duels play the same clips on the effects volume alone.
+        /// </summary>
+        public static void Play(string name, float volume = 1f, float pitch = 1f, bool ui = false)
         {
             var s = _instance;
             if (s == null || !s._clips.TryGetValue(name, out var clip) || EffectsVolume <= 0) return;
@@ -125,7 +129,7 @@ namespace YgoCampaign.Game
             volume *= Mathf.Max(0.4f, Mathf.Pow(0.8f, repeats));
             s._lastPlayed[name] = now;
             if (Important.Contains(name)) { s._duck = 0.35f; s._duckUntil = now + 0.8f; }
-            if (UiSounds.Contains(name)) volume *= UiVolume;
+            if (ui || UiSounds.Contains(name)) volume *= UiVolume;
             var voice = s._voices[s._nextVoice];
             s._nextVoice = (s._nextVoice + 1) % s._voices.Length;
             // The prized chimes are tuned to the music, so they don't take the usual slight random pitch.

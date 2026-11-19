@@ -506,8 +506,9 @@ Duels where you bet DP or a card, away from the shop. Alley duels pay **no DP**:
 - Forbidden cards are allowed, but only 1 copy each.
 - 35 lock and loop cards are banned completely, for example Imperial Order, Royal Oppression and Self-Destruct Button.
 - No Ban Passes. Old cards play with their original printed text.
-- **Warrior's Charge players (the shop's way only):** your starter has 3 Reinforcement of the Army, but the Alley allows
-  1. Edit the deck first. (Under Historic Rules your starter is the 2011 version, which has 1.)
+- **Too many copies of a card?** If the Alley's list is the only problem, click **Make it Alley-legal** on the duel
+  screen. It saves a copy with "(Alley)" after its name and the extra copies swapped for cards you own. Your deck stays
+  as it is. (Warrior's Charge needs this in the shop's way: it has 3 Reinforcement of the Army, and the Alley allows 1.)
 
 **Headliners.** Some seats hold headliners: duelists famous for one big combo. Stop the combo before its payoff, then
 win, to earn their Combo Breaker poster. (A rematch from the **Encore** button doesn't count.) Two Back Alley opponents
