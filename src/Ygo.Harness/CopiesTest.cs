@@ -121,6 +121,7 @@ public static partial class CopiesTest
                 checkedCount > 0 && same == checkedCount);
         }
         failures += Versions(cards, root);
+        failures += PrintingsImport.SelfTest(); // the importer's "New" placeholder rule (docs/dev/CARD-REFRESH-2026-11-19.md)
         Console.WriteLine($"\n{(failures == 0 ? "All copy checks passed." : $"{failures} copy checks failed.")}");
         return failures == 0 ? 0 : 1;
     }
