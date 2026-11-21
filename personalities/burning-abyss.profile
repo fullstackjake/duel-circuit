@@ -5,7 +5,7 @@ aggression: 0.5
 caution: 0.5
 patience: 0.55
 spending: 0.5
-skill: 0.55
+skill: 0.85
 decks: burning-abyss
 intro: Every card I lose comes back to haunt you.
 win: Abandon hope. I did warn you.

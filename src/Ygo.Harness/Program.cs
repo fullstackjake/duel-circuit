@@ -92,6 +92,7 @@ for (int i = 0; i < args.Length; i++)
         case "--export-sounds":
         case "--sound-export": return SoundExport.Run(args[++i]);
         case "--boss-music": return SoundExport.Bosses(FindProjectRoot());
+        case "--audio-check": return AudioCheck.Run(args.Skip(i + 1).ToArray());
         case "--characters": return CharacterSheet.Run(FindProjectRoot(), args[++i]);
         case "--ladder-test": return LadderTest.Run(FindProjectRoot()); // the Champion's Ladder (docs/dev/CHAMPIONS-LADDER-SPEC-2026-11-06.md section 9)
         case "--download-pictures":

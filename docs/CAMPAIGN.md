@@ -57,7 +57,7 @@ Choose **Campaign** in the main menu. A new campaign starts at Gus's card shop.
 | **Undead Legion** | Zombie World, Book of Life, Pyramid Turtle and Goblin Zombie. |
 | **Mekk-Knight Invoked Evolved** | A modern deck with Mekk-Knights, Aleister and Invocation, and hand traps. Much stronger than the early circuits. |
 
-New to Yu-Gi-Oh!? **Legendary Dragons** is marked **Best first deck**. **Mekk-Knight Invoked Evolved** is strong from
+New to Yu-Gi-Oh!? **Warrior's Charge** is marked **Best first deck**. **Mekk-Knight Invoked Evolved** is strong from
 the first duel, but its plays take practice.
 
 ## Two ways to play
@@ -106,7 +106,9 @@ Gauntlet at the top.
 | **Gauntlet** | Tier 0 Gauntlet |
 
 **How it works:**
-- Each circuit has three or four **matches**: a duelist with a particular deck.
+- Each circuit has three or four **matches**: a duelist with a particular deck. The last one is the circuit's **final**:
+  its row reads "Final: <name>", the versus screen reads "Circuit final", and that duelist says a line before the duel.
+- Each match shows its deck's strength as one to five stars.
 - Win every match to clear the circuit. That pays its prize and opens the next one.
 - Each circuit is a round node with its boss's face: dark with a padlock (locked), a pulsing halo (next up) or a crown
   (cleared). Click a node to see its matches.
@@ -118,6 +120,9 @@ Gauntlet at the top.
 - A win pays DP. Later circuits pay more.
 - The first time you win a match, you get 200 DP more.
 - A loss pays 50 DP and a draw 100 DP, so you always earn something.
+- **A rematch pays 150 DP.** That's a win in a match you've already won, in a circuit, a Tag Cup or against a guest. With
+  a loaner deck it pays 75. Level-ups in a match you've already won pay Card Tokens, not DP. First wins and prizes pay as
+  before.
 
 ## Before and after a duel
 
@@ -318,14 +323,18 @@ Open the **Recipe Book** on the campaign screen. It lists every deck the campaig
 by map region. (These are different from the 74 historic tournament decks.)
 
 - **Beat a duelist** while they play a deck to unlock its recipe. The results screen tells you.
+- **Decks change.** If a duelist's deck was swapped in a later version and you had already beaten the old one, you keep
+  the old recipe: it shows "in an earlier version" and stays unlocked. You also have the new one, and no DP moves.
 - **A locked recipe** tells you who to beat, and where.
 - **An unlocked recipe** shows:
+  - the deck's strength in stars, first on the "by" line (a long line wraps to a second),
   - the deck list, and its story (its era, how it worked, why it mattered),
   - how much of it you own, and where to get what you're missing,
   - **Add missing to wishlist**,
   - **Build this deck**, which builds it from your collection and opens it in the editor,
   - **Watch [name] play it** (the button shows the duelist's name): a short replay of the deck's owner at their best
     turn.
+- A recipe you already own every card of says so ("You already own every card in it.") when you unlock it.
 - **Recipe packs:** a pack of 9 cards from that recipe, missing cards first. Price goes by the band where you meet the
   deck: from 300 DP (Beginner) to 2,500 DP (Master and Gauntlet).
 - **Buy what's missing:** every missing card at once, at its lowest rarity. For decks from later bands there's an
@@ -384,7 +393,7 @@ sits under the circuit that opens it. You don't need them to move on: play them 
 | Fall Format Tag Cup | Expert Series: Fall Format |
 | Master Tag Cup | Master League: Graveyard Kings |
 
-- Each cup has 3 tag matches against pairs of duelists from its band.
+- Each cup has 3 tag matches against pairs of duelists from its band. A row shows the pair's strength in stars.
 - Pick your partner on the cup's page with **‹ ›**. The game remembers your pick.
 - A cup pays DP and EXP like its band's circuits, plus its prize and a Card Token the first time you win it.
 
@@ -405,6 +414,8 @@ until then they show as "???".
 - Click **Duel** to face a guest alone, or **Tag duel** to face them with their partner (Ines, Nocturne, Rhea and Seraph).
 - Duchess Ilse plays four decks, one after another: beat one to face the next.
 - Once you've beaten a guest, they can partner you in the Tag Cups.
+- An open guest's line shows their deck's strength in stars and, until you clear them, "Best after the <band> band":
+  where that deck is best met.
 
 ## The Locker
 

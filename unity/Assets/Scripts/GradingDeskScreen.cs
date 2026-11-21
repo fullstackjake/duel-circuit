@@ -404,7 +404,7 @@ namespace YgoCampaign.Game
                 {
                     if (beat == SlabReveal.Beat.Number)
                     {
-                        Sounds.Play(copy.Slab >= 10 ? "burst" : "rare", 0.8f);
+                        PackSounds.SlabNumber(copy.Rarity, copy.Slab);
                         var echo = Ui.Text(Ui.Placed("Echo", overlay, new Vector2(0, 380), new Vector2(300, 140)), copy.Slab.ToString(), 96, Ui.Hex("#F3E3B5"));
                         echo.fontStyle = FontStyle.Bold;
                         StartCoroutine(Fade(echo, 0.5f));

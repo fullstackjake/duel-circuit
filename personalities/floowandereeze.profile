@@ -5,7 +5,7 @@ aggression: 0.3
 caution: 0.7
 patience: 0.75
 spending: 0.4
-skill: 0.55
+skill: 0.85
 decks: floowandereeze
 intro: Normal Summon, Normal Summon, Normal Summon... and no Graveyard for you.
 win: The birds fly home, and your Graveyard stays empty.

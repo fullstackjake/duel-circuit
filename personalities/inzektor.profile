@@ -5,7 +5,7 @@ aggression: 0.7
 caution: 0.35
 patience: 0.4
 spending: 0.7
-skill: 0.7
+skill: 0.85
 decks: inzektor
 intro: Dragonfly, Hornet, boom. Your best card is gone.
 win: Every equip was a removal spell. You never stood a chance.

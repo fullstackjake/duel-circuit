@@ -5,7 +5,7 @@ aggression: 0.3
 caution: 0.7
 patience: 0.75
 spending: 0.4
-skill: 0.55
+skill: 0.85
 decks: domain-monarch
 intro: My domain. No Extra Deck allowed.
 win: Bow before the Monarchs.

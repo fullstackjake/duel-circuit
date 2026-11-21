@@ -5,8 +5,8 @@ aggression: 0.5
 caution: 0.5
 patience: 0.55
 spending: 0.5
-skill: 0.55
-decks: yummy
+skill: 0.85
+decks: yummy, synchron
 intro: Small monsters, tiny Synchros, lots of hand traps. Delicious.
 win: Order up: one loss for table two.
 lose: That dish didn't come out right.

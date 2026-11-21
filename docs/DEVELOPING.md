@@ -209,7 +209,7 @@ than one game (`--games N`) runs quietly and prints totals. Pass two `.ydk` path
 | `--ui-test` | The human seat played with random clicks through the same choice lists the game shows; reports every prompt type and rejected answers. `--responses auto\|on\|off` picks the Chain prompt mode |
 | `--deckbuilding-test` | The deck editor's engine pieces: search, ban lists (including `Banlist.NewestTcg`, free play's default list), validation, odds, codes, the tester; historic decks legal under their lists |
 | `--card-search-test [--write-baseline]` | The editor's card search (202 steps): the old-query baseline (`src/Ygo.Harness/fixtures/card-search-baseline.txt`, compared as sets of cards, so a ranking change can't fail it), exact words first (`Find(..., exactWords: true)`, `LastPhrase`), keywords and other terms between the words. `--write-baseline` rewrites the baseline from the current search: do it before changing `CardSearch.cs`, not after |
-| `--campaign-test` | The shop, pack odds, circuit payouts and unlocks, the copy cap, collection rules, saving, the story's triggers and speakers |
+| `--campaign-test` | The shop, pack odds, circuit payouts and unlocks, the copy cap, collection rules, saving, the story's triggers and speakers. `ClimbTest.cs` adds the climb's steps: rematch pay (circuit, Tag Cup, guest, loaner, level-ups as tokens, a loss in a won match), `finalline:` and `was:` parsing, the old-save migration and former recipes (also on real saves), deck stars, no "skill" in a style summary, `OwnsAll` |
 | `--import-test` | The card picture importer (Import Cards) on stand-in files in a temp folder: names, zips, existing pictures with both answers, size limits, unsafe names, cancel, the card back. Uses no card pictures |
 | `--copies-test` | Each card keeps its copy's look through a duel; old replays still deal the same |
 | `--profile-check <save>` | Loads a save (migrating an old one), reports its copies by grade; only reads the file |
@@ -232,7 +232,8 @@ than one game (`--games N`) runs quietly and prints totals. Pass two `.ydk` path
 | `--export-printings <cardinfo.json> <out.bin>` | Writes `printings.bin` ([BUILDING.md](BUILDING.md#7-export-the-printings)) |
 | `--export-sounds <folder>` | Every sound as a WAV, and the music themes ([Sound](#sound-and-music)) |
 | `--sfx-wav <folder> [prefix]` | Only the effects whose names start with the prefix |
-| `--boss-music` | Every boss duel with its theme and key, each rendered |
+| `--boss-music` | Every boss duel with its theme and key, each rendered; exits 0 when every boss has a theme of its own (it passes now) |
+| `--audio-check [--write-baseline]` | Renders every sound in memory and checks it, without a game. Rows: 1 every effect renders cleanly and the same twice; 2 loudness, length and peak against `src/Ygo.Harness/fixtures/audio-baseline.txt`; 3 loudness rules by family; 4 every theme and the menu loop; 5 the boss list; 6 the tuning tables; 7 the limiter on pile-ups; 8 warnings only (small speakers, aliasing: audio pass 2's targets). Exit 1 on any FAIL. After a deliberate change to a sound, rewrite the baseline with `--write-baseline` |
 | `--download-pictures <cardinfo.json> <folder> [--limit N]` | See [Downloading card pictures](#downloading-card-pictures) |
 
 Environment variables: `YGO_EVENTS=1` adds the animation events the game would play to a play-by-play;
@@ -301,7 +302,7 @@ run, so working beside it can't press anything in the check. Its window still co
 
 | Check | What it covers |
 |---|---|
-| `-campaigncheck <folder>` | A fresh campaign: shop, a pack, collection deck building, a match with random clicks; checks it pays and saves |
+| `-campaigncheck <folder>` | A fresh campaign: shop, a pack, collection deck building, a match with random clicks; checks it pays and saves. It ends with the climb's checks (below) |
 | `-menucheck <folder>` | Title screen, attract mode, menu, settings, campaign start. Run it without `-mute` (its sound checks fail muted) |
 | `-replaycheck <folder>` | A duel, then its auto-saved replay played back to the same end |
 | `-tagcheck <folder>` | The tag setup screen, a four-bot tag duel past a swap, its result and replay |
@@ -314,10 +315,12 @@ run, so working beside it can't press anything in the check. Its window still co
 | `-clickcheck <folder>` | Clicks that must land the first time (drags in lists, hand cards, a press across a redraw) |
 | `-shopcheck <folder>` | The card shop's shelves, tags, odds, a box, New arrivals |
 | `-alleycheck <folder>` | The Back Alley's loop |
-| `-finalcheck <folder>` | The Library's "Every Era" final to its epilogue |
-| `-laddercheck <folder>` | The Champion's Ladder from its locked plaque to the top |
+| `-finalcheck <folder>` | The Library's "Every Era" final to its epilogue (the guests' decks line now carries deck stars, not a skill number) |
+| `-laddercheck <folder>` | The Champion's Ladder from its locked plaque to the top (a holder's skill is read from `Ladder.Opponent`: 1.0) |
 | `-themecheck <folder>` | The shell screens in both UI themes |
-| `-musiccheck <folder>` | The duel music, including a real boss duel to the end (run it with `-mute`) |
+| `-musiccheck <folder>` | (20 steps) The duel music, including a real boss duel to the end (run it with `-mute`) |
+| `-soundcheck <folder>` | (51 steps) The sound groups and Settings sliders (mouse, `<` `>`, keys, pad), the old-settings conversion, hover, the pause (the duel theme at half volume under Settings from the gear), the background fade, moves and chains, a real duel's phases, LP ticks and climbing chains, the coin, the draw game, packs and grading, tuning to the music, the voices, the limiter on a final blow's pile-up, a simulated output-device change. Run it with `-mute` and `-mods <empty folder>`: `-mute` zeroes the output after the limiter, so the check still reads real levels |
+| `-climbcheck <folder>` | (21 steps) The climb's screens: the billed final on a row and its versus, rematch pay on rows and results, deck stars on circuit and Tag Cup rows, guests and the Recipe Book, a recipe kept from before a swap, "You already own every card in it.", the starter ribbon. Also runs as the last part of `-campaigncheck` (210 steps in all) |
 | `-stylecheck <folder>` | Card art styles; run twice to check the choices are kept |
 | `-searchcheck <folder>` | The deck editor's card search (71 steps): chips, pickers, More filters, scopes; exact words first (`destroy all` puts Dark Hole and Raigeki on the first page), the chip showing what was typed, the real count and the "first 2,000" page label, the "No cards match" note with Clear all (it keeps the scope), an empty Favorites' own note |
 | `-focuscheck <folder>` | (77 steps) The deck editor's click to focus and change signals, through a test mouse and keyboard: pointing, clicks, Shift and right clicks, a 3 px wobble, the ring after a removal, keys in every text field, Enter / Delete / arrows / Page keys, the wheel, a search keeping the focus, the test hand, the messages and their Undo, reduced motion, the sounds asked for (logged as `editor sound:`), a card not owned in the campaign, Sort and Clear writing the status line, no ring under the test hand, "▼ more" on its own strip, Enter on a Side Deck copy adding to the Side Deck, a deck opened from the list mid-message |
@@ -333,7 +336,7 @@ Other launch options for checks and screenshots:
 | Option | What it does |
 |---|---|
 | `-mods <folder>` | Use this mods folder |
-| `-mute` | No sound this run (the volume settings are untouched) |
+| `-mute` | No sound this run (the volume settings are untouched). The whole output is zeroed after the limiter, so checks still mix audio and read real levels; no theme is built |
 | `-gosecond` | Checks skip the coin toss and give you turn 1; this gives it to the other side |
 | `-reducedmotion` | Reduced motion for this run |
 | `-dev` | Developer mode in a normal build (F12 panel) |
@@ -349,28 +352,51 @@ Other launch options for checks and screenshots:
 
 Every sound is synthesized in code: no audio files ship with the game.
 
-**Effects** (`src/Ygo.Engine/Audio/Sfx.cs`, prize chimes in `Sfx.Prize.cs`): 36 effects made from tones with pitch
+**Effects** (`src/Ygo.Engine/Audio/Sfx.cs`, prize chimes in `Sfx.Prize.cs`): 43 effects made from tones with pitch
 sweeps, filtered noise, envelopes and a little echo.
 
-- **Duels:** draws, shuffles, cards moving and landing, flips, summons (normal, special, and a bigger one for Level 7+
-  and Extra Deck monsters), activations, two kinds of negation, attacks and their impact, destruction, damage (heavier at
-  2,000 or more), LP paid and gained, each new turn, and a win fanfare or a falling loss.
+- **Duels:** draws, shuffles, cards moving and landing, Set (`set`), banish (`banish`), flips, summons (normal, special,
+  and a bigger one for Level 7+ and Extra Deck monsters), activations, two kinds of negation, attacks and their impact,
+  destruction (a card sent to the Graveyard plays `destroy` quieter), damage (heavier at 2,000 or more), LP ticks, LP paid
+  and gained, the coin (`coin_spin`, `coin_land`), a phase tick (`phase`), a tick as a chain link resolves
+  (`chain_resolve`), each new turn, and a win fanfare, a falling loss or a draw chord (`draw_game`).
 - **Packs and menus:** the pack tearing open, a chime for rares and a burst for Ultra and above, clicks, hovers, DP
   counting in, level-ups, Card Tokens, and a buzz when something can't be done.
 - **Prized moments:** chimes for a Gem Mint slab or a top rarity landing face-up, tuned to the duel's music.
 
 Effects are timed with their animations and follow the duel speed (none at the fastest speeds, where animations are off
-too). Settings has separate Sound effects and Music volumes, and Reactive music on or off.
+too).
 
-**Music** (`src/Ygo.Engine/Audio/Sfx.Themes.cs`): a calm loop for the menus, and 17 duel themes written as chords, a
+**Volumes and the mix** (`Sounds.cs`, `SettingsSound.cs`, `OutputLimiter.cs`; spec
+[AUDIO-PASS-1-SPEC-2026-11-20.md](dev/AUDIO-PASS-1-SPEC-2026-11-20.md)):
+
+- Four saved volumes: Master over Sound effects, Music and Interface sounds (default 65%). Interface sounds (clicks,
+  hovers, errors, the deck editor's change sounds) no longer depend on Sound effects. Sliders move in 5% steps.
+  `Sounds.MigratePrefs` converts old settings once: the saved interface volume becomes interface x effects, rounded to 5%.
+- Settings also has Reactive music and Mute in the background (on by default; the game fades out in 0.25 s while another
+  window is in front). Check runs ignore real window focus, so a check never goes quiet.
+- The whole output goes through a lookahead limiter (`src/Ygo.Engine/Audio/Limiter.cs`, run in `OutputLimiter`'s
+  `OnAudioFilterRead` on the listener's own GameObject): peaks stay under -1 dBFS. The gain recovers with a 120 ms
+  release; `--audio-check` allows 350 ms to be back.
+- Tonal effects (`Sfx.TunedRoots`) are moved to the music's key, with no random pitch; with Music or Master at 0 they play
+  at their own pitch. A chain's activations step up by `Sfx.ChainSteps` (root, 2nd, 5th, octave); a chain of two or more
+  ticks back down as it resolves, one tick per highest link activated.
+- Packs and the grading desk call `PackSounds` (a tick per card dealt, rising; rarity chimes). A rebuilt pack screen must
+  keep calling it.
+- Hover plays only when the pointer moves onto a button or the keys or pad move focus (`Sounds.HoverSounds` turns it off).
+- Voices: 16, one sound each; stealing spares prize chimes. After an output-device change the music restarts.
+- Sound log: automated runs keep a log of every `Sounds.Play` (name, group, volume, pitch, played or why not); the checks read it.
+
+**Music** (`src/Ygo.Engine/Audio/Sfx.Themes.cs`): a calm loop for the menus, and 19 duel themes written as chords, a
 melody and a groove. Each renders as seven layers of the same length that loop in sync: bed (pad and bass), drums,
 lead (the tune), drive (for low LP), dread (you're low), hope (they're low) and lethal (a heartbeat while a finishing
-attack is pending). Each theme also has a sting, a victory and a defeat ending. The 17 themes:
+attack is pending). Each theme also has a sting, a victory and a defeat ending. The 19 themes:
 
 - the everyday duel music;
 - one per band (Beginner, Novice, Intermediate, Advanced, Expert, Master, Gauntlet);
 - one for the Tag Cup finals;
-- one per special guest (Ines, Nocturne, Rhea, Seraph);
+- one per special guest (Ines, Nocturne, Rhea, Seraph), and Ilse's and Vera's, which are copies of Nocturne's (3 semitones
+  up) and Rhea's (2 down) until they get their own (`Transposed` in `Sfx.Themes.cs`);
 - the Back Alley's everyday music, Orvel's Table and Nyx's Table;
 - No Limits (written for the locked No Limits table).
 
@@ -389,7 +415,8 @@ the game is muted or the music is off. During the duel (`Sounds.DuelState`) the 
 tune comes in once the boss's ace is out and stays; at a quarter of the LP or less, drive comes in with dread or hope;
 an attack that would end the duel drops everything to the heartbeat within a third of a second (and brings it back as
 fast if it doesn't); at the end the theme stops for its ending. Reduced motion makes every change a two-second fade;
-Reactive music off keeps bed, drums and tune steady.
+Reactive music off keeps bed, drums and tune steady. A duel paused under the menu or Settings keeps its theme at half
+volume (`Sounds.PauseDip`, set in `DuelController.UpdateMusic`).
 
 Listen without the game:
 

@@ -62,10 +62,10 @@ namespace YgoCampaign.Game
         }
 
         /// <summary>Plays a sound effect <paramref name="delay"/> seconds from now, in step with the animation.</summary>
-        private void Sound(float delay, string name, float volume = 1f)
+        private void Sound(float delay, string name, float volume = 1f, float pitch = 1f)
         {
-            if (delay <= 0) { Sounds.Play(name, volume); return; }
-            Animate(delay, 0.001f, _ => { }, () => Sounds.Play(name, volume));
+            if (delay <= 0) { Sounds.Play(name, volume, pitch); return; }
+            Animate(delay, 0.001f, _ => { }, () => Sounds.Play(name, volume, pitch));
         }
 
         /// <summary>Does something <paramref name="delay"/> seconds from now, in step with the animations.</summary>
@@ -254,6 +254,23 @@ namespace YgoCampaign.Game
             return Vector2.LerpUnclamped(a, b, k) + side * bow * Mathf.Sin(Mathf.Clamp01(k) * Mathf.PI);
         }
 
+        /// <summary>
+        /// A move's sound (docs/dev/AUDIO-PASS-1-SPEC-2026-11-20.md, section E): destroyed on the field, the shatter's; Set from
+        /// the hand or Deck face-down, a tap; banished, an airy sweep; sent from the field to the GY, a lighter crash; onto the
+        /// field, a place; anything else, a move.
+        /// </summary>
+        internal static (string name, float volume) MoveSoundFor(CardRef from, CardRef to, uint reason)
+        {
+            bool leavesField = (from.Location & (Location.MZone | Location.SZone)) != 0;
+            bool toPile = (to.Location & (Location.Grave | Location.Removed)) != 0;
+            if (leavesField && (reason & ReasonDestroy) != 0 && toPile) return ("destroy", 0.9f);
+            if ((to.Location & (Location.MZone | Location.SZone)) != 0 && (to.Position & 0xA) != 0 && (from.Location & (Location.Hand | Location.Deck)) != 0)
+                return ("set", 0.8f);
+            if ((to.Location & Location.Removed) != 0) return ("banish", 0.8f);
+            if (leavesField && (to.Location & Location.Grave) != 0) return ("destroy", 0.6f);
+            return ((to.Location & (Location.MZone | Location.SZone)) != 0 ? "place" : "move", 0.8f);
+        }
+
         private float MoveCard(DuelEvent e, float delay, Vector2? converge)
         {
             var from = e.From;
@@ -293,17 +310,17 @@ namespace YgoCampaign.Game
             var duration = 0.36f * Tempo;
             Started?.Invoke("move");
 
+            var (sound, loudness) = MoveSoundFor(from, to, e.Reason);
             // Destroyed on the field: the card shatters, then lands in its pile.
             if (leavesField && (e.Reason & ReasonDestroy) != 0 && (to.Location & (Location.Grave | Location.Removed)) != 0)
             {
-                Sound(delay, "destroy", 0.9f);
+                Sound(delay, sound, loudness);
                 Shatter(e.Code, from.Controller, src, delay);
                 PilePulse(dest.anchoredPosition, delay + 0.35f * Tempo, Ui.Hex("#B8C0D0"));
                 return 0.4f * Tempo;
             }
 
-            Sound(delay, (to.Location & (Location.Grave | Location.Removed)) != 0 && leavesField ? "destroy"
-                : (to.Location & (Location.MZone | Location.SZone)) != 0 ? "place" : "move", 0.8f);
+            Sound(delay, sound, loudness);
 
             if (!IsPile(to.Location))
             {
@@ -606,7 +623,9 @@ namespace YgoCampaign.Game
             Started?.Invoke("summon");
             if (e.Kind == DuelEventKind.SpecialSummon && info != null) delay += SummonScene(info, view, at, delay);
             if (info != null && ((info.Level >= 8 && (type & CardType.Link) == 0) || info.Attack >= 3000)) delay += CutIn(info, delay);
-            Sound(delay, big ? "summon_big" : e.Kind == DuelEventKind.SpecialSummon ? "special" : "summon");
+            // A Flip Summon turns the card over first.
+            if (e.Kind == DuelEventKind.FlipSummon) Sound(delay, "flip", 0.8f);
+            Sound(delay + (e.Kind == DuelEventKind.FlipSummon ? 0.08f : 0), big ? "summon_big" : e.Kind == DuelEventKind.SpecialSummon ? "special" : "summon");
             _landed[(e.To.Controller, e.To.Location, (int)e.To.Sequence)] = (delay, big ? 0.35f : 0.25f, null);
 
             var glow = Sprite("Glow", Textures.Glow, at, new Vector2(180, 180), color);
@@ -928,6 +947,27 @@ namespace YgoCampaign.Game
         /// <summary>Badges a chain's end has taken in hand (they fade out on their own; the safety net leaves them).</summary>
         private readonly HashSet<RectTransform> _clearing = new HashSet<RectTransform>();
 
+        /// <summary>A chain link's pitch, in semitones over the root (link 0, no chain: the root).</summary>
+        internal static int ChainPitchStep(int link)
+        {
+            var steps = Ygo.Engine.Audio.Sfx.ChainSteps;
+            return link <= 0 ? steps[0] : steps[Math.Min(link, steps.Count) - 1];
+        }
+
+        /// <summary>A chain of <paramref name="links"/> resolving: one tick per link, the top first (none for fewer than two).</summary>
+        internal static IReadOnlyList<int> ResolveSteps(int links)
+        {
+            var steps = new List<int>();
+            if (links < 2) return steps;
+            for (int i = 0; i < links; i++) steps.Add(ChainPitchStep(links - i));
+            return steps;
+        }
+
+        private static float Semitones(int steps) => Mathf.Pow(2, steps / 12f);
+
+        /// <summary>The highest chain link activated since the last chain ended.</summary>
+        private int _chainLinks;
+
         private void ClearChain(float delay)
         {
             var badges = new List<RectTransform>(_chainBadges);
@@ -936,6 +976,11 @@ namespace YgoCampaign.Game
             var banner = _effectBanner;
             _chainBadges.Clear();
             _effectBanner = null;
+            // The chain resolving ticks back down, top link first, as the badges shrink (two links or more). Counted from the
+            // links activated, not the badges left: a resolved Spell leaving for the GY takes its badge with it.
+            var steps = ResolveSteps(_chainLinks);
+            _chainLinks = 0;
+            for (int i = 0; i < steps.Count; i++) Sound(delay + 0.3f + i * 0.09f * Tempo, "chain_resolve", 0.5f, Semitones(steps[i]));
             Animate(delay + 0.3f, 0.3f, t =>
             {
                 foreach (var b in badges) if (b != null) b.localScale = Vector3.one * (1 - t);
@@ -1086,6 +1131,7 @@ namespace YgoCampaign.Game
             };
             if (name == null) return 0;
             Started?.Invoke("phase");
+            Sound(delay, "phase", e.Amount == Ygo.Engine.Phase.BattleStart ? 0.8f : 0.5f);
             return Sweep(name, e.Amount == Ygo.Engine.Phase.BattleStart ? Ui.Hex("#B8322F") : Ui.Hex("#8A2B2B"), delay);
         }
 
@@ -1104,7 +1150,9 @@ namespace YgoCampaign.Game
             var src = _board.PreviousPosition(e.From.Controller, e.From.Location, (int)e.From.Sequence);
             var duration = (First("spot:" + e.Code) ? 1.05f : 0.6f) * Tempo;
             Started?.Invoke("spotlight");
-            Sound(delay, "activate");
+            // Each chain link a step higher: root, 2nd, 5th, octave.
+            Sound(delay, "activate", 1f, Semitones(ChainPitchStep(e.ChainLink)));
+            _chainLinks = e.ChainLink <= 1 ? e.ChainLink : Math.Max(_chainLinks, e.ChainLink); // link 1 starts a chain afresh
             // The effect's words live in its callout (BoardView.ShowCallout) and the chain panel (BoardView.ShowChain).
             ChainBadge(e, delay);
             // And its text at the top right, stacked with the rest of the chain.

@@ -67,6 +67,27 @@ namespace Ygo.Engine.Audio
             ["prize_ping"] = PrizePing,
             ["prize_glint"] = PrizeGlint,
             ["token"] = () => Normalize(Echo(Mix(Tone(1046.5, 2093, 0.25, Wave.Sine, 0.003, 0.22, 0.5), Shimmer(0.7, 0.05)), 0.1, 0.4), 0.65),
+            // The silent moments (docs/dev/AUDIO-PASS-1-SPEC-2026-11-20.md section E).
+            // The coin in the air: a slow whoosh and seven bright glints as it turns over, 1.3 s.
+            ["coin_spin"] = () => Normalize(Mix(new[] { Swish(1.3, 1200, 2600, 0.2) }.Concat(Enumerable.Range(0, 7).Select(i =>
+                Delay(Mix(Tone(3400, 3000, 0.03, Wave.Sine, 0.001, 0.028, 0.5), Noise(0.02, 8000, 6000, 0.001, 0.018, 0.25)), i * 0.186)))
+                .ToArray()), 0.4),
+            // The coin landing: a small thud and a ring.
+            ["coin_land"] = () => Normalize(Mix(Thud(0.12, 180, 0.8), Tone(2900, 2900, 0.35, Wave.Sine, 0.001, 0.33, 0.35),
+                Tone(4350, 4350, 0.2, Wave.Sine, 0.001, 0.18, 0.15)), 0.55),
+            // A phase banner: a soft C and G (tuned to the music).
+            ["phase"] = () => Normalize(Mix(Tone(1046.5, 1046.5, 0.06, Wave.Triangle, 0.002, 0.055, 0.5),
+                Tone(1568, 1568, 0.09, Wave.Triangle, 0.002, 0.085, 0.4), 0.05), 0.3),
+            // A card Set face-down: a tap.
+            ["set"] = () => Normalize(Mix(Thud(0.07, 220, 0.6), Noise(0.05, 2500, 1200, 0.002, 0.045, 0.5)), 0.45),
+            // Banished: an airy rising whoosh.
+            ["banish"] = () => Normalize(Mix(Swish(0.45, 800, 9000, 0.7), Tone(300, 1200, 0.4, Wave.Sine, 0.02, 0.38, 0.3),
+                Shimmer(0.4, 0.05)), 0.6),
+            // A chain link resolving: a short tick down (G to C; the game pitches it to the link).
+            ["chain_resolve"] = () => Normalize(Tone(1568, 1046.5, 0.07, Wave.Triangle, 0.002, 0.065, 0.5), 0.35),
+            // A draw game: an open A chord (A, D, E) over a low A, neither win nor loss.
+            ["draw_game"] = () => Normalize(Echo(Mix(Chord(new[] { 440.0, 587.3, 659.3 }, 1.2, 0, 1.1, 0.2),
+                Tone(220, 220, 1.2, Wave.Triangle, 0.01, 1.15, 0.3)), 0.18, 0.3), 0.6),
         };
 
         /// <summary>Music loops by name: "menu" (calm). It loops cleanly. Duels play layered themes (<see cref="Themes"/>).</summary>

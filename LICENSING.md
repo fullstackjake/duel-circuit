@@ -21,6 +21,7 @@ This page is a summary, not legal advice. The license texts are what count.
 | What | Where | License | License text |
 |---|---|---|---|
 | Our code: the game, the CPU duelists, the testing tools, the build scripts | `src/`, `unity/` (except the items below), `tools/`, `Directory.Build.props` | AGPL-3.0-or-later, plus the Unity permission | [LICENSE](LICENSE), [LICENSES/UNITY-PERMISSION.md](LICENSES/UNITY-PERMISSION.md) |
+| Music and sound effects: written as code, no audio files ship | `src/Ygo.Engine/Audio/` | AGPL-3.0-or-later, with the code | [LICENSE](LICENSE) |
 | Our changes to the rules engine | `patches/ygopro-core/` | AGPL-3.0-or-later, on ygopro-core's terms (they change ygopro-core); the Unity permission doesn't cover them | [LICENSE](LICENSE) |
 | Character portraits, duel mats, map art, coin art | `art/` (except `art/logo/`) | CC BY-SA 4.0 | [LICENSES/CC-BY-SA-4.0.txt](LICENSES/CC-BY-SA-4.0.txt) |
 | Characters: profiles, personalities, lines | `personalities/` | CC BY-SA 4.0 | [LICENSES/CC-BY-SA-4.0.txt](LICENSES/CC-BY-SA-4.0.txt) |

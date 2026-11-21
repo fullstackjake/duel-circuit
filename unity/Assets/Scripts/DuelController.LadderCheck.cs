@@ -197,12 +197,13 @@ namespace YgoCampaign.Game
             Report($"3. before ladder-holder the top's holder is a stranger on the board ({rows.FirstOrDefault()})",
                 rows.Count > 0 && rows[0].StartsWith("rung 10 | ??? |") && !profile.Seen.Contains(Ladder.HolderScene));
 
-            // 4. Rung 1's versus: the Gauntlet's rules, skill 10/10; a loaner is refused (nothing goes live).
+            // 4. Rung 1's versus: the Gauntlet's rules, the holder at full strength (Ladder.Opponent: skill 1.0); a loaner is refused (nothing goes live).
             yield return PressDuel(ladder.Rungs[0].Key, "rung1");
             yield return Shot("rung1-versus");
             var sides = _scenes.LastVersus;
-            Report($"4. rung 1's versus: \"{Plain(sides?.you.Detail ?? "").Replace("\n", " ")}\" against \"{Plain(sides?.them.Detail ?? "").Replace("\n", " ")}\"",
-                sides != null && sides.Value.you.Detail.Contains("Tier 0 Gauntlet") && sides.Value.them.Detail.Contains("skill 10/10") && sides.Value.them.Name == "Rhea"
+            var rungOne = Ladder.Opponent(ladder.Rungs[0]);
+            Report($"4. rung 1's versus: \"{Plain(sides?.you.Detail ?? "").Replace("\n", " ")}\" against \"{Plain(sides?.them.Detail ?? "").Replace("\n", " ")}\"; {rungOne.Name} plays at full strength (skill {rungOne.Skill:0.00}, profile {ladder.Rungs[0].Character.Skill:0.00})",
+                sides != null && sides.Value.you.Detail.Contains("Tier 0 Gauntlet") && rungOne.Skill == 1.0 && sides.Value.them.Detail.StartsWith(rungOne.StyleSummary + "\n") && sides.Value.them.Name == "Rhea"
                 && _versusDeck != null && _campaign.LadderProblems(_versusDeck).Count == 0);
             var legalDeck = _versusDeck;
             // A custom loaner of yours (a campaign deck, not one you built): the arrows never offer it here, and Duel! refuses it.
@@ -323,8 +324,9 @@ namespace YgoCampaign.Game
             yield return PressDuel(topSeat.Key, "holder");
             yield return Shot("top-versus");
             sides = _scenes.LastVersus;
-            Report($"7. Duel on rung 10 plays ladder-holder{SceneNote("ladder-holder")} before a versus with {sides?.them.Name} on {sides?.them.Deck} ({Plain(sides?.them.Detail ?? "").Split('\n')[0]})",
-                profile.Seen.Contains("ladder-holder") && sides?.them.Deck == DeckTitle("chaos-ritual") && sides.Value.them.Detail.Contains("skill 10/10"));
+            var holder = Ladder.Opponent(topSeat);
+            Report($"7. Duel on rung 10 plays ladder-holder{SceneNote("ladder-holder")} before a versus with {sides?.them.Name} on {sides?.them.Deck} ({Plain(sides?.them.Detail ?? "").Split('\n')[0]}); the holder plays at full strength (skill {holder.Skill:0.00})",
+                profile.Seen.Contains("ladder-holder") && sides?.them.Deck == DeckTitle("chaos-ritual") && holder.Skill == 1.0 && sides.Value.them.Detail.StartsWith(holder.StyleSummary + "\n"));
             _scenes.Close();
             int tokens0 = profile.Tokens;
             var topWin = _campaign.RecordLadder(topSeat, 0)!;

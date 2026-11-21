@@ -8,6 +8,10 @@
 #   blurb: <one line>          shown under its name
 #   prize: <DP>                paid the first time you clear it
 #   match: <character> <deck>  an opponent (personalities/<character>.profile) with one of the decks in decks/
+#   was: <N> <character> <deck>
+#                              match N (1-based) as it was before a deck swap: a save that won it keeps that recipe
+#   finalline: <text>          the last match's character says it before the circuit's deciding duel (100 characters at
+#                              most, no #); without one the row and the versus show the intro
 # Bands follow measured deck strength (campaign/deck-ratings.txt: bot vs bot Elo), not release year; each circuit
 # groups decks from nearby years. The opponents' skill also rises band by band. The late bands (Expert, Master,
 # Gauntlet) pay more per win and bigger prizes, plus Card Tokens per clear: by then a player needs several top decks.
@@ -18,6 +22,7 @@ band: Beginner
 era: 2005
 blurb: Friendly duels at the local card shop. Everyone starts here.
 prize: 600
+finalline: Okay. Last match of the circuit. I already wrote WIN on the next page. In pen.
 match: rookie-ryo classic
 match: brask warriors
 match: rookie-ryo warriors
@@ -27,6 +32,7 @@ band: Beginner
 era: 2005
 blurb: The shop's weekly tournament. Some regulars take it seriously.
 prize: 800
+finalline: I saved my best parts for the last machine of the night. Wind it up!
 match: brask gadgets
 match: old-gus classic
 match: tink gadgets
@@ -36,6 +42,7 @@ band: Beginner
 era: 2005
 blurb: Duelists from the whole town, and a few from out of it.
 prize: 1000
+finalline: I hate waiting. I've been waiting for this one since your first night.
 match: old-gus zombies
 match: tink stall-burn
 match: vera warriors
@@ -45,6 +52,7 @@ band: Beginner
 era: 2005
 blurb: Win here and the regional circuit opens up.
 prize: 1200
+finalline: One more lecture between you and the regional circuit. I'm told I run long.
 match: vera zombies
 match: tink gadgets
 match: hollis stall-burn
@@ -53,34 +61,40 @@ circuit: Underdog Open
 band: Novice
 era: 2011
 banlist: TCG March 2011
-blurb: Frog FTK, Six Samurai, Spellbooks and Burning Abyss: decks from 2010 to 2014.
+blurb: Frog FTK, Six Samurai, Spellcaster's Command and Burning Abyss: underdogs from 2005 to 2014.
 prize: 1400
+finalline: Every poem needs a last canto. Tonight, I write yours.
 match: frog-ftk frog-ftk
 match: six-samurai six-samurai
-match: spellbook spellbook
+match: spellbook spellcasters-command
 match: burning-abyss burning-abyss
+was: 3 spellbook spellbook
 
 circuit: Trap Masters Cup
 band: Novice
 era: 2011
 banlist: TCG March 2011
-blurb: Geargia, Domain Monarch, Zoodiac and Altergeist: decks from 2014 to 2018.
+blurb: Machine Re-Volt, Domain Monarch, Zoodiac and Altergeist: machines, monarchs and trap walls from 2008 to 2018.
 prize: 1600
-match: geargia geargia
+finalline: Final process loaded. I ran this match a thousand times. You lost most of them.
+match: geargia machine-re-volt
 match: domain-monarch domain-monarch
 match: zoodiac zoodiac
 match: altergeist altergeist
+was: 1 geargia geargia
 
 circuit: Small Engines Invitational
 band: Novice
 era: 2011
 banlist: TCG March 2011
-blurb: Floowandereeze, Runick Spright, Purrely and Yummy: decks from 2022 to 2026.
+blurb: Floowandereeze, Runick Spright, Purrely and Junk Synchron: small monsters that add up, from 2008 to 2026.
 prize: 1800
+finalline: And for dessert, the chef's special: the final! I hope you saved room.
 match: floowandereeze floowandereeze
 match: runick-spright runick-spright
 match: purrely purrely
-match: yummy yummy
+match: yummy synchron
+was: 4 yummy yummy
 
 circuit: Synchro Dawn Classic
 band: Intermediate
@@ -88,6 +102,7 @@ era: 2015
 banlist: TCG April 2015
 blurb: TeleDAD, Blackwing, Lightsworn and Infernity: decks from 2008 to 2010.
 prize: 2000
+finalline: Win this and the circuit's yours. Lose, and you've got nothing. I recommend nothing.
 match: teledad teledad
 match: blackwing blackwing
 match: lightsworn lightsworn
@@ -99,6 +114,7 @@ era: 2015
 banlist: TCG April 2015
 blurb: Dino Rabbit, Inzektor, Qliphort and Gouki: decks from 2012 to 2018.
 prize: 2200
+finalline: Main event! The title belt's on the line, and I don't drop title fights at home.
 match: dino-rabbit dino-rabbit
 match: inzektor inzektor
 match: qliphort qliphort
@@ -110,6 +126,7 @@ era: 2015
 banlist: TCG April 2015
 blurb: Pendulum Magicians, Sky Striker, Salamangreat and Maliss: decks from 2018 to 2025.
 prize: 2400
+finalline: Last door in Wonderland, and it's ever so small. Only one of us gets through.
 match: pendulum-magician pendulum-magician
 match: sky-striker sky-striker
 match: salamangreat salamangreat
@@ -121,6 +138,7 @@ era: 2019
 banlist: TCG October 2019
 blurb: Yata-Lock, Goat Control, Plant Synchro and the Dragon Rulers: decks from 2004 to 2013.
 prize: 2600
+finalline: Golden Age, last match. I've won it in four elements. Pick the one you'd like to lose to.
 match: chaos-yata chaos-yata
 match: goat-control goat-control
 match: plant-synchro plant-synchro
@@ -132,6 +150,7 @@ era: 2019
 banlist: TCG October 2019
 blurb: HAT, Satellarknight, ABC and True Draco: decks from 2014 to 2017.
 prize: 2800
+finalline: Three kings fell to reach me. I won't even stand up.
 match: hat hat
 match: satellarknight satellarknight
 match: abc abc
@@ -143,6 +162,7 @@ era: 2019
 banlist: TCG October 2019
 blurb: Orcust, Tri-Brigade, Exosister and Unchained: decks from 2019 to 2023.
 prize: 3000
+finalline: Everything I had, I broke to get here. One thing left to break. Guess what it is.
 match: orcust orcust
 match: tri-brigade tri-brigade
 match: exosister exosister
@@ -154,6 +174,7 @@ era: 2023
 banlist: TCG June 2023
 blurb: Wind-Up, Shaddoll, Kozmo and Danger! Dark World: decks from 2012 to 2018.
 prize: 6000
+finalline: The final! They say you're rare. I've never caught anything rare. Until tonight!
 match: wind-up wind-up
 match: shaddoll shaddoll
 match: kozmo kozmo
@@ -165,6 +186,7 @@ era: 2023
 banlist: TCG June 2023
 blurb: Adamancipator, Drytron, Yubel and Tenpai Dragon: decks from 2020 to 2024.
 prize: 6500
+finalline: It's the final, so build it big. Bigger. More for me to break.
 match: adamancipator adamancipator
 match: drytron drytron
 match: yubel yubel
@@ -176,6 +198,7 @@ era: 2023
 banlist: TCG June 2023
 blurb: Fire King Snake-Eye, Ryzeal, Angelechy and Elfnote: decks from 2024 to 2026.
 prize: 7000
+finalline: Every series ends with a coda. Tonight's is mine to conduct.
 match: fire-king-snake-eye fire-king-snake-eye
 match: ryzeal ryzeal
 match: angelechy angelechy
@@ -187,6 +210,7 @@ era: 2023
 banlist: TCG June 2023
 blurb: Artmage, Dracotail, Mermail Atlantean and Lunalight: the rogue decks of autumn 2026.
 prize: 7500
+finalline: Midnight, and the last song. Every masquerade ends with someone unmasked.
 match: artmage artmage
 match: dracotail dracotail
 match: mermail-atlantean mermail-atlantean
@@ -198,6 +222,7 @@ era: 2026
 banlist: TCG September 2026
 blurb: Thunder Dragon, Eldlich, Bystial Dragon Link and Spright: decks from 2018 to 2022.
 prize: 8000
+finalline: Two of us left in the whole circuit. Two! That's my number. I like my odds.
 match: thunder-dragon thunder-dragon
 match: eldlich eldlich
 match: bystial-dragon-link bystial-dragon-link
@@ -209,6 +234,7 @@ era: 2026
 banlist: TCG September 2026
 blurb: Tearlaments, Kashtira, Snake-Eye and K9 Vanquish Soul: decks from 2022 to 2025.
 prize: 8500
+finalline: The case closes tonight. I've read your whole file. All it's missing is the ending.
 match: tearlaments tearlaments
 match: kashtira kashtira
 match: snake-eye snake-eye
@@ -220,6 +246,7 @@ era: 2026
 banlist: TCG September 2026
 blurb: The decks that topped YCS Houston, October 2026.
 prize: 9000
+finalline: The final, then. Judge me fairly. I will do the same for you.
 match: mitsurugi mitsurugi
 match: light-and-darkness light-and-darkness
 match: branded-despia branded-despia
@@ -230,6 +257,7 @@ era: 2026
 banlist: TCG October 2026
 blurb: The decks topping regionals after the October 19 list: Blitzclique, Sacred Beast and the Chaos Rituals.
 prize: 9500
+finalline: I've cut through every regional this month. You're the last name on my scroll.
 match: blitzclique blitzclique
 match: sacred-beast sacred-beast
 match: dark-magician-chaos-ritual dark-magician-chaos-ritual
@@ -241,6 +269,7 @@ era: 2026
 banlist: TCG September 2026
 blurb: The champions return with the strongest decks the circuit has seen, back to back: Eldlich, K9 Vanquish Soul, Tearlaments and Ishizu Tearlaments.
 prize: 15000
+finalline: I've already started tonight's page. The result is the only column left blank.
 match: eldlich eldlich
 match: k9-vanquish-soul k9-vanquish-soul
 match: tearlaments tearlaments

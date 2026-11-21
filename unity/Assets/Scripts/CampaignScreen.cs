@@ -1275,7 +1275,7 @@ namespace YgoCampaign.Game
             Ui.Text(Ui.Box(_detail, 30, 20, 940, 46), circuit.Name, 30, T.Text, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
             Ui.Text(Ui.Box(_detail, 30, 66, 940, 28), circuit.Blurb, 16, T.TextMuted, TextAnchor.MiddleLeft);
             var prize = Ui.Text(Ui.Box(_detail, 30, 96, 940, 28),
-                cleared ? $"<color={T.GoldHex}>Cleared.</color> Replay any match for DP." : $"Clear all {circuit.Matches.Count} matches: <color={T.GoldHex}>+{circuit.Prize:N0} DP prize</color>"
+                cleared ? $"<color={T.GoldHex}>Cleared.</color> A rematch pays {Circuits.RepeatWinDp} DP." : $"Clear all {circuit.Matches.Count} matches: <color={T.GoldHex}>+{circuit.Prize:N0} DP prize</color>"
                 + (index + 1 < circuits.All.Count ? $" and {circuits.All[index + 1].Name} opens." : "."), 16, T.Text, TextAnchor.MiddleLeft);
             prize.supportRichText = true;
             if (_state.ListFor(index) is Banlist list)
@@ -1294,15 +1294,21 @@ namespace YgoCampaign.Game
                 Ui.Image(row, won ? T.RowWon : T.RowA);
                 // Their portrait on the left of the row (text starts after it).
                 float tx = Portraits.Place(Ui.Box(row, 6, 4, 110, 108), c.Id) ? 124 : 20;
-                Ui.Text(Ui.Box(row, tx, 10, 600 - tx + 20, 34), $"Match {m + 1}: {c.DisplayName}", 21, T.Text, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+                // The last match is the circuit's final: billed by name, with its own line before the deciding duel.
+                bool final = Circuits.IsFinal(circuit, m);
+                Ui.Text(Ui.Box(row, tx, 10, 600 - tx + 20, 34), final ? $"Final: {c.DisplayName}" : $"Match {m + 1}: {c.DisplayName}", 21, T.Text, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
                 Ui.Text(Ui.Box(row, tx, 44, 600 - tx + 20, 26), $"Deck: {_state.DeckTitle(match.Deck)} · {c.StyleSummary}", 14, T.TextFaint, TextAnchor.MiddleLeft);
-                var intro = c.IntroFor(circuit.Matches.Take(m).Any(earlier => earlier.Character.Id == c.Id));
+                var intro = final && circuit.FinalLine.Length > 0 ? circuit.FinalLine : c.IntroFor(circuit.Matches.Take(m).Any(earlier => earlier.Character.Id == c.Id));
                 if (intro.Length > 0)
                     Ui.Text(Ui.Box(row, tx, 72, 600 - tx + 20, 36), $"“{intro}”", 14, T.Intro, TextAnchor.UpperLeft).fontStyle = FontStyle.Italic;
-                // Same numbers as the results screen: the first win carries the bonus, rematches pay the base.
-                var reward = won ? $"Won ×{profile.MatchWins[Profile.MatchKey(index, m)]}\nRematch: +{circuits.WinDp(index)} DP"
-                                 : $"First win: +{circuits.WinDp(index) + Circuits.FirstWinBonus} DP";
+                // Same numbers as the results screen: the first win carries the bonus, a rematch pays RepeatWinDp. Above them,
+                // the deck's strength.
+                var stars = StrengthText.Stars(DeckStrength.StarsFor(_state.Ratings, match.Deck), T);
+                var reward = (stars.Length > 0 ? stars + "\n" : "")
+                             + (won ? $"Won ×{profile.MatchWins[Profile.MatchKey(index, m)]}\nRematch: +{circuits.DuelDp(index, repeat: true)} DP"
+                                    : $"First win: +{circuits.DuelDp(index, repeat: false) + Circuits.FirstWinBonus} DP");
                 var r = Ui.Text(Ui.Box(row, 610, 0, 160, 116), reward, 16, won ? T.Good : T.Gold);
+                r.supportRichText = true;
                 int circuitIndex = index, matchIndex = m;
                 Ui.BoxButton(row, 780, 10, 140, 54, "Duel", () => TryDuel(circuitIndex, matchIndex), 20).targetGraphic.color = m == nextUp ? T.Primary : T.Button;
                 var scouted = new List<(string, string)> { (c.Name, match.Deck) };
@@ -1389,7 +1395,7 @@ namespace YgoCampaign.Game
             Ui.Text(Ui.Box(_detail, 30, 20, 940, 46), cup.Name, 30, T.GoldSoft, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
             Ui.Text(Ui.Box(_detail, 30, 66, 940, 28), cup.Blurb, 16, T.TextMuted, TextAnchor.MiddleLeft);
             var prize = Ui.Text(Ui.Box(_detail, 30, 94, 940, 28),
-                cleared ? $"<color={T.GoldHex}>Cleared.</color> Replay any match for DP." : $"You and a partner against two. Clear all {cup.Matches.Count}: <color={T.GoldHex}>+{cup.Prize:N0} DP prize</color>",
+                cleared ? $"<color={T.GoldHex}>Cleared.</color> A rematch pays {Circuits.RepeatWinDp} DP." : $"You and a partner against two. Clear all {cup.Matches.Count}: <color={T.GoldHex}>+{cup.Prize:N0} DP prize</color>",
                 16, T.Text, TextAnchor.MiddleLeft);
             prize.supportRichText = true;
 
@@ -1473,8 +1479,12 @@ namespace YgoCampaign.Game
                 Ui.Text(Ui.Box(row, tx, 44, 620 - tx, 26), $"Decks: {_state.DeckTitle(lead.Deck)} + {_state.DeckTitle(second.Deck)}", 14, T.TextFaint, TextAnchor.MiddleLeft);
                 if (lead.Character.Intro.Length > 0)
                     Ui.Text(Ui.Box(row, tx, 70, 620 - tx, 30), $"“{lead.Character.Intro}”", 14, T.Intro, TextAnchor.UpperLeft).fontStyle = FontStyle.Italic;
-                var reward = won ? $"Won ×{profile.MatchWins[Circuits.TagKey(index, m)]}\nRematch: +{circuits.WinDp(cup.After)} DP" : $"First win: +{circuits.WinDp(cup.After) + Circuits.FirstWinBonus} DP";
-                Ui.Text(Ui.Box(row, 610, 0, 160, 108), reward, 16, won ? T.Good : T.Gold);
+                // The pair's strength (their decks' mean), then the pay: a rematch pays RepeatWinDp.
+                var stars = StrengthText.Stars(DeckStrength.StarsFor(_state.Ratings, new[] { lead.Deck, second.Deck }), T);
+                var reward = (stars.Length > 0 ? stars + "\n" : "")
+                             + (won ? $"Won ×{profile.MatchWins[Circuits.TagKey(index, m)]}\nRematch: +{circuits.DuelDp(cup.After, repeat: true)} DP"
+                                    : $"First win: +{circuits.DuelDp(cup.After, repeat: false) + Circuits.FirstWinBonus} DP");
+                Ui.Text(Ui.Box(row, 610, 0, 160, 108), reward, 16, won ? T.Good : T.Gold).supportRichText = true;
                 int cupIndex = index, matchIndex = m;
                 Ui.BoxButton(row, 780, 8, 140, 52, "Duel", () => TryTagDuel(cupIndex, matchIndex), 20).targetGraphic.color = m == nextUp ? T.Primary : T.Button;
                 var scoutedPair = new List<(string, string)> { (lead.Character.Name, lead.Deck), (second.Character.Name, second.Deck) };

@@ -50,7 +50,8 @@ namespace YgoCampaign.Game
                 return new CampaignScenes.GuestRow
                 {
                     Id = g.Character.Id, Name = g.Character.DisplayName, Blurb = g.Blurb, Unlocked = open, TagLocked = open && !tagOpen, HasTag = g.HasTag,
-                    Decks = decks + (g.HasTag ? $" · in a tag duel with {g.Partner.DisplayName} ({DeckTitle(g.PartnerDeck)})" : " · no tag duel"),
+                    Decks = decks + (g.HasTag ? $" · in a tag duel with {g.Partner.Name} ({DeckTitle(g.PartnerDeck)})" : " · no tag duel")
+                            + (open ? GuestStrength(g, profile) : ""), // the partner's short name leaves room for the stars (1140 px at 16 px)
                     Status = (!open ? $"Locked: {GuestList.UnlockText(g, profile)}"
                         : (!prizeLeft ? $"Beaten {wins}x: they can partner you in tag duels" : $"First win: +{g.Prize:N0} DP") + next) + (g.HasTag ? tagLock : ""),
                 };
@@ -60,6 +61,25 @@ namespace YgoCampaign.Game
                 i => { if (GuestList.IsTagUnlocked(guests[i], _campaign.Circuits, profile)) GuestVersus(guests[i], true); else ShowGuests(i); },
                 () => _campaignScreen.Open(),
                 scout: i => _scenes.ShowScoutReport(GuestScouts(guests[i], profile), () => ShowGuests(), over: true));
+        }
+
+        /// <summary>
+        /// The end of an open guest's decks line: their deck's stars (the strongest of several) and, while it isn't cleared, the
+        /// band they're best met after (<see cref="DeckStrength.BestAfterBand"/>): " · ★★★★★ · Best after the Master band".
+        /// </summary>
+        private string GuestStrength(Guest g, Profile profile)
+        {
+            var circuits = _campaign.Circuits;
+            double elo = DeckStrength.Elo(_campaign.Ratings, g.Decks, strongest: true);
+            if (elo <= 0) return "";
+            var text = " · " + StrengthText.Stars(DeckStrength.Stars(elo), UiTheme.Current);
+            // A band's name, or the last circuit's ("Tier 0 Gauntlet") above every band.
+            var after = DeckStrength.BestAfterBand(circuits, _campaign.Ratings, elo);
+            bool band = circuits.All.Any(c => c.Band.Equals(after, StringComparison.OrdinalIgnoreCase));
+            var where = Enumerable.Range(0, circuits.All.Count)
+                .Where(i => band ? circuits.All[i].Band.Equals(after, StringComparison.OrdinalIgnoreCase) : circuits.All[i].Name == after).ToList();
+            if (where.Count == 0 || where.All(i => circuits.IsCleared(i, profile))) return text;
+            return text + (band ? $" · Best after the {after} band" : $" · Best after the {after}");
         }
 
         /// <summary>The guests screen's Scout: the deck they play next one on one (only that one), and their partner's in a tag duel.</summary>
@@ -268,7 +288,9 @@ namespace YgoCampaign.Game
             };
             if (winner == 0)
             {
-                r.Earnings.Add((GuestLoaner(gd.tag) ? "Win (half: loaner deck)" : "Win", reward.Dp - (reward.FirstWin ? g.Prize : 0)));
+                bool lent = GuestLoaner(gd.tag);
+                // A rematch's own words (WinLabel); a first or prize win reads "Win", its prize on its own line.
+                r.Earnings.Add((reward.Repeat ? WinLabel(reward, lent) : lent ? "Win (half: loaner deck)" : "Win", reward.Dp - (reward.FirstWin ? g.Prize : 0)));
                 if (reward.FirstWin) r.Earnings.Add(($"First win against {g.Character.Name}", g.Prize));
             }
             else r.Earnings.Add((winner == 1 ? "For the duel" : "Draw", reward.Dp));

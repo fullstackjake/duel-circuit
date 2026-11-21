@@ -2504,6 +2504,9 @@ namespace YgoCampaign.Game
             _plateDeck[p].text = _deckNames[p];
         }
 
+        /// <summary>When each plate's LP counter may tick next.</summary>
+        private readonly float[] _lpTickNext = { 0, 0 };
+
         private void Update()
         {
             try { UpdateClicks(); }
@@ -2545,8 +2548,15 @@ namespace YgoCampaign.Game
                 _plateFrame[p].effectDistance = Vector2.one * (2 + 3 * Mathf.Max(beat, _jolt[p])) * new Vector2(1, -1);
                 _lifePoints[p].rectTransform.localScale = Vector3.one * (1 + 0.15f * beat + 0.2f * _jolt[p]);
                 if (Mathf.Approximately(_lpShown[p], _lpTarget[p])) continue;
+                bool falling = _lpTarget[p] < _lpShown[p];
                 _lpShown[p] = Mathf.MoveTowards(_lpShown[p], _lpTarget[p], _lpRollRate[p] * Time.unscaledDeltaTime);
                 DrawLifePoints(p);
+                // The counter ticks as it rolls (every 60 ms a plate), higher going up.
+                if (Fx != null && Fx.Tempo > 0 && Time.unscaledTime >= _lpTickNext[p])
+                {
+                    _lpTickNext[p] = Time.unscaledTime + 0.06f;
+                    Sounds.Play("lp_tick", 0.3f, falling ? 1f : 1.25f);
+                }
             }
             if (_waiting != null)
             {

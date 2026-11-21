@@ -93,7 +93,8 @@ namespace YgoCampaign.Game
             _library.Refresh();
             _mine = null; // a built-in recipe first, as before (your own are a click away at the top)
             _deleteArmed = null;
-            _recipes = RecipeBook.All(Circuits);
+            // A pairing from before a deck swap is listed only once it's yours (RecipeBook.FormerKey, kept by Circuits.Migrate).
+            _recipes = RecipeBook.All(Circuits).Where(r => !r.Former || Unlocked(r)).ToList();
             // Start on the newest unlock you haven't looked at, else the first unlocked one.
             int fresh = _recipes.FindIndex(r => Unlocked(r) && !Profile.Seen.Contains(RecipeBook.SeenKey(r)));
             _selected = fresh >= 0 ? fresh : Math.Max(0, _recipes.FindIndex(Unlocked));
@@ -200,7 +201,9 @@ namespace YgoCampaign.Game
             var deck = open ? Load(r) : null;
             var name = Ui.Text(Ui.Box(row, 84, 8, 380, 30), open ? Title(r, deck) : "???", 19, open ? Color.white : new Color(1, 1, 1, 0.45f), TextAnchor.MiddleLeft);
             name.fontStyle = FontStyle.Bold;
-            Ui.Text(Ui.Box(row, 84, 40, 400, 26), open ? $"{r.Owner.Name}{(r.Boss ? "  ·  <color=#FFC940>boss</color>" : "")}" : $"Beat {r.Owner.Name} in {r.Where}",
+            // An open recipe's owner line ends with the deck's strength (none when it isn't rated).
+            var stars = open ? StrengthText.Stars(DeckStrength.StarsFor(_state.Ratings, r.Deck), UiTheme.Current) : "";
+            Ui.Text(Ui.Box(row, 84, 40, 400, 26), open ? $"{r.Owner.Name}{(r.Boss ? "  ·  <color=#FFC940>boss</color>" : "")}{(stars.Length > 0 ? "  ·  " + stars : "")}" : $"Beat {r.Owner.Name} in {r.Where}",
                 14, new Color(0.72f, 0.76f, 0.84f, open ? 1 : 0.6f), TextAnchor.MiddleLeft).supportRichText = true;
             if (open && deck != null)
             {
@@ -325,13 +328,19 @@ namespace YgoCampaign.Game
             title.resizeTextMaxSize = 32;
             var era = deck.Note("era");
             var by = Ui.Text(Ui.Box(_detail, 270, 64, 890, 26),
-                $"{r.Owner.DisplayName}'s deck  ·  {r.Where}" + (era.Length > 0 ? $"  ·  <color=#FFC940>{era}{(deck.Note("tier").Length > 0 ? $", {deck.Note("tier")}" : "")}</color>" : ""),
+                // The strength first, then whose deck and where (a long line takes two, below).
+                (DeckStrength.StarsFor(_state.Ratings, r.Deck) is int strength && strength > 0 ? "Strength " + StrengthText.Stars(strength, UiTheme.Current) + "  ·  " : "")
+                + $"{r.Owner.DisplayName}'s deck  ·  {r.Where}" + (era.Length > 0 ? $"  ·  <color=#FFC940>{era}{(deck.Note("tier").Length > 0 ? $", {deck.Note("tier")}" : "")}</color>" : ""),
                 15, new Color(0.75f, 0.78f, 0.86f), TextAnchor.MiddleLeft);
             by.supportRichText = true;
+            // A line too long for its box (a former recipe's "where", a long circuit name) takes two, broken at a separator at its
+            // size; the ban line and the story move down by that line (the story keeps its bottom, as it fits itself).
+            float grow = BreakAtSeparator(by, 890) ? 20 : 0;
+            if (grow > 0) by.rectTransform.sizeDelta = new Vector2(890, 26 + grow);
             // As a loaner today: what the current circuit's ban list does to it.
             var now = _state.ListFor(_state.CurrentCircuit);
             var changes = now == null || now.Name == list.Name ? new List<string>() : _state.LoanerChanges(r.Deck, _state.CurrentCircuit).Where(c => c.StartsWith("Removed")).ToList();
-            var banLine = Ui.Text(Ui.Box(_detail, 270, 90, 890, 24), (list != Banlist.None ? $"Ban list: {list.Name}"
+            var banLine = Ui.Text(Ui.Box(_detail, 270, 90 + grow, 890, 24), (list != Banlist.None ? $"Ban list: {list.Name}"
                     : _state.Profile?.EraLimited == true ? "Plays with no ban list (house rules)." : "Lent as built: ban lists only apply in era-limited play.")
                 + (now == null || now.Name == list.Name ? "" : changes.Count == 0 ? $"   ·   As a loaner under {now.Name}: unchanged"
                     : $"   ·   As a loaner under {now.Name}: <color=#FF8A8A>{string.Join(", ", changes.Take(2).Select(c => c.Replace("Removed ", "−")))}{(changes.Count > 2 ? $" (+{changes.Count - 2})" : "")}</color>"),
@@ -347,7 +356,7 @@ namespace YgoCampaign.Game
             var story = about.Length > 0 || why.Length > 0
                 ? (about.Length > 0 ? $"<b>How it worked:</b> {about}\n" : "") + (why.Length > 0 ? $"<b>Why it mattered:</b> {why}" : "")
                 : $"<i>\"{r.Owner.Intro}\"</i>\n{DeckRules.Breakdown(deck.Main, _cards)}";
-            var storyText = Ui.Text(Ui.Box(_detail, 270, 120, 600, 140), story, 15, new Color(0.86f, 0.88f, 0.93f), TextAnchor.UpperLeft);
+            var storyText = Ui.Text(Ui.Box(_detail, 270, 120 + grow, 600, 140 - grow), story, 15, new Color(0.86f, 0.88f, 0.93f), TextAnchor.UpperLeft);
             storyText.supportRichText = true;
             storyText.resizeTextForBestFit = true;
             storyText.resizeTextMinSize = 11;
@@ -528,6 +537,47 @@ namespace YgoCampaign.Game
             _scrollToSelected = true;
             Refresh();
             return Unlocked(_recipes[_selected]);
+        }
+
+        private const string Separator = "  ·  ";
+
+        /// <summary>The text's width on one line, as drawn at the current size (layout px).</summary>
+        private static float LineWidth(Text t, string text)
+        {
+            var settings = t.GetGenerationSettings(new Vector2(100000, 0));
+            settings.horizontalOverflow = HorizontalWrapMode.Overflow;
+            return new TextGenerator().GetPreferredWidth(text, settings) / t.pixelsPerUnit;
+        }
+
+        /// <summary>
+        /// When <paramref name="t"/> is wider than <paramref name="width"/>, breaks it into two lines at the last separator whose first
+        /// part fits (never mid-word). True when it broke the line.
+        /// </summary>
+        private static bool BreakAtSeparator(Text t, float width)
+        {
+            var text = t.text;
+            if (LineWidth(t, text) <= width) return false;
+            for (int at = text.LastIndexOf(Separator, StringComparison.Ordinal); at > 0; at = text.LastIndexOf(Separator, at - 1, StringComparison.Ordinal))
+                if (LineWidth(t, text.Substring(0, at)) <= width)
+                {
+                    t.text = text.Substring(0, at) + "\n" + text.Substring(at + Separator.Length);
+                    return true;
+                }
+            return false;
+        }
+
+        /// <summary>For automated checks: the recipes listed, in order.</summary>
+        public IReadOnlyList<Recipe> DebugRecipes => _recipes;
+
+        /// <summary>For automated checks: selects a listed recipe by its key (owner|deck); false when it isn't listed.</summary>
+        public bool DebugSelectKey(string key)
+        {
+            int at = _recipes.FindIndex(r => r.Key == key);
+            if (at < 0) return false;
+            _selected = at;
+            _scrollToSelected = true;
+            Refresh();
+            return true;
         }
 
         /// <summary>For automated checks: presses Build on the selected recipe.</summary>

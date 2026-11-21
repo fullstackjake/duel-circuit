@@ -157,7 +157,7 @@ namespace YgoCampaign.Game
 
             // Muted, with the check's override gone: nothing builds at all.
             Sounds.BuildWhenMuted = false;
-            if (AudioListener.volume <= 0)
+            if (Sounds.OutputMuted)
             {
                 Sounds.Prepare("seraph", 0);
                 yield return null;

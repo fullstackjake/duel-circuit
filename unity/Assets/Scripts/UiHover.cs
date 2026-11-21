@@ -114,7 +114,15 @@ namespace YgoCampaign.Game
         public void OnPointerEnter(PointerEventData e)
         {
             _inside = true;
+            // Only when the pointer moved onto it: not a button rebuilt, or a screen opened, under a resting pointer.
+            if (e.delta.sqrMagnitude > 0) HoverSound();
             Wake();
+        }
+
+        /// <summary>A button coming under the pointer or the keys' focus: the soft hover tick (Interface sounds, at half).</summary>
+        private void HoverSound()
+        {
+            if (Sounds.HoverSounds && Style == HoverStyle.Button && Interactable) Sounds.Play("hover", 0.5f);
         }
 
         public void OnPointerExit(PointerEventData e)
@@ -146,6 +154,8 @@ namespace YgoCampaign.Game
             // doesn't light up when an arrow is pressed next.
             if (InputMode.Pointer && !InputMode.NavigatedThisFrame()) return;
             _focused = true;
+            // Only when the keys or the d-pad moved the focus here, not a screen setting its first selection.
+            if (InputMode.NavigatedThisFrame()) HoverSound();
             Wake();
         }
 

@@ -5,7 +5,7 @@ aggression: 0.7
 caution: 0.35
 patience: 0.4
 spending: 0.7
-skill: 0.7
+skill: 0.85
 decks: pendulum-magician
 intro: Wind the scales and let the magicians swing.
 win: Right on the hour. Like clockwork.

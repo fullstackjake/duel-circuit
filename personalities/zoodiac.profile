@@ -5,7 +5,7 @@ aggression: 0.7
 caution: 0.35
 patience: 0.4
 spending: 0.7
-skill: 0.55
+skill: 0.85
 decks: zoodiac
 intro: One little rat becomes a stack of twelve.
 win: Every sign of the zodiac said I'd win.

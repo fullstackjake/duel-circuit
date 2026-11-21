@@ -69,17 +69,11 @@ public static class SoundExport
     // `--boss-music`: every boss duel and the theme (and key) it plays, each rendered once to check it builds cleanly.
     public static int Bosses(string root)
     {
-        var roster = Ygo.Engine.AI.Personality.LoadFolder(Path.Combine(root, "personalities"));
-        var circuits = Ygo.Engine.Campaign.Circuits.Load(Path.Combine(root, "campaign", "circuits.txt"), roster);
-        var guests = Ygo.Engine.Campaign.GuestList.Load(Path.Combine(root, "campaign", "guests.txt"), roster);
-        var bosses = Ygo.Engine.Campaign.BossMusic.All(circuits, guests);
+        var (bosses, expected) = BossList(root);
         int problems = 0;
         foreach (var (where, who, theme, key) in bosses)
             Console.WriteLine($"  {where,-44} {who,-38} {theme} {(key >= 0 ? "+" : "")}{key}");
-        // Every circuit's last match, every Gauntlet match, every Tag Cup final and every guest has a boss theme.
-        int expected = circuits.All.Count(c => c.Band != "Gauntlet") + circuits.All.Where(c => c.Band == "Gauntlet").Sum(c => c.Matches.Count)
-                       + circuits.TagCups.Count + guests.All.Count;
-        if (bosses.Count != expected || bosses.Any(b => b.theme == Ygo.Engine.Campaign.BossMusic.Everyday || !Sfx.Themes.ContainsKey(b.theme)))
+        if (!BossListOk(bosses, expected))
         {
             Console.WriteLine($"  (!) {bosses.Count} boss duels with themes, expected {expected}");
             problems++;
@@ -96,6 +90,23 @@ public static class SoundExport
         Console.WriteLine($"{bosses.Count} boss duels, {bosses.Select(b => (b.theme, b.transpose)).Distinct().Count()} theme keys" + (problems > 0 ? $"; {problems} problems" : ", all fine"));
         return problems > 0 ? 1 : 0;
     }
+
+    /// <summary>Every boss duel and its theme (BossMusic.All over the repo's campaign), and how many there should be: every
+    /// circuit's last match, every Gauntlet match, every Tag Cup final and every guest.</summary>
+    public static (List<(string where, string who, string theme, int transpose)> bosses, int expected) BossList(string root)
+    {
+        var roster = Ygo.Engine.AI.Personality.LoadFolder(Path.Combine(root, "personalities"));
+        var circuits = Ygo.Engine.Campaign.Circuits.Load(Path.Combine(root, "campaign", "circuits.txt"), roster);
+        var guests = Ygo.Engine.Campaign.GuestList.Load(Path.Combine(root, "campaign", "guests.txt"), roster);
+        var bosses = Ygo.Engine.Campaign.BossMusic.All(circuits, guests);
+        int expected = circuits.All.Count(c => c.Band != "Gauntlet") + circuits.All.Where(c => c.Band == "Gauntlet").Sum(c => c.Matches.Count)
+                       + circuits.TagCups.Count + guests.All.Count;
+        return (bosses, expected);
+    }
+
+    /// <summary>The boss list's rule: every boss duel there should be, each with a theme that exists and isn't the everyday one.</summary>
+    public static bool BossListOk(List<(string where, string who, string theme, int transpose)> bosses, int expected) =>
+        bosses.Count == expected && !bosses.Any(b => b.theme == Ygo.Engine.Campaign.BossMusic.Everyday || !Sfx.Themes.ContainsKey(b.theme));
 
     private static int ExportThemes(string folder)
     {

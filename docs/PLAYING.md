@@ -505,11 +505,26 @@ Open **Settings** from the main menu, or from the gear icon in a duel. Click a s
 
 | Setting | What it does |
 |---|---|
-| Sound effects, Music, Interface sounds | Volume for each, from off to 100% |
+| Master volume | Everything the game plays |
+| Sound effects | Summons, attacks, damage, packs and the other game sounds |
+| Music | The menu and duel themes |
 | Reactive music | The music follows the duel: the boss's theme, more drive at low LP, a heartbeat when an attack could end it |
+| Interface sounds | Button clicks, hovers and errors. Sound effects doesn't change them |
+| Mute in the background | On at first. The game goes quiet while another window is in front, and comes back when you return |
 | Window | Full screen or a window |
 | Card pictures | How many pictures the game found, and from which folders ([CARD-PICTURES.md](CARD-PICTURES.md)) |
 | Prefer style | The art style to use when you have several ([CARD-PICTURES.md](CARD-PICTURES.md#art-styles)) |
+
+The four volumes are sliders in steps of 5%. Drag one, click it, press the `<` and `>` buttons, or use Left and Right on
+the keyboard or the d-pad. A change applies at once and is saved. At Master 0% or Music 0% the game plays no music.
+
+**While a duel waits.** Open Settings from the duel's gear, or the menu or Settings over a campaign duel, and the duel's
+music carries on at half volume. A free duel behind the main menu plays the menu music instead.
+
+**Sounds you'll notice.** The coin spins and lands. A soft tick marks each phase, and LP tick up or down as they change.
+Setting and banishing a card have their own sounds. Destroying a card is louder than sending it to the Graveyard. A chain climbs in pitch with each
+link, then ticks back down as it resolves. Packs tick as each card is dealt, and the top rarities chime in the music's key.
+Buttons tick when the pointer moves onto them, or when the keys or d-pad move to them.
 
 ## Animations
 

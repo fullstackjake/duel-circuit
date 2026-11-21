@@ -5,7 +5,7 @@ aggression: 0.7
 caution: 0.35
 patience: 0.4
 spending: 0.7
-skill: 0.7
+skill: 0.85
 decks: lightsworn
 intro: I mill my deck and something bright always comes out.
 win: Judgment came, as it always does.

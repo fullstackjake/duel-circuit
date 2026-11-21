@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Ygo.Engine.AI;
+using Ygo.Engine.Data;
+using Ygo.Engine.DeckBuilding;
 
 namespace Ygo.Engine.Campaign
 {
@@ -16,6 +18,12 @@ namespace Ygo.Engine.Campaign
         public string Where = "";
         /// <summary>The circuit's final opponent (a boss's deck).</summary>
         public bool Boss;
+        /// <summary>
+        /// A match's pairing from before a deck swap ("was:" in circuits.txt), met nowhere else now: unlocked only for a
+        /// save that won it then (<see cref="RecipeBook.FormerKey"/> in <see cref="Profile.Unlocks"/>, written by
+        /// <see cref="Circuits.Migrate"/>); the Recipe Book lists it only once unlocked.
+        /// </summary>
+        public bool Former;
         public string Key => RecipeBook.Key(Owner.Id, Deck);
     }
 
@@ -29,15 +37,28 @@ namespace Ygo.Engine.Campaign
         public static string Key(string owner, string deck) => $"{owner}|{deck}";
         public static string SeenKey(Recipe recipe) => "recipe:" + recipe.Key;
 
+        /// <summary>The <see cref="Profile.Unlocks"/> key prefix of a recipe kept from before a deck swap.</summary>
+        public const string FormerPrefix = "formerrecipe:";
+
+        /// <summary>The <see cref="Profile.Unlocks"/> key that keeps a recipe a save won before its match's deck swap: "formerrecipe:" + its key.</summary>
+        public static string FormerKey(Recipe recipe) => FormerPrefix + recipe.Key;
+
+        /// <summary>
+        /// Whether you own every card the recipe needs, by count, in every mode (unlike <see cref="RecipeShop.Missing"/>, no era rule
+        /// leaves a card out: one never printed in the TCG still has to be owned).
+        /// </summary>
+        public static bool OwnsAll(Deck recipe, Profile profile, PrintingIndex printings, ICardDataProvider cards) =>
+            AutoDeck.Wants(recipe, Banlist.None, cards).All(w => profile.Collection.Owned(w.Key) >= w.Value);
+
         /// <summary>Every recipe, once each (by duelist and deck), in the order you meet them.</summary>
         public static List<Recipe> All(Circuits circuits)
         {
             var list = new List<Recipe>();
             var seen = new HashSet<string>();
-            void Add(CircuitMatch m, int circuit, string where, bool boss)
+            void Add(CircuitMatch m, int circuit, string where, bool boss, bool former = false)
             {
                 if (m.Deck.Length == 0 || !seen.Add(Key(m.Character.Id, m.Deck))) return;
-                list.Add(new Recipe { Owner = m.Character, Deck = m.Deck, Circuit = circuit, Where = where, Boss = boss });
+                list.Add(new Recipe { Owner = m.Character, Deck = m.Deck, Circuit = circuit, Where = where, Boss = boss, Former = former });
             }
             // Circuit matches first (a deck a boss plays is listed as theirs, from that circuit), then decks only met
             // in Tag Cups; then in map order.
@@ -53,12 +74,17 @@ namespace Ygo.Engine.Campaign
                     Add(lead, circuits.TagCups[t].After, circuits.TagCups[t].Name, false);
                     Add(partner, circuits.TagCups[t].After, circuits.TagCups[t].Name, false);
                 }
+            // Last, pairings from before a deck swap that no match or Tag Cup still plays.
+            for (int c = 0; c < circuits.All.Count; c++)
+                foreach (var (m, was) in circuits.All[c].Former)
+                    Add(was, c, $"{circuits.All[c].Name}, match {m + 1}, in an earlier version", Circuits.IsFinal(circuits.All[c], m), former: true);
             return list.Select((r, i) => (r, i)).OrderBy(x => x.r.Circuit).ThenBy(x => x.i).Select(x => x.r).ToList();
         }
 
-        /// <summary>Whether you've beaten the recipe's duelist while they played it.</summary>
+        /// <summary>Whether you've beaten the recipe's duelist while they played it (before a deck swap too: <see cref="FormerKey"/>).</summary>
         public static bool IsUnlocked(Recipe recipe, Circuits circuits, Profile profile)
         {
+            if (profile.Unlocks.Contains(FormerKey(recipe))) return true;
             for (int c = 0; c < circuits.All.Count; c++)
                 for (int m = 0; m < circuits.All[c].Matches.Count; m++)
                 {
@@ -105,7 +131,9 @@ namespace Ygo.Engine.Campaign
                     if ((lead.Character.Id == played.Character.Id && lead.Deck == played.Deck) || (partner.Character.Id == played.Character.Id && partner.Deck == played.Deck))
                         wins += profile.MatchWins.TryGetValue(Circuits.TagKey(t, m), out var n) ? n : 0;
                 }
-            return wins == 1 ? All(circuits).FirstOrDefault(r => r.Owner.Id == played.Character.Id && r.Deck == played.Deck) : null;
+            // A recipe kept from before a deck swap (FormerKey) was already yours.
+            var recipe = wins == 1 ? All(circuits).FirstOrDefault(r => r.Owner.Id == played.Character.Id && r.Deck == played.Deck) : null;
+            return recipe != null && !profile.Unlocks.Contains(FormerKey(recipe)) ? recipe : null;
         }
 
         /// <summary>The recipes a Tag Cup win just unlocked (its two opponents' decks, when this was their first loss with them).</summary>
@@ -129,7 +157,7 @@ namespace Ygo.Engine.Campaign
                         if ((a.Character.Id == played.Character.Id && a.Deck == played.Deck) || (b.Character.Id == played.Character.Id && b.Deck == played.Deck))
                             wins += profile.MatchWins.TryGetValue(Circuits.TagKey(t, m), out var n) ? n : 0;
                     }
-                if (wins == 1) found.Add(recipe);
+                if (wins == 1 && !profile.Unlocks.Contains(FormerKey(recipe))) found.Add(recipe);
             }
             return found;
         }

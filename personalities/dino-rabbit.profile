@@ -5,7 +5,7 @@ aggression: 0.3
 caution: 0.7
 patience: 0.75
 spending: 0.4
-skill: 0.7
+skill: 0.85
 decks: dino-rabbit
 intro: One little rabbit, two dinosaurs, and a negate with your name on it.
 win: Laggia says no. Laggia always says no.

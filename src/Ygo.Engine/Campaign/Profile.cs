@@ -1500,6 +1500,8 @@ namespace Ygo.Engine.Campaign
         /// <summary>Card Tokens paid for clearing a circuit or Tag Cup.</summary>
         public int Tokens;
         public bool FirstWin;
+        /// <summary>A win in a match already won before this duel (circuit, Tag Cup or guest): paid <see cref="Circuits.RepeatWinDp"/>.</summary>
+        public bool Repeat;
         public Circuit? ClearedCircuit, UnlockedCircuit;
         /// <summary>A Library cup whose Format Master stamp this win earned.</summary>
         public Circuit? StampedCup;
@@ -1563,15 +1565,29 @@ namespace Ygo.Engine.Campaign
         /// three extra CPUs of its 8-player bracket (see <see cref="Brackets"/>). Not matches: nothing else counts them.
         /// </summary>
         public List<CircuitMatch> Locals = new List<CircuitMatch>();
+        /// <summary>The last match's line before the circuit's deciding duel ("finalline:"), or "".</summary>
+        public string FinalLine = "";
+        /// <summary>Matches as they were before a deck swap ("was: N character deck"): 0-based match index, the old pairing.</summary>
+        public List<(int Match, CircuitMatch Was)> Former = new List<(int Match, CircuitMatch Was)>();
     }
 
     /// <summary>
     /// The campaign: circuits in order (campaign/circuits.txt). Only the first is open at the start; clearing one (every
-    /// match won) opens the next. Wins pay DP by circuit, more the first time; losses and draws pay a little.
+    /// match won) opens the next. Wins pay DP by circuit, more the first time, and a rematch pays <see cref="RepeatWinDp"/>;
+    /// losses and draws pay a little.
     /// </summary>
     public sealed class Circuits
     {
         public const int LossDp = 50, DrawDp = 100, FirstWinBonus = 200;
+
+        /// <summary>A rematch's DP: a win in a match (circuit, Tag Cup or guest) already won before, as the Library pays.</summary>
+        public const int RepeatWinDp = Library.RepeatWinDp; // 150
+
+        /// <summary>
+        /// The first build's gate of <see cref="Migrate"/>'s former-recipe step (THE-CLIMB-SPEC section 4): a save that holds it has
+        /// that day's three swaps applied. Migrate now writes a <see cref="FormerDoneKey"/> per swap instead, so a later swap still applies.
+        /// </summary>
+        public const string ClimbMigrated = "climb:2026-11-20";
 
         public IReadOnlyList<Circuit> All { get; }
         public IReadOnlyList<TagCup> TagCups { get; }
@@ -1588,6 +1604,8 @@ namespace Ygo.Engine.Campaign
             var byId = roster.ToDictionary(p => p.Id);
             var circuits = new List<Circuit>();
             var cups = new List<TagCup>();
+            // "was:" lines, checked against their circuit's match count once the whole file is read.
+            var former = new List<(Circuit circuit, int number, CircuitMatch was)>();
             Circuit? current = null;
             TagCup? cup = null;
             // "<character> <deck name>" (the deck may contain spaces; missing = the character's first deck).
@@ -1638,6 +1656,14 @@ namespace Ygo.Engine.Campaign
                     case "era" when current != null: int.TryParse(value, out current.Era); break;
                     case "banlist" when current != null: current.Banlist = value; break;
                     case "pool" when current != null: current.Pool = value; break;
+                    // "finalline: <text>": the last match's character says it before the deciding duel (a Tag Cup ignores it).
+                    case "finalline" when current != null && cup == null: current.FinalLine = value; break;
+                    // "was: <match number, 1-based> <character> <deck>": that match as it was before a deck swap.
+                    case "was" when current != null && cup == null:
+                        var wasGap = value.IndexOf(' ');
+                        if (wasGap > 0 && int.TryParse(value.Substring(0, wasGap), out var number) && Match(value.Substring(wasGap + 1)) is CircuitMatch was)
+                            former.Add((current, number, was));
+                        break;
                     case "match" when current != null:
                     case "champion" when current != null:
                     case "local" when current != null:
@@ -1650,6 +1676,8 @@ namespace Ygo.Engine.Campaign
                         break;
                 }
             }
+            foreach (var (circuit, number, was) in former)
+                if (number >= 1 && number <= circuit.Matches.Count) circuit.Former.Add((number - 1, was));
             var kept = circuits.Where(c => c.Matches.Count > 0).ToList();
             // Re-resolve "after" against the kept list (cups whose circuit is missing are dropped).
             foreach (var c in cups) c.After = c.After >= 0 && c.After < circuits.Count ? kept.IndexOf(circuits[c.After]) : -1;
@@ -1700,7 +1728,40 @@ namespace Ygo.Engine.Campaign
             }
             profile.CircuitLayout = circuitNames;
             profile.TagCupLayout = cupNames;
+            // Last, on today's keys (moved above): each deck swap ("was:" line) once per save, whenever it arrives (its
+            // FormerDoneKey records it). A save that beat the old pairing keeps its recipe (RecipeBook.FormerKey). No DP moves;
+            // MatchWins isn't touched. A new save just records every swap as done.
+            for (int ci = 0; ci < All.Count; ci++)
+                foreach (var (match, was) in All[ci].Former)
+                {
+                    var done = FormerDoneKey(All[ci], match, was);
+                    if (profile.Unlocks.Contains(done) || (profile.Unlocks.Contains(ClimbMigrated) && ClimbSwaps.Contains(done))) continue;
+                    if (was.Deck.Length > 0 && BeatBeforeSwap(profile, ci, match, was))
+                        profile.Unlocks.Add(RecipeBook.FormerPrefix + RecipeBook.Key(was.Character.Id, was.Deck));
+                    profile.Unlocks.Add(done);
+                }
         }
+
+        /// <summary>
+        /// The <see cref="Profile.Unlocks"/> mark that a deck swap was applied to a save: "wasdone:&lt;circuit slug&gt;.&lt;match, 1-based&gt;:&lt;owner&gt;|&lt;deck&gt;"
+        /// ("wasdone:underdog-open.3:spellbook|spellbook").
+        /// </summary>
+        public static string FormerDoneKey(Circuit circuit, int match, CircuitMatch was) =>
+            $"wasdone:{AI.Playbooks.Playbooks.Slug(circuit.Name)}.{match + 1}:{RecipeBook.Key(was.Character.Id, was.Deck)}";
+
+        /// <summary>The swaps of 2026-11-20 (THE-CLIMB-SPEC section 1): a save holding the old <see cref="ClimbMigrated"/> gate has them applied.</summary>
+        private static readonly string[] ClimbSwaps =
+        {
+            "wasdone:underdog-open.3:spellbook|spellbook", "wasdone:trap-masters-cup.1:geargia|geargia", "wasdone:small-engines-invitational.4:yummy|yummy",
+        };
+
+        /// <summary>
+        /// Whether a save beat a swapped match's old pairing: it has won the match (this cycle), or, in a New Game+ cycle (which
+        /// clears match wins but can start at any time), it has beaten that duelist or opened that recipe in the book.
+        /// </summary>
+        private static bool BeatBeforeSwap(Profile profile, int circuit, int match, CircuitMatch was) =>
+            profile.HasWon(circuit, match)
+            || (profile.Cycle >= 1 && (profile.WinsAgainst(was.Character.Id) > 0 || profile.Seen.Contains("recipe:" + RecipeBook.Key(was.Character.Id, was.Deck))));
 
         public bool IsCleared(int circuit, Profile profile) =>
             circuit >= 0 && circuit < All.Count && Enumerable.Range(0, All[circuit].Matches.Count).All(m => profile.HasWon(circuit, m));
@@ -1811,25 +1872,29 @@ namespace Ygo.Engine.Campaign
 
         /// <summary>
         /// Records a tag match (winner 0 your team, 1 theirs, 2 draw): pays like a match of the cup's circuit, with the
-        /// cup's prize the first time it is cleared, and EXP. A win with your <paramref name="loaner"/> deck pays half the
-        /// duel's DP (the prize in full).
+        /// cup's prize the first time it is cleared, and EXP. A rematch (a win in a tag match already won) pays
+        /// <see cref="RepeatWinDp"/>, and any result there pays its level-ups in Card Tokens only. A win with your
+        /// <paramref name="loaner"/> deck pays half the duel's DP (the prize in full).
         /// </summary>
         public DuelReward RecordTag(Profile profile, int cup, int match, int winner, bool loaner = false)
         {
             var reward = new DuelReward();
             var c = TagCups[cup];
             var key = TagKey(cup, match);
+            // A match already won before this duel: a win is a rematch (RepeatWinDp), and any result's level-ups pay tokens.
+            bool wonBefore = profile.MatchWins.ContainsKey(key);
             int prize = 0;
             if (winner == 0)
             {
                 bool wasCleared = IsTagCupCleared(cup, profile);
-                reward.FirstWin = !profile.MatchWins.ContainsKey(key);
-                reward.Dp = WinDp(c.After) + (reward.FirstWin ? FirstWinBonus : 0);
+                reward.FirstWin = !wonBefore;
+                reward.Repeat = wonBefore;
+                reward.Dp = DuelDp(c.After, reward.Repeat) + (reward.FirstWin ? FirstWinBonus : 0);
                 if (loaner) reward.Dp = (int)Math.Round(reward.Dp * Loaners.DpShare);
                 profile.MatchWins[key] = (profile.MatchWins.TryGetValue(key, out var n) ? n : 0) + 1;
                 foreach (var who in new[] { c.Matches[match].lead.Character, c.Matches[match].partner.Character })
                     profile.AddWin(who.Id, reward);
-                var parts = new List<string> { $"+{reward.Dp} DP" + (reward.FirstWin ? " (first win)" : "") + (loaner ? " (half: loaner deck)" : "") };
+                var parts = new List<string> { WinPart(reward.Dp, reward.FirstWin, reward.Repeat, loaner) };
                 if (!wasCleared && IsTagCupCleared(cup, profile))
                 {
                     reward.Dp += c.Prize;
@@ -1848,9 +1913,8 @@ namespace Ygo.Engine.Campaign
             PayDuel(profile, Ledger.Tag, winner, reward.Dp, prize);
             profile.NoteResult(key, winner);
             reward.Exp = Leveling.DuelExp(c.After, winner, reward.FirstWin);
-            reward.LevelUps = Leveling.AddExp(profile, reward.Exp);
-            foreach (var up in reward.LevelUps)
-                reward.Summary += $" · Level {up.Level}! +{up.Dp} DP" + (up.Tokens > 0 ? $", +{up.Tokens} Card Token{(up.Tokens > 1 ? "s" : "")}" : "");
+            reward.LevelUps = Leveling.AddExp(profile, reward.Exp, payDp: !wonBefore);
+            reward.Summary += LevelParts(reward.LevelUps);
             return reward;
         }
 
@@ -1871,6 +1935,19 @@ namespace Ygo.Engine.Campaign
         /// </summary>
         public int WinDp(int circuit) => (int)Math.Round((150 + 75 * circuit) * (IsLateBand(circuit) ? 1.5 : 1.0));
 
+        /// <summary>A win's DP before the first-win bonus and the loaner share: <see cref="WinDp"/>, or <see cref="RepeatWinDp"/> for a rematch.</summary>
+        public int DuelDp(int circuit, bool repeat) => repeat ? RepeatWinDp : WinDp(circuit);
+
+        /// <summary>The circuit's last match: its final (billed on the row and the versus).</summary>
+        public static bool IsFinal(Circuit circuit, int match) => circuit.Matches.Count > 0 && match == circuit.Matches.Count - 1;
+
+        /// <summary>A win's first DP part of the results summary: "+1050 DP (first win)", "+150 DP (rematch)", with the loaner note.</summary>
+        internal static string WinPart(int dp, bool firstWin, bool repeat, bool loaner) =>
+            $"+{dp} DP" + (firstWin ? " (first win)" : "") + (repeat ? " (rematch)" : "") + (loaner ? " (half: loaner deck)" : "");
+
+        /// <summary>The summary's level-up parts, as each paid (a rematch's pay Card Tokens only).</summary>
+        internal static string LevelParts(List<LevelUp> ups) => string.Concat(ups.Select(up => " · " + Leveling.Describe(up)));
+
         /// <summary>Card Tokens for clearing a circuit the first time: one, and three in the late bands.</summary>
         public const int ClearTokens = 1, LateClearTokens = 3, TagCupClearTokens = 1;
 
@@ -1882,24 +1959,28 @@ namespace Ygo.Engine.Campaign
         public bool IsLateBand(int circuit) => circuit >= 0 && circuit < All.Count && LateBands.Contains(All[circuit].Band);
 
         /// <summary>
-        /// Records a match result and pays out. <paramref name="winner"/>: 0 you, 1 them, 2 draw. A win with a
-        /// <paramref name="loaner"/> deck pays half the duel's DP (the circuit's prize still in full).
+        /// Records a match result and pays out. <paramref name="winner"/>: 0 you, 1 them, 2 draw. A rematch (a win in a match
+        /// already won) pays <see cref="RepeatWinDp"/>, and any result in a won match pays its level-ups in Card Tokens only. A
+        /// win with a <paramref name="loaner"/> deck pays half the duel's DP (the circuit's prize still in full).
         /// </summary>
         public DuelReward Record(Profile profile, int circuit, int match, int winner, bool loaner = false)
         {
             var reward = new DuelReward();
             var opponent = All[circuit].Matches[match].Character;
+            // A match already won before this duel: a win is a rematch (RepeatWinDp), and any result's level-ups pay tokens.
+            bool wonBefore = profile.HasWon(circuit, match);
             int prize = 0;
             if (winner == 0)
             {
                 bool wasCleared = IsCleared(circuit, profile);
-                reward.FirstWin = !profile.HasWon(circuit, match);
-                reward.Dp = WinDp(circuit) + (reward.FirstWin ? FirstWinBonus : 0);
+                reward.FirstWin = !wonBefore;
+                reward.Repeat = wonBefore;
+                reward.Dp = DuelDp(circuit, reward.Repeat) + (reward.FirstWin ? FirstWinBonus : 0);
                 if (loaner) reward.Dp = (int)Math.Round(reward.Dp * Loaners.DpShare);
                 var key = Profile.MatchKey(circuit, match);
                 profile.MatchWins[key] = (profile.MatchWins.TryGetValue(key, out var n) ? n : 0) + 1;
                 profile.AddWin(opponent.Id, reward);
-                var parts = new List<string> { $"+{reward.Dp} DP" + (reward.FirstWin ? " (first win)" : "") + (loaner ? " (half: loaner deck)" : "") };
+                var parts = new List<string> { WinPart(reward.Dp, reward.FirstWin, reward.Repeat, loaner) };
                 if (!wasCleared && IsCleared(circuit, profile))
                 {
                     reward.ClearedCircuit = All[circuit];
@@ -1928,9 +2009,8 @@ namespace Ygo.Engine.Campaign
             // EXP, and whatever the levels it reaches pay.
             reward.Exp = Leveling.DuelExp(circuit, winner, reward.FirstWin) + (reward.ClearedCircuit != null ? Leveling.CircuitClearExp : 0);
             NoteBand(profile); // before the level-ups, so a new band counts from the level you reach it at
-            reward.LevelUps = Leveling.AddExp(profile, reward.Exp);
-            foreach (var up in reward.LevelUps)
-                reward.Summary += $" · Level {up.Level}! +{up.Dp} DP" + (up.Tokens > 0 ? $", +{up.Tokens} Card Token{(up.Tokens > 1 ? "s" : "")}" : "");
+            reward.LevelUps = Leveling.AddExp(profile, reward.Exp, payDp: !wonBefore);
+            reward.Summary += LevelParts(reward.LevelUps);
             return reward;
         }
 

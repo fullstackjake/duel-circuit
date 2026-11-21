@@ -5,7 +5,7 @@ aggression: 0.7
 caution: 0.35
 patience: 0.4
 spending: 0.7
-skill: 0.7
+skill: 0.85
 decks: maliss
 intro: Down the rabbit hole... and into banishment.
 win: Tea's over. You may leave the table.

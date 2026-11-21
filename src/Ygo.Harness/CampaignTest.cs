@@ -559,12 +559,12 @@ public static class CampaignTest
         int guestDp = student.Dp;
         var guestWin = GuestList.Record(student, circuits, lessonGuest, false, 0);
         var guestAgain = GuestList.Record(student, circuits, lessonGuest, false, 0);
-        Check($"a guest win pays the prize once ({guestWin.Summary} / {guestAgain.Summary}) and counts against them",
-            guestWin.FirstWin && !guestAgain.FirstWin && guestWin.Dp == guestAgain.Dp + lessonGuest.Prize && student.WinsAgainst(lessonGuest.Character.Id) == 2 && student.Dp > guestDp);
+        Check($"a guest win pays the prize once ({guestWin.Summary} / {guestAgain.Summary}, a rematch) and counts against them",
+            guestWin.FirstWin && !guestAgain.FirstWin && guestAgain.Repeat && guestAgain.Dp == Circuits.RepeatWinDp && guestWin.Dp == circuits.WinDp(circuits.Current(student)) + lessonGuest.Prize && student.WinsAgainst(lessonGuest.Character.Id) == 2 && student.Dp > guestDp);
         var otherGuest = guests.All.First(g => g != lessonGuest);
         var guestLoaned = GuestList.Record(student, circuits, otherGuest, false, 0, loaner: true);
         Check($"a guest win with a loaner pays half the duel's DP and the whole prize ({guestLoaned.Summary})",
-            guestLoaned.Dp == (int)Math.Round(guestAgain.Dp * Loaners.DpShare) + otherGuest.Prize);
+            guestLoaned.Dp == (int)Math.Round(circuits.WinDp(circuits.Current(student)) * Loaners.DpShare) + otherGuest.Prize);
         IlseChecks(Check, root, cards, printings, roster, circuits, library, guests, starter, finalLockedForVeteran, veteran, story, alleyData);
         VeraChecks(Check, root, cards, printings, roster, circuits, library, guests, starter, story, scouting, scoutFiles, TriggerOk);
         Check("New Game+ resets the circuits and keeps cards, DP, level and tokens", reloaded.MatchWins.Count == 0 && reloaded.Cycle == 1
@@ -582,7 +582,7 @@ public static class CampaignTest
         Check($"clearing a circuit pays a Card Token ({w2.Tokens})",
             w2.Tokens == Circuits.ClearTokens && profile.Tokens == tokensBefore + w2.Tokens + w2.LevelUps.Sum(u => u.Tokens));
         var again = circuits.Record(profile, 0, 0, 0);
-        Check($"replaying a cleared match pays without bonus or prize ({again.Summary})", again.Dp == circuits.WinDp(0) && again.ClearedCircuit == null);
+        Check($"replaying a cleared match is a rematch: {Circuits.RepeatWinDp} DP, no bonus or prize ({again.Summary})", again.Dp == Circuits.RepeatWinDp && again.Repeat && again.ClearedCircuit == null);
 
         // The 3-copy cap: a 4th copy becomes DP, or replaces a less rare copy.
         var c3 = new Collection();
@@ -894,6 +894,8 @@ public static class CampaignTest
         failures += HeadlinerTest.Run(cards, root, printings, roster, circuits, library, starter);
         failures += LiveDuelTest.Run(cards, root, printings, catalog, roster, circuits, library, guests, starter);
         failures += StoryPlacesTest.Run(cards, root, library);
+        // The climb (docs/dev/THE-CLIMB-SPEC-2026-11-20.md, Part E): repeat pay, billed finals, former recipes, deck stars.
+        failures += ClimbTest.Run(cards, root, printings, roster, circuits, guests, starter);
         // The Champion's Ladder (docs/dev/CHAMPIONS-LADDER-SPEC-2026-11-06.md section 9; also alone as --ladder-test).
         if (LadderTest.Run(cards, root) != 0) failures++;
 
@@ -1440,7 +1442,7 @@ public static class CampaignTest
             seen.SequenceEqual(new[] { "synchron", "synchron", "synchron", "zombies", "gadgets", "modern", "synchron" })
             && GuestList.DeckIndex(ilse, rot) == 0 && guests.All.Where(g => g != ilse).All(g => GuestList.DeckFor(g, rot) == g.Deck));
 
-        // 3. The prize once (then WinDp), Mirror Force with beat:ilse, met at the last circuit, no signature problems.
+        // 3. The prize once (then a rematch's RepeatWinDp), Mirror Force with beat:ilse, met at the last circuit, no signature problems.
         var noPass = BanPasses.LoadNoPass(Path.Combine(root, "campaign", "no-pass.txt"), cards);
         var deckFiles = Directory.GetFiles(Path.Combine(root, "decks"), "*.ydk", SearchOption.AllDirectories)
             .GroupBy(Path.GetFileNameWithoutExtension).ToDictionary(g => g.Key!, g => g.First());
@@ -1456,8 +1458,8 @@ public static class CampaignTest
         var mirror = cards.All.FirstOrDefault(c => c.Name == "Mirror Force")?.Code ?? 0;
         var eraLists = Ygo.Engine.DeckBuilding.Banlist.LoadFolders(new[] { Path.Combine(root, "lflists") });
         var sigProblems = unlocks.SignatureProblems(eraLists);
-        Check($"her first win pays {first.Dp:N0} DP ({first.Summary}), the next {again.Dp:N0} (WinDp {duelDp}); the gift is {gift?.Text} ({gift?.Event}); met at circuit {unlocks.MeetCircuit("ilse")} of {circuits.All.Count}; signature problems: {string.Join("; ", sigProblems)}",
-            first.FirstWin && first.Dp == duelDp + 10000 && dp1 - dp0 == first.Dp && !again.FirstWin && again.Dp == duelDp && ilse.Prize == 10000
+        Check($"her first win pays {first.Dp:N0} DP ({first.Summary}), the next {again.Dp:N0} (a rematch); the gift is {gift?.Text} ({gift?.Event}); met at circuit {unlocks.MeetCircuit("ilse")} of {circuits.All.Count}; signature problems: {string.Join("; ", sigProblems)}",
+            first.FirstWin && first.Dp == duelDp + 10000 && dp1 - dp0 == first.Dp && !again.FirstWin && again.Repeat && again.Dp == Circuits.RepeatWinDp && ilse.Prize == 10000
             && gift != null && gift.Code == unlocks.SignatureOf("ilse") && unlocks.SignatureOf("ilse") != 0 && cards.Get(unlocks.SignatureOf("ilse"))?.Name == "Mirror Force"
             && gift.Event == "beat:ilse" && CardUnlocks.Events(grants).Contains("beat:ilse")
             && unlocks.MeetCircuit("ilse") == circuits.All.Count - 1 && sigProblems.Count == 0 && mirror != 0);
@@ -1698,12 +1700,12 @@ public static class CampaignTest
         var eraLists = Ygo.Engine.DeckBuilding.Banlist.LoadFolders(new[] { Path.Combine(root, "lflists") });
         var sigProblems = unlocks.SignatureProblems(eraLists);
         Check($"beaten in the circuits first (her gift then: {giftedInCircuit}), her first guest win pays {first.Dp:N0} DP ({first.Summary}) with no second gift "
-              + $"({string.Join(", ", firstGrants.Select(g => g.Kind))}) and raises [{string.Join(", ", firstEvents)}], not beat:vera; a rematch pays {again.Dp:N0} (WinDp {duelDp}) and raises "
+              + $"({string.Join(", ", firstGrants.Select(g => g.Kind))}) and raises [{string.Join(", ", firstEvents)}], not beat:vera; a rematch pays {again.Dp:N0} (RepeatWinDp) and raises "
               + $"[{string.Join(", ", againEvents)}], a loss [{string.Join(", ", lossEvents)}]; New Game+'s first win pays {nextCycle.Dp:N0}, no prize again ({nextCycle.FirstWin}) and still no gift; "
               + $"met at circuit {unlocks.MeetCircuit("vera")} (her match's); signature problems: {string.Join("; ", sigProblems)}",
             giftedInCircuit && first.FirstWin && first.Dp == duelDp + vera.Prize && paid == first.Dp + first.LevelUps.Sum(u => u.Dp)
             && !firstGrants.Any(g => g.Kind is GrantKind.RivalGift or GrantKind.BondGift && g.Character == "vera") && !CardUnlocks.Events(firstGrants).Contains("beat:vera")
-            && firstEvents.SequenceEqual(new[] { Story.GuestBeatEvent("vera") }) && !again.FirstWin && again.Dp == duelDp && againEvents.Count == 0 && lossEvents.Count == 0
+            && firstEvents.SequenceEqual(new[] { Story.GuestBeatEvent("vera") }) && !again.FirstWin && again.Repeat && again.Dp == Circuits.RepeatWinDp && againEvents.Count == 0 && lossEvents.Count == 0
             && !nextCycle.FirstWin && nextCycle.Dp == circuits.WinDp(circuits.Current(player)) && !nextGrants.Any(g => g.Kind == GrantKind.RivalGift)
             && unlocks.MeetCircuit("vera") == veraCircuit && sigProblems.Count == 0);
 

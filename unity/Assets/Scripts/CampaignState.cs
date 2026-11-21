@@ -36,16 +36,16 @@ namespace YgoCampaign.Game
     {
         public static readonly StarterDeck[] Starters =
         {
-            new StarterDeck { Deck = "classic", HistoricDeck = "classic-2011", Title = "Legendary Dragons", Tag = "Classic era · big monsters, simple plays", Badge = "Best first deck",
+            new StarterDeck { Deck = "classic", HistoricDeck = "classic-2011", Title = "Legendary Dragons", Tag = "Classic era · big monsters, simple plays",
                 Blurb = "Lord of D. and The Flute of Summoning Dragon call Blue-Eyes straight from your hand; Trade-In and Silver's Cry turn spare dragons into cards and comebacks.",
                 Showcase = new uint[] { 89631139, 17985575, 43973174 } },
-            new StarterDeck { Deck = "warriors", HistoricDeck = "warriors-2011", Title = "Warrior's Charge", Tag = "Classic era · equip and attack",
+            new StarterDeck { Deck = "warriors", HistoricDeck = "warriors-2011", Title = "Warrior's Charge", Tag = "Classic era · equip and attack", Badge = "Best first deck",
                 Blurb = "Gearfried the Swordmaster destroys a monster each time you equip it; Marauding Captain and Command Knight keep it safe.",
                 Showcase = new uint[] { 57046845, 423705, 10375182 } },
             new StarterDeck { Deck = "zombies", HistoricDeck = "zombies-2011", Title = "Undead Legion", Tag = "Classic era · comebacks from the Graveyard",
                 Blurb = "Zombie World and Book of Life keep your undead coming back; Pyramid Turtle and Goblin Zombie fetch the next one whenever one falls.",
                 Showcase = new uint[] { 5186893, 4064256, 77044671 } },
-            new StarterDeck { Deck = "mekk-knight-invoked", Title = "Mekk-Knight Invoked Evolved", Tag = "Modern · strong from the start, hard to play well",
+            new StarterDeck { Deck = "mekk-knight-invoked", Title = "Mekk-Knight Invoked Evolved", Tag = "Modern · makes the early circuits easy",
                 Blurb = "A modern deck that's best going second: cards from your hand stop the opponent's big turn, then you break their field and strike back. Strong from the first duel, but its plays take practice.",
                 Showcase = new uint[] { 86120751, 28692962, 75286621 } },
         };

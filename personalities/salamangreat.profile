@@ -5,7 +5,7 @@ aggression: 0.5
 caution: 0.5
 patience: 0.55
 spending: 0.5
-skill: 0.7
+skill: 0.85
 decks: salamangreat
 intro: Burn me down. I'll just come back stronger.
 win: Reborn from the ashes, as always.

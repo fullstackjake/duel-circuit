@@ -5,7 +5,7 @@ aggression: 0.3
 caution: 0.7
 patience: 0.75
 spending: 0.4
-skill: 0.7
+skill: 0.85
 decks: qliphort
 intro: Initializing Pendulum Scales. Resistance is inefficient.
 win: Apoqliphort Towers online. Duel terminated.

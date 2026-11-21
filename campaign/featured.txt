@@ -46,14 +46,14 @@ soon: DPYG | gadgets, stall-burn | Red, Green and Yellow Gadget, Marshmallon
 shelf: Underdog Open
 set: STOR | six-samurai | Kagemusha of the Six Samurai, Legendary Six Samurai - Kizan, Legendary Six Samurai - Kageki
 set: DR04 | frog-ftk, burning-abyss | Poison Draw Frog, Des Frog, Treeborn Frog, Karma Cut
-set: GLD2 | six-samurai, frog-ftk, spellbook, burning-abyss | Six Samurai United, Double-Edged Sword Technique
-set: DB2 | spellbook, six-samurai | Kycoo the Ghost Destroyer, Jowgen the Spiritualist, Royal Oppression
-soon: BP03 | spellbook, burning-abyss | Spellbook of Wisdom, Night Beam, Ghostrick Alucard
-soon: PGL2 | spellbook, burning-abyss | The Grand Spellbook Tower, Karma Cut, Downerd Magician
+set: GLD2 | six-samurai, frog-ftk, burning-abyss | Six Samurai United, Double-Edged Sword Technique
+set: DR1 | spellcasters-command | Skilled Dark Magician, Breaker the Magical Warrior, Apprentice Magician, Royal Magical Library
+soon: BP03 | burning-abyss | Night Beam, Ghostrick Alucard
+soon: PGL2 | burning-abyss | Karma Cut, Downerd Magician
 
 shelf: Trap Masters Cup
-set: GENF | geargia | Geargiano
-set: ABPF | geargia | Fiendish Chain
+set: DR04 | machine-re-volt | Cyber Dragon, Proto-Cyber Dragon, Power Bond, Machine King Prototype
+set: CRV | machine-re-volt | Cyber Dragon, Cyber Twin Dragon, Power Bond
 set: DR1 | domain-monarch, zoodiac | Reasoning, My Body as a Shield
 set: DR3 | altergeist | Mind Crush
 soon: HSRD | zoodiac | Speedroid Terrortop
@@ -63,7 +63,7 @@ shelf: Small Engines Invitational
 set: TDGS | purrely | Book of Eclipse
 set: PGD | runick-spright, purrely, floowandereeze | Lava Golem, Book of Moon, Terraforming
 set: DR1 | runick-spright, floowandereeze | Lava Golem, Terraforming
-set: DB2 | yummy, purrely | Witch of the Black Forest, Book of Moon
+set: DP08 | synchron | Junk Synchron, Junk Warrior, Quillbolt Hedgehog, Stardust Dragon
 
 # ---- Intermediate (era 2015) ----
 

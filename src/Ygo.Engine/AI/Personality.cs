@@ -75,7 +75,8 @@ namespace Ygo.Engine.AI
         public static Personality Balanced => new Personality();
 
         /// <summary>
-        /// A short summary of the knobs in plain dueling words, at most two, e.g. "attacks hard, fires traps early · skill 3/10".
+        /// A short summary of the knobs in plain dueling words, at most two, e.g. "attacks hard, fires traps early".
+        /// No skill number: most duelists play at or near full strength, so it said nothing about a match (deck stars do).
         /// (Spending isn't shown: it doesn't read as something you see across the table.)
         /// </summary>
         public string StyleSummary
@@ -90,7 +91,7 @@ namespace Ygo.Engine.AI
                 if (Patience >= 0.7) traits.Add("saves its traps");
                 else if (Patience <= 0.25) traits.Add("fires traps early");
                 if (traits.Count == 0) traits.Add("balanced");
-                return $"{string.Join(", ", traits.Take(2))} · skill {(int)Math.Round(Skill * 10)}/10";
+                return string.Join(", ", traits.Take(2));
             }
         }
 

@@ -255,7 +255,7 @@ namespace YgoCampaign.Game
             yield return new WaitForSecondsRealtime(0.6f);
             var row = _scenes.LastGuestRows.FirstOrDefault(r => r.Id == "vera");
             Report($"Vera's row after the final (beaten {profile.WinsAgainst("vera")}x in the circuits): \"{row?.Decks}\" / \"{row?.Status}\"; Duel:vera and Scout:vera, no Tag:vera",
-                row != null && row.Unlocked && row.Decks == $"Plays {DeckTitle("warriors")} · no tag duel" && row.Status == $"First win: +{vera.Prize:N0} DP"
+                row != null && row.Unlocked && row.Decks.StartsWith($"Plays {DeckTitle("warriors")} · no tag duel · ") && row.Decks.Contains(StrengthText.Star) && row.Status == $"First win: +{vera.Prize:N0} DP"
                 && _scenes.Buttons.ContainsKey("Duel:vera") && _scenes.Buttons.ContainsKey("Scout:vera") && !_scenes.Buttons.ContainsKey("Tag:vera"));
             if (_scenes.Buttons.TryGetValue("Duel:vera", out var fight)) fight();
             var meetBy = Time.realtimeSinceStartup + 4;
@@ -329,7 +329,7 @@ namespace YgoCampaign.Game
                 && _scenes.Buttons.ContainsKey("Duel:ilse") && !_scenes.Buttons.ContainsKey("Tag:ilse") && _scenes.Buttons.ContainsKey("Scout:ilse"));
             var row = _scenes.LastGuestRows.FirstOrDefault(r => r.Id == "ilse");
             Report($"her row: \"{row?.Decks}\" / \"{row?.Status}\"",
-                row != null && row.Decks == "Plays four decks, one a duel: Synchron, Zombies, Gadgets, Modern · no tag duel"
+                row != null && row.Decks.StartsWith("Plays four decks, one a duel: Synchron, Zombies, Gadgets, Modern · no tag duel · ") && row.Decks.Contains(StrengthText.Star)
                 && row.Status == $"First win: +{ilse.Prize:N0} DP · next: Synchron (1 of 4)");
 
             // Duel: her meeting first (when the story has it), then the versus.

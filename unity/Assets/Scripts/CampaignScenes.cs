@@ -434,6 +434,7 @@ namespace YgoCampaign.Game
             {
                 // Up and down again, flipping end over end, landing on the winner's side (the winner's face up last).
                 const float Flight = 1.3f;
+                if (!FxSettings.ReducedMotion) Sounds.Play("coin_spin", 0.8f);
                 if (!FxSettings.ReducedMotion)
                     for (float t = 0; t < Flight && flier != null; t += Time.unscaledDeltaTime)
                     {
@@ -450,7 +451,8 @@ namespace YgoCampaign.Game
                 flier.localScale = Vector3.one;
                 flier.anchoredPosition = Vector2.zero;
                 ShowFace(youWin);
-                Sounds.Play(youWin ? "win" : "turn");
+                Sounds.Play("coin_land", 0.7f);
+                Sounds.PlayLater(0.12f, youWin ? "win" : "turn");
                 if (youWin)
                 {
                     result.text = $"{you} {won}!";
@@ -714,7 +716,7 @@ namespace YgoCampaign.Game
                 name.fontStyle = FontStyle.Bold;
                 Ui.Text(Ui.Box(panel, textX, dense ? 40 : compact ? 50 : 60, 1140, dense ? 26 : compact ? 42 : 50), g.Blurb, 17 + (compact ? 0 : 1), T.TextSoft,
                     dense ? TextAnchor.MiddleLeft : TextAnchor.UpperLeft);
-                if (g.Unlocked) Ui.Text(Ui.Box(panel, textX, dense ? 66 : compact ? 90 : 108, 1140, dense ? 24 : compact ? 26 : 28), g.Decks, 16, T.TextQuiet, TextAnchor.MiddleLeft);
+                if (g.Unlocked) Ui.Text(Ui.Box(panel, textX, dense ? 66 : compact ? 90 : 108, 1140, dense ? 24 : compact ? 26 : 28), g.Decks, 16, T.TextQuiet, TextAnchor.MiddleLeft).supportRichText = true;
                 Ui.Text(Ui.Box(panel, textX, dense ? 92 : compact ? 116 : 138, 1140, dense ? 28 : compact ? 28 : 30), g.Status, 17, g.Unlocked ? T.Good : T.TextQuiet, TextAnchor.MiddleLeft)
                     .supportRichText = true;
                 if (!g.Unlocked) continue;

@@ -228,7 +228,8 @@ namespace Ygo.Engine.Campaign
 
         /// <summary>
         /// Records a duel against a guest (<paramref name="tag"/>: them and their partner). A win pays like a match of the
-        /// circuit you're on, plus the guest's prize the first time; a loss or draw pays a little. Wins count against
+        /// circuit you're on, plus the guest's prize the first time; a rematch (a win when you'd already won that duel this
+        /// cycle) pays <see cref="Circuits.RepeatWinDp"/>, and its level-ups pay Card Tokens only; a loss or draw pays a little. Wins count against
         /// the guest (and their partner), so they can partner you afterwards. A win with your <paramref name="loaner"/> deck
         /// pays half the duel's DP (the prize in full).
         /// </summary>
@@ -237,19 +238,24 @@ namespace Ygo.Engine.Campaign
             var reward = new DuelReward();
             int circuit = circuits.Current(profile);
             var key = Key(guest, tag);
+            // Won before (this cycle): a win is a rematch (Circuits.RepeatWinDp), and any result's level-ups pay tokens.
+            bool wonBefore = profile.MatchWins.ContainsKey(key);
             int prize = 0;
             if (winner == 0)
             {
                 // FirstWin is the prize-paying win: the first this cycle, and for a "once" guest the first ever.
                 reward.FirstWin = PrizeDue(guest, profile, tag);
-                if (!tag && !profile.MatchWins.ContainsKey(key)) profile.Unlocks.Add(PrizeKey(guest.Character.Id));
-                int duelDp = circuits.WinDp(circuit);
+                // PrizeDue needs the key absent, so a prize-paying win is never a repeat.
+                reward.Repeat = wonBefore && !reward.FirstWin;
+                if (!tag && !wonBefore) profile.Unlocks.Add(PrizeKey(guest.Character.Id));
+                int duelDp = circuits.DuelDp(circuit, reward.Repeat);
                 if (loaner) duelDp = (int)Math.Round(duelDp * Loaners.DpShare);
                 reward.Dp = duelDp + (reward.FirstWin ? guest.Prize : 0);
                 profile.MatchWins[key] = (profile.MatchWins.TryGetValue(key, out var n) ? n : 0) + 1;
                 profile.AddWin(guest.Character.Id, reward);
                 if (tag) profile.AddWin(guest.Partner.Id, reward);
-                reward.Summary = $"+{reward.Dp} DP" + (reward.FirstWin ? $" (first win: {guest.Prize} DP prize)" : "") + (loaner ? " (half: loaner deck)" : "");
+                reward.Summary = $"+{reward.Dp} DP" + (reward.FirstWin ? $" (first win: {guest.Prize} DP prize)" : "") + (reward.Repeat ? " (rematch)" : "")
+                                 + (loaner ? " (half: loaner deck)" : "");
                 prize = reward.FirstWin ? guest.Prize : 0;
             }
             else
@@ -261,9 +267,8 @@ namespace Ygo.Engine.Campaign
             Circuits.PayDuel(profile, Ledger.Guest, winner, reward.Dp, prize);
             profile.NoteResult(key, winner);
             reward.Exp = Leveling.DuelExp(circuit, winner, reward.FirstWin);
-            reward.LevelUps = Leveling.AddExp(profile, reward.Exp);
-            foreach (var up in reward.LevelUps)
-                reward.Summary += $" · Level {up.Level}! +{up.Dp} DP" + (up.Tokens > 0 ? $", +{up.Tokens} Card Token{(up.Tokens > 1 ? "s" : "")}" : "");
+            reward.LevelUps = Leveling.AddExp(profile, reward.Exp, payDp: !wonBefore);
+            reward.Summary += Circuits.LevelParts(reward.LevelUps);
             return reward;
         }
     }

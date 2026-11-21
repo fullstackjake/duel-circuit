@@ -1011,10 +1011,11 @@ namespace YgoCampaign.Game
 
         private IEnumerator DealIn()
         {
-            Sounds.Play("pack_tear");
+            PackSounds.Opened();
             for (int i = 0; i < _pack.Count; i++)
             {
                 var slot = _pack[i].Slot;
+                PackSounds.Dealt(i);
                 StartCoroutine(Tween(0.22f, t => { if (slot != null) slot.localScale = Vector3.one * Mathf.Lerp(0.6f, 1f, EaseOutBack(t)); }));
                 yield return new WaitForSecondsRealtime(0.05f);
             }
@@ -1050,8 +1051,8 @@ namespace YgoCampaign.Game
                 card.Slot.localRotation = Quaternion.identity;
             }
 
-            // Turn over: squash the back to nothing, swap in the face, and unsquash.
-            Sounds.Play("flip", 0.8f);
+            // Turn over: squash the back to nothing, swap in the face, and unsquash. The turn's sounds, all of them (PackSounds).
+            PackSounds.Turned(card.Pull.Rarity, card.Hit);
             yield return Tween(0.12f, t => card.Slot.localScale = new Vector3(1 - t, 1 + 0.05f * t, 1));
             card.Back.gameObject.SetActive(false);
             // The copy you got: its rarity and its condition (a sold 4th copy shows plain).
@@ -1081,7 +1082,6 @@ namespace YgoCampaign.Game
             Spoken(card);
             yield return Tween(0.14f, t => card.Slot.localScale = new Vector3(t, 1.05f - 0.05f * t, 1));
 
-            if (rare) Sounds.Play(big ? "burst" : "rare", big ? 1f : 0.7f);
             if (rare && card.Glow != null)
             {
                 var glow = card.Glow;

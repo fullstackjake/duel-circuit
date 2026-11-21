@@ -226,7 +226,45 @@ namespace Ygo.Engine.Audio
                        + "A5:4 C#6:2 E6:2 | D#6:3 C#6:1 B5:4 | C#6:2 G#5:2 E5:4 | A5:2 E5:2 C#5:4 | "
                        + "F#5:3 A5:1 C#6:4 | B5:2 D#6:2 F#6:4 | G#5:2 C6:2 D#6:2 G#6:2 | G#5:6 r:2",
             },
-        }.ToDictionary(t => t.Name);
+        }.SelectMany(t =>
+            // Guests who borrow a theme for now (AUDIO-PASS-1-SPEC section G): copies in a new key, so the notes stay
+            // one source. Duchess Ilse: Nocturne three semitones up (D minor); Vera: Rhea two down (D major).
+            t.Name == "nocturne" ? new[] { t, Transposed(t, "ilse", 3) }
+            : t.Name == "rhea" ? new[] { t, Transposed(t, "vera", -2) }
+            : new[] { t }).ToDictionary(t => t.Name);
+
+        /// <summary>
+        /// A copy of <paramref name="theme"/> named <paramref name="name"/>, <paramref name="semitones"/> higher: its key,
+        /// chords and melody moved (spelled with sharps). It renders exactly as the original with that transpose.
+        /// </summary>
+        private static Theme Transposed(Theme theme, string name, int semitones)
+        {
+            string[] names = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
+            string MoveChord(string text)
+            {
+                int i = 0;
+                int pc = PitchClass(text, ref i);
+                return names[Mod(pc + semitones, 12)] + text.Substring(i);
+            }
+            string MoveNote(string token)
+            {
+                var parts = token.Split(':');
+                if (parts[0] == "r") return token;
+                int i = 0;
+                int pc = PitchClass(parts[0], ref i);
+                int midi = 12 * (int.Parse(parts[0].Substring(i)) + 1) + pc + semitones;
+                return names[Mod(midi, 12)] + (midi / 12 - 1) + ":" + parts[1];
+            }
+            string Bars(string text, Func<string, string> each) => string.Join(" | ", text.Split('|')
+                .Select(bar => string.Join(" ", bar.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(each))));
+            return new Theme
+            {
+                Name = name, Bpm = theme.Bpm, Key = Mod(theme.Key + semitones, 12), Minor = theme.Minor,
+                Chords = Bars(theme.Chords, MoveChord), Melody = theme.Melody.Trim().Length == 0 ? theme.Melody : Bars(theme.Melody, MoveNote),
+                Lead = theme.Lead, LeadShift = theme.LeadShift, Harmony = theme.Harmony, Octave = theme.Octave,
+                Groove = theme.Groove, Bass = theme.Bass, Swing = theme.Swing,
+            };
+        }
 
         // ---- Voices ----------------------------------------------------------------------------------
 

@@ -521,9 +521,6 @@ namespace YgoCampaign.Game
             Closed?.Invoke();
         }
 
-        /// <summary>The next volume step: 0, 20, 40, 60, 80, 100%, then back to 0.</summary>
-        private static float Next(float volume) => Mathf.Round(volume * 5) >= 5 ? 0 : (Mathf.Round(volume * 5) + 1) / 5f;
-
         private void Refresh()
         {
             for (int i = _rows.childCount - 1; i >= 0; i--) Destroy(_rows.GetChild(i).gameObject);
@@ -599,15 +596,7 @@ namespace YgoCampaign.Game
                 "A gold ▶ tab above every card you can play right now, besides the gold border, so they stand out without relying on color.",
                 () => FxSettings.PlayableTabs = !FxSettings.PlayableTabs);
             Heading("SOUND AND SCREEN");
-            Row("Sound effects", $"{Mathf.RoundToInt(Sounds.EffectsVolume * 100)}%", "Summons, attacks, damage, pack openings and buttons. Click to change (off, 20% ... 100%).",
-                () => { Sounds.EffectsVolume = Next(Sounds.EffectsVolume); Sounds.Play("summon"); });
-            Row("Music", $"{Mathf.RoundToInt(Sounds.MusicVolume * 100)}%", "A calm theme in the menus, a driving one in duels, and a theme of their own for bosses. It dips under negations and big hits.",
-                () => Sounds.MusicVolume = Next(Sounds.MusicVolume));
-            Row("Reactive music", OnOff(Sounds.ReactiveMusic),
-                "Duel music follows the duel: the boss's tune with their ace, more drive at low LP, a heartbeat when an attack could end it. Off: steady. Reduced motion slows its changes.",
-                () => Sounds.ReactiveMusic = !Sounds.ReactiveMusic);
-            Row("Interface sounds", $"{Mathf.RoundToInt(Sounds.UiVolume * 100)}%", "Button clicks and hovers, apart from the duel's sounds. Click to change (off, 20% ... 100%).",
-                () => { Sounds.UiVolume = Next(Sounds.UiVolume); Sounds.Play("click"); });
+            y = SettingsSound.Build(_rows, y, Refresh);
             Row("Window", Screen.fullScreen ? "Full screen" : "Windowed", "Switch between full screen and a window. The window can be dragged to any size; its size is kept for next time.",
                 WindowSize.Toggle);
             var art = CardView.Art;

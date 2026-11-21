@@ -579,8 +579,9 @@ namespace YgoCampaign.Game
                 var i = Array.IndexOf(args, name);
                 return i >= 0 && i + 1 < args.Length ? args[i + 1] : null;
             }
-            // `-mute`: no sound this session (tests and QA runs); the volume settings themselves are untouched.
-            if (Array.IndexOf(args, "-mute") >= 0) AudioListener.volume = 0f;
+            // `-mute`: no sound this session (tests and QA runs); the volume settings themselves are untouched. The output is
+            // zeroed after the limiter's meters (OutputLimiter), so checks still read real levels.
+            if (Array.IndexOf(args, "-mute") >= 0) Sounds.OutputMuted = true;
             // `-gosecond`: checks that skip the toss give the other side turn 1 (you go second).
             _nextFirstPlayer = _checkFirstPlayer = Array.IndexOf(args, "-gosecond") >= 0 ? 1 : 0;
             var mid = Arg("-autoshot");
@@ -711,9 +712,13 @@ namespace YgoCampaign.Game
             // makes itself (DuelController.ImportCheck).
             var importCheck = Arg("-importcheck");
             if (importCheck != null) StartCoroutine(ImportCheck(importCheck));
+            // `-soundcheck <folder>` (absolute; with -mods <empty folder> and -mute): the sound groups, sliders, pause, limiter and duel sounds (DuelController.SoundCheck).
+            if (Arg("-soundcheck") is string soundCheck) StartCoroutine(SoundCheck(soundCheck));
+            // `-climbcheck <folder>` (absolute; with -mods <empty folder>): billed finals, rematch pay, deck stars, the starter ribbon (DuelController.ClimbCheck).
+            if (Arg("-climbcheck") is string climbCheck) StartCoroutine(ClimbCheck(climbCheck));
 
             // Players start on the title screen; automated checks go straight to what they test.
-            var checks = new[] { "-autoshot", "-autoshot-end", "-editor", "-fxshots", "-replaycheck", "-campaigncheck", "-finalcheck", "-laddercheck", "-themecheck", "-shopcheck", "-alleycheck", "-tagcheck", "-boardcheck", "-matcheck", "-foilshowcase", "-gradeshowcase", "-slabreveal", "-artcheck", "-autoclick", "-p0", "-p1", "-layoutcheck", "-pilecheck", "-controlscheck", "-qaplay", "-qareplay", "-ordercheck", "-musiccheck", "-stylecheck", "-clickcheck", "-ydkcheck", "-searchcheck", "-focuscheck", "-editorcheck", "-aboutcheck", "-importcheck" };
+            var checks = new[] { "-autoshot", "-autoshot-end", "-editor", "-fxshots", "-replaycheck", "-campaigncheck", "-finalcheck", "-laddercheck", "-themecheck", "-shopcheck", "-alleycheck", "-tagcheck", "-boardcheck", "-matcheck", "-foilshowcase", "-gradeshowcase", "-slabreveal", "-artcheck", "-autoclick", "-p0", "-p1", "-layoutcheck", "-pilecheck", "-controlscheck", "-qaplay", "-qareplay", "-ordercheck", "-musiccheck", "-stylecheck", "-clickcheck", "-ydkcheck", "-searchcheck", "-focuscheck", "-editorcheck", "-aboutcheck", "-importcheck", "-soundcheck", "-climbcheck" };
             PromptTiming = checks.Any(c => Array.IndexOf(args, c) >= 0); // checks log decisions left waiting
             // A check that throws stops its coroutine; without this the app would sit there forever. Fail and quit instead.
             if (PromptTiming)
@@ -891,11 +896,13 @@ namespace YgoCampaign.Game
             {
                 Name = m.Character.Name, Title = m.Character.Title, Deck = DeckTitle(m.Deck),
                 DeckNote = theirDeck.Note("era").Length > 0 ? $"({theirDeck.Note("era")})" : "",
-                Showcase = CampaignScenes.ShowcaseOf(theirDeck, _cardPack!), Quote = m.Character.IntroFor(c.Matches.Take(match).Any(earlier => earlier.Character.Id == m.Character.Id)), Portraits = { m.Character.Id },
+                Showcase = CampaignScenes.ShowcaseOf(theirDeck, _cardPack!),
+                // The circuit's final: their line before the deciding duel when the circuit has one.
+                Quote = Circuits.IsFinal(c, match) && c.FinalLine.Length > 0 ? c.FinalLine : m.Character.IntroFor(c.Matches.Take(match).Any(earlier => earlier.Character.Id == m.Character.Id)), Portraits = { m.Character.Id },
                 Detail = m.Character.StyleSummary + (wins + losses > 0 ? $"\nYour record against them: {wins}-{losses}" : "\nFirst meeting"),
             };
             BossSting(BossMusic.ForMatch(_campaign.Circuits, circuit, match), cycled);
-            _scenes.ShowVersus(c.Name, $"Match {match + 1} of {c.Matches.Count}", you, them,
+            _scenes.ShowVersus(c.Name, (Circuits.IsFinal(c, match) ? "Circuit final · " : "") + $"Match {match + 1} of {c.Matches.Count}", you, them,
                 start: () =>
                 {
                     seed++;
@@ -1095,10 +1102,11 @@ namespace YgoCampaign.Game
                 int prize = reward.Summary.Contains("cleared") ? c.Prize : 0;
                 if (TeamHasLoaner(_tag, ""))
                     // A loaner pays half the duel's DP (the prize in full): what was paid, not the cup's rates.
-                    r.Earnings.Add((reward.FirstWin ? "Win and first win (half: loaner deck)" : "Win (half: loaner deck)", reward.Dp - prize));
+                    r.Earnings.Add((WinLabel(reward, loaner: true), reward.Dp - prize));
                 else
                 {
-                    r.Earnings.Add(("Win", circuits.WinDp(c.After)));
+                    // What DuelReward says was paid: a rematch's RepeatWinDp, or the win before its first-win bonus.
+                    r.Earnings.Add((WinLabel(reward, loaner: false), reward.Dp - prize - (reward.FirstWin ? Circuits.FirstWinBonus : 0)));
                     if (reward.FirstWin) r.Earnings.Add(("First win", Circuits.FirstWinBonus));
                 }
                 if (prize > 0) r.Earnings.Add(($"{c.Name} prize", prize));
@@ -2357,10 +2365,16 @@ namespace YgoCampaign.Game
         /// <summary>Menu music on any menu screen; in a duel, its theme following how the duel stands.</summary>
         private void UpdateMusic()
         {
-            bool menus = _editor.IsOpen || _browser.IsOpen || _campaignScreen.IsOpen || _shop.IsOpen || _menu.IsOpen || _settings.IsOpen || _about.IsOpen
+            bool others = _editor.IsOpen || _browser.IsOpen || _campaignScreen.IsOpen || _shop.IsOpen || _about.IsOpen
                          || _import.IsOpen || _trader.IsOpen || _recipeBook.IsOpen || _structures.IsOpen || _scenes.IsOpen || _tagSetup.IsOpen || _storyScreen.IsOpen || (_title.IsOpen && !_title.InAttract)
                          || _van.IsOpen;
-            Sounds.Music(menus ? "menu" : _runner != null ? "duel" : "menu");
+            bool menus = others || _menu.IsOpen || _settings.IsOpen;
+            // A duel paused under the menu or Settings, to go back to (the gear's Settings, or a campaign duel waiting behind
+            // the menu): its theme carries on at half volume, from where it was.
+            bool paused = _runner != null && _board != null && _board.Winner < 0 && !others
+                          && ((_settings.IsOpen && _settingsFromDuel) || ((_menu.IsOpen || _settings.IsOpen) && CampaignDuelLive));
+            Sounds.PauseDip(paused);
+            Sounds.Music(paused ? "duel" : menus ? "menu" : _runner != null ? "duel" : "menu");
             // The alley's rain bed, under whatever plays, while the Back Alley tab or Moth's van is shown (or a story scene
             // plays over either).
             Sounds.Bed((_campaignScreen.IsOpen && _campaignScreen.InAlley) || _van.IsOpen || (_storyScreen.IsOpen && _storyOverAlley));
@@ -3999,6 +4013,8 @@ namespace YgoCampaign.Game
             yield return LiveDuelCampaignCheck(Report, Shot);
             // Original texts at the table: the editor's note, a modern circuit's versus and duel, the Goat Cup (DuelController.TextsCheck).
             yield return TextsCampaignCheck(Report, Shot);
+            // The climb: billed finals, rematch pay, deck stars, the starter ribbon (DuelController.ClimbCheck).
+            yield return ClimbCampaignCheck(Report, Shot);
 
             // Start over: the save is backed up and the starter screen comes back.
             var saveDir = Path.GetDirectoryName(_campaign.SavePath)!;
@@ -4494,7 +4510,7 @@ namespace YgoCampaign.Game
             _settings.Open();
             yield return new WaitForSecondsRealtime(0.5f);
             yield return Shot("settings");
-            _settings.DebugScroll(0.68f); // the Duel Presentation rows
+            _settings.DebugScroll(0.70f); // the Duel Presentation rows
             yield return new WaitForSecondsRealtime(0.3f);
             yield return Shot("settings-presentation");
             // The controller rows, one waiting for a button press (in memory only).
@@ -5715,8 +5731,8 @@ namespace YgoCampaign.Game
             // Your result when you play; a fanfare for the winner when you watch.
             bool youPlay = _tag != null ? _tag.YouPlay : _pickCharacter[0] < 0;
             // A boss's theme has its own endings; otherwise the fanfare or the sad descent.
-            if (_board.Winner > 1) Sounds.Play("turn");
-            else if (!Sounds.Ending(win: _board.Winner == 0)) Sounds.Play(youPlay && _board.Winner != 0 ? "lose" : "win");
+            if (_board.Winner > 1) Sounds.Play(ResultSound(_board.Winner, youPlay));
+            else if (!Sounds.Ending(win: _board.Winner == 0)) Sounds.Play(ResultSound(_board.Winner, youPlay));
             if (_recording != null)
             {
                 // Keep every finished duel in the recent replays.
@@ -5840,6 +5856,9 @@ namespace YgoCampaign.Game
             if (loser.LoseLine.Length > 0) _view.AppendLog($"{loser.Name}: \"{loser.LoseLine}\"");
         }
 
+        /// <summary>The result's sound when no boss ending plays: a draw's chord, else your fanfare or your descent (a watcher hears the winner's fanfare).</summary>
+        private static string ResultSound(int winner, bool youPlay) => winner > 1 ? "draw_game" : youPlay && winner != 0 ? "lose" : "win";
+
         /// <summary>
         /// A campaign result line when the duel ended by Yata-lock: who's locked (you, or <paramref name="opponent"/>). A tag duel
         /// (<paramref name="partner"/>: your partner's name) locks a team: "Kit &amp; Vera are Yata-locked!", "You and Hollis are ...".
@@ -5880,10 +5899,11 @@ namespace YgoCampaign.Game
                 int prize = reward.ClearedCircuit != null ? c.Prize : 0;
                 if (_campaign.IsLoanerDeck(_pickDeck[0]))
                     // A loaner pays half the duel's DP (the prize in full): what was paid, not the circuit's rates.
-                    r.Earnings.Add((reward.FirstWin ? "Win and first win (half: loaner deck)" : "Win (half: loaner deck)", reward.Dp - prize));
+                    r.Earnings.Add((WinLabel(reward, loaner: true), reward.Dp - prize));
                 else
                 {
-                    r.Earnings.Add(("Win", circuits.WinDp(circuit)));
+                    // What DuelReward says was paid: a rematch's RepeatWinDp, or the win before its first-win bonus.
+                    r.Earnings.Add((WinLabel(reward, loaner: false), reward.Dp - prize - (reward.FirstWin ? Circuits.FirstWinBonus : 0)));
                     if (reward.FirstWin) r.Earnings.Add(("First-win bonus", Circuits.FirstWinBonus));
                 }
                 if (reward.ClearedCircuit != null) r.Earnings.Add(($"{c.Name} prize", prize));
@@ -5898,7 +5918,14 @@ namespace YgoCampaign.Game
             foreach (var up in reward.LevelUps)
                 r.Unlocks.Add($"Level {up.Level}!" + (up.Tokens > 0 ? $" +{up.Tokens} Card Token{(up.Tokens > 1 ? "s" : "")}: trade {(up.Tokens > 1 ? "them" : "it")} for any card at the Card Trader" : ""));
             if (winner == 0 && RecipeBook.JustUnlocked(circuits, profile, circuit, match) is Recipe unlockedRecipe)
-                r.Unlocks.Add($"Recipe unlocked: {unlockedRecipe.Owner.Name}'s {DeckTitle(unlockedRecipe.Deck)}. Find it in the Recipe Book.");
+            {
+                // A recipe you already own every card of: said so, and not marked NEW in the Recipe Book.
+                bool ownsAll = _library.Contains(unlockedRecipe.Deck) && _campaign.Printings is PrintingIndex unlockPrintings
+                               && RecipeBook.OwnsAll(_library.Load(unlockedRecipe.Deck), profile, unlockPrintings, _cardPack!);
+                if (ownsAll && profile.Seen.Add(RecipeBook.SeenKey(unlockedRecipe))) _campaign.Save();
+                r.Unlocks.Add($"Recipe unlocked: {unlockedRecipe.Owner.Name}'s {DeckTitle(unlockedRecipe.Deck)}. "
+                              + (ownsAll ? "You already own every card in it." : "Find it in the Recipe Book."));
+            }
             if (reward.ClearedCircuit != null)
             {
                 r.Unlocks.Add($"{c.Name} cleared!" + (reward.Tokens > 0 ? $" +{reward.Tokens} Card Token{(reward.Tokens > 1 ? "s" : "")}: trade for any card at the Card Trader" : ""));

@@ -4,6 +4,52 @@ Open follow-ups noticed while building, not yet scheduled. Check one off (`[x]`)
 UI polish ideas live in [UI-ROADMAP.md](UI-ROADMAP.md); the post-game's phases in
 [POST-GAME-PLAN-2026-10-31.md](POST-GAME-PLAN-2026-10-31.md).
 
+## Audio pass 1 (built 2026-11-21; docs/dev/AUDIO-PASS-1-SPEC-2026-11-20.md)
+
+- [ ] **The owner's listening pass.** Nothing has been heard: every check runs muted. Do the spec's "Listening pass"
+  list (about 10 minutes): the sliders, hover (pleasant or chattery?), the coin, phase and LP ticks (too busy at speed 4?),
+  a 3-link chain, set / banish / Graveyard / destroy, `win` and `lose` in the music's key, a 3 s pause, a final blow at
+  full volume (no crackle, no pumping), a pack with a Secret or better, switching to another app, Ilse and Vera, a draw game.
+- [ ] **From the evidence pass (docs/dev/EVIDENCE-2026-11-21.md, sections 5 and 6):** the Settings screenshot never shows
+  the "Mute in the background" row's button (`DebugShowRow("Master volume")` scrolls it under the fade; finding 3); steps
+  that assert less than the spec: its section 6.
+- [ ] **Not verified:** a real output-device switch (the check simulates it); manual dev launches fading out in the
+  background (check runs ignore real window focus, so only a hand test shows it); Windows.
+- [ ] **Audio pass 2** (its own spec): more music (variety in the duel themes; own themes for Ilse and Vera, who borrow
+  Nocturne's and Rhea's for now), and the warnings in `--audio-check` row 8 (small-speaker table, aliasing).
+- [ ] **Character text blips** (decided later, 2026-11-20).
+- [ ] **`docs/dev/UI-ROADMAP.md` item 22** (2000 LP, seven layers): the audio spec's section L asks for it; not updated.
+
+## The climb (built 2026-11-21; docs/dev/THE-CLIMB-SPEC-2026-11-20.md)
+
+- [ ] **Early skills, next (decided 2026-11-21).** This build ships Novice and Intermediate at 0.85. A follow-up data round
+  sets both bands to 1.0 (full strength) and gives easier decks to the circuits that fall under their band at 1.0
+  (measured: Small Engines, Xyz and Link, Link Age at 29-38%); the CPU starts planning at skill 0.9, which is the jump.
+  Numbers: the spec's "As measured".
+- [x] **"Best first deck"** stays on Warrior's Charge (decided 2026-11-21): the measured rule picked Legendary Dragons with a
+  skilled pilot, and a beginner needs the kinder start.
+- [ ] **Loss-farming (Game Designer).** Conceding in a match you haven't won still pays level-up DP (about 110 DP a duel
+  late on); a rematch's level-ups pay tokens only. Left for now (owner, 2026-11-21).
+- [ ] **Not re-measured after the skill raise:** the Library cups (their Stuck? odds read a little easy until the tuning
+  pass's Library step), the Tag Cups, the guests and two tag partners now play at 0.85 too. Mekk-Knight after the changes.
+- [ ] **Not verified:** a real played duel ending in a rematch (the checks go through the engine and the screens).
+- [ ] **From the evidence pass (docs/dev/EVIDENCE-2026-11-21.md, section 5; all low):**
+  - `-climbcheck` refuses a folder with a save, but the game has already migrated and rewritten that save on load (finding 1).
+  - No check draws a live final line on the versus screen: `ClimbCheck` swaps in a fixture line; the longest, 89
+    characters, is unseen (finding 2).
+  - The stars are about 10.7 px at 1280x720 (16 px at 1080), gold against grey is close (finding 4).
+  - Steps that could pass with the feature broken, or assert less than the spec: its section 6.
+  - After New Game+, a "once" guest beaten before pays the full win rate without the prize (as built; flagged for the
+    owner: does he expect 150?).
+
+## Next specs (decided 2026-11-21)
+
+- [ ] **Plain cards** (docs/dev/PLAIN-CARDS-SPEC-2026-11-20.md): specced; it starts next (owner, 2026-11-21).
+- [ ] **From the game review** (docs/dev/PRODUCTION-REVIEW-GAME-2026-11-20.md), each its own spec: Vera's rival matches,
+  the Champion's Circuit (New Game+), Hollis's lessons, Gus's puzzle book.
+- [ ] **From the UI review** (docs/dev/PRODUCTION-REVIEW-UI-2026-11-20.md), each its own spec: the type scale, fonts,
+  pack opening and results.
+
 ## Deck editor (click to focus, 2026-11-19; docs/dev/EDITOR-CLICK-FOCUS-SPEC-2026-11-19.md)
 
 - [x] **Leftovers from the final test pass (docs/dev/EVIDENCE-2026-11-19b.md), all small:** after Sort or Clear the
