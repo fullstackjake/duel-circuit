@@ -82,11 +82,11 @@ namespace YgoCampaign.Game
                 Ui.Image(tile, open ? Ui.Hex("#1C2232") : Ui.Hex("#15181F"));
                 // Its signature card.
                 var face = CampaignScenes.ShowcaseOf(deck, _cards).FirstOrDefault();
-                var art = face == 0 ? null : CardView.Art?.Get(face);
-                if (art != null)
+                if (face != 0)
                 {
+                    // The picture, else the plain card.
                     var img = Ui.Box(tile, 12, 12, 118, 172).gameObject.AddComponent<RawImage>();
-                    img.texture = art;
+                    CardFace.Draw(img, face, _cards.Get(face), new Vector2(118, 172));
                     img.color = open ? Color.white : new Color(1, 1, 1, 0.3f);
                 }
                 var title = Title(name, deck);

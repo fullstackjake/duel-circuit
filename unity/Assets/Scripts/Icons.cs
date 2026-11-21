@@ -73,6 +73,19 @@ namespace YgoCampaign.Game
                 "zone-banish" => (x, y) => Max(CardOutline(x, y, 0.42f, 0.58f),
                     Max(Edge(Mathf.Abs((x - y * 0.72f) * 0.8f) - 0.06f), Edge(Mathf.Abs((x + y * 0.72f) * 0.8f) - 0.06f)) * Box(x, y, 0.3f, 0.45f)),
                 "zone-deck" => (x, y) => Max(CardOutline(x - 0.1f, y - 0.08f, 0.36f, 0.5f), CardOutline(x + 0.1f, y + 0.08f, 0.36f, 0.5f)),
+                // The plain card's glyphs (docs/dev/PLAIN-CARDS-SPEC-2026-11-20.md): the attributes and the Spell and Trap marks,
+                // our own shapes (no symbol or letter in a ring).
+                "attr-light" => AttrLight,
+                "attr-dark" => (x, y) => Mathf.Clamp01(Edge(Mathf.Sqrt(x * x + y * y) - 0.66f) - Edge(Mathf.Sqrt((x - 0.34f) * (x - 0.34f) + (y - 0.1f) * (y - 0.1f)) - 0.54f)),
+                "attr-fire" => (x, y) => Max(Tongue(x, y, 0, -0.42f, 0.36f, 1.2f, 0.08f), Tongue(x, y, -0.4f, -0.5f, 0.24f, 0.72f, -0.18f), Tongue(x, y, 0.4f, -0.5f, 0.24f, 0.8f, 0.18f)),
+                "attr-water" => (x, y) => Max(Wave(x, y - 0.24f), Wave(x, y + 0.26f)),
+                "attr-earth" => (x, y) => Max(Edge(Mathf.Max(-0.55f - y, y - (0.62f - Mathf.Abs(x + 0.22f) * 1.55f))),
+                    Edge(Mathf.Max(-0.55f - y, y - (0.12f - Mathf.Abs(x - 0.36f) * 1.4f)))),
+                "attr-wind" => (x, y) => Max(Swoosh(x, y - 0.4f, -0.55f, 0.45f), Swoosh(x, y, -0.7f, 0.68f), Swoosh(x, y + 0.4f, -0.4f, 0.2f)),
+                "attr-divine" => (x, y) => Max(Ring(x, y, 0.74f, 0.05f), Edge((Mathf.Abs(x) / 0.36f + Mathf.Abs(y) / 0.54f - 1) * 0.3f)),
+                "kind-spell" => KindSpell,
+                "kind-trap" => (x, y) => Max(CardOutline(x, y, 0.6f, 0.6f),
+                    Max(Edge(Mathf.Abs((x - y) * 0.7071f - 0.2f) - 0.075f), Edge(Mathf.Abs((x - y) * 0.7071f + 0.2f) - 0.075f)) * Box(x, y, 0.52f, 0.52f)),
                 _ => (x, y) => Ring(x, y, 0.3f, 0.12f),
             };
             return Cache[key] = Make(shape);
@@ -84,6 +97,7 @@ namespace YgoCampaign.Game
             if (v is "star" or "rank" or "shield" or "link" or "crown" or "lock" or "hand" or "search" or "removal" or "negate" or "play" or "gear" or "menu" or "history" or "coin" or "heart"
                 or "cancel" or "view" or "details" or "chevron" or "draw" or "standby" or "end") return v;
             if (v.StartsWith("zone-")) return v; // the empty-zone and pile marks
+            if (v.StartsWith("attr-") || v.StartsWith("kind-")) return v; // the plain card's glyphs
             if (v.StartsWith("main")) return "main";
             if (v == "battle") return "attack";
             if (v.Contains("face-up attack") || v == "to attack") return "up-attack";
@@ -246,6 +260,53 @@ namespace YgoCampaign.Game
             float grip = Box(u + 0.6f, v, 0.16f, 0.07f);
             float pommel = Edge(Mathf.Sqrt((u + 0.82f) * (u + 0.82f) + v * v) - 0.11f);
             return Max(blade, tip, guard, grip, pommel);
+        }
+
+        // ---- The plain card's glyphs ----
+
+        private static float AttrLight(float x, float y)
+        {
+            // A disc with eight short rays.
+            float r = Mathf.Sqrt(x * x + y * y), a = Mathf.Atan2(y, x);
+            float step = Mathf.PI / 4, near = Mathf.Round(a / step) * step;
+            float across = r * Mathf.Abs(Mathf.Sin(a - near));
+            float ray = Edge(Mathf.Max(across - 0.075f, Mathf.Max(0.5f - r, r - 0.84f)));
+            return Max(Edge(r - 0.34f), ray);
+        }
+
+        /// <summary>A flame's tongue: a round foot at (cx, foot) of radius r narrowing to a tip h above it, leaning by lean.</summary>
+        private static float Tongue(float x, float y, float cx, float foot, float r, float h, float lean)
+        {
+            float t = (y - foot) / h;
+            float body = t < 0 || t > 1 ? 0 : Edge(Mathf.Abs(x - (cx + lean * t * t)) - r * Mathf.Pow(1 - t, 0.85f));
+            return Max(body, Edge(Mathf.Sqrt((x - cx) * (x - cx) + (y - foot) * (y - foot)) - r));
+        }
+
+        /// <summary>A wave crest: a stroke along a curve that rises to a crest and falls, across the glyph.</summary>
+        private static float Wave(float x, float y)
+        {
+            if (Mathf.Abs(x) > 0.74f) return 0;
+            float curve = 0.16f * Mathf.Sin(x * Mathf.PI * 1.35f + 0.5f);
+            return Edge(Mathf.Abs(y - curve) - 0.085f);
+        }
+
+        /// <summary>A horizontal stroke from x0 to x1 with round ends and a slight lift toward its right end.</summary>
+        private static float Swoosh(float x, float y, float x0, float x1)
+        {
+            float t = Mathf.Clamp01((x - x0) / (x1 - x0));
+            float lift = 0.12f * t * t;
+            float cx = Mathf.Clamp(x, x0, x1);
+            float dy = y - lift, dx = x - cx;
+            return Edge(Mathf.Sqrt(dx * dx + dy * dy) - 0.08f);
+        }
+
+        private static float KindSpell(float x, float y)
+        {
+            // A circle with three arcs fanning out from its upper right.
+            float cx = -0.22f, cy = -0.22f;
+            float dx = x - cx, dy = y - cy, r = Mathf.Sqrt(dx * dx + dy * dy), a = Mathf.Atan2(dy, dx);
+            float fan = a > 0.12f && a < 1.45f ? 1 : 0;
+            return Max(Edge(r - 0.34f), fan * Max(Edge(Mathf.Abs(r - 0.56f) - 0.055f), Edge(Mathf.Abs(r - 0.76f) - 0.055f), Edge(Mathf.Abs(r - 0.96f) - 0.055f)));
         }
 
         private static Texture2D Make(Func<float, float, float> alpha)

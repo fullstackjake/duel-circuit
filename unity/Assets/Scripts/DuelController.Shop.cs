@@ -80,6 +80,7 @@ namespace YgoCampaign.Game
             // 1. A fresh save's first visit.
             yield return Visit();
             yield return Shot("1-fresh");
+            yield return FaceAudit(Report, "the shop's shelf", ScreenRoot("ShopCanvas"), 5);
             Report($"the plate reads {_shop.DebugPlate}", _shop.DebugPlate == "GUS'S CARDS");
             Report($"the default pick is {_shop.DebugSelected?.Info.Code}", _shop.DebugSelected?.Info.Code == "DB2");
             var rows = _shop.DebugRows;
@@ -343,6 +344,11 @@ namespace YgoCampaign.Game
                 yield return _shop.DebugSeeded("DB1", seed, box: false);
                 yield return _shop.DebugRevealAll();
                 yield return Shot("5-pack");
+                // Its 9 cards face up, a rarity mark on each Rare and up (the pulls this seed gives), none on the rest.
+                var wantMarks = PackCatalog.Open(db1, new System.Random(seed)).Where(x => x.Rarity >= Rarity.Rare)
+                    .Select(x => CardFace.RarityShort(x.Rarity)).OrderBy(m => m, System.StringComparer.Ordinal).ToList();
+                yield return FaceAudit(Report, "a DB1 pack", ScreenRoot("ShopCanvas"), PackCatalog.PackSize,
+                    faces => PackMarks(faces, marks => marks.SequenceEqual(wantMarks), $"the pulls' \"{string.Join(" ", wantMarks)}\""), only: InPackSlot);
                 var tags = _shop.DebugTagLines();
                 var now = _campaign.SetProgress(db1);
                 var summary = _shop.DebugSummary;
@@ -479,6 +485,7 @@ namespace YgoCampaign.Game
             int dp = profile.Dp, total = profile.Collection.Total, opened = profile.PacksOpened;
             yield return _shop.DebugSeeded("DB2", 7, box: true);
             yield return Shot("6-box-summary");
+            yield return FaceAudit(Report, "a box's summary", ScreenRoot("ShopCanvas"), 0, only: InPackSlot);
             var box = _shop.DebugBox;
             if (box == null || !box.Opened) Report($"a box of DB2 ({price} DP) opened", false);
             else
@@ -502,6 +509,7 @@ namespace YgoCampaign.Game
                     shownBox.Count == 10 && shownBox[shownBox.Count - 1].code == box.Topper.Code && _shop.DebugVoice.Length > 0);
                 yield return _shop.DebugRevealAll();
                 yield return Shot("6-box-revealed");
+                yield return FaceAudit(Report, "a box revealed", ScreenRoot("ShopCanvas"), shownBox.Count, only: InPackSlot);
                 var (boxGap, boxRoom) = _shop.DebugCaptions();
                 var (boxButtons, boxOff) = _shop.DebugButtons();
                 Report($"the box's captions sit under their names ({boxGap:0} apart, {boxRoom:0} clear), and its one button ({string.Join(", ", boxButtons)}) is centered ({boxOff:0} off)",
@@ -784,6 +792,7 @@ namespace YgoCampaign.Game
 #if ENABLE_INPUT_SYSTEM
             UnityEngine.InputSystem.InputSystem.RemoveDevice(keyboard);
 #endif
+            FaceAuditSummary("shop");
             Debug.Log($"shop check: done ({bad} FAIL)");
             yield return new WaitForSecondsRealtime(0.5f);
             Application.Quit();

@@ -163,9 +163,8 @@ namespace YgoCampaign.Game
             who.resizeTextMaxSize = 14;
 
             var thumb = TopLeft(rt, "Art", 50, 12, 48, 70);
-            var art = CardView.Art?.Get(code);
-            if (art != null) thumb.gameObject.AddComponent<RawImage>().texture = art;
-            else Ui.Image(thumb, CardView.FrameColor(info.Type));
+            // The picture, else the plain card's thumb.
+            CardFace.Draw(thumb.gameObject.AddComponent<RawImage>(), code, info, new Vector2(48, 70));
 
             var name = Ui.Text(TopLeft(rt, "Name", TextLeft, 8, textW, 30), info.Name, 22, Color.white, TextAnchor.MiddleLeft);
             name.fontStyle = FontStyle.Bold;

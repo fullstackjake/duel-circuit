@@ -193,9 +193,14 @@ namespace YgoCampaign.Game
                 who.fontStyle = FontStyle.Bold;
                 who.raycastTarget = false;
                 var thumb = Ui.Placed("Art", row, new Vector2(-(width - 8) / 2 + 52, 0), new Vector2(27, 39));
-                var art = info != null ? CardView.Art?.Get(l.Code) : null;
-                if (art != null) { var raw = thumb.gameObject.AddComponent<RawImage>(); raw.texture = art; raw.raycastTarget = false; }
-                else Ui.Image(thumb, info != null ? CardView.FrameColor(info.Type) : CardView.BackFill).raycastTarget = false;
+                if (l.Code != 0)
+                {
+                    // The picture, else the plain card's thumb (its kind's colour and glyph).
+                    var raw = thumb.gameObject.AddComponent<RawImage>();
+                    raw.raycastTarget = false;
+                    CardFace.Draw(raw, l.Code, info, new Vector2(27, 39));
+                }
+                else Ui.Image(thumb, CardView.BackFill).raycastTarget = false;
                 // The name on one line: a size down to 9, then shortened with "…" (never a second, cut-off line).
                 var name = Ui.Text(Ui.Placed("Name", row, new Vector2(12, inner / 2 - 12), new Vector2(textW, 20)), info?.Name ?? "a card", 13,
                     negated ? new Color(1, 1, 1, 0.45f) : Color.white, TextAnchor.MiddleLeft);

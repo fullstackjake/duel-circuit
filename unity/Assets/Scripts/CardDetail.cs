@@ -22,17 +22,18 @@ namespace YgoCampaign.Game
     /// </summary>
     public sealed class CardDetail
     {
+        /// <summary>The attribute badge: the plain card's glyph (Icons) on a disc of the attribute's colour (owner decision N3).</summary>
         private static readonly Dictionary<uint, (string glyph, string color)> AttributeLooks = new Dictionary<uint, (string, string)>
         {
-            [0x01] = ("地", "#8A6A3A"), [0x02] = ("水", "#2E7FD0"), [0x04] = ("炎", "#D0402E"), [0x08] = ("風", "#3FA04A"),
-            [0x10] = ("光", "#D9B52E"), [0x20] = ("闇", "#7B3FA0"), [0x40] = ("神", "#C9A227"),
+            [0x01] = ("attr-earth", "#8A6A3A"), [0x02] = ("attr-water", "#2E7FD0"), [0x04] = ("attr-fire", "#D0402E"), [0x08] = ("attr-wind", "#3FA04A"),
+            [0x10] = ("attr-light", "#D9B52E"), [0x20] = ("attr-dark", "#7B3FA0"), [0x40] = ("attr-divine", "#C9A227"),
         };
 
         private readonly RectTransform _root;
         private readonly RectTransform _header, _artRt, _stats, _typeBar, _textView, _textContent, _rarityRt;
         private readonly Image _headerImage, _typeImage, _rarityImage;
-        private readonly Text _name, _attrGlyph, _type, _text, _rarity, _version, _printing, _hint;
-        private readonly RawImage _art, _attrDisc;
+        private readonly Text _name, _type, _text, _rarity, _version, _printing, _hint;
+        private readonly RawImage _art, _attrDisc, _attrGlyph;
         private readonly List<(RectTransform row, RawImage icon, Text value)> _rows = new List<(RectTransform, RawImage, Text)>();
         private readonly ScrollRect _scroll;
         private readonly RectTransform _helpChip;
@@ -104,9 +105,11 @@ namespace YgoCampaign.Game
             var fill = Ui.Placed("Fill", disc, Vector2.zero, new Vector2(29, 29));
             _attrDisc = fill.gameObject.AddComponent<RawImage>();
             _attrDisc.texture = Icons.Round;
-            _attrGlyph = Ui.Text(Ui.Stretched("Glyph", disc, Vector2.zero, Vector2.one), "", 17, Color.white);
-            _attrGlyph.fontStyle = FontStyle.Bold;
-            Shadow(_attrGlyph);
+            var glyph = Ui.Stretched("Glyph", disc, Vector2.zero, Vector2.one);
+            glyph.offsetMin = new Vector2(6, 6);
+            glyph.offsetMax = new Vector2(-6, -6);
+            _attrGlyph = glyph.gameObject.AddComponent<RawImage>();
+            _attrGlyph.raycastTarget = false;
 
             _artRt = Box("Art");
             _art = _artRt.gameObject.AddComponent<RawImage>();
@@ -221,7 +224,6 @@ namespace YgoCampaign.Game
             if (reading)
             {
                 _name.fontSize = _name.resizeTextMaxSize = 30;
-                _attrGlyph.fontSize = 24;
                 disc.sizeDelta = new Vector2(42, 42);
                 disc.anchoredPosition = new Vector2(-28, 0);
                 ((RectTransform)rim.transform).sizeDelta = new Vector2(46, 46);
@@ -265,13 +267,16 @@ namespace YgoCampaign.Game
             _typeImage.color = Color.Lerp(frame, Color.black, 0.2f);
             _name.text = info.Name;
             var (glyph, color) = monster && AttributeLooks.TryGetValue(info.Attribute, out var look) ? look
-                : (info.Type & CardType.Spell) != 0 ? ("魔", "#1D9C73") : ("罠", "#B0457F");
-            _attrGlyph.text = glyph;
-            _attrDisc.color = Ui.Hex(color);
+                : (info.Type & CardType.Spell) != 0 ? ("kind-spell", "#1D9C73") : ("kind-trap", "#B0457F");
+            _attrGlyph.texture = Icons.For(glyph);
+            var disc = Ui.Hex(color);
+            _attrDisc.color = disc;
+            // Light ink, dark on a light disc (LIGHT's yellow, DIVINE's gold), as the plain card's glyphs are.
+            _attrGlyph.color = 0.299f * disc.r + 0.587f * disc.g + 0.114f * disc.b > 0.6f ? Ui.Hex("#1B1408") : Ui.Hex("#F4F1EA");
 
             var shownLook = ShowArt(info);
             var rarity = shownLook is CopyLook shownCopy && CardFoil.Mode == CardFoil.Display.On ? shownCopy.Rarity : CardFoil.RarityOf(info);
-            _rarity.text = Short(rarity);
+            _rarity.text = CardFace.RarityShort(rarity);
             _rarityImage.color = rarity >= Rarity.UltraRare ? Ui.Hex("#C9A227") : rarity >= Rarity.SuperRare ? Ui.Hex("#E07A1F") : rarity >= Rarity.Rare ? Ui.Hex("#5A7FB5") : Ui.Hex("#5A6070");
             _rarityRt.gameObject.SetActive(CardFoil.Printings != null);
 
@@ -390,9 +395,10 @@ namespace YgoCampaign.Game
         private CopyLook? ShowArt(CardInfo info)
         {
             var styles = CardView.Art;
-            var art = _reading ? styles?.GetFull(info.Code) : styles?.Get(info.Code); // the reader is big enough for the whole picture
-            _art.texture = art;
-            _art.color = art != null ? Color.white : CardView.FrameColor(info.Type);
+            // The picture (the reader is big enough for the whole one), else the plain card at the art box's size.
+            var box = _artRt.rect.size;
+            CardFace.Draw(_art, info.Code, info, box.x > 1 && box.y > 1 ? box : new Vector2(200, 292), full: _reading);
+            _art.color = Color.white;
             // The copy you're pointing at (on the board: that card's own copy; in your collection: your best one).
             var (hoveredCode, hoveredLook) = CardView.Hovered;
             CopyLook? look = hoveredCode == info.Code ? hoveredLook
@@ -545,7 +551,7 @@ namespace YgoCampaign.Game
         {
             var size = _root.rect.size;
             if (size.x <= 0 || size.y <= 0) return;
-            if (_reading) { LayoutReading(size); return; }
+            if (_reading) { LayoutReading(size); RefitArt(); return; }
             const float headerH = 34, gap = 6, typeH = 28;
             // Text beside the picture only when the panel is short and wide enough for a real column of text: in the
             // play layout's narrow column it would be a sliver one word wide.
@@ -587,6 +593,13 @@ namespace YgoCampaign.Game
                 Place(_textView, statX, textTop, statW, WholeLines(size.y - textTop - BottomReserve));
             }
             foreach (var (_, _, value) in _rows) value.resizeTextMaxSize = full ? 24 : 15;
+            RefitArt();
+        }
+
+        /// <summary>A plain card drawn before the art box had its size is drawn again for the size it got.</summary>
+        private void RefitArt()
+        {
+            if (_shown != null && _artRt.rect.width > 1 && _artRt.rect.height > 1 && CardFace.IsPlain(_art.texture) && CardFace.LayoutOf(_art.texture) != CardFace.LayoutFor(_artRt.rect.size)) ShowArt(_shown);
         }
 
         /// <summary>
@@ -622,7 +635,7 @@ namespace YgoCampaign.Game
             var copies = CopiesOf(info.Alias != 0 ? info.Alias : info.Code);
             if (copies.Count == 0) return "<color=#8A8F9A>Not owned</color>";
             return string.Join("\n", copies.Take(3).Select(c =>
-                $"<color={Grades.Color(c.Shown)}>{Grades.Glyph(c.Shown)}</color> {Short(c.Rarity)} · <color={Grades.Color(c.Shown)}>{ShortCondition(c)}</color>"
+                $"<color={Grades.Color(c.Shown)}>{Grades.Glyph(c.Shown)}</color> {CardFace.RarityShort(c.Rarity)} · <color={Grades.Color(c.Shown)}>{ShortCondition(c)}</color>"
                 + $" · {PrintingTag(c)}"
                 + (c.AtDesk ? " <color=#8A93A6>(at the desk)</color>" : "")));
         }
@@ -863,17 +876,6 @@ namespace YgoCampaign.Game
 
         private static string Scales(CardInfo info) =>
             (info.Type & CardType.Pendulum) != 0 ? $"   <size=16><color=#9FE6D8>Scale {info.LScale}</color></size>" : "";
-
-        /// <summary>Master Duel's rarity badge: N, R, SR, UR, then short forms of the rest.</summary>
-        private static string Short(Rarity r) => r switch
-        {
-            Rarity.Common or Rarity.ShortPrint => "N",
-            Rarity.Rare => "R",
-            Rarity.SuperRare => "SR",
-            Rarity.UltraRare => "UR",
-            Rarity.SecretRare => "ScR",
-            _ => string.Concat(Rarities.Name(r).Split(' ').Where(w => w.Length > 0).Select(w => char.ToUpperInvariant(w[0]))),
-        };
 
         private static string SpellTrapKind(uint type)
         {

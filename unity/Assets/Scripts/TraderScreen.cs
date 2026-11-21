@@ -205,10 +205,8 @@ namespace YgoCampaign.Game
                 var info = _shown[i];
                 var rt = Ui.Box(_list, 0, row * 62, 820, 58);
                 Ui.Image(rt, info == _selected ? T.RowSelected : row % 2 == 0 ? T.RowA : T.RowB);
-                var art = CardView.Art?.Get(info.Code);
                 var thumb = Ui.Box(rt, 4, 4, 36, 50);
-                if (art != null) thumb.gameObject.AddComponent<RawImage>().texture = art;
-                else Ui.Image(thumb, T.Button); // no art yet: the button fill, as before
+                CardFace.Draw(thumb.gameObject.AddComponent<RawImage>(), info.Code, info, new Vector2(36, 50)); // the picture, else the plain thumb
                 Ui.Text(Ui.Box(rt, 50, 4, 560, 26), info.Name, 16, T.Text, TextAnchor.MiddleLeft);
                 if (_state.Imports.IsOcgOnly(info.Code)) OcgBadge(rt, 750, 6);
                 var blocked = CardTrader.Blocked(info.Code, profile, ShopYear, CardFoil.Printings, _cards, Pool);
@@ -270,10 +268,9 @@ namespace YgoCampaign.Game
             ClearDetail();
             var profile = _state.Profile!;
             var printings = CardFoil.Printings;
-            var art = CardView.Art?.Get(info.Code);
             var face = Ui.Box(_detail, 30, 30, 300, 438);
             Ui.Image(face, T.Well);
-            if (art != null) Ui.Stretched("Art", face, Vector2.zero, Vector2.one).gameObject.AddComponent<RawImage>().texture = art;
+            CardFace.Draw(Ui.Stretched("Art", face, Vector2.zero, Vector2.one).gameObject.AddComponent<RawImage>(), info.Code, info, new Vector2(300, 438));
             Ui.Text(Ui.Box(_detail, 360, 30, 590, 44), info.Name, 26, T.Text, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
             int year = printings?.FirstYear(info.Code, info.Alias) ?? 0;
             var rarity = printings?.Commonest(info.Code, info.Alias) ?? Rarity.Common;

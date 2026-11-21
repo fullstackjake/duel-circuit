@@ -388,9 +388,11 @@ namespace YgoCampaign.Game
         {
             Started?.Invoke("shatter");
             var info = _data.Get(code);
-            var art = info != null ? CardView.Art?.Get(code) : null;
-            var color = info != null ? CardView.FrameColor(info.Type) : CardView.BackFill; // an unknown card breaks as its back
             var size = CardView.FieldSize;
+            // The shards are cut from the card's face: its picture, else its plain card (the one the board showed).
+            var art = info != null ? CardFace.Picture(code, info, size) : null;
+            if (art != null) CardFace.Hold(art, delay + 0.7f * Tempo + 0.5f); // the shards show it after the card is gone
+            var color = CardView.BackFill; // an unknown card breaks as its back
             const int cols = 3, rows = 4;
             var rng = new System.Random((int)code + (int)(at.x * 7));
             var flash = Sprite("ShatterFlash", Textures.Glow, at, new Vector2(200, 240), Color.white);
@@ -1023,7 +1025,8 @@ namespace YgoCampaign.Game
         {
             // An ace's cut-in plays once per duel (every time when repeats are full).
             if (!FxSettings.CutIns || !First("cutin:" + info.Code)) return 0;
-            var art = CardView.Art?.Get(info.Code);
+            // The picture, else the plain card's window (its pattern and glyph) cropped from a Standard face.
+            var art = CardFace.Picture(info.Code, info, new Vector2(260, 380));
             var duration = 1.1f * Tempo;
             if (duration <= 0) return 0;
             Started?.Invoke("cutin");
@@ -1033,7 +1036,19 @@ namespace YgoCampaign.Game
             var band = Ui.Placed("CutBand", _layer, Vector2.zero, new Vector2(1500, 300));
             var bandImg = Ui.Image(band, new Color(0.05f, 0.07f, 0.12f, 0));
             RawImage? picture = null;
-            if (art != null)
+            if (art != null && CardFace.IsPlain(art))
+            {
+                var window = CardFace.WindowUv(art);
+                float aspect = window.width * art.width / Mathf.Max(1f, window.height * art.height);
+                picture = Ui.Placed("Art", band, new Vector2(-260, 0), new Vector2(Mathf.Min(320, 260 * aspect), Mathf.Min(320, 260 * aspect) / aspect)).gameObject.AddComponent<RawImage>();
+                picture.texture = art;
+                picture.uvRect = window;
+                picture.raycastTarget = false;
+                CardFoil.Apply(picture, info, 1f);
+                if (picture.transform.Find("RarityMark") is Transform mark) UnityEngine.Object.Destroy(mark.gameObject); // placed for the whole card, not the crop
+                CardFace.Tag(picture, info.Code, new Vector2(260, 380), CardFit.Normal); // (not CardFace.Draw: it would reset the crop)
+            }
+            else if (art != null)
             {
                 picture = Ui.Placed("Art", band, new Vector2(-260, 0), new Vector2(260, 380)).gameObject.AddComponent<RawImage>();
                 picture.texture = art;

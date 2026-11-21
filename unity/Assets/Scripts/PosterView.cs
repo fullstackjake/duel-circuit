@@ -1,19 +1,21 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Ygo.Engine;
 using Ygo.Engine.Campaign;
 
 namespace YgoCampaign.Game
 {
     /// <summary>
     /// A poster as it hangs on your plate or in the Locker: a paper bill, tilted and taped, with a title band over its
-    /// card's artwork (cropped from the card picture). Without a picture it's the title on the poster's ink. The lower
-    /// third stays quiet (a tagline only, left off on the plate, where the name and LP sit).
+    /// card's artwork (cropped from the card picture; without one, the plain card's window: its pattern and glyph). The
+    /// lower third stays quiet (a tagline only, left off on the plate, where the name and LP sit).
     /// </summary>
     public static class PosterView
     {
         public static readonly Vector2 Size = new Vector2(240, 320);
-        /// <summary>The artwork's square in a card picture (EDOPro's 177x254: 136x136 at 21,46 from the top left), as a UV rect.</summary>
-        private static readonly Rect ArtBox = new Rect(21f / 177, 1 - 182f / 254, 136f / 177, 136f / 254);
+
+        /// <summary>Card data for the plain cards' windows (set once at start; posters are built without it).</summary>
+        public static ICardDataProvider? Cards { get; set; }
 
         /// <summary>Builds the poster at full size, centered at <paramref name="center"/>; scale the result to shrink it.</summary>
         public static RectTransform Create(Transform parent, Poster poster, Vector2 center, float tilt = -3f, bool tagline = true)
@@ -36,23 +38,23 @@ namespace YgoCampaign.Game
             title.resizeTextMaxSize = 26;
             title.raycastTarget = false;
 
-            // The artwork, or the title's first letter on the ink when the card has no picture.
+            // The artwork: the picture's art square, or the middle of a plain card's window (its glyph), square.
             var window = Ui.Placed("Art", root, new Vector2(0, -12), new Vector2(222, 222));
+            var raw = window.gameObject.AddComponent<RawImage>();
+            raw.raycastTarget = false;
             var art = CardView.Art?.Get(poster.Card);
-            if (art != null)
+            // A Standard face (its window has the glyph in the middle) wide enough that the square crop is sharp.
+            var texture = art ?? CardFace.PlainOnly(poster.Card, Cards?.Get(poster.Card), CardLayout.Standard,
+                CardFace.PixelWidth(CardLayout.Standard, 222 / (0.29f / CardFace.Aspect)));
+            raw.texture = texture;
+            CardFace.Tag(raw, poster.Card, new Vector2(200, 292), CardFit.Normal);
+            var uv = CardFace.WindowUv(texture);
+            if (CardFace.IsPlain(texture))
             {
-                var raw = window.gameObject.AddComponent<RawImage>();
-                raw.texture = art;
-                raw.uvRect = ArtBox;
-                raw.raycastTarget = false;
+                float side = uv.height * texture.height / texture.width; // the window's height, as a width in UV
+                uv = new Rect(uv.center.x - side / 2, uv.y, side, uv.height);
             }
-            else
-            {
-                Ui.Image(window, Color.Lerp(ink, Color.black, 0.35f)).raycastTarget = false;
-                var letter = Ui.Text(window, poster.Title.Substring(0, 1), 120, new Color(1, 1, 1, 0.85f));
-                letter.fontStyle = FontStyle.Bold;
-                letter.raycastTarget = false;
-            }
+            raw.uvRect = uv;
 
             if (tagline)
             {

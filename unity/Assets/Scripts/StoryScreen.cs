@@ -231,14 +231,15 @@ namespace YgoCampaign.Game
             if (deckName == null) return;
             var deck = _library.Load(deckName);
             var code = CampaignScenes.ShowcaseOf(deck, _cards).FirstOrDefault();
-            var art = code == 0 ? null : CardView.Art?.Get(code);
-            if (art == null) return;
+            if (code == 0) return;
             var frame = Ui.Stretched("Frame", _portrait, Vector2.zero, Vector2.one);
             Ui.Image(frame, Ui.Hex("#C8901E"));
+            // The card's picture, else its plain card.
             var image = Ui.Stretched("Art", frame, new Vector2(0.02f, 0.015f), new Vector2(0.98f, 0.985f)).gameObject.AddComponent<RawImage>();
-            image.texture = art;
             image.raycastTarget = false;
-            if (_cards.Get(code) is CardInfo info) CardFoil.Apply(image, info, 1f);
+            var info = _cards.Get(code);
+            CardFace.Draw(image, code, info, _portrait.sizeDelta * 0.96f);
+            if (info != null) CardFoil.Apply(image, info, 1f);
             _portrait.localRotation = Quaternion.Euler(0, 0, -4);
         }
 

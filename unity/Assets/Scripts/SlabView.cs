@@ -95,13 +95,9 @@ namespace YgoCampaign.Game
             // The card.
             var art = Ui.Placed("Art", root, s.CardAt, s.Card).gameObject.AddComponent<RawImage>();
             art.raycastTarget = false;
-            var picture = size == Size.Full ? CardView.Art?.GetFull(copy.Code) : CardView.Art?.Get(copy.Code); // Full is big enough for the whole picture
-            if (picture != null)
-            {
-                art.texture = picture;
-                CardFoil.Apply(art, info, copy.Rarity, 1f, copy.Look);
-            }
-            else art.color = info != null ? CardView.FrameColor(info.Type) : Ui.Hex("#6B3F1F");
+            // The picture (Full is big enough for the whole one), else the plain card at the slab's size.
+            CardFace.Draw(art, copy.Code, info, s.Card, full: size == Size.Full);
+            CardFoil.Apply(art, info, copy.Rarity, 1f, copy.Look);
 
             // The label, flat print in its well.
             var label = Ui.Placed("Label", root, s.LabelWellAt, s.LabelWell - 2 * s.LabelInset * Vector2.one);

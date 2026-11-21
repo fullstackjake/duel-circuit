@@ -486,18 +486,25 @@ namespace YgoCampaign.Game
             };
             _menu.Showcase = () =>
             {
-                // Your rarest card with a picture; before a campaign, any installed card as a Secret Rare.
+                // Your rarest card, its picture or its plain card (one with a picture first among the rarest); before a
+                // campaign, a starter's showcase card as a Secret Rare.
                 var art = CardView.Art;
-                if (art == null) return null;
                 var profile = _campaign.Profile;
                 if (profile != null)
                 {
-                    var best = profile.Collection.Codes.Where(c => art.Get(c) != null)
-                        .OrderByDescending(c => profile.Collection.Best(c)).FirstOrDefault();
+                    var best = profile.Collection.Codes.Where(c => _cardPack!.Get(c) != null)
+                        .OrderByDescending(c => profile.Collection.Best(c)).ThenByDescending(c => art?.Get(c) != null).FirstOrDefault();
                     if (best != 0) return (best, profile.Collection.Best(best) ?? Rarity.Common);
                 }
-                var installed = art.Installed;
-                return installed.Count > 0 ? (installed[new System.Random(seed).Next(installed.Count)], Rarity.SecretRare) : ((uint, Rarity)?)null;
+                // A starter card with a picture first; else, with any pictures installed, one of them (as before plain cards);
+                // a plain starter card only when there are no pictures.
+                var starters = CampaignState.Starters.SelectMany(s => s.Showcase).Where(c => _cardPack!.Get(c) != null).ToList();
+                var pictured = starters.Where(c => art?.Get(c) != null).ToList();
+                var pick = new System.Random(seed);
+                if (pictured.Count > 0) return (pictured[pick.Next(pictured.Count)], Rarity.SecretRare);
+                var installed = art?.Installed ?? (IReadOnlyList<uint>)Array.Empty<uint>();
+                if (installed.Count > 0) return (installed[pick.Next(installed.Count)], Rarity.SecretRare);
+                return starters.Count > 0 ? (starters[pick.Next(starters.Count)], Rarity.SecretRare) : ((uint, Rarity)?)null;
             };
             _tagSetup = gameObject.AddComponent<TagSetupScreen>();
             _tagSetup.Init(_roster, IsFreeCharacter, c => c < 0 ? _allDecks : DeckChoices(_roster[c]));
@@ -716,9 +723,10 @@ namespace YgoCampaign.Game
             if (Arg("-soundcheck") is string soundCheck) StartCoroutine(SoundCheck(soundCheck));
             // `-climbcheck <folder>` (absolute; with -mods <empty folder>): billed finals, rematch pay, deck stars, the starter ribbon (DuelController.ClimbCheck).
             if (Arg("-climbcheck") is string climbCheck) StartCoroutine(ClimbCheck(climbCheck));
+            if (Arg("-plaincheck") is string plainCheck) StartCoroutine(PlainCheck(plainCheck));
 
             // Players start on the title screen; automated checks go straight to what they test.
-            var checks = new[] { "-autoshot", "-autoshot-end", "-editor", "-fxshots", "-replaycheck", "-campaigncheck", "-finalcheck", "-laddercheck", "-themecheck", "-shopcheck", "-alleycheck", "-tagcheck", "-boardcheck", "-matcheck", "-foilshowcase", "-gradeshowcase", "-slabreveal", "-artcheck", "-autoclick", "-p0", "-p1", "-layoutcheck", "-pilecheck", "-controlscheck", "-qaplay", "-qareplay", "-ordercheck", "-musiccheck", "-stylecheck", "-clickcheck", "-ydkcheck", "-searchcheck", "-focuscheck", "-editorcheck", "-aboutcheck", "-importcheck", "-soundcheck", "-climbcheck" };
+            var checks = new[] { "-autoshot", "-autoshot-end", "-editor", "-fxshots", "-replaycheck", "-campaigncheck", "-finalcheck", "-laddercheck", "-themecheck", "-shopcheck", "-alleycheck", "-tagcheck", "-boardcheck", "-matcheck", "-foilshowcase", "-gradeshowcase", "-slabreveal", "-artcheck", "-autoclick", "-p0", "-p1", "-layoutcheck", "-pilecheck", "-controlscheck", "-qaplay", "-qareplay", "-ordercheck", "-musiccheck", "-stylecheck", "-clickcheck", "-ydkcheck", "-searchcheck", "-focuscheck", "-editorcheck", "-aboutcheck", "-importcheck", "-soundcheck", "-climbcheck", "-plaincheck" };
             PromptTiming = checks.Any(c => Array.IndexOf(args, c) >= 0); // checks log decisions left waiting
             // A check that throws stops its coroutine; without this the app would sit there forever. Fail and quit instead.
             if (PromptTiming)
@@ -2737,6 +2745,7 @@ namespace YgoCampaign.Game
             _campaignScreen.Open();
             yield return new WaitForSecondsRealtime(0.5f);
             yield return Shot("starters");
+            yield return FaceAudit(Report, "the starter tiles", ScreenRoot("CampaignCanvas"), 12);
             Report($"every starter tile has its deck, and the classic ones their Historic Rules edition ({CampaignState.Starters.Length} starters)",
                 CampaignState.Starters.All(st => _library.Contains(st.Deck) && (st.HistoricDeck.Length == 0 || _library.Contains(st.HistoricDeck))));
             Report("the era option explains itself when highlighted", _campaignScreen.DebugHoverEraOption().Contains("era-limited"));
@@ -2766,6 +2775,9 @@ namespace YgoCampaign.Game
 
             int cards = profile.Collection.Total, dpBefore = profile.Dp;
             yield return _shop.DebugOpenPack(0, name => ScreenCapture.CaptureScreenshot(Path.Combine(folder, $"campaign-{name}.png")));
+            // The pack face up (still showing): its cards, and a rarity mark on each Rare and up as its caption names it.
+            yield return FaceAudit(Report, "the pack revealed", ScreenRoot("ShopCanvas"), PackCatalog.PackSize,
+                faces => PackMarks(faces, marks => marks.SequenceEqual(CaptionMarks(faces)), $"the captions' \"{string.Join(" ", CaptionMarks(faces))}\""), only: InPackSlot);
             Report($"a pack opened: {profile.Collection.Total - cards} cards kept, DP {dpBefore} -> {profile.Dp}", profile.Collection.Total > cards);
             // Gauge & Gilt: the desk's three tabs, an express grading and its reveal.
             DebugAddDp(profile, 20000);
@@ -2775,6 +2787,8 @@ namespace YgoCampaign.Game
             int slabbed = _gradingDesk.DebugGradeBest();
             yield return new WaitForSecondsRealtime(2.4f);
             yield return Shot("slab-reveal");
+            yield return FaceAudit(Report, "the slab reveal", FindDeep(ScreenRoot("GradingDeskCanvas"), "Reveal"), 1,
+                faces => faces.Any(f => f.Layout == CardLayout.Full) ? null : "no Full face in the slab");
             Report($"the Grading Desk grades a copy express and reveals its slab ({slabbed}: {profile.Collection.All.Count(c => c.IsSlab)} slab in the collection)",
                 slabbed >= 1 && slabbed <= 10 && _gradingDesk.DebugRevealing && profile.Collection.All.Count(c => c.IsSlab) == 1);
             _gradingDesk.DebugFinishReveal();
@@ -2835,6 +2849,7 @@ namespace YgoCampaign.Game
             _editor.Open(profile.Deck, profile.Collection);
             yield return new WaitForSecondsRealtime(0.6f);
             yield return Shot("collection-editor");
+            yield return FaceAudit(Report, "the collection editor", ScreenRoot("DeckEditorCanvas"), 10, expectedOf: () => CardsShowing(ScreenRoot("DeckEditorCanvas")));
             // The catalog shows every card: yours first, the rest dimmed with where to get them.
             var (allCards, unowned, _) = _editor.DebugCatalog();
             Report($"the campaign catalog shows cards you don't own too ({unowned} of {allCards})", unowned > 0 && unowned < allCards);
@@ -2852,6 +2867,8 @@ namespace YgoCampaign.Game
             Report("clicking the card text opens the reading view", _editor.DebugReading());
             yield return new WaitForSecondsRealtime(0.4f);
             yield return Shot("catalog-reading");
+            yield return FaceAudit(Report, "the reading view", ScreenRoot("DeckEditorCanvas")?.Find("DeckEditor/Reading"), 1,
+                faces => faces.Any(f => f.Layout == CardLayout.Full) ? null : "no Full face in the reading view");
             _editor.DebugClearFilters();
             // Extras: favorites, the deck's archetype and key cards, the Extra Deck check.
             int favorites = _editor.DebugFavorite();
@@ -2908,6 +2925,7 @@ namespace YgoCampaign.Game
             ShowVersus(0, 0);
             yield return new WaitForSecondsRealtime(0.8f);
             yield return Shot("versus");
+            yield return FaceAudit(Report, "the versus screen", ScreenRoot("CampaignScenesCanvas"), 5);
             Report("the versus screen offers Duel!", _scenes.IsOpen && _scenes.Buttons.ContainsKey("Duel!"));
             // For this duel only, every copy in your deck is a Gem Mint Secret Rare: one landing face-up has its prized
             // moment (a screenshot mid-sweep). The copies are put back after the duel.
@@ -2943,6 +2961,8 @@ namespace YgoCampaign.Game
             if (shownCard is { } sc && _cardPack!.Get(sc.Code) is { } shownInfo) _view.ShowInfo(shownInfo);
             yield return new WaitForSecondsRealtime(0.5f);
             yield return Shot("duel-layout");
+            // The hand and field cards, and the card detail beside them.
+            yield return FaceAudit(Report, "the duel layout", ScreenRoot("Canvas"), 2, expectedOf: () => CardsShowing(ScreenRoot("Canvas")) + 1);
             // Your cards are your copies: each card in your hand carries its deck slot and shows that copy.
             var hand = _duel!.QueryLocation(0, Ygo.Engine.Location.Hand).OfType<FieldCard>().ToList();
             var handLooks = hand.Select(c => _duel.Looks?.Of(c)).ToList();
@@ -3069,6 +3089,7 @@ namespace YgoCampaign.Game
             Report($"the {bossDeck} recipe is unlocked", _recipeBook.DebugSelect(bossDeck));
             yield return new WaitForSecondsRealtime(0.4f);
             yield return Shot("recipe-book");
+            yield return FaceAudit(Report, "the recipe book", ScreenRoot("RecipeBookCanvas"), 1, expectedOf: () => CardsShowing(ScreenRoot("RecipeBookCanvas")));
             Report("a later boss's recipe is locked", !_recipeBook.DebugSelect("burning-abyss"));
             yield return new WaitForSecondsRealtime(0.3f);
             yield return Shot("recipe-locked");
@@ -3117,6 +3138,8 @@ namespace YgoCampaign.Game
             int earnedPosters = _campaignScreen.DebugOpenLocker();
             yield return new WaitForSecondsRealtime(0.5f);
             yield return Shot("locker");
+            yield return FaceAudit(Report, "the locker's posters", ScreenRoot("CampaignCanvas"), 1,
+                expectedOf: () => ScreenRoot("CampaignCanvas")!.GetComponentsInChildren<RectTransform>().Count(t => t.name == "Poster" && Showing(t)));
             bool emblemPicked = _campaignScreen.DebugPickPoster(Posters.Emblem) && Posters.Current(_campaign.Circuits, profile) == null;
             bool lockedRefused = Posters.IsUnlocked(Posters.All[Posters.All.Count - 1], _campaign.Circuits, profile) || !_campaignScreen.DebugPickPoster(Posters.All[Posters.All.Count - 1].Id);
             _campaignScreen.DebugPickPoster(Posters.All[0].Id);
@@ -3469,6 +3492,7 @@ namespace YgoCampaign.Game
             ShowLessons();
             yield return new WaitForSecondsRealtime(0.4f);
             yield return Shot("lessons");
+            yield return FaceAudit(Report, "the lessons", ScreenRoot("CampaignScenesCanvas"), 3);
             Report("the lessons list offers Gus's three lessons", _scenes.IsOpen && _scenes.Buttons.ContainsKey("Lesson 1") && _scenes.Buttons.ContainsKey("Lesson 3"));
             _scenes.Buttons["Lesson 1"]();
             yield return new WaitForSecondsRealtime(0.8f);
@@ -3565,6 +3589,7 @@ namespace YgoCampaign.Game
             Report($"the Card Trader trades a token for {traded}", traded != null && profile.Tokens == tokens - 1 && profile.Collection.Total == before + 1);
             yield return new WaitForSecondsRealtime(0.6f);
             yield return Shot("trader");
+            yield return FaceAudit(Report, "the Card Trader", ScreenRoot("TraderCanvas"), 2);
             // DP buys a token; Ban Passes are earned, never sold.
             DebugAddDp(profile, 10000);
             int tokensNow = profile.Tokens, allowance = _campaign.PassAllowance;
@@ -3940,6 +3965,7 @@ namespace YgoCampaign.Game
             _structures.Open();
             yield return new WaitForSecondsRealtime(0.6f);
             yield return Shot("structure-decks");
+            yield return FaceAudit(Report, "the structure decks", ScreenRoot("StructureCanvas"), 1);
             _structures.DebugBuyFirst();
             _library.Refresh();
             Report($"{onSale} structure decks on sale; bought {_structures.LastBought} (+{profile.Collection.Total - before2} cards, saved as a campaign deck)",
@@ -4031,6 +4057,7 @@ namespace YgoCampaign.Game
             Report($"Start over drops the old run's queued story and notice (queued before: {queuedBefore})",
                 queuedBefore && _campaign.AlleyNoticeEvents.Count == 0 && _campaign.AlleyNotice.Length == 0);
             _campaignScreen.Close();
+            FaceAuditSummary("campaign");
             Application.Quit();
         }
 
@@ -4482,6 +4509,11 @@ namespace YgoCampaign.Game
             yield return new WaitForSecondsRealtime(1.5f);
             Report("the game opens on the title screen", _title.IsOpen);
             yield return Shot("title");
+            // The wall's faces judged without the title's dimming scrim over them (72% black: it flattens a face's edge strip).
+            var darken = FindDeep(ScreenRoot("TitleCanvas"), "Darken");
+            darken?.gameObject.SetActive(false);
+            yield return FaceAudit(Report, "the title wall", ScreenRoot("TitleCanvas"), 24);
+            darken?.gameObject.SetActive(true);
             _title.DebugAttract();
             yield return new WaitForSecondsRealtime(5f);
             Report("attract mode plays a duel behind the title", !_paused && _ticks > 0);
@@ -4490,6 +4522,8 @@ namespace YgoCampaign.Game
             yield return new WaitForSecondsRealtime(0.8f);
             Report("a button press opens the menu (and pauses the duel)", _menu.IsOpen && !_title.IsOpen && _paused);
             yield return Shot("main");
+            yield return FaceAudit(Report, "the main menu's showcase", ScreenRoot("MenuCanvas"), 1,
+                faces => faces.Any(f => f.Layout == CardLayout.Full) ? null : "no Full face in the showcase");
             yield return new WaitForSecondsRealtime(1.2f);
             var sound = Sounds.DebugState();
             Report($"sounds: {sound.clips} clips built; music \"{sound.music}\" {(sound.playing ? "playing" : "silent")} on the menu; "
@@ -4525,6 +4559,7 @@ namespace YgoCampaign.Game
             _settings.Close();
             var free = FreeCharacters().Select(i => _roster[i].Name).ToList();
             Report($"free play offers {free.Count} of {_roster.Count} duelists: {string.Join(", ", free)}", free.Count < _roster.Count && free.Count >= _roster.Count / 2);
+            FaceAuditSummary("menu");
             Application.Quit();
         }
 
@@ -5103,6 +5138,7 @@ namespace YgoCampaign.Game
             ShowFreeDuel();
             yield return new WaitForSecondsRealtime(0.5f);
             yield return Shot("free-duel");
+            yield return FaceAudit(Report, "the Free Duel screen", ScreenRoot("CampaignScenesCanvas"), 5);
             Report("the Free Duel screen offers Duel!, a random opponent and Back", _scenes.Buttons.ContainsKey("Duel!") && _scenes.Buttons.ContainsKey("Random opponent"));
             // Its deck lines stop short of their deck arrows too (a 720-wide line ran under the "<").
             {
@@ -5120,6 +5156,7 @@ namespace YgoCampaign.Game
             deadline = Time.realtimeSinceStartup + 6;
             while (_view.DetailVisible && Time.realtimeSinceStartup < deadline) yield return null;
             yield return Shot("board");
+            yield return FaceAudit(Report, "the board", ScreenRoot("Canvas"), 1, expectedOf: () => CardsShowing(ScreenRoot("Canvas")));
             Report("with no card looked at, the card detail is out of the way", !_view.DetailVisible);
             // The playable-card tabs, on and then off (an override for this run: the saved setting isn't touched).
             int Tabs() => FindObjectsByType<RectTransform>(FindObjectsSortMode.None).Count(t => t.name == "Act" && t.gameObject.activeInHierarchy);
@@ -5139,6 +5176,7 @@ namespace YgoCampaign.Game
             if (_cardPack!.Get(89631139) is { } shown) _view.ShowInfo(shown);
             yield return new WaitForSecondsRealtime(0.4f);
             yield return Shot("detail");
+            yield return FaceAudit(Report, "the board with the card detail", ScreenRoot("Canvas"), 2, expectedOf: () => CardsShowing(ScreenRoot("Canvas")) + 1);
             Report("a card the duel shows slides the detail in", _view.DetailVisible);
             Report($"its text has room to read ({_view.Detail.TextWidth:0} wide)", _view.Detail.TextWidth >= 200);
             // Settings from the gear mid-duel, then Back: the duel carries on (it used to stay paused, stuck on "Resolving...").
@@ -5173,6 +5211,7 @@ namespace YgoCampaign.Game
                 if (_cardPack.Get(89631139) is { } hovered) _view.ShowInfo(hovered);
                 yield return new WaitForSecondsRealtime(0.4f);
                 yield return Shot("pinned");
+                yield return FaceAudit(Report, "the pinned and the hovered detail", ScreenRoot("Canvas"), 3, expectedOf: () => CardsShowing(ScreenRoot("Canvas")) + 2);
                 Report($"pinned and compared, both texts have room ({_view.Detail.TextWidth:0} and {_view.HoverDetail.TextWidth:0} wide)",
                     _view.Detail.TextWidth >= 200 && _view.HoverDetail.TextWidth >= 200);
                 _view.TogglePin();
@@ -5206,10 +5245,12 @@ namespace YgoCampaign.Game
             if (!toastShot) Report("no message by turn 4 (the opponent didn't activate anything)", _history?.Entries.All(e => e.Kind != Ygo.Engine.Presentation.HistoryKind.Activate || e.Player == 0) == true);
             yield return new WaitForSecondsRealtime(0.4f);
             yield return Shot("strip");
+            yield return FaceAudit(Report, "the recent-actions strip", FindDeep(ScreenRoot("Canvas"), "Recent"), 1);
             Report($"the recent-actions strip shows {_view.StripTiles} tiles after {_history?.Entries.Count} history entries", _view.StripTiles > 0);
             _view.ToggleHistory();
             yield return new WaitForSecondsRealtime(0.3f);
             yield return Shot("history");
+            yield return FaceAudit(Report, "the history drawer", FindDeep(ScreenRoot("Canvas"), "History"), 1);
             Report($"History opens the drawer ({_view.DrawerState.rows} rows)", _view.DrawerState.open && _view.DrawerState.rows > 0);
             _view.ToggleHistory();
             _view.ToggleLog();
@@ -5258,6 +5299,8 @@ namespace YgoCampaign.Game
                 _view.DebugCallout(ash, 1, 2);
                 yield return new WaitForSecondsRealtime(0.8f);
                 yield return Shot("chain-panel");
+                yield return FaceAudit(Report, "the chain panel", FindDeep(ScreenRoot("Canvas"), "ChainPanel"), 2,
+                    faces => faces.All(f => f.Layout == CardLayout.Thumb) ? null : "a link's card isn't a thumb");
                 var chainLines = _view.ChainLines;
                 var chainProblems = _view.ChainProblems;
                 string N(uint c) => _cardPack!.Get(c)?.Name ?? "?";
@@ -5362,6 +5405,7 @@ namespace YgoCampaign.Game
             Debug.Log($"layout check: note {small.Count} label{(small.Count == 1 ? "" : "s")} under {MinTextSize} px");
             foreach (var (label, (size, shot)) in small.OrderBy(s => s.Value.size).ThenBy(s => s.Value.shot))
                 Debug.Log($"layout check: note   {size} px on {shot}: {label}");
+            FaceAuditSummary("layout");
             yield return new WaitForSecondsRealtime(0.3f);
             Application.Quit();
         }

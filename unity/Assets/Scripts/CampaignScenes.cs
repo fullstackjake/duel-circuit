@@ -603,15 +603,12 @@ namespace YgoCampaign.Game
                 }
                 var slot = Ui.Box(panel, cardX + i * gap, cardY, cardW, cardH);
                 Ui.Image(slot, T.Well);
-                var art = CardView.Art?.Get(side.Showcase[i]);
-                if (art != null)
-                {
-                    var image = Ui.Stretched("Art", slot, Vector2.zero, Vector2.one).gameObject.AddComponent<RawImage>();
-                    image.texture = art;
-                    image.raycastTarget = false;
-                    if (_cards.Get(side.Showcase[i]) is CardInfo info) CardFoil.Apply(image, info, 1f);
-                }
-                else Ui.Text(slot, _cards.Get(side.Showcase[i])?.Name ?? "", 18, T.Text);
+                // The picture, or the plain card (foiled as a picture is).
+                var image = Ui.Stretched("Art", slot, Vector2.zero, Vector2.one).gameObject.AddComponent<RawImage>();
+                image.raycastTarget = false;
+                var info = _cards.Get(side.Showcase[i]);
+                CardFace.Draw(image, side.Showcase[i], info, new Vector2(cardW, cardH));
+                CardFoil.Apply(image, info, 1f);
             }
 
             // (Well short of the deck arrows, shrinking to fit: a tag team's two deck names are long, and a line that ran to
@@ -771,11 +768,12 @@ namespace YgoCampaign.Game
                 Ui.Image(Ui.Box(panel, 0, 0, 8, height), done ? T.GoodStripe : T.Brass);
                 var slot = Ui.Box(panel, 30, 14, 106, 154);
                 Ui.Image(slot, T.Well);
-                if (CardView.Art?.Get(lesson.Showcase) is Texture art)
+                if (lesson.Showcase != 0)
                 {
+                    // The picture, or the plain card.
                     var image = Ui.Stretched("Art", slot, Vector2.zero, Vector2.one).gameObject.AddComponent<RawImage>();
-                    image.texture = art;
                     image.raycastTarget = false;
+                    CardFace.Draw(image, lesson.Showcase, _cards.Get(lesson.Showcase), new Vector2(106, 154));
                 }
                 var title = Ui.Text(Ui.Box(panel, 166, 16, 780, 46), first ? lesson.Title : $"{numbered}.  {lesson.Title}", 30, T.Text, TextAnchor.MiddleLeft);
                 title.fontStyle = FontStyle.Bold;

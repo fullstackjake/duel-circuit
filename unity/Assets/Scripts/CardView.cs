@@ -8,8 +8,8 @@ using Ygo.Engine.Data;
 namespace YgoCampaign.Game
 {
     /// <summary>
-    /// A card drawn with the player's picture of it (with its rarity's foil) or, without one, as a colored frame
-    /// with its name and stats. The game ships no card art: official images are Konami's.
+    /// A card drawn with the player's picture of it or, without one, its plain card (<see cref="CardFace"/>: the game's own
+    /// drawn face), either with its rarity's foil. The game ships no card art: official images are Konami's.
     /// </summary>
     public sealed class CardView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
     {
@@ -35,16 +35,24 @@ namespace YgoCampaign.Game
 
         /// <summary>Whether this view shows a card you may read (not a back or a hidden card).</summary>
         public bool ShowsFace => _info != null;
+
+        /// <summary>The face drawn (picture or plain card), and whether it's a plain one.</summary>
+        private RawImage? _face;
+        private bool _plainFace;
+
+        /// <summary>For checks (CardFace.DebugAudit): this view draws a card's face (not a back, not a peek).</summary>
+        public bool DebugFaceDrawn => _face != null;
         private Action? _onRightClick;
 
         /// <param name="reveal">Show the face even if the card is face-down (your own set cards, or spectating).</param>
         /// <param name="offField">In hand / pile: never sideways, no SET tag.</param>
         /// <param name="hand">A card in the duel's fanned hand (see <see cref="HandStats"/>).</param>
+        /// <param name="fit">What a plain face leaves room for (the deck editor's limit badge and in-deck count).</param>
         public static CardView Create(Transform parent, Vector2 center, Vector2 size, FieldCard card, CardInfo? info,
             int owner, bool reveal, Action<CardInfo>? onHover, bool offField = false, Action? onClick = null, bool highlight = false,
-            Action? onRightClick = null, bool flip = false, bool hand = false)
+            Action? onRightClick = null, bool flip = false, bool hand = false, CardFit fit = CardFit.Normal)
         {
-            var view = Build(parent, center, size, card, info, owner, reveal, onHover, offField, onClick, highlight, onRightClick);
+            var view = Build(parent, center, size, card, info, owner, reveal, onHover, offField, onClick, highlight, onRightClick, fit);
             if (hand) HandStats(view, card, info, flip);
             if (!offField) StatusBadges(view, card, size, reveal || card.IsFaceUp);
             if (highlight && FxSettings.PlayableTabs) ActionTab(view.transform, size);
@@ -54,12 +62,32 @@ namespace YgoCampaign.Game
                 var root = (RectTransform)view.transform;
                 root.localRotation *= Quaternion.Euler(0, 0, 180);
                 foreach (var text in view.GetComponentsInChildren<Text>()) text.rectTransform.localRotation = Quaternion.Euler(0, 0, 180);
+                if (view._plainFace) TurnBack(view);
             }
             return view;
         }
 
+        /// <summary>
+        /// A turned plain card is turned back so its writing reads upright, as the text look's did (owner decision N2): the
+        /// face and its rarity mark, and the live stat strip moved to the face's far end (the bottom as you see it), so it
+        /// covers the plain card's footer as it covers a picture's. The border keeps the owner's colour.
+        /// </summary>
+        private static void TurnBack(CardView view)
+        {
+            var art = view._face!.rectTransform;
+            art.localRotation = Quaternion.Euler(0, 0, 180);
+            foreach (var text in art.GetComponentsInChildren<Text>(true)) text.rectTransform.localRotation = Quaternion.identity;
+            if (view.transform.Find("Face/Stats") is RectTransform strip)
+            {
+                strip.anchorMin = new Vector2(0, 0.82f);
+                strip.anchorMax = Vector2.one;
+                strip.localRotation = Quaternion.Euler(0, 0, 180);
+                foreach (var text in strip.GetComponentsInChildren<Text>(true)) text.rectTransform.localRotation = Quaternion.identity;
+            }
+        }
+
         private static CardView Build(Transform parent, Vector2 center, Vector2 size, FieldCard card, CardInfo? info,
-            int owner, bool reveal, Action<CardInfo>? onHover, bool offField, Action? onClick, bool highlight, Action? onRightClick)
+            int owner, bool reveal, Action<CardInfo>? onHover, bool offField, Action? onClick, bool highlight, Action? onRightClick, CardFit fit)
         {
             var root = Ui.Placed("Card", parent, center, size);
             var view = root.gameObject.AddComponent<CardView>();
@@ -99,52 +127,21 @@ namespace YgoCampaign.Game
             }
 
             bool showFace = card.IsFaceUp || reveal;
-            if (!showFace || info == null)
+            if (!showFace)
             {
-                if (!showFace) DrawBack(face);
-                else Ui.Image(face, Ui.Hex("#6B3F1F")); // a card the game has no data for: a plain frame with its code
-                if (!showFace)
-                {
-                    view._info = null; // hovering a hidden card must not reveal it
-                    return view;
-                }
+                DrawBack(face);
+                view._info = null; // hovering a hidden card must not reveal it
+                return view;
             }
-            else
-            {
-                var art = Art?.Get(card.Code);
-                // Under a picture the face is see-through, so the picture's rounded corners (CardFoil) show round.
-                Ui.Image(face, art != null ? Color.clear : FrameColor(info.Type));
-                if (art != null)
-                {
-                    view._look = LookOf(card, info, offField);
-                    DrawArt(face, art, card, info, offField, size, view._look);
-                    return view;
-                }
-            }
-
-            var textColor = TextColor(info?.Type ?? 0);
-            var name = Ui.Stretched("Name", face, new Vector2(0, 0.35f), new Vector2(1, 1));
-            name.offsetMin = new Vector2(4, 0);
-            name.offsetMax = new Vector2(-4, -4);
-            var nameText = Ui.Text(name, info?.Name ?? card.Code.ToString(), 12, textColor, TextAnchor.UpperCenter);
-            // Whole words on a line ("Polymerization", not "Polymerizatio n"), however narrow the card.
-            FitWords(nameText, size.x - 2 * border - 8, 12);
-
-            var stats = Ui.Stretched("Stats", face, new Vector2(0, 0), new Vector2(1, 0.35f));
-            var statText = Ui.Text(stats, StatLine(card, info, size.x >= MinWidthForLevel), 12, textColor, TextAnchor.LowerCenter);
-            statText.fontStyle = FontStyle.Bold;
-            statText.supportRichText = true;
-            statText.resizeTextForBestFit = true;
-            statText.resizeTextMinSize = 9;
-            statText.resizeTextMaxSize = 12;
-
-            if (!card.IsFaceUp && !offField)
-            {
-                // Revealed for the spectator, but still face-down in the duel.
-                var tag = Ui.Stretched("SetTag", face, new Vector2(0, 0.42f), new Vector2(1, 0.58f));
-                Ui.Image(tag, new Color(0, 0, 0, 0.55f));
-                Ui.Text(tag, "SET", 11, Color.white);
-            }
+            // Every shown face: the player's picture, else the plain card (a card with no data too: "Card <code>"). Under
+            // either the face is see-through, so the picture's rounded corners (CardFoil) show round.
+            var texture = CardFace.Picture(card.Code, info, size, fit);
+            Ui.Image(face, texture != null ? Color.clear : Ui.Hex("#6B3F1F")); // only code 0 has no face at all
+            if (texture == null) return view;
+            if (info != null) view._look = LookOf(card, info, offField);
+            view._face = DrawArt(face, texture, card, info, offField, size, view._look);
+            view._plainFace = CardFace.IsPlain(texture);
+            CardFace.Tag(view._face, card.Code, size, fit, info);
             return view;
         }
 
@@ -429,12 +426,19 @@ namespace YgoCampaign.Game
         /// <summary>The copy under the pointer (its card id and look), for the detail panel to draw the same copy.</summary>
         public static (uint code, CopyLook? look) Hovered { get; private set; }
 
-        private static void DrawArt(RectTransform face, Texture2D art, FieldCard card, CardInfo info, bool offField, Vector2 size, CopyLook? look)
+        /// <summary>The card's face (its picture or plain card) over its whole face, plus a strip with live stats for monsters.</summary>
+        private static RawImage DrawArt(RectTransform face, Texture art, FieldCard card, CardInfo? info, bool offField, Vector2 size, CopyLook? look)
         {
             var picture = Ui.Stretched("Art", face, Vector2.zero, Vector2.one);
             var raw = picture.gameObject.AddComponent<RawImage>();
             raw.texture = art;
             raw.raycastTarget = false;
+            if (info == null)
+            {
+                // A card the game has no data for: its plain card, square (no foil without data).
+                SetTag(face, card, offField);
+                return raw;
+            }
             // Your copy: its own rarity and wear. Anything else: the card's look as before (your best rarity or its printings).
             if (look is CopyLook copy && CardFoil.Mode == CardFoil.Display.On)
                 CardFoil.Apply(raw, info, copy.Rarity, offField ? 0.75f : 0.6f, copy, card.Cover);
@@ -444,7 +448,9 @@ namespace YgoCampaign.Game
             if ((info.Type & CardType.Monster) != 0)
             {
                 var strip = Ui.Stretched("Stats", face, new Vector2(0, 0), new Vector2(1, 0.18f));
-                var stripBack = Ui.Image(strip, new Color(0, 0, 0, 0.72f));
+                // Over a plain card's footer (its printed stats, inside this strip's 0.18 of the card) the strip is opaque, so
+                // nothing printed shows through under the live numbers. Pictures keep today's see-through strip.
+                var stripBack = Ui.Image(strip, new Color(0, 0, 0, CardFace.IsPlain(art) ? 1f : 0.72f));
                 stripBack.raycastTarget = false;
                 // Its bottom corners round with the card's own (0.028 card heights; see CardFoil), so they don't poke out.
                 float height = face.rect.height > 0 ? face.rect.height : size.y;
@@ -459,12 +465,17 @@ namespace YgoCampaign.Game
                 stripText.resizeTextMinSize = 9;
                 stripText.resizeTextMaxSize = 11;
             }
-            if (!card.IsFaceUp && !offField)
-            {
-                var tag = Ui.Stretched("SetTag", face, new Vector2(0, 0.42f), new Vector2(1, 0.58f));
-                Ui.Image(tag, new Color(0, 0, 0, 0.6f)).raycastTarget = false;
-                Ui.Text(tag, "SET", 11, Color.white);
-            }
+            SetTag(face, card, offField);
+            return raw;
+        }
+
+        /// <summary>A face-down card revealed to the viewer (spectating) still says it's set.</summary>
+        private static void SetTag(RectTransform face, FieldCard card, bool offField)
+        {
+            if (card.IsFaceUp || offField) return;
+            var tag = Ui.Stretched("SetTag", face, new Vector2(0, 0.42f), new Vector2(1, 0.58f));
+            Ui.Image(tag, new Color(0, 0, 0, 0.6f)).raycastTarget = false;
+            Ui.Text(tag, "SET", 11, Color.white);
         }
 
         /// <summary>
@@ -678,7 +689,7 @@ namespace YgoCampaign.Game
             return Ui.Hex("#D9B85C"); // Normal
         }
 
-        private static Color TextColor(uint type) =>
+        public static Color TextColor(uint type) =>
             (type & (CardType.Xyz | CardType.Link | CardType.Spell | CardType.Trap | CardType.Fusion)) != 0
                 ? Color.white
                 : new Color(0.1f, 0.08f, 0.05f);

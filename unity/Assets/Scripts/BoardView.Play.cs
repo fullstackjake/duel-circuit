@@ -455,8 +455,13 @@ namespace YgoCampaign.Game
             var face = Ui.Stretched("Face", tile, Vector2.zero, Vector2.one);
             face.offsetMin = new Vector2(3, 3);
             face.offsetMax = new Vector2(-3, -3);
-            var art = e.Code != 0 ? CardView.Art?.Get(e.Code) : null;
-            if (art != null) { var raw = face.gameObject.AddComponent<RawImage>(); raw.texture = art; raw.raycastTarget = false; }
+            if (e.Code != 0)
+            {
+                // The picture, else the plain card's thumb.
+                var raw = face.gameObject.AddComponent<RawImage>();
+                raw.raycastTarget = false;
+                CardFace.Draw(raw, e.Code, _cards.Get(e.Code), new Vector2(50, 70));
+            }
             else
             {
                 Ui.Image(face, new Color(0.1f, 0.12f, 0.18f, 1)).raycastTarget = false;
@@ -531,8 +536,13 @@ namespace YgoCampaign.Game
                 var stripe = Ui.Box(row, 0, 4, 4, 44);
                 Ui.Image(stripe, OwnerColor(e.Player)).raycastTarget = false;
                 var thumb = Ui.Box(row, 12, 2, 34, 48);
-                var art = e.Code != 0 ? CardView.Art?.Get(e.Code) : null;
-                if (art != null) { var raw = thumb.gameObject.AddComponent<RawImage>(); raw.texture = art; raw.raycastTarget = false; }
+                if (e.Code != 0)
+                {
+                    // The picture, else the plain card's thumb.
+                    var raw = thumb.gameObject.AddComponent<RawImage>();
+                    raw.raycastTarget = false;
+                    CardFace.Draw(raw, e.Code, _cards.Get(e.Code), new Vector2(34, 48));
+                }
                 else Ui.Image(thumb, new Color(0.12f, 0.14f, 0.2f, 1)).raycastTarget = false;
                 // Whose it is in a column of its own (every row's text starts at the same place); "YOU  You activate..."
                 // drops the repeated word: "YOU  activate...".

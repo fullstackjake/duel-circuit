@@ -64,19 +64,23 @@ namespace YgoCampaign.Game
                 _shop.Open();
                 yield return new WaitForSecondsRealtime(0.5f);
                 yield return Shot($"{name}-shop");
+                yield return FaceAudit(Report, $"the {name} shop", ScreenRoot("ShopCanvas"), 5);
                 _shop.Close();
                 _trader.Open();
                 yield return new WaitForSecondsRealtime(0.5f);
                 yield return Shot($"{name}-trader");
+                yield return FaceAudit(Report, $"the {name} Card Trader", ScreenRoot("TraderCanvas"), 0); // (an empty wishlist shows no card: none blank)
                 _trader.Close();
                 _campaignScreen.Close(); // (closing the trader brings it back, over the editor)
                 _editor.Open(profile.Deck, profile.Collection);
                 yield return new WaitForSecondsRealtime(0.6f);
                 yield return Shot($"{name}-editor");
+                yield return FaceAudit(Report, $"the {name} deck editor", ScreenRoot("DeckEditorCanvas"), 10, expectedOf: () => CardsShowing(ScreenRoot("DeckEditorCanvas")));
                 _editor.Close();
                 ShowVersus(0, 0);
                 yield return new WaitForSecondsRealtime(0.6f);
                 yield return Shot($"{name}-versus");
+                yield return FaceAudit(Report, $"the {name} versus screen", ScreenRoot("CampaignScenesCanvas"), 5);
                 _scenes.Close();
                 // Original texts: the versus line at a circuit past CED's errata, and the editor's note (DuelController.TextsCheck).
                 yield return TextsThemeShots(name, Shot, Report);
@@ -113,6 +117,7 @@ namespace YgoCampaign.Game
                     _van.DebugShow(tab);
                     yield return new WaitForSecondsRealtime(0.5f);
                     yield return Shot($"{name}-van-{tabs[tab]}");
+                    if (tab == 0) yield return FaceAudit(Report, $"the {name} van's shelf", ScreenRoot("VanCanvas"), 1, expectedOf: () => CardsShowing(ScreenRoot("VanCanvas")));
                     van &= _van.IsOpen && UiTheme.Current == theme;
                 }
                 var plate = _van.DebugPlate;
@@ -197,6 +202,7 @@ namespace YgoCampaign.Game
             Report($"switching themes raises UiTheme.Changed ({changes})", changes >= 1);
             _campaignScreen.ThemeOverride = null;
             UiTheme.Current = UiTheme.MainStreet;
+            FaceAuditSummary("theme");
             Debug.Log("theme check: done");
             Application.Quit();
         }

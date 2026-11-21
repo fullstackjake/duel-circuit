@@ -302,22 +302,22 @@ run, so working beside it can't press anything in the check. Its window still co
 
 | Check | What it covers |
 |---|---|
-| `-campaigncheck <folder>` | A fresh campaign: shop, a pack, collection deck building, a match with random clicks; checks it pays and saves. It ends with the climb's checks (below) |
-| `-menucheck <folder>` | Title screen, attract mode, menu, settings, campaign start. Run it without `-mute` (its sound checks fail muted) |
+| `-campaigncheck <folder>` | A fresh campaign: shop, a pack, collection deck building, a match with random clicks; checks it pays and saves. It ends with the climb's checks (below). With no pictures it also audits the card faces on its screens (below) |
+| `-menucheck <folder>` | Title screen, attract mode, menu, settings, campaign start. Run it without `-mute` (its sound checks fail muted). With no pictures it also audits the card faces on its screens (below) |
 | `-replaycheck <folder>` | A duel, then its auto-saved replay played back to the same end |
 | `-tagcheck <folder>` | The tag setup screen, a four-bot tag duel past a swap, its result and replay |
 | `-boardcheck <folder>` | You play with random clicks: zone choice, the Graveyard viewer |
 | `-matcheck <folder>` | Two Field Spell decks: the mats and a Field Spell taking over |
 | `-pilecheck <folder>` | Pile menus, the picker, double-click to view, face-down banished cards, Cancel |
 | `-controlscheck <folder>` | The phase bar, the attack arrow, pinning |
-| `-layoutcheck <folder>` | The play layout through a Free Duel and a replay's controls |
+| `-layoutcheck <folder>` | The play layout through a Free Duel and a replay's controls. With no pictures it also audits the card faces on its screens (below) |
 | `-ordercheck <folder>` | Ordering effects that activate at once; the chain dialog's hint |
 | `-clickcheck <folder>` | Clicks that must land the first time (drags in lists, hand cards, a press across a redraw) |
-| `-shopcheck <folder>` | The card shop's shelves, tags, odds, a box, New arrivals |
+| `-shopcheck <folder>` | The card shop's shelves, tags, odds, a box, New arrivals. With no pictures it also audits the card faces on its screens (below) |
 | `-alleycheck <folder>` | The Back Alley's loop |
 | `-finalcheck <folder>` | The Library's "Every Era" final to its epilogue (the guests' decks line now carries deck stars, not a skill number) |
 | `-laddercheck <folder>` | The Champion's Ladder from its locked plaque to the top (a holder's skill is read from `Ladder.Opponent`: 1.0) |
-| `-themecheck <folder>` | The shell screens in both UI themes |
+| `-themecheck <folder>` | The shell screens in both UI themes. With no pictures it also audits the card faces on its screens (below) |
 | `-musiccheck <folder>` | (20 steps) The duel music, including a real boss duel to the end (run it with `-mute`) |
 | `-soundcheck <folder>` | (51 steps) The sound groups and Settings sliders (mouse, `<` `>`, keys, pad), the old-settings conversion, hover, the pause (the duel theme at half volume under Settings from the gear), the background fade, moves and chains, a real duel's phases, LP ticks and climbing chains, the coin, the draw game, packs and grading, tuning to the music, the voices, the limiter on a final blow's pile-up, a simulated output-device change. Run it with `-mute` and `-mods <empty folder>`: `-mute` zeroes the output after the limiter, so the check still reads real levels |
 | `-climbcheck <folder>` | (21 steps) The climb's screens: the billed final on a row and its versus, rematch pay on rows and results, deck stars on circuit and Tag Cup rows, guests and the Recipe Book, a recipe kept from before a swap, "You already own every card in it.", the starter ribbon. Also runs as the last part of `-campaigncheck` (210 steps in all) |
@@ -328,8 +328,37 @@ run, so working beside it can't press anything in the check. Its window still co
 | `-aboutcheck <folder> [-aboutlicenses <folder>]` | The About screen: every notice, the license and third-party readers, missing files, keys, controller and mouse; it never opens a browser or Finder |
 | `-ydkcheck <folder> -ydkfile <.ydk> -ydkfixture <.ydk>` | Importing `.ydk` files from paths |
 | `-importcheck <folder>` | The Import Cards screen: the menu and screen layout, a zip, loose pictures and bad names, Keep mine and Replace them, HD, the card back, Cancel. It makes its own flat-colour pictures and never opens the file dialog |
+| `-plaincheck <folder>` | (34 steps) The plain card renderer: every layout and card kind drawn and not blank, light writing on every plate, names kept whole and clear of the editor's badges, the text box, foil regions and the rarity mark, pictures still winning (it makes its own flat-colour test pictures), the opponent's cards read upright, face-down cards untouched, the time and memory budget, the cache and the hidden studio. Needs `-mods <empty folder>`, `-pics <empty folder>` and `-hdpics off`; it fails at once if it finds pictures |
 | `-artcheck <folder>` | Card picture load times and memory (needs an HD picture folder) |
 | `-editor <deck> -versioncheck <folder>` | Switching card versions in the editor |
+
+### Running checks with no pictures
+
+The game ships no card pictures, but it finds them by itself: in `mods/cards/images`, and in EDOPro's `pics` folder when
+EDOPro is installed (see [CARD-PICTURES.md](CARD-PICTURES.md#use-edopros-pictures)). On a machine with EDOPro, a check
+sees pictures unless you say otherwise. To test what a player without pictures sees (the plain card), give the run an
+empty pictures folder and turn the HD folder off:
+
+```bash
+APP="$PWD/build/qa/Duel Circuit.app/Contents/MacOS/Duel Circuit"; OUT="$PWD/build/qa/checks/menu-nopics"; rm -rf "$OUT"; mkdir -p "$OUT/mods" "$OUT/out" "$OUT/pics"; "$APP" -mods "$OUT/mods" -pics "$OUT/pics" -hdpics off -menucheck "$OUT/out" -logFile "$OUT/log.txt"
+```
+
+All paths are absolute, as for every check. `-plaincheck` needs this setup. The screen checks (`-menucheck`,
+`-campaigncheck`, `-shopcheck`, `-themecheck`, `-layoutcheck`) take the **no-pictures audit** at their shots, but only
+on such a run:
+
+- **What it does.** It waits for queued plain faces, captures the screen, and reports `FAIL` for each face problem it
+  finds (a tagged face with no texture, or a card showing a face that has no tag), each tagged face that looks blank in the capture, and fewer
+  faces on the screen than the step expects. Each step's line reads `no pictures: <screen> shows N card faces ...`.
+- **With pictures installed it does nothing.** It logs `face audit: skipped "<screen>": N pictures installed`, so the
+  run is as it was before plain cards.
+- **A run that claims no pictures but has some fails.** If `-pics` names an empty folder and pictures are found anyway,
+  the step reports `FAIL`.
+- **The end-of-check note.** Each of those five checks ends with `<check> check: note N no-pictures audit steps ran, M
+  skipped`. If it says 0 ran, the run wasn't a no-pictures run.
+
+The audit's expected counts are minimums, so a step with an expected count of 0 (the shop's box summary, the Card
+Trader in the theme check) can't fail on a missing card; see `docs/dev/TODO.md`, "Plain cards".
 
 Other launch options for checks and screenshots:
 

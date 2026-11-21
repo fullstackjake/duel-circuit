@@ -16,8 +16,15 @@ Duel Circuit ships with **no card pictures**. This page shows you how to add pic
 
 Card pictures are © Konami. We can't include them, so the game doesn't.
 
-Without pictures, every card shows its name, stats and text in a clean card frame. You can play the whole game this
-way. Pictures only change how cards look.
+Without a picture, a card shows its **plain card**: a card face the game draws itself. It has a frame in the colour of
+the card's kind, a name bar, a symbol for its Attribute (or for Spell or Trap), a chip with its Level, Rank or Link
+rating (or the Spell or Trap type), and its ATK and DEF. On bigger views it also shows the type line and the card's
+text. Link Markers show as a small grid of arrows. The plain card wears its rarity's foil and grade, and from Rare up
+it also carries a short rarity mark (see [Rarity marks](PLAYING.md#rarity-marks)).
+
+You can play the whole game this way. Pictures only change how cards look. A card with a picture shows the picture,
+and a card without one shows its plain card, side by side if you have pictures for only some cards. Every screen that
+shows a card does this, including the title screen, which fills with plain cards until you have 12 or more pictures.
 
 ## Import from the game
 
@@ -92,7 +99,7 @@ The game makes this folder the first time it starts.
 **Good to know:**
 - Any picture folder that works with EDOPro works here too, because EDOPro names pictures the same way.
 - Alternate artworks use the base card's picture when they don't have their own.
-- A card without a picture keeps its text look.
+- A card without a picture shows its plain card.
 - Face-down cards never show their picture, so nothing gives away a hidden card.
 
 **Opening the folder:**

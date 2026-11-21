@@ -457,9 +457,10 @@ namespace YgoCampaign.Game
         }
 
         /// <summary>
-        /// For checks: the drawn cards' names that break a word mid-word (or hyphenate inside "gh", "th"...) or sit under a
-        /// card's limit badge or in-deck count, how many text-look names were looked at, how many of those wear a limit badge
-        /// and how many an in-deck count. Call a frame after drawing (the text is laid out when it's drawn).
+        /// For checks: the plain cards' names (as laid out on their faces, CardFace.DebugName) that break a word mid-word
+        /// (or hyphenate inside "gh", "th"...) or sit under a card's limit badge or in-deck count, how many plain names were
+        /// looked at, how many of those wear a limit badge and how many an in-deck count. A plain face not drawn yet is a
+        /// problem. Call once the faces are drawn (CardFace.DebugQueued == 0).
         /// </summary>
         public (List<string> problems, int names, int badges, int counts) DebugNameProblems()
         {
@@ -469,26 +470,33 @@ namespace YgoCampaign.Game
             foreach (var layer in new[] { _cardsLayer, _resultsLayer })
                 foreach (var view in layer.GetComponentsInChildren<CardView>())
                 {
-                    if (view.transform.Find("Face/Name") is not RectTransform nameRt || nameRt.GetComponent<Text>() is not Text name) continue;
+                    if (view.GetComponentInChildren<FaceTag>() is not FaceTag tag || !tag.Plain || tag.GetComponent<RawImage>() is not RawImage face) continue;
+                    var name = CardFace.DebugName(face.texture);
+                    if (name == null)
+                    {
+                        problems.Add($"card {tag.Code}'s plain face isn't drawn yet");
+                        continue;
+                    }
                     names++;
-                    foreach (var broken in CardView.BrokenWords(name)) problems.Add(broken);
-                    foreach (var split in CardView.SplitDigraphs(name)) problems.Add(split);
+                    problems.AddRange(name.Problems);
+                    // The name's box on screen, from its rect on the card (fractions, y from the bottom).
+                    face.rectTransform.GetWorldCorners(corners);
+                    Vector3 origin = corners[0], right = corners[3] - corners[0], up = corners[1] - corners[0];
+                    var nameLow = origin + right * name.Rect.xMin + up * name.Rect.yMin;
+                    var nameHigh = origin + right * name.Rect.xMax + up * name.Rect.yMax;
+                    string shown = name.Text.Replace("\n", "/");
                     // The in-deck count ("x2", a result's bottom right): the name's box ends above it.
                     if (view.transform.Find("InDeck") is RectTransform count)
                     {
                         counts++;
                         count.GetWorldCorners(corners);
-                        float countTop = corners[1].y;
-                        nameRt.GetWorldCorners(corners);
-                        if (corners[0].y < countTop - 0.5f) problems.Add($"\"{name.text.Replace("\n", "/")}\" runs down behind its in-deck count");
+                        if (nameLow.y < corners[1].y - 0.5f && nameHigh.x > corners[0].x + 0.5f) problems.Add($"\"{shown}\" runs down behind its in-deck count");
                     }
                     if (view.transform.Find("Limit") is RectTransform badge)
                     {
                         badges++;
                         badge.GetWorldCorners(corners);
-                        float badgeBottom = corners[0].y;
-                        nameRt.GetWorldCorners(corners);
-                        if (corners[1].y > badgeBottom + 0.5f) problems.Add($"\"{name.text.Replace("\n", "/")}\" starts behind its limit badge");
+                        if (nameHigh.y > corners[0].y + 0.5f && nameLow.x < corners[3].x - 0.5f) problems.Add($"\"{shown}\" starts behind its limit badge");
                     }
                 }
             return (problems, names, badges, counts);
@@ -1039,18 +1047,16 @@ namespace YgoCampaign.Game
             Ui.Image(panel, T.PanelDeep);
             panel.gameObject.AddComponent<Outline>().effectColor = T.Focus;
             var artBox = Box(panel, 30, 30, 360, 525);
-            var art = CardView.Art?.GetFull(info.Code); // big enough for the whole picture
-            if (art != null)
             {
+                // The whole picture (big enough for it), else the plain card at Full.
                 var raw = artBox.gameObject.AddComponent<RawImage>();
-                raw.texture = art;
+                CardFace.Draw(raw, info.Code, info, new Vector2(360, 525), full: true);
                 // Your best copy, as it is.
                 var best = OwnedCards?.CopiesOf(Banlist.BaseCode(info.Code, _cards)) is { Count: > 0 } mine ? mine[0] : null;
                 if (best != null && CardFoil.Mode == CardFoil.Display.On) CardFoil.Apply(raw, info, best.Rarity, 1f, best.Look);
                 else CardFoil.Apply(raw, info, CardFoil.RarityOf(info), 1f, best?.Look ?? default);
                 CardFoil.Tilting(raw);
             }
-            else Ui.Image(artBox, CardView.FrameColor(info.Type));
             var name = Label(420, 30, 800, 48, info.Name, 30, parent: panel);
             name.fontStyle = FontStyle.Bold;
             name.color = T.Text;
@@ -1449,10 +1455,10 @@ namespace YgoCampaign.Game
         {
             _dragging = true;
             var info = _cards.Get(code);
-            var art = CardView.Art?.Get(code);
-            _ghostArt.texture = art;
-            _ghostArt.color = art != null ? Color.white : KindColor(info?.Type ?? 0);
-            _ghostName.text = art != null ? "" : info?.Name ?? "";
+            // The picture, else the plain card (a face over this frame's budget shows its kind's blank and fills in mid-drag).
+            CardFace.Draw(_ghostArt, code, info, _ghostArt.rectTransform.rect.size);
+            _ghostArt.color = Color.white;
+            _ghostName.text = "";
             _ghost.gameObject.SetActive(true);
             _ghost.SetAsLastSibling();
             MoveDrag(screen, fromDeck: false);
@@ -2720,7 +2726,7 @@ namespace YgoCampaign.Game
                 };
                 // Click to focus (pointing only lifts it): DeckEditor.Focus.
                 var view = CardView.Create(_cardsLayer, new Vector2(x - 960, 540 - y), DeckCard, card, info, 0, true,
-                    null, offField: true, highlight: _deck.Starters.Contains(Banlist.BaseCode(codes[index], _cards)));
+                    null, offField: true, highlight: _deck.Starters.Contains(Banlist.BaseCode(codes[index], _cards)), fit: CardFit.Badged);
                 view.EditorMode(button => ClickDeck(section, index, button));
                 _deckViews.Add((section, index, view, ((RectTransform)view.transform).anchoredPosition));
                 int allowed = limits.Allowed(codes[i], _cards);
@@ -2805,8 +2811,6 @@ namespace YgoCampaign.Game
             rt.sizeDelta = new Vector2(20, 20);
             Ui.Image(rt, color).raycastTarget = false;
             Ui.Text(rt, text, 13, Color.white).fontStyle = FontStyle.Bold;
-            // A card without a picture has its name at the top: it starts under the badge (shrinking to fit), not behind it.
-            if (card.Find("Face/Name") is RectTransform name) name.offsetMax = new Vector2(name.offsetMax.x, Mathf.Min(name.offsetMax.y, -20));
         }
 
         private void RunSearch()
@@ -2949,7 +2953,7 @@ namespace YgoCampaign.Game
                     SlabView.Rim(rim, Vector2.zero, ResultCard);
                 }
                 // Click to focus, the focused one again to add, right-click to the Side Deck (DeckEditor.Focus); pointing only lifts it.
-                var view = CardView.Create(_resultsLayer, new Vector2(cx, cy), ResultCard, card, shown, 0, true, null, offField: true, highlight: copies > 0);
+                var view = CardView.Create(_resultsLayer, new Vector2(cx, cy), ResultCard, card, shown, 0, true, null, offField: true, highlight: copies > 0, fit: CardFit.Badged);
                 view.EditorMode(button => ClickResult(info, i, button));
                 _resultViews.Add((Banlist.BaseCode(info.Code, _cards), view, Math.Max(0, Math.Min(2, (ownedCopies?.Count ?? 0) - 1)), new Vector2(cx, cy)));
                 if (ownedCopies is { Count: > 0 } && ownedCopies[0].IsSlab) SlabView.RimGlass(_resultsLayer, new Vector2(cx, cy), ResultCard, view);
@@ -2970,16 +2974,6 @@ namespace YgoCampaign.Game
                     var tag = Ui.Placed("InDeck", view.transform, new Vector2(ResultCard.x / 2 - 14, -ResultCard.y / 2 + 38), new Vector2(26, 22)); // above the stat strip
                     Ui.Image(tag, Ui.Hex("#13203A")).raycastTarget = false; // theme: kept, a badge on the card
                     Ui.Text(tag, $"x{copies}", 13, CardView.Actionable).fontStyle = FontStyle.Bold;
-                    // A card without a picture has its name above: it ends over the count (shrinking to fit), not behind it.
-                    if (view.transform.Find("Face/Name") is RectTransform nameBox)
-                    {
-                        var at = new Vector3[4];
-                        tag.GetWorldCorners(at);
-                        float countTop = at[1].y;
-                        nameBox.GetWorldCorners(at);
-                        if (at[0].y < countTop && nameBox.lossyScale.y > 0)
-                            nameBox.offsetMin = new Vector2(nameBox.offsetMin.x, nameBox.offsetMin.y + (countTop - at[0].y) / nameBox.lossyScale.y + 1);
-                    }
                 }
                 // Under the card: how many you own (campaign), or its kind.
                 var under = OwnedCards != null && allowed > 0

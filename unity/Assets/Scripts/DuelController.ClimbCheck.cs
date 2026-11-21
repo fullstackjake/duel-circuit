@@ -149,7 +149,6 @@ namespace YgoCampaign.Game
             // ---- 1. The final's row: "Final: ...", the fallback quote, then a fixture's final line ------------------------
             var originalLine = c0.FinalLine;
             var originalFormer = c0.Former.ToList();
-            bool dataHasWas = circuits.All.Any(c => c.Former.Count > 0); // circuits.txt's own "was:" lines, before the fixture's
             const string fixtureLine = "Fixture final line: one duel left, the whole circuit on it, so bring the best deck you have.";
             var owner = c0.Matches[0].Character;
             var allRecipes = RecipeBook.All(circuits);
@@ -404,9 +403,22 @@ namespace YgoCampaign.Game
             c0.Former.AddRange(originalFormer);
             if (fc != null) c0.Former.AddRange(fc.Former);
             var formerRecipe = RecipeBook.All(circuits).FirstOrDefault(r => r.Former && r.Key == RecipeBook.Key(owner.Id, formerDeck));
-            // The live data's former recipe: Chef Praline's Yummy (Sage's Spellbook and Gage's Geargia are still met in the Novice Tag Cup).
-            var liveFormer = RecipeBook.All(circuits).FirstOrDefault(r => r.Former && r.Key == RecipeBook.Key("yummy", "yummy"))
-                             ?? RecipeBook.All(circuits).FirstOrDefault(r => r.Former && r.Key != formerRecipe?.Key);
+            // The live data's former recipes: circuits.txt's own "was:" pairings that no circuit match or Tag Cup still plays
+            // (one still met, as Gage's Geargia in the Novice Tag Cup, is a current recipe). Each must be listed as former.
+            var metNow = new HashSet<string>();
+            foreach (var circuit in circuits.All)
+                foreach (var m in circuit.Matches)
+                    if (m.Deck.Length > 0) metNow.Add(RecipeBook.Key(m.Character.Id, m.Deck));
+            foreach (var cup in circuits.TagCups)
+                foreach (var (lead, partner) in cup.Matches)
+                    foreach (var m in new[] { lead, partner })
+                        if (m.Deck.Length > 0) metNow.Add(RecipeBook.Key(m.Character.Id, m.Deck));
+            var dataWas = circuits.All.SelectMany((c, i) => (i == 0 ? originalFormer : c.Former).Select(f => f.Was)).ToList();
+            var formerOnly = dataWas.Where(w => w.Deck.Length > 0).Select(w => RecipeBook.Key(w.Character.Id, w.Deck))
+                .Where(k => !metNow.Contains(k)).Distinct().ToList();
+            var liveFormers = RecipeBook.All(circuits).Where(r => r.Former && r.Key != formerRecipe?.Key).ToList();
+            var unlisted = formerOnly.Where(k => liveFormers.All(r => r.Key != k)).ToList();
+            var liveFormer = formerOnly.Select(k => liveFormers.FirstOrDefault(r => r.Key == k)).FirstOrDefault(r => r != null);
             _recipeBook.Open();
             yield return Settle(0.5f);
             bool listedBefore = _recipeBook.DebugRecipes.Any(r => r.Former && r.Key == formerRecipe?.Key);
@@ -443,8 +455,12 @@ namespace YgoCampaign.Game
                 WholeLine("recipe strength line (former, live)", 2);
                 yield return shot("climb-recipes-long");
             }
-            else if (dataHasWas) report("7. circuits.txt has \"was:\" lines, but no former recipe is listed from them", false);
-            else Debug.Log("climb check: note  circuits.txt has no \"was:\" line yet: the fixture's former recipe covers step 7");
+            else if (formerOnly.Count == 0)
+                Debug.Log($"climb check: note  circuits.txt's {dataWas.Count} \"was:\" line(s) ({string.Join(", ", dataWas.Select(w => RecipeBook.Key(w.Character.Id, w.Deck)))}) "
+                          + "are all still met in a circuit or Tag Cup: no former recipe from the data; the fixture's covers step 7");
+            if (formerOnly.Count > 0)
+                report($"7. every \"was:\" pairing met nowhere else in the map is listed as a former recipe ({string.Join(", ", formerOnly)})"
+                       + (unlisted.Count > 0 ? $": not listed {string.Join(", ", unlisted)}" : ""), unlisted.Count == 0);
             // The longest real "by" line: the recipe met in the circuit with the longest name.
             var longest = _recipeBook.DebugRecipes.Where(r => DeckStrength.StarsFor(_campaign.Ratings, r.Deck) > 0).OrderByDescending(r => r.Where.Length + r.Owner.DisplayName.Length).FirstOrDefault();
             if (longest != null)

@@ -495,3 +495,110 @@ draws in text (▲ ▼ ⊘ ⬢ ★ ☆ · …): where a face lacks one, the type
 3. **Chakra Petch (display) + IBM Plex Sans (body).** OFL. From Google Fonts; Plex also from IBM's repository
    (github.com/IBM/plex). Chakra Petch's cut corners echo the logo's circuit-board edges, the most "Duel Circuit" of the
    three; Plex Sans is sturdy and clear in body text. The display face is the most distinctive and the least neutral.
+
+## As built (2026-11-21)
+
+Built by two Unity Architects (Opus): part R (the renderer) and part S (the screens and the no-pictures pass). A Code
+Reviewer (Opus) read both diffs against this spec, and one fix round followed. The spec was a UI Designer's (Opus). This
+section is written from the code. Where the code and the spec differ, the code is right.
+
+Decided (owner, 2026-11-21): N1 to N7 as recommended. Kind colours kept, the opponent's plain cards read upright,
+the card detail's attribute badge is now a glyph, the title wall fills with plain cards under 12 pictures, the rarity
+mark is on plain cards only, field spell mats unchanged, no "plain cards for everything" setting.
+
+### What was built
+
+- **`CardFace`** (`unity/Assets/Scripts/CardFace.cs`) is the one entry point: `Picture` and `Draw` give the player's
+  picture where there is one, else a plain texture; `PlainOnly` gives the plain card alone (checks, the title wall).
+  Never null for a card with a code. Four layouts by layout width (`LayoutFor`: Thumb under 60, Compact under 140,
+  Standard under 280, else Full) and a `Badged` fit for the editor's Compact tiles.
+- **`PlainCards`** (`PlainCards.cs`) draws a face in a hidden world-space studio canvas and copies it to a mipmapped
+  texture. The cache is least-recently-used and capped at 96 MB (`CardFace.CacheCap`); a face on an active object is
+  never evicted. Faces past a frame's 6 ms budget show their kind's blank and fill in over later frames (the same texture).
+- **Glyphs** (`Icons.cs`): nine drawn shapes, `attr-light`, `attr-dark`, `attr-fire`, `attr-water`, `attr-earth`,
+  `attr-wind`, `attr-divine`, `kind-spell`, `kind-trap`.
+- **Foil and the rarity mark** (`CardFoil.cs`): `Apply` gives a plain texture its layout's regions. The mark
+  (`RarityMark`, an `Image` and a `Text`) shows on Standard and Full plain faces for Rare and up, with foils off too.
+- **Card detail** (`CardDetail.cs`): the attribute badge is the glyph on the attribute's disc (dark ink on LIGHT and
+  DIVINE's light discs); the art box shows the plain card. Its rarity text uses `CardFace.RarityShort`.
+- **Title and menu** (`MenuScreens.cs`): the wall draws its faces when the title opens and lets them go when it closes;
+  the main menu showcase is drawn through `CardFace.Draw` at Full size.
+- **Checks:** `-plaincheck` (`DuelController.PlainCheck.cs`, 34 steps) and the no-pictures audit
+  (`DuelController.FaceAudit.cs`, used by `-menucheck`, `-campaigncheck`, `-shopcheck`, `-themecheck`, `-layoutcheck`).
+  See docs/DEVELOPING.md, "App checks".
+
+The rarity marks (`CardFace.RarityShort`), one per rarity: Common N, Short Print SP, Rare R, Normal Parallel NPR, Rare
+Parallel RPR, Super Rare SR, Super Parallel SPR, Starfoil SFR, Mosaic MSR, Shatterfoil SHR, Ultra Rare UR, Ultra Parallel
+UPR, Pharaoh's PhR, Gold GR, Premium Gold PGR, Platinum PlR, Secret Rare ScR, Prismatic Secret PScR, Gold Secret GScR,
+Extra Secret EScR, Platinum Secret PlScR, Ultimate UtR, Collector's CR, Ghost Gold GGR, Ghost GhR, Quarter Century Secret
+QCSR, Starlight StR. Their colours: R, SR, UR and ScR have their own; Common and Short Print are grey; the rest use
+`CardFoil.PrizeColor`. A plain card wears the mark only from Rare up.
+
+### Where the build differs from the spec
+
+1. **One explicit rarity table** replaces the spec's "initials" rule (`CardFace.RarityShort`). It is used by the mark and
+   by the card detail (its old `Short` is gone), so Short Print now reads SP there, not N.
+2. **Standard's smallest name size is 11** (the spec said 13: at 13 two-line names lost their last word). Full's is 18.
+3. **Dark glyph ink on light grounds** (`GlyphInk`): the light-ink rule gives way where the ground is light.
+4. **An unknown card's Thumb shows its pattern** (there is no glyph or text to carry it, and it would read as blank).
+5. **The stat strip over a plain face is fully opaque** (0.72 over a picture), so it covers the footer's printed stats. (The first build made it 0.93; the follow-up fix below made it 1.)
+6. **The studio canvas is world-space and rebuilds only itself**, never through `Canvas.ForceUpdateCanvases` (that would
+   rebuild every other canvas and could run game code).
+7. **The title wall's faces are at most 288 px wide** (`CardFace.WallWidth`) and are released when the title closes.
+8. **Only faces on active objects pin their texture.** A hidden screen's plain faces may be evicted and are drawn
+   again when it shows.
+9. **The drag ghost is a Compact face** (it is 74 x 108 layout units).
+10. **The cut-in on a plain card is a window crop without its mark** (`CardFace.WindowUv`).
+11. **`PosterView.Cards`** is a new data provider (posters are built without the card data); the title sets it.
+12. **Before a campaign the main menu showcase prefers a card with a picture:** a starter card with a picture, else any
+    installed picture, else a plain starter card.
+13. **The rarity mark's tilt is approximate:** it rotates with the card's tilt, without the shader's perspective.
+
+### Follow-up fix (after the evidence pass)
+
+- **Spell and Trap thumbs show their pattern on a plate under the glyph** (`PlainCards.cs`). Their glyph disc was the kind
+  colour itself and vanished into the card, leaving thin strokes; the blank test rejected the Trap thumbs at 3024x1964.
+  Unknown cards' thumbs use the same plate.
+- **On Compact faces the chip is on the left and the glyph disc on the right** (`PlainCards.cs`: chip at x 0.06 to 0.58,
+  disc centred at 0.75), so the hand's big Level digit no longer covers the glyph. The digit now sits partly over the
+  "LV n" chip.
+- **The live stat strip over a plain face is fully opaque** (`CardView.cs`).
+- **`-plaincheck`'s burst note counts correctly** (per the builder: the evidence pass saw "-10 drawn at once"; I could
+  not tell from the code alone which line changed).
+
+After the fix, `-plaincheck` passes at 1280x720, 1920x1080 and 3024x1964 (the builder's report). The evidence pass below ran
+before it, so it is not proof of the fix.
+
+### Evidence (2026-11-21)
+
+The Evidence Collector tested a fresh build ([EVIDENCE-2026-11-21b.md](EVIDENCE-2026-11-21b.md)).
+Harness: `--campaign-test`, `--deckbuilding-test` and `--texts-check` pass; `--games 30` has 0 script errors and 0 crashed
+games; `check_history_decks.py` reports 0 problems. App: 41 check runs, 39 with 0 FAIL and 2 with one FAIL each; no
+exception in any log, every run exited 0. Both picture modes ran: with no pictures at 1280x720 (23 runs), 1920x1080 (4)
+and 3024x1964 (2), and with the machine's 3551 EDOPro pictures at 1280x720 (7 runs) plus 5 awkward-input runs; every
+audited no-pictures run logs its audit steps (menu 2, campaign 12, layout 7, shop 4, theme 10) and every with-pictures
+run logs them skipped. `-plaincheck` passes 34 of 34 at 1280x720 and 1920x1080. At 3024x1964 (canvas scale 1.58) the
+plain cache reached 95.9 MB against its 96 MB cap. The two FAIL lines:
+
+- `-plaincheck` step 1 at 3024x1964: the Trap, Cont. Trap and Counter thumbs "look blank". Cause: the thumb glyph vanished
+  into the kind colour (fixed, above).
+- `-themecheck` at 1280x720, once: a cold place's crossfade took 0.54 s against a 0.54 s floor. An old timing flake, not
+  this build; the rerun passed 41 of 41.
+
+### Checks
+
+The spec's verification plan was the app checks listed under "Verification". The checks that now exist are `-plaincheck`
+and the audit. The Evidence Collector's report is [EVIDENCE-2026-11-21b.md](EVIDENCE-2026-11-21b.md).
+
+### Not verified
+
+Real high-resolution screens (the check only simulates one, unless the evidence report says otherwise); the mark's tilt
+on a moving pointer; Windows; real mouse input.
+
+### Open (also in `TODO.md`)
+
+Text inside Standard plain cards is about 6 px at 1280x720, and the deck editor's tile names about 7 px (the type scale
+build); the Spell glyph can read like a wifi symbol; the collection editor shows one more face than its check expects
+(unexplained, most likely the detail's face); weak audit steps (counts that can't come up short, an expected count of 0
+for the box summary and the theme check's Card Trader). Next specs, unchanged: the type scale and fonts (the owner picks
+one of the three font pairs in the appendix below), then pack opening and results.

@@ -266,6 +266,9 @@ namespace YgoCampaign.Game
             _tiltSent = _tilt;
             float ax = _tilt.x * Mathf.Deg2Rad, ay = _tilt.y * Mathf.Deg2Rad;
             _material.SetVector("_Tilt", new Vector4(ax, ay, 0, 0));
+            // The rarity mark (a child drawn by the default UI shader) turns with the card about its own centre: the same
+            // foreshortening, without the shader's perspective.
+            if (_image != null && _image.transform.Find("RarityMark") is Transform mark) mark.localRotation = Quaternion.Euler(_tilt.x, _tilt.y, 0);
             // The viewer's direction in the card's frame (the card turned about x, then y; the eye straight in front).
             _material.SetVector("_TiltView", _tilt == Vector2.zero ? new Vector4(0, 0, 1, 0)
                 : new Vector4(-Mathf.Sin(ay) * Mathf.Cos(ax), Mathf.Sin(ax), Mathf.Cos(ay) * Mathf.Cos(ax), 0));
@@ -291,6 +294,7 @@ namespace YgoCampaign.Game
             var finish = info == null || Mode == Display.Off ? new Finish() : Rarities.FinishOf(rarity);
             bool wear = info != null && CardWear.Shows(look, !finish.IsPlain);
             var existing = image.GetComponent<CardFoil>();
+            RarityMark(image, info, rarity);
             if (info == null || LoadShader() == null)
             {
                 if (existing != null) existing.Clear();
@@ -298,6 +302,47 @@ namespace YgoCampaign.Game
             }
             var effect = existing != null ? existing : image.gameObject.AddComponent<CardFoil>();
             effect.Set(image, info!, finish, strength, wear ? look : default, cover);
+        }
+
+        /// <summary>
+        /// A plain card's rarity mark (Standard and Full faces, Rare and up): a tag at its window's bottom right, the plate's
+        /// colour, the rarity's short form in its colour (CardFace.RarityShort, RarityColor). A copy's rarity is the copy's,
+        /// so it's a child here, not part of the texture: an Image and a Text (never a RawImage: screens give every RawImage
+        /// under a card foil). Information, so it shows with foils off too. Pictures never get one (owner decision N5).
+        /// </summary>
+        private static void RarityMark(RawImage image, CardInfo? info, Rarity rarity)
+        {
+            var existing = image.transform.Find("RarityMark") as RectTransform;
+            bool plain = CardFace.PlainLayout(image.texture, out var layout, out _);
+            bool show = plain && info != null && rarity >= Rarity.Rare && (layout == CardLayout.Standard || layout == CardLayout.Full);
+            if (!show)
+            {
+                if (existing != null) Destroy(existing.gameObject);
+                return;
+            }
+            var window = PlainCards.FoilRects(layout, CardFit.Normal).art;
+            float w = 0.22f, h = 0.07f, m = 0.012f;
+            var mark = existing;
+            Text label;
+            if (mark == null)
+            {
+                mark = Ui.Stretched("RarityMark", image.transform, Vector2.zero, Vector2.one);
+                Ui.Image(mark, Color.black).raycastTarget = false;
+                label = Ui.Text(mark, "", 12, Color.white);
+                label.fontStyle = FontStyle.Bold;
+                label.resizeTextForBestFit = true;
+                label.resizeTextMinSize = 5;
+                label.resizeTextMaxSize = 40;
+                label.rectTransform.offsetMin = new Vector2(1, 1);
+                label.rectTransform.offsetMax = new Vector2(-1, -1);
+            }
+            else label = mark.GetComponentInChildren<Text>();
+            mark.anchorMin = new Vector2(window.z - m - w, window.y + m * CardFace.Aspect);
+            mark.anchorMax = new Vector2(window.z - m, window.y + m * CardFace.Aspect + h);
+            mark.offsetMin = mark.offsetMax = Vector2.zero;
+            mark.GetComponent<Image>().color = PlainCards.PlateColor(info);
+            label.text = CardFace.RarityShort(rarity);
+            label.color = CardFace.RarityColor(rarity);
         }
 
         // ---- The prized moment -------------------------------------------------------------------------
@@ -376,23 +421,43 @@ namespace YgoCampaign.Game
             }
             // A picture that wasn't card-shaped (a manga panel) is letterboxed: there's no name bar, stars, border or text
             // box where the card's layout would have them, so only the art and whole-card foils apply, over all of it.
-            bool boxed = ArtLoader.IsLetterboxed(image.texture);
-            _material.SetFloat("_ArtFoil", (float)finish.Art);
-            _material.SetFloat("_NameFoil", boxed ? 0 : (float)finish.Name);
+            // A plain card (CardFace) has its own layout's regions, and light letters on dark plates; a Thumb takes only
+            // whole-card foils.
+            bool plain = CardFace.PlainLayout(image.texture, out var layout, out var fit);
+            bool boxed = !plain && ArtLoader.IsLetterboxed(image.texture);
+            bool thumb = plain && layout == CardLayout.Thumb;
+            _material.SetFloat("_ArtFoil", thumb ? 0 : (float)finish.Art);
+            _material.SetFloat("_NameFoil", boxed || thumb ? 0 : (float)finish.Name);
             _material.SetFloat("_CardFoil", (float)finish.Card);
-            _material.SetFloat("_BorderFoil", boxed ? 0 : (float)finish.Border);
-            _material.SetFloat("_Stars", finish.Stars && !boxed ? 1 : 0);
-            _material.SetFloat("_Outline", finish.Outline && !boxed ? 1 : 0);
+            _material.SetFloat("_BorderFoil", boxed || thumb ? 0 : (float)finish.Border);
+            _material.SetFloat("_Stars", finish.Stars && !boxed && !thumb ? 1 : 0);
+            _material.SetFloat("_Outline", finish.Outline && !boxed && !thumb ? 1 : 0);
             // A plain card with wear: no foil layers and no surface glare, just the wear.
             _material.SetFloat("_Strength", finish.IsPlain ? 0 : strength);
-            _material.SetFloat("_Ink", LightLetters(info.Type) ? 1 : 0);
-            // Card layout in the picture (UV, origin bottom-left). Pendulum cards have a wider, shorter art window, and their
-            // text runs from the monster's text box up through the Pendulum effect box (which overlaps the art's bottom).
-            bool pendulum = (info.Type & 0x1000000) != 0;
-            _material.SetVector("_ArtRect", boxed ? new Vector4(0, 0, 1, 1)
-                : pendulum ? new Vector4(0.07f, 0.42f, 0.93f, 0.82f) : new Vector4(0.12f, 0.285f, 0.885f, 0.82f));
-            _material.SetVector("_TextRect", boxed ? Vector4.zero
-                : pendulum ? new Vector4(0.04f, 0.05f, 0.96f, 0.42f) : new Vector4(0.06f, 0.05f, 0.94f, 0.262f));
+            _material.SetFloat("_Ink", plain || LightLetters(info.Type) ? 1 : 0);
+            if (plain)
+            {
+                var rects = PlainCards.FoilRects(layout, fit);
+                _material.SetVector("_NameRect", rects.name);
+                _material.SetVector("_ArtRect", rects.art);
+                _material.SetVector("_AttrRect", rects.attr);
+                _material.SetVector("_StarsRect", rects.stars);
+                _material.SetVector("_TextRect", rects.text);
+            }
+            else
+            {
+                // Card layout in the picture (UV, origin bottom-left). Pendulum cards have a wider, shorter art window, and their
+                // text runs from the monster's text box up through the Pendulum effect box (which overlaps the art's bottom).
+                bool pendulum = (info.Type & 0x1000000) != 0;
+                _material.SetVector("_ArtRect", boxed ? new Vector4(0, 0, 1, 1)
+                    : pendulum ? new Vector4(0.07f, 0.42f, 0.93f, 0.82f) : new Vector4(0.12f, 0.285f, 0.885f, 0.82f));
+                _material.SetVector("_TextRect", boxed ? Vector4.zero
+                    : pendulum ? new Vector4(0.04f, 0.05f, 0.96f, 0.42f) : new Vector4(0.06f, 0.05f, 0.94f, 0.262f));
+                // The shader's own values for a picture (a material that showed a plain card before must not keep its rects).
+                _material.SetVector("_NameRect", new Vector4(0.06f, 0.885f, 0.83f, 0.955f));
+                _material.SetVector("_AttrRect", new Vector4(0.835f, 0.885f, 0.945f, 0.96f));
+                _material.SetVector("_StarsRect", new Vector4(0.1f, 0.828f, 0.9f, 0.878f));
+            }
             _small = -1;
             UpdateSmall();
             _worn = look.IsCopy;

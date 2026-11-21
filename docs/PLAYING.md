@@ -34,6 +34,12 @@ This guide covers duels, the deck editor, controls and settings. For the campaig
 
 Use the mouse, the arrow keys and **Enter**, or a controller's d-pad and **A**.
 
+**The title screen and the menu's showcase.** Behind the title, rows of cards drift past, about a third of them in foil. With
+fewer than 12 card pictures installed, the game fills the wall with plain cards (the card it draws itself when it has
+no picture; see [CARD-PICTURES.md](CARD-PICTURES.md)). The big card on the right of the menu is your best card once you
+have a campaign. Before that it is one of the starter decks' cards: a card with a picture if you have one, else a plain
+card. It tilts as you move the mouse.
+
 In this guide, **CPU duelists** are the computer players.
 
 ## Playing a duel
@@ -63,6 +69,8 @@ Duel Circuit plays like Master Duel: **click a card to act with it.**
   Settings.
 - Click a Graveyard, your banished cards or your Extra Deck to look through them.
 - Point at any card to read it in the side column. Click its picture for a bigger view.
+- A card's detail shows its Attribute as a symbol on a coloured disc (Earth, Water, Fire, Wind, Light, Dark and Divine
+  each have their own), or a Spell or Trap mark. Your opponent's plain cards read upright, not turned upside down.
 
 **Changing phase:**
 1. Click the **turn ring** on the center line, right of the board.
@@ -543,8 +551,9 @@ everything that happens.
 
 ## Rarity and foils
 
-Cards with a picture are drawn with their rarity's finish, like the real cards. There are 26 rarity finishes (the plain
-Common finish is one of them), for example:
+Cards are drawn with their rarity's finish, like the real cards, whether they have a picture or show their plain card
+(the card the game draws when you have no picture for it; see [CARD-PICTURES.md](CARD-PICTURES.md)). There are 26
+rarity finishes (the plain Common finish is one of them), for example:
 
 | Rarity | How it looks |
 |---|---|
@@ -559,6 +568,33 @@ Common finish is one of them), for example:
 
 Move the mouse (or the controller cursor) near a card and the light follows it. Otherwise a glint sweeps across now and
 then.
+
+Grades work the same way: a copy's worn corners, scratches and creases show on its plain card as on a picture.
+
+### Rarity marks
+
+A plain card also carries a **rarity mark**: a small tag at the bottom right of its window, in the rarity's colour. It
+shows on bigger cards (not on the small ones on the board or in lists), for Rare and up. It shows even when Foils is
+**Off**. Cards with pictures don't get one.
+
+| Rarity | Mark | | Rarity | Mark |
+|---|---|---|---|---|
+| Rare | R | | Platinum Rare | PlR |
+| Normal Parallel Rare | NPR | | Secret Rare | ScR |
+| Rare Parallel Rare | RPR | | Prismatic Secret Rare | PScR |
+| Super Rare | SR | | Gold Secret Rare | GScR |
+| Super Parallel Rare | SPR | | Extra Secret Rare | EScR |
+| Starfoil Rare | SFR | | Platinum Secret Rare | PlScR |
+| Mosaic Rare | MSR | | Ultimate Rare | UtR |
+| Shatterfoil Rare | SHR | | Collector's Rare | CR |
+| Ultra Rare | UR | | Ghost Gold Rare | GGR |
+| Ultra Parallel Rare | UPR | | Ghost Rare | GhR |
+| Pharaoh's Rare | PhR | | Quarter Century Secret Rare | QCSR |
+| Gold Rare | GR | | Starlight Rare | StR |
+| Premium Gold Rare | PGR | | | |
+
+Common is **N** and Short Print is **SP**. You see those two in lists and in the card detail's printing line, but a plain
+card doesn't wear them. The card detail uses the same short forms.
 
 **The Foils setting:**
 - **On** (default): in the campaign, each card shows your best copy. Elsewhere, its rarest classic printing (up to Secret Rare).

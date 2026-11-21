@@ -52,8 +52,35 @@ namespace YgoCampaign.Game
             _root.gameObject.SetActive(false);
         }
 
+        /// <summary>The wall's cards: what each shows (its faces are drawn while the title is open and let go when it closes).</summary>
+        private readonly List<(RawImage image, uint code, CardInfo? info, Rarity rarity)> _wall = new List<(RawImage, uint, CardInfo?, Rarity)>();
+
+        private void DrawWall()
+        {
+            foreach (var (image, code, info, rarity) in _wall)
+            {
+                // A picture where there is one, else the plain card at most CardFace.WallWidth wide (dimmed behind the logo, it
+                // needn't be sharper); faces past a frame's budget fill in over the next frames.
+                image.texture = CardFace.WallFace(code, info, image.rectTransform.sizeDelta);
+                if (CardFace.IsPlain(image.texture)) image.uvRect = new Rect(0, 0, 1, 1);
+                CardFace.Tag(image, code, image.rectTransform.sizeDelta, CardFit.Normal, info);
+                CardFoil.Apply(image, info, rarity, 0.8f); // about a third foiled; the rest for their rounded corners
+            }
+        }
+
+        /// <summary>Lets go of the wall's faces (a hidden title holds no cache memory).</summary>
+        private void ReleaseWall()
+        {
+            foreach (var (image, code, _, _) in _wall)
+            {
+                image.texture = null;
+                CardFace.Tag(image, code, image.rectTransform.sizeDelta, CardFit.Normal); // (no texture: the tag goes)
+            }
+        }
+
         public void Open()
         {
+            DrawWall();
             _root.gameObject.SetActive(true);
             _shown = Time.unscaledTime;
             SetAttract(false);
@@ -64,6 +91,7 @@ namespace YgoCampaign.Game
         {
             SetAttract(false);
             _root.gameObject.SetActive(false);
+            ReleaseWall();
         }
 
         private void Build()
@@ -71,12 +99,16 @@ namespace YgoCampaign.Game
             _root = Ui.Overlay(transform, "Title", 40);
             _shade = Ui.Image(_root, Ui.Hex("#07090E"));
 
-            // Card pictures drifting slowly up in tilted columns.
+            // Card faces drifting slowly up in tilted columns: your pictures; with fewer than 12 installed, plain cards of the
+            // starter and built-in decks' showcase cards too (owner decision N4).
             _drift = Ui.Stretched("Drift", _root, Vector2.zero, Vector2.one);
             _driftGroup = _drift.gameObject.AddComponent<CanvasGroup>();
             _driftGroup.blocksRaycasts = false;
             var art = CardView.Art;
             var installed = art?.Installed ?? (IReadOnlyList<uint>)Array.Empty<uint>();
+            var codes = installed.ToList();
+            if (installed.Count < 12) codes.AddRange(ShowcaseCodes().Where(c => !codes.Contains(c)));
+            PosterView.Cards ??= _data; // posters draw plain cards too (they're built without the card data)
             var rng = new System.Random(Environment.TickCount);
             var tilt = Ui.Placed("Tilt", _drift, Vector2.zero, new Vector2(2600, 2000));
             tilt.localRotation = Quaternion.Euler(0, 0, 12);
@@ -87,14 +119,12 @@ namespace YgoCampaign.Game
                     var rt = Ui.Placed("Card", tilt, new Vector2((col - 4) * 270, (row - 2.5f) * 380 + (col % 2) * 190), new Vector2(236, 344));
                     var image = rt.gameObject.AddComponent<RawImage>();
                     image.raycastTarget = false;
-                    if (installed.Count > 0)
+                    if (codes.Count > 0)
                     {
-                        var code = installed[rng.Next(installed.Count)];
-                        image.texture = art!.Get(code);
-                        var info = _data.Get(code);
-                        // About a third in foil; the rest still go through Apply, for their rounded corners.
+                        // Its card, drawn when the title opens (DrawWall); about a third in foil.
+                        var code = codes[rng.Next(codes.Count)];
                         bool foiled = rng.NextDouble() < 0.35;
-                        CardFoil.Apply(image, info, foiled ? rarities[rng.Next(rarities.Length)] : Rarity.Common, 0.8f);
+                        _wall.Add((image, code, _data.Get(code), foiled ? rarities[rng.Next(rarities.Length)] : Rarity.Common));
                     }
                     else image.color = Ui.Hex("#2A2016");
                     _cards.Add(rt);
@@ -135,6 +165,25 @@ namespace YgoCampaign.Game
             // The attract duel plays behind: the notice gets a strip of its own so it doesn't run over the hand.
             Ui.Image(Ui.Box(_root, 0, 1028, 1920, 52), new Color(0, 0, 0, 0.75f)).raycastTarget = false;
             Ui.Text(Ui.Box(_root, 30, 1040, 1860, 30), $"{GameInfo.Version}   ·   {GameInfo.Notice}", 14, new Color(1, 1, 1, 0.6f));
+        }
+
+        /// <summary>The title wall's plain cards: the starter decks' showcase cards, then the built-in decks' (CampaignScenes.ShowcaseOf).</summary>
+        private List<uint> ShowcaseCodes()
+        {
+            var codes = new List<uint>();
+            void Add(uint code) { if (code != 0 && _data.Get(code) != null && !codes.Contains(code)) codes.Add(code); }
+            foreach (var starter in CampaignState.Starters)
+                foreach (var code in starter.Showcase) Add(code);
+            // The built-in decks (StreamingAssets in a build, the repo's decks/ in the editor), top level only.
+            var folder = System.IO.Path.Combine(Application.streamingAssetsPath, "decks");
+            if (!System.IO.Directory.Exists(folder)) folder = System.IO.Path.GetFullPath(System.IO.Path.Combine(Application.dataPath, "..", "..", "decks"));
+            if (System.IO.Directory.Exists(folder))
+                foreach (var file in System.IO.Directory.GetFiles(folder, "*.ydk").OrderBy(f => f, StringComparer.Ordinal))
+                {
+                    try { foreach (var code in CampaignScenes.ShowcaseOf(Deck.LoadYdk(file), _data)) Add(code); }
+                    catch (Exception e) { Debug.LogWarning($"Title wall: skipped {file}: {e.Message}"); }
+                }
+            return codes;
         }
 
         private static RawImage Glow(Transform parent, Vector2 at, Vector2 size, Color color)
@@ -401,11 +450,10 @@ namespace YgoCampaign.Game
         {
             for (int i = _showcase.childCount - 1; i >= 0; i--) Destroy(_showcase.GetChild(i).gameObject);
             if (Showcase() is not { } pick) return;
-            var art = CardView.Art?.Get(pick.code);
-            if (art == null) return;
+            // The picture when there is one, else the plain card (Full at the showcase's size).
             var image = Ui.Stretched("Card", _showcase, Vector2.zero, Vector2.one).gameObject.AddComponent<RawImage>();
-            image.texture = art;
             image.raycastTarget = false;
+            CardFace.Draw(image, pick.code, FindInfo(pick.code), _showcase.sizeDelta);
             CardFoil.Apply(image, FindInfo(pick.code), pick.rarity, 1f);
             CardFoil.Tilting(image);
         }
