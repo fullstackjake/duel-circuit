@@ -60,7 +60,7 @@ namespace YgoCampaign.Game
             _root = Ui.Overlay(transform, "RecipeBook", 15);
             Ui.Image(_root, Ui.Hex("#121620"));
             Ui.Image(Ui.Box(_root, 0, 0, 1920, 90), Ui.Hex("#0D1017"));
-            Ui.Text(Ui.Box(_root, 40, 0, 400, 90), "RECIPE BOOK", 34, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Box(_root, 40, 0, 400, 90), "RECIPE BOOK", 34, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
             _header = Ui.Text(Ui.Box(_root, 380, 0, 1200, 90), "", 20, Ui.Hex("#FFD86B"), TextAnchor.MiddleLeft);
             _header.supportRichText = true;
             Ui.BoxButton(_root, 1720, 22, 160, 46, "Back", Close, 18);
@@ -168,7 +168,7 @@ namespace YgoCampaign.Game
                 {
                     band = circuit.Band;
                     var heading = Ui.Text(Ui.Box(_list, 6, y + 8, 620, 28), band.ToUpperInvariant(), 16, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
-                    heading.fontStyle = FontStyle.Bold;
+                    Typography.Strong(heading);
                     y += 40;
                 }
                 if (i == _selected) _rowTop = y;
@@ -200,7 +200,7 @@ namespace YgoCampaign.Game
                 portrait.color = open ? Color.white : new Color(0.18f, 0.18f, 0.22f);
             var deck = open ? Load(r) : null;
             var name = Ui.Text(Ui.Box(row, 84, 8, 380, 30), open ? Title(r, deck) : "???", 19, open ? Color.white : new Color(1, 1, 1, 0.45f), TextAnchor.MiddleLeft);
-            name.fontStyle = FontStyle.Bold;
+            Typography.Strong(name);
             // An open recipe's owner line ends with the deck's strength (none when it isn't rated).
             var stars = open ? StrengthText.Stars(DeckStrength.StarsFor(_state.Ratings, r.Deck), UiTheme.Current) : "";
             Ui.Text(Ui.Box(row, 84, 40, 400, 26), open ? $"{r.Owner.Name}{(r.Boss ? "  ·  <color=#FFC940>boss</color>" : "")}{(stars.Length > 0 ? "  ·  " + stars : "")}" : $"Beat {r.Owner.Name} in {r.Where}",
@@ -225,7 +225,7 @@ namespace YgoCampaign.Game
             {
                 var tag = Ui.Box(row, 490, 6, 50, 20);
                 Ui.Image(tag, Ui.Hex("#2F8F4A")).raycastTarget = false;
-                Ui.Text(tag, "NEW", 12, Color.white).fontStyle = FontStyle.Bold;
+                Typography.Strong(Ui.Text(tag, "NEW", 12, Color.white));
             }
             Ui.Clickable(row, () => { _selected = index; _mine = null; Refresh(); }, hover: () => _keys.Point(index), style: HoverStyle.Row);
         }
@@ -304,7 +304,7 @@ namespace YgoCampaign.Game
 
             if (!open)
             {
-                Ui.Text(Ui.Box(_detail, 270, 30, 880, 50), "Locked recipe", 30, Color.white, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+                Typography.Strong(Ui.Text(Ui.Box(_detail, 270, 30, 880, 50), "Locked recipe", 30, Color.white, TextAnchor.MiddleLeft));
                 var how = Ui.Text(Ui.Box(_detail, 270, 90, 880, 120),
                     $"Beat <b>{r.Owner.DisplayName}</b> in <b>{r.Where}</b> ({circuit.Band}) to unlock the deck they play there.\n\n"
                     + (Circuits.IsUnlocked(r.Circuit, Profile) ? "That circuit is open now." : $"That circuit opens later on the map."),
@@ -322,7 +322,7 @@ namespace YgoCampaign.Game
             }
             var list = List(r);
             var title = Ui.Text(Ui.Box(_detail, 270, 18, 890, 46), Title(r, deck), 32, Color.white, TextAnchor.MiddleLeft);
-            title.fontStyle = FontStyle.Bold;
+            Typography.Strong(title);
             title.resizeTextForBestFit = true;
             title.resizeTextMinSize = 18;
             title.resizeTextMaxSize = 32;

@@ -212,7 +212,7 @@ namespace YgoCampaign.Game
             {
                 var tab = Ui.Placed("Tab", content, new Vector2(x + 70, 106), new Vector2(160, 26));
                 Ui.Image(tab, ChainHeader);
-                Ui.Text(tab, g.Key.name, 14, Color.white).fontStyle = FontStyle.Bold;
+                Typography.Strong(Ui.Text(tab, g.Key.name, 14, Color.white));
                 foreach (var i in g)
                 {
                     var center = new Vector2(x + CardSize.x / 2, -12);
@@ -396,7 +396,7 @@ namespace YgoCampaign.Game
                 disc.color = Gold;
                 disc.raycastTarget = false;
                 var n = Ui.Text(badge, (place + 1).ToString(), 18, Ui.Hex("#1A1408"));
-                n.fontStyle = FontStyle.Bold;
+                Typography.Strong(n);
                 n.raycastTarget = false;
                 int link = set.ChainLength + place + 1, resolves = total - link + 1;
                 string caption = chain ? $"Chain Link {link} · resolves {Ordinal(resolves)}" : place == 0 ? "on top" : $"{Ordinal(place + 1)} from the top";
@@ -463,7 +463,7 @@ namespace YgoCampaign.Game
                 var underline = Ui.Placed("Line", tab, new Vector2(0, -24), new Vector2(tabW - 10, 3));
                 Ui.Image(underline, Ui.Hex("#9BD12E")).raycastTarget = false;
                 var number = Ui.Text(tab, (i + 1).ToString(), 24, on ? Ui.Hex("#0B1A10") : Color.white);
-                number.fontStyle = FontStyle.Bold;
+                Typography.Strong(number);
                 Ui.Clickable(tab, () => SelectTab(index), style: on ? HoverStyle.None : HoverStyle.Button); // the open tab doesn't light up
             }
             var body = Ui.Placed("Body", box, new Vector2(0, -25), new Vector2(840, 190));

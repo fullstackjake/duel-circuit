@@ -244,7 +244,7 @@ namespace YgoCampaign.Game
                 var label = _pillButton.GetComponentInChildren<Text>();
                 label.color = T.Info;
                 label.fontSize = 14;
-                label.fontStyle = FontStyle.Bold;
+                Typography.Strong(label);
             }
             _pillGroup = pill.gameObject.AddComponent<CanvasGroup>();
             _pillGroup.alpha = 0;

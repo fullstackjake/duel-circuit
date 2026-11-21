@@ -55,6 +55,22 @@ UI polish ideas live in [UI-ROADMAP.md](UI-ROADMAP.md); the post-game's phases i
   - After New Game+, a "once" guest beaten before pays the full win rate without the prize (as built; flagged for the
     owner: does he expect 150?).
 
+## Type scale and fonts (R1 built 2026-11-21; docs/dev/TYPE-AND-FONTS-SPEC-2026-11-21.md, "As built: R1")
+
+R1 is built and reviewed (one fix round): the fonts, the helpers, the checks and the licences. No text size changed.
+Open:
+
+- [ ] **R2 and R3 wait for the owner's go-ahead.** R2 applies the scale screen by screen; R3 does card and editor text
+  (and the deck editor review's M1). Until then buttons in the condensed face look small at 1280x720, and text inside
+  mid-sized plain cards is still about 5 px there.
+- [ ] **Windows is untested.** Run `-typecheck` on the PC: its log shows which font draws each fallback character (Greek
+  letters in three card names, the katakana middle dot in seven, two Chinese characters in one card's text, arrows).
+- [ ] **About 100 script lines still use rich-text `<b>` / `<i>`,** which draw as synthesized bold or italic on Barlow.
+  The glyph corpus lists them as `# faux` lines and `-typecheck` step 6 prints them. Among them: the shop's opened-card
+  info and the grading desk's names at display size.
+- [ ] **Not verified:** a real missing font file (the fallback to the built-in font); a real 4K screen; that the wallet
+  step would fail without its fix.
+
 ## Plain cards (built 2026-11-21; docs/dev/PLAIN-CARDS-SPEC-2026-11-20.md, "As built")
 
 Built and reviewed (one fix round). The Evidence Collector's report is
@@ -65,8 +81,9 @@ Built and reviewed (one fix round). The Evidence Collector's report is
 - [ ] **Sparkle foil hides a name** (evidence, finding 8): a whole-card sparkle foil can make a plain card's name hard to
   read in the editor.
 - [ ] **The hand's big Level digit** now sits partly over the "LV n" chip (evidence, finding 5; the glyph is clear of it).
-- [ ] **`-themecheck`'s story crossfade step** fails now and then at exactly its 0.54 s floor (evidence, finding 6; old):
-  widen its margin.
+- [x] **`-themecheck`'s story crossfade step** fails now and then at exactly its 0.54 s floor (evidence, finding 6; old):
+  widen its margin. (done 2026-11-21: the step measures in the fade's own clock, with a floor of 0.566 s and at least 17
+  frames; the fade itself is unchanged)
 - [ ] **Weak steps:** the evidence report's list of steps that could pass with their feature broken is its section 7.
 - [ ] **The Spell glyph can read like a wifi symbol.** Look at a redraw.
 - [ ] **The collection editor shows one more face than its check expects.** Unexplained; most likely the card detail's

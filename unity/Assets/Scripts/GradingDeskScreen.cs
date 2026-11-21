@@ -86,7 +86,7 @@ namespace YgoCampaign.Game
             _root = Ui.Overlay(transform, "GradingDesk", 15);
             Ui.Image(_root, Ui.Hex("#141821"));
             Ui.Image(Ui.Box(_root, 0, 0, 1920, 90), Ui.Hex("#0D1017"));
-            Ui.Text(Ui.Box(_root, 40, 0, 680, 90), "GAUGE & GILT · GRADING DESK", 34, Ui.Hex("#EFE6D2"), TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Box(_root, 40, 0, 680, 90), "GAUGE & GILT · GRADING DESK", 34, Ui.Hex("#EFE6D2"), TextAnchor.MiddleLeft));
             _dp = Ui.Text(Ui.Box(_root, 760, 0, 400, 90), "", 24, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
             Ui.BoxButton(_root, 1720, 22, 160, 46, "Back", Close, 18);
             _tabs = Ui.Box(_root, 40, 104, 900, 48);
@@ -406,7 +406,7 @@ namespace YgoCampaign.Game
                     {
                         PackSounds.SlabNumber(copy.Rarity, copy.Slab);
                         var echo = Ui.Text(Ui.Placed("Echo", overlay, new Vector2(0, 380), new Vector2(300, 140)), copy.Slab.ToString(), 96, Ui.Hex("#F3E3B5"));
-                        echo.fontStyle = FontStyle.Bold;
+                        Typography.Strong(echo);
                         StartCoroutine(Fade(echo, 0.5f));
                         return;
                     }
@@ -505,7 +505,7 @@ namespace YgoCampaign.Game
                 name.resizeTextForBestFit = true;
                 name.resizeTextMinSize = 8;
                 name.resizeTextMaxSize = 11;
-                Ui.Text(Ui.Box(tile, 4, 150, 122, 18), l.Sold ? "SOLD" : $"{l.Price:N0} DP", 14, l.Sold ? Ui.Hex("#8A8F9A") : Ui.Hex("#FFC940")).fontStyle = FontStyle.Bold;
+                Typography.Strong(Ui.Text(Ui.Box(tile, 4, 150, 122, 18), l.Sold ? "SOLD" : $"{l.Price:N0} DP", 14, l.Sold ? Ui.Hex("#8A8F9A") : Ui.Hex("#FFC940")));
                 if (l.Sold) tile.gameObject.AddComponent<CanvasGroup>().alpha = 0.4f;
                 var pick = l;
                 int at = i;
@@ -566,7 +566,7 @@ namespace YgoCampaign.Game
             Ui.Image(_overlay, new Color(0, 0, 0, 0.75f));
             var panel = Ui.Box(_overlay, 510, 230, 900, 620);
             Ui.Image(panel, Ui.Hex("#1A1F2B"));
-            Ui.Text(Ui.Box(panel, 30, 16, 840, 40), "Special order", 28, Color.white, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Box(panel, 30, 16, 840, 40), "Special order", 28, Color.white, TextAnchor.MiddleLeft));
             Ui.Text(Ui.Box(panel, 30, 56, 840, 24), "Any printing but a card's commonest, Raw Near Mint, at its value plus half. It's here as soon as you pay.", 14, new Color(0.8f, 0.83f, 0.9f), TextAnchor.MiddleLeft);
             var results = Ui.Box(panel, 30, 140, 840, 400);
             void Find(string text)

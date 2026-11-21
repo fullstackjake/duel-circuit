@@ -1,0 +1,33 @@
+fileFormatVersion: 2
+guid: e1350484e50049c8a5949a254155ecec
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Noto Sans Symbols 2
+  - Helvetica Neue
+  - Arial
+  - Segoe UI Symbol
+  - Arial Unicode MS
+  - Segoe UI
+  - Yu Gothic
+  - Meiryo
+  - Microsoft YaHei
+  - MS Gothic
+  - Hiragino Sans
+  - PingFang SC
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 0f40fcde0c4d4054abe97d4de3041459, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -142,7 +142,7 @@ namespace YgoCampaign.Game
             _sign.gameObject.AddComponent<Outline>().effectColor = UiTheme.NeonCyan.WithAlpha(0.35f);
             _plate = Ui.Text(Ui.Box(_root, 126, 42, 640, 56), "UNDER THE COUNTER", 34, T.Sign, TextAnchor.MiddleLeft);
             T.Title(_plate);
-            _dp = Ui.Text(Ui.Box(_root, 780, 12, 900, 92), "", 24, T.Gold, TextAnchor.MiddleLeft);
+            _dp = Typography.Counter(Ui.Text(Ui.Box(_root, 780, 12, 900, 92), "", 24, T.Gold, TextAnchor.MiddleLeft));
             _dp.supportRichText = true;
             Ui.BoxButton(_root, 1720, 34, 160, 46, "Back", Close, 18).targetGraphic.color = T.Button;
             _tabs = Ui.Box(_root, 40, 118, 1840, 48);
@@ -189,7 +189,7 @@ namespace YgoCampaign.Game
                 button.targetGraphic.color = t == tab ? T.TabOn : T.ButtonOff;
                 var label = button.GetComponentInChildren<Text>();
                 label.color = t == tab ? T.Gold : T.TextDim;
-                label.fontStyle = t == tab ? FontStyle.Bold : FontStyle.Normal;
+                Typography.Weight(label, t == tab);
                 if (t == tab) Ui.Image(Ui.Box(_tabs, i * 248, 45, 240, 3), T.Highlight).raycastTarget = false;
             }
             Clear(_list);
@@ -261,6 +261,16 @@ namespace YgoCampaign.Game
             return printings.Of(copy.Code, _cards.Get(copy.Code)?.Alias ?? 0).FirstOrDefault(p => p.Rarity == copy.Rarity).SetCode ?? "";
         }
 
+        /// <summary>A card's name over its facts, in the strong face (its own text: rich-text bold would be a faux weight).</summary>
+        private void CardName(float y, string? name)
+        {
+            var t = Typography.Strong(Ui.Text(Ui.Box(_detail, 300, y, 650, 32), name ?? "", 26, UiTheme.Current.Text, TextAnchor.UpperLeft));
+            t.supportRichText = false;
+            t.resizeTextForBestFit = true; // a long name shrinks rather than wraps into the facts
+            t.resizeTextMinSize = 16;
+            t.resizeTextMaxSize = 26;
+        }
+
         private Text Facts(float y, float h, string text, int size = 17)
         {
             var t = Ui.Text(Ui.Box(_detail, 300, y, 650, h), text, size, UiTheme.Current.Text, TextAnchor.UpperLeft);
@@ -307,12 +317,12 @@ namespace YgoCampaign.Game
             if (picked) Ui.Image(Ui.Box(tile, 0, 0, w, 3), T.Highlight).raycastTarget = false;
             // A note over the card (the shelf's "Authenticated by the Loupe"), in italics.
             float top = note.Length > 0 ? 26 : 8, cardH = h - 68 - top, cardW = cardH * 0.69f;
-            if (note.Length > 0) Ui.Text(Ui.Box(tile, 4, 5, w - 8, 18), note, 12, T.TextQuiet, l.Restored ? TextAnchor.MiddleLeft : TextAnchor.MiddleCenter).fontStyle = FontStyle.Italic;
+            if (note.Length > 0) Typography.Italic(Ui.Text(Ui.Box(tile, 4, 5, w - 8, 18), note, 12, T.TextQuiet, l.Restored ? TextAnchor.MiddleLeft : TextAnchor.MiddleCenter));
             // A restored slot (a peak build's own banned card, once the wall is open): RESTORED, in No Limits' sign ink (as UNBANNED).
             if (l.Restored)
             {
                 var tag = Ui.Text(Ui.Box(tile, 4, 5, w - 8, 18), RestoredTag, 12, T.Sign, TextAnchor.MiddleRight);
-                tag.fontStyle = FontStyle.Bold;
+                Typography.Strong(tag);
                 tag.gameObject.name = RestoredTag;
             }
             Thumb(tile, new Vector2(0, h / 2 - top - cardH / 2), new Vector2(cardW, cardH), l.Copy);
@@ -326,7 +336,7 @@ namespace YgoCampaign.Game
             name.resizeTextMinSize = 8;
             name.resizeTextMaxSize = 12;
             var price = Ui.Text(Ui.Box(tile, 4, h - 24, w - 8, 20), l.Sold ? "SOLD" : $"{l.Price:N0} DP", 14, l.Sold ? T.TextDim : T.Gold);
-            price.fontStyle = FontStyle.Bold;
+            Typography.Strong(price);
             price.supportRichText = true;
             if (l.Sold) tile.gameObject.AddComponent<CanvasGroup>().alpha = 0.4f;
             Ui.Clickable(tile, click, style: HoverStyle.Tile);
@@ -379,7 +389,8 @@ namespace YgoCampaign.Game
             var info = _cards.Get(l.Copy.Code);
             int value = Collection.Value(l.Copy);
             Showcase(l.Copy);
-            Facts(20, 230, $"<b><size=26>{info?.Name}</size></b>\n{(CardDetail.PrintingLine(l.Copy) is { Length: > 0 } printed ? printed : SetCode(l.Copy))} · {CardFoil.ColoredName(l.Copy.Rarity)}\n{GradeLine(l.Copy)}\n"
+            CardName(20, info?.Name);
+            Facts(52, 198, $"{(CardDetail.PrintingLine(l.Copy) is { Length: > 0 } printed ? printed : SetCode(l.Copy))} · {CardFoil.ColoredName(l.Copy.Rarity)}\n{GradeLine(l.Copy)}\n"
                 + (shelf ? $"Worth <color={T.GoldHex}>{value:N0} DP</color> · Moth's price <color={T.GoldHex}>{l.Price:N0} DP</color>"
                          : $"Price = value <color={T.GoldHex}>{l.Price:N0} DP</color>")
                 + $"\n<size=14><color={T.TextDimHex}>The Sell desk would pay {Math.Min(value / 4, l.Price / 2):N0} DP for it.</color></size>"
@@ -489,7 +500,7 @@ namespace YgoCampaign.Game
                 Ui.Image(row, T.Well);
                 Ui.Image(Ui.Box(row, 0, 0, 4, railRow - 6), T.Locked).raycastTarget = false;
                 Thumb(row, new Vector2(-410 + 34, 0), new Vector2(38, 56), new CardCopy { Code = MothsVan.HeldCode, Grade = MothsVan.HeldGrade }, faceDown: true);
-                Ui.Text(Ui.Box(row, 66, 0, 740, railRow - 6), HeldRowLabel, 17, T.TextDim, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+                Typography.Strong(Ui.Text(Ui.Box(row, 66, 0, 740, railRow - 6), HeldRowLabel, 17, T.TextDim, TextAnchor.MiddleLeft));
                 Action held = () => Say("van:held");
                 Ui.Clickable(row, held, style: HoverStyle.Row);
                 Spot(row, held, false);
@@ -519,7 +530,8 @@ namespace YgoCampaign.Game
             var info = _cards.Get(r.Copy.Code);
             int left = Ante.DuelsLeft(Profile, r);
             Showcase(r.Copy);
-            Facts(20, 260, $"<b><size=26>{info?.Name}</size></b>\n{SetCode(r.Copy)} · {CardFoil.ColoredName(r.Copy.Rarity)}\n{GradeLine(r.Copy)}\n"
+            CardName(20, info?.Name);
+            Facts(52, 228, $"{SetCode(r.Copy)} · {CardFoil.ColoredName(r.Copy.Rarity)}\n{GradeLine(r.Copy)}\n"
                 + $"Moth's tag <color={T.GoldHex}>{r.Price:N0} DP</color> ({AlleyEconomy.RailMarkup:0.#}× its value)\n"
                 + $"{left} duel{(left == 1 ? "" : "s")} left on the clock, then he sells it.\n<size=14><color={T.TextDimHex}>Bought back, it's the same card: "
                 + "its grade, its wear, its slab. The tag is added to what you paid for it.</color></size>");

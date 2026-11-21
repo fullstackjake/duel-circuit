@@ -69,7 +69,7 @@ namespace YgoCampaign.Game
             Ui.Image(_root, T.Base);
             Ui.Image(Ui.Box(_root, 0, 0, 1920, 90), T.Deep);
             _title = Ui.Text(Ui.Box(_root, 40, 0, 400, 90), "CARD TRADER", 34, T.Sign, TextAnchor.MiddleLeft);
-            _title.fontStyle = FontStyle.Bold;
+            Typography.Strong(_title);
             _header = Ui.Text(Ui.Box(_root, 380, 0, 780, 90), "", 22, T.GoldSoft, TextAnchor.MiddleLeft);
             _header.supportRichText = true;
             // DP buys tokens too, dearer each time.
@@ -238,7 +238,7 @@ namespace YgoCampaign.Game
             var chip = Ui.Box(parent, x, y, 56, 22);
             Ui.Image(chip, T.ImportChip).raycastTarget = false;
             var label = Ui.Text(chip, "OCG", 13, T.Text);
-            label.fontStyle = FontStyle.Bold;
+            Typography.Strong(label);
             label.raycastTarget = false;
         }
 
@@ -271,7 +271,7 @@ namespace YgoCampaign.Game
             var face = Ui.Box(_detail, 30, 30, 300, 438);
             Ui.Image(face, T.Well);
             CardFace.Draw(Ui.Stretched("Art", face, Vector2.zero, Vector2.one).gameObject.AddComponent<RawImage>(), info.Code, info, new Vector2(300, 438));
-            Ui.Text(Ui.Box(_detail, 360, 30, 590, 44), info.Name, 26, T.Text, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Box(_detail, 360, 30, 590, 44), info.Name, 26, T.Text, TextAnchor.MiddleLeft));
             int year = printings?.FirstYear(info.Code, info.Alias) ?? 0;
             var rarity = printings?.Commonest(info.Code, info.Alias) ?? Rarity.Common;
             bool ocg = _state.Imports.IsOcgOnly(info.Code);

@@ -138,7 +138,7 @@ namespace YgoCampaign.Game
             icon.texture = For(label);
             icon.raycastTarget = false;
             var text = Ui.Text(Ui.Placed("Label", disc, new Vector2(0, -size / 2 - 16), new Vector2(size + 90, 30)), label, 18, Color.white);
-            text.fontStyle = FontStyle.Bold;
+            Typography.Strong(text);
             text.raycastTarget = false;
             var shadow = text.gameObject.AddComponent<Outline>();
             shadow.effectColor = new Color(0, 0, 0, 0.9f);

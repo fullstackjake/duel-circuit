@@ -61,18 +61,18 @@ namespace YgoCampaign.Game
             Ui.Image(Ui.Placed("Top", band, new Vector2(0, h / 2 - 2), new Vector2(1500, 4)), T.Sign).raycastTarget = false;
             Ui.Image(Ui.Placed("Bottom", band, new Vector2(0, -h / 2 + 2), new Vector2(1500, 4)), T.IsAlley ? UiTheme.NeonCyan : T.Sign).raycastTarget = false;
             var title = Ui.Text(Ui.Placed("Who", band, new Vector2(0, h / 2 - 50), new Vector2(1400, 64)), $"{who.ToUpperInvariant()} IS GOING FOR IT", 44, T.Text);
-            title.fontStyle = FontStyle.BoldAndItalic;
+            Typography.Strong(title);
             title.raycastTarget = false;
             T.Title(title);
             title.gameObject.AddComponent<Outline>().effectDistance = new Vector2(3, -3);
             var name = Ui.Text(Ui.Placed("Route", band, new Vector2(0, h / 2 - 108), new Vector2(1400, 54)), route.ToUpperInvariant(), 40, T.Sign);
-            name.fontStyle = FontStyle.Bold;
+            Typography.Strong(name);
             name.raycastTarget = false;
             T.Title(name);
             if (call.Length > 0)
             {
                 var said = Ui.Text(Ui.Placed("Call", band, new Vector2(0, -h / 2 + 34), new Vector2(1400, 40)), call, 22, T.Quote);
-                said.fontStyle = FontStyle.Italic;
+                Typography.Italic(said);
                 said.raycastTarget = false;
                 said.resizeTextForBestFit = true;
                 said.resizeTextMinSize = 14;
@@ -104,7 +104,7 @@ namespace YgoCampaign.Game
             edge.effectColor = accent;
             edge.effectDistance = new Vector2(4, -4);
             var word = Ui.Text(Ui.Placed("Word", stamp, new Vector2(0, h / 2 - 52), new Vector2(1060, 84)), payoff ? "PAYOFF!" : "FIZZLED", 68, accent);
-            word.fontStyle = FontStyle.BoldAndItalic;
+            Typography.Strong(word);
             word.raycastTarget = false;
             T.Title(word);
             var sub = Ui.Text(Ui.Placed("Line", stamp, new Vector2(0, h / 2 - 116), new Vector2(1060, 40)), line, 24, T.Text);
@@ -115,7 +115,7 @@ namespace YgoCampaign.Game
             for (int i = 0; i < calls.Count; i++)
             {
                 var said = Ui.Text(Ui.Placed($"Call{i}", stamp, new Vector2(0, h / 2 - 160 - i * 34), new Vector2(1060, 32)), calls[i], 20, T.Quote);
-                said.fontStyle = FontStyle.Italic;
+                Typography.Italic(said);
                 said.raycastTarget = false;
                 said.resizeTextForBestFit = true;
                 said.resizeTextMinSize = 12;
@@ -145,14 +145,14 @@ namespace YgoCampaign.Game
             var head = Ui.Text(Ui.Placed("Head", meter, new Vector2(8, MeterHeight / 2 - 14), new Vector2(MeterWidth - 32, 22)),
                 $"{show.Route.ToUpperInvariant()}  <color={T.TextDimHex}>· {show.Handle}</color>", 14, T.Sign, TextAnchor.MiddleLeft);
             head.supportRichText = true;
-            head.fontStyle = FontStyle.Bold;
+            Typography.Strong(head);
             head.raycastTarget = false;
             string state = fizzled ? $"FIZZLED AT STEP {show.FizzledAt}"
                 : show.State == ComboShow.Phase.Finished ? $"FINISHED · STEP {show.Step} OF {show.Steps}"
                 : show.State == ComboShow.Phase.PaidOff ? $"PAYOFF · STEP {show.Step} OF {show.Steps}"
                 : $"STEP {Mathf.Max(1, show.Step)} OF {show.Steps}";
             var big = Ui.Text(Ui.Placed("State", meter, new Vector2(8, 6), new Vector2(MeterWidth - 32, 34)), state, 24, fizzled ? T.Bad : T.Text, TextAnchor.MiddleLeft);
-            big.fontStyle = FontStyle.Bold;
+            Typography.Strong(big);
             big.raycastTarget = false;
             big.resizeTextForBestFit = true;
             big.resizeTextMinSize = 14;
@@ -169,7 +169,7 @@ namespace YgoCampaign.Game
                 Ui.Image(pip, stopped ? T.Bad : done ? (fizzled ? T.TextDim : accent) : T.Inset).raycastTarget = false;
             }
             var total = Ui.Text(Ui.Placed("Total", meter, new Vector2(MeterWidth / 2 - 92, -MeterHeight / 2 + 18), new Vector2(170, 24)), show.TotalText, 16, T.Gold, TextAnchor.MiddleRight);
-            total.fontStyle = FontStyle.Bold;
+            Typography.Strong(total);
             total.raycastTarget = false;
             ComboMeterText = $"{state.ToLowerInvariant()} · {show.TotalText}";
             if (show.State is ComboShow.Phase.Fizzled or ComboShow.Phase.Finished) _meterHide = StartCoroutine(HideMeterLater(6f));

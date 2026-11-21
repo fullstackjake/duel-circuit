@@ -96,6 +96,7 @@ public static class TextsCheck
             failures += hits.Count;
         }
         Console.WriteLine(linted == 0 ? "  (no deck says #originals)" : "");
+        failures += GlyphCorpus(root);
         Console.WriteLine(failures == 0 ? "All texts checks passed." : $"{failures} texts check(s) FAILED.");
         return failures == 0 ? 0 : 1;
     }
@@ -224,5 +225,142 @@ public static class TextsCheck
             if (!dates.TryGetValue(name, out var had) || string.CompareOrdinal(date, had) < 0) dates[name] = date;
         }
         return dates;
+    }
+
+    // ---- The glyph corpus's freshness (docs/dev/TYPE-AND-FONTS-SPEC-2026-11-21.md, section 7 step 3) ----
+
+    /// <summary>Where tools/glyph_corpus.py writes the corpus the game's -typecheck reads.</summary>
+    public static string GlyphCorpusPath(string root) => Path.Combine(root, "unity", "Assets", "Resources", "glyph-corpus.txt");
+
+    /// <summary>
+    /// unity/Assets/Resources/glyph-corpus.txt is current: its "chars-sha256" line is the hash of the characters the sources
+    /// hold now (the same rule as tools/glyph_corpus.py: string and char literals in unity/Assets/Scripts/*.cs, every file in
+    /// campaign/ and personalities/), and its lines list exactly those characters. First a fixture shows the literal rule.
+    /// </summary>
+    public static int GlyphCorpus(string root)
+    {
+        Console.WriteLine("\nGlyph corpus (tools/glyph_corpus.py):");
+        int failures = 0;
+        void Report(string what, bool ok) { Console.WriteLine($"  {(ok ? "ok  " : "FAIL")} {what}"); if (!ok) failures++; }
+
+        // The rule on a fixture: comments don't count, literals do (verbatim and interpolated too), escapes are decoded.
+        const string fixture = "// ★ in a comment\n/* ☆ in a block */ var a = \"→ x\"; var b = '\\u2190'; var c = @\"say \"\"◆\"\"\"; var d = $\"{n} ✦\"; var e = \"\\\" ⬢\"; var f = \"\\uD83D\\uDCCC\";\n";
+        var got = new string(CsLiterals(fixture).Where(ch => ch > 0x7F).ToArray());
+        Report($"the literal rule on a fixture: \"{got}\" (comments skipped, verbatim, interpolated and escaped literals read; an escaped surrogate pair is one character, as tools/glyph_corpus.py reads it)",
+            got == "→←◆✦⬢\U0001F4CC" && CorpusOf(got).SequenceEqual(new[] { "→", "←", "◆", "✦", "⬢", "\U0001F4CC" }));
+
+        var path = GlyphCorpusPath(root);
+        if (!File.Exists(path)) { Report($"{path} exists (run python3 tools/glyph_corpus.py)", false); return failures; }
+        var lines = File.ReadAllText(path).Replace("\r\n", "\n").Split('\n');
+        var recorded = lines.FirstOrDefault(l => l.StartsWith("# chars-sha256: ", StringComparison.Ordinal))?.Substring("# chars-sha256: ".Length).Trim() ?? "";
+        var listed = lines.Where(l => l.Length > 0 && !l.StartsWith("#", StringComparison.Ordinal)).Select(l => l.Split('\t')[0]).ToList();
+        var now = CorpusCharacters(root);
+        var hash = CorpusHash(now);
+        Report($"the corpus is current: {now.Count} characters in the sources, {listed.Count} listed; hash {(hash.Length >= 12 ? hash.Substring(0, 12) : hash)} "
+               + $"{(hash == recorded ? "matches" : $"!= recorded {(recorded.Length >= 12 ? recorded.Substring(0, 12) : recorded)}: run python3 tools/glyph_corpus.py")}",
+            hash == recorded && listed.SequenceEqual(now));
+        return failures;
+    }
+
+    /// <summary>The SHA-256 (hex) of the characters in order, as UTF-8 with nothing between them.</summary>
+    public static string CorpusHash(IEnumerable<string> characters)
+    {
+        using var sha = System.Security.Cryptography.SHA256.Create();
+        var bytes = sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(string.Concat(characters)));
+        return string.Concat(bytes.Select(b => b.ToString("x2")));
+    }
+
+    /// <summary>The characters above U+007F in <paramref name="text"/>, in order, a surrogate pair as one (as the corpus counts them).</summary>
+    public static List<string> CorpusOf(string text)
+    {
+        var list = new List<string>();
+        for (int i = 0; i < text.Length; i++)
+        {
+            int cp = char.IsHighSurrogate(text[i]) && i + 1 < text.Length && char.IsLowSurrogate(text[i + 1]) ? char.ConvertToUtf32(text[i], text[++i]) : text[i];
+            if (cp > 0x7F) list.Add(char.ConvertFromUtf32(cp));
+        }
+        return list;
+    }
+
+    /// <summary>Every character above U+007F (the byte-order mark aside) the sources hold, by code point, each as a string.</summary>
+    public static List<string> CorpusCharacters(string root)
+    {
+        var found = new HashSet<int>();
+        void Add(string text)
+        {
+            for (int i = 0; i < text.Length; i++)
+            {
+                int cp = char.IsHighSurrogate(text[i]) && i + 1 < text.Length && char.IsLowSurrogate(text[i + 1]) ? char.ConvertToUtf32(text[i], text[++i]) : text[i];
+                if (cp > 0x7F && cp != 0xFEFF) found.Add(cp);
+            }
+        }
+        var scripts = Path.Combine(root, "unity", "Assets", "Scripts");
+        if (Directory.Exists(scripts))
+            foreach (var file in Directory.EnumerateFiles(scripts, "*.cs", SearchOption.AllDirectories)) Add(CsLiterals(File.ReadAllText(file)));
+        foreach (var top in new[] { "campaign", "personalities" })
+        {
+            var folder = Path.Combine(root, top);
+            if (Directory.Exists(folder))
+                foreach (var file in Directory.EnumerateFiles(folder, "*", SearchOption.AllDirectories)) Add(File.ReadAllText(file));
+        }
+        return found.OrderBy(cp => cp).Select(char.ConvertFromUtf32).ToList();
+    }
+
+    /// <summary>The text inside a C# file's string and char literals (comments skipped; \\u and \\U escapes decoded).</summary>
+    public static string CsLiterals(string src)
+    {
+        var o = new System.Text.StringBuilder();
+        int i = 0, n = src.Length;
+        while (i < n)
+        {
+            char c = src[i];
+            if (c == '/' && i + 1 < n && src[i + 1] == '/') { int j = src.IndexOf('\n', i); i = j < 0 ? n : j; continue; }
+            if (c == '/' && i + 1 < n && src[i + 1] == '*') { int j = src.IndexOf("*/", i + 2, StringComparison.Ordinal); i = j < 0 ? n : j + 2; continue; }
+            bool verbatim = false;
+            if ((c == '@' || c == '$') && i + 1 < n && (src[i + 1] == '"' || ((src[i + 1] == '@' || src[i + 1] == '$') && i + 2 < n && src[i + 2] == '"')))
+            {
+                int length = src[i + 1] == '"' ? 2 : 3;
+                verbatim = src.Substring(i, length).Contains('@');
+                i += length - 1;
+                c = '"';
+            }
+            if (c == '"' || c == '\'')
+            {
+                char quote = c;
+                i++;
+                while (i < n)
+                {
+                    char d = src[i];
+                    if (verbatim)
+                    {
+                        if (d == '"')
+                        {
+                            if (i + 1 < n && src[i + 1] == '"') { i += 2; continue; }
+                            i++;
+                            break;
+                        }
+                        o.Append(d);
+                        i++;
+                        continue;
+                    }
+                    if (d == '\\' && i + 1 < n)
+                    {
+                        char e = src[i + 1];
+                        if (e == 'u' && i + 6 <= n && int.TryParse(src.Substring(i + 2, 4), System.Globalization.NumberStyles.HexNumber, null, out int u))
+                        { o.Append((char)u); i += 6; continue; }
+                        if (e == 'U' && i + 10 <= n && int.TryParse(src.Substring(i + 2, 8), System.Globalization.NumberStyles.HexNumber, null, out int big))
+                        { o.Append(char.ConvertFromUtf32(big)); i += 10; continue; }
+                        i += 2;
+                        continue;
+                    }
+                    if (d == quote || d == '\n') { i++; break; }
+                    o.Append(d);
+                    i++;
+                }
+                continue;
+            }
+            i++;
+        }
+        return o.ToString();
     }
 }

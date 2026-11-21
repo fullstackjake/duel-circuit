@@ -64,7 +64,7 @@ namespace YgoCampaign.Game
             Ui.Image(root, Ui.Hex("#161A23"));
 
             _title = Ui.Text(Row("Title", 6, 40), "", 16, Color.white, TextAnchor.UpperLeft);
-            _title.fontStyle = FontStyle.Bold;
+            Typography.Strong(_title);
             _title.supportRichText = true;
             _detail = Ui.Text(Row("Detail", 46, 18), "", 13, new Color(0.78f, 0.8f, 0.86f), TextAnchor.UpperLeft);
             _status = Ui.Text(Row("Status", 64, 18), "", 13, Ui.Hex("#FF7A7A"), TextAnchor.UpperLeft);

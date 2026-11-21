@@ -19,6 +19,8 @@ Thank you to everyone below.
 | [yugiohmeta.com](#yugiohmetacom) | Recent tournament deck lists | Fetched for each data update | None stated | Reformatted | Yes, as `.ydk` files |
 | [Yugipedia](#yugipedia) | Research source (facts only) | — | — | — | No text or images copied |
 | [Unity](#unity) | Game engine | Unity 6 (6000.3.27f1) | Unity's own terms | No | Yes, the runtime |
+| [Barlow](#barlow) | The game's fonts (Barlow, Barlow Condensed) | google/fonts `06bfe0d` | SIL OFL 1.1 | No | Yes, 5 font files |
+| [Noto Sans Symbols 2](#noto-sans-symbols-2) | Fallback font for symbols | google/fonts `06bfe0d` | SIL OFL 1.1 | No | Yes, 1 font file |
 | [Build tools](#build-tools) | meson, ninja, mingw-w64, .NET | — | Various | No | Only the parts noted below |
 | [Microsoft.Data.Sqlite](#microsoftdatasqlite) | Reads the card database in our tools | 7.0.20 | MIT | No | No |
 
@@ -262,6 +264,43 @@ The game engine.
 - **Changed:** no.
 - **Ships as:** the Unity runtime in every build. Our code may be combined with it under the
   [Unity permission](LICENSES/UNITY-PERMISSION.md).
+
+## Barlow
+
+The game's typefaces: Barlow for reading text, Barlow Condensed for titles, buttons and chips.
+
+- **Source:** https://github.com/google/fonts, folders `ofl/barlow/` and `ofl/barlowcondensed/`. Upstream project:
+  https://github.com/jpt/barlow (Jeremy Tribby).
+- **Pinned commit:** `06bfe0d62a98375cb09c942fa18e68bd32cff057` (google/fonts)
+- **License:** SIL Open Font License 1.1. "Copyright 2017 The Barlow Project Authors (https://github.com/jpt/barlow)".
+  No Reserved Font Name. The full text is in [LICENSES/OFL-1.1-Barlow.txt](LICENSES/OFL-1.1-Barlow.txt).
+- **Changed:** no. The files ship unmodified (not subset, not renamed).
+- **Ships as:** five font files in `unity/Assets/Resources/GameFonts/`, built into the game:
+
+  | File | SHA-256 |
+  |---|---|
+  | `Barlow-Regular.ttf` | `95aa02c7c43096e0dd44d787ba6216864a67157e402adab59b35572e0c1577ea` |
+  | `Barlow-Italic.ttf` | `70cf45c354af39e55082fd506e748cc6a0a1812949875f99ded3f76bf691e4ca` |
+  | `Barlow-SemiBold.ttf` | `86577cb32f8abe3673db53ca0f4221e6856751a4f6730c867e00f720f8bb1fc5` |
+  | `BarlowCondensed-SemiBold.ttf` | `7b619d14bc2327509a9ef32b0890f709626f7ecc9ff61191c2a4314c5499d2d9` |
+  | `BarlowCondensed-Bold.ttf` | `e476562ec9c1e16cf16475895b511f08c804f438cc9a9f80a44ea50a0eeb5b65` |
+
+## Noto Sans Symbols 2
+
+The fallback font for symbols Barlow doesn't have (stars, arrows, shapes).
+
+- **Source:** https://github.com/google/fonts, folder `ofl/notosanssymbols2/`. Upstream project:
+  https://github.com/notofonts/symbols (the Noto Project).
+- **Pinned commit:** `06bfe0d62a98375cb09c942fa18e68bd32cff057` (google/fonts)
+- **License:** SIL Open Font License 1.1. "Copyright 2022 The Noto Project Authors
+  (https://github.com/notofonts/symbols)". No Reserved Font Name. The full text is in
+  [LICENSES/OFL-1.1-Noto.txt](LICENSES/OFL-1.1-Noto.txt).
+- **Changed:** no. The file ships unmodified.
+- **Ships as:** one font file in `unity/Assets/Resources/GameFonts/`, built into the game:
+
+  | File | SHA-256 |
+  |---|---|
+  | `NotoSansSymbols2-Regular.ttf` | `7d5fb73b7ca67a6798101741f5d280a3d016a56a197afcd4199dbb57b4b82a21` |
 
 ## Build tools
 

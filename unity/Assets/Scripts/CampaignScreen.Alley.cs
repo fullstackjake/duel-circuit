@@ -332,7 +332,7 @@ namespace YgoCampaign.Game
                     frame.effectColor = T.Highlight;
                 }
                 var title = Ui.Text(Ui.Box(row, 28, 12, 470, 40), name.ToUpperInvariant(), 26, open ? T.Text : T.Text.WithAlpha(0.5f), TextAnchor.MiddleLeft);
-                title.fontStyle = FontStyle.Bold;
+                Typography.Strong(title);
                 T.Title(title);
                 title.raycastTarget = false;
                 var subText = Ui.Text(Ui.Box(row, 28, 54, 470, 34), sub, 16, open ? T.Gold : T.TextDim, TextAnchor.MiddleLeft);
@@ -341,7 +341,7 @@ namespace YgoCampaign.Game
                 if (cleared)
                 {
                     var tick = Ui.Text(Ui.Box(row, 510, 10, 190, 40), "✓ Cleared", 20, T.Good, TextAnchor.MiddleRight);
-                    tick.fontStyle = FontStyle.Bold;
+                    Typography.Strong(tick);
                     tick.raycastTarget = false;
                 }
                 if (progress.Length > 0) Ui.Text(Ui.Box(row, 510, 54, 190, 34), progress, 16, T.TextSoft, TextAnchor.MiddleRight).raycastTarget = false;
@@ -400,7 +400,7 @@ namespace YgoCampaign.Game
             if (index == Chalkboard && ChalkboardOpen(profile)) { ShowChalkboard(); return; }
             if (index < 0 || index >= data.Tables.Count || !BackAlley.IsUnlocked(profile, data, index))
             {
-                Ui.Text(Ui.Box(_detail, 30, 20, 940, 46), "THE BACK ALLEY", 30, T.Text, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+                Typography.Strong(Ui.Text(Ui.Box(_detail, 30, 20, 940, 46), "THE BACK ALLEY", 30, T.Text, TextAnchor.MiddleLeft));
                 Ui.Text(Ui.Box(_detail, 30, 70, 940, 60), "Pick a table on the left.", 18, T.TextMuted, TextAnchor.UpperLeft);
                 return;
             }
@@ -457,7 +457,7 @@ namespace YgoCampaign.Game
                     $"Seat {o.Seat}: {o.Handle}" + (tag.Length > 0 ? $"  <color={T.VioletHex}>{tag}</color>" : "")
                     + (won ? $"  <color={T.GoodHex}>✓</color>" : ""),
                     21, T.Text, TextAnchor.MiddleLeft);
-                head.fontStyle = FontStyle.Bold;
+                Typography.Strong(head);
                 head.supportRichText = true;
                 head.resizeTextForBestFit = true;
                 head.resizeTextMinSize = 15;
@@ -468,7 +468,7 @@ namespace YgoCampaign.Game
                 if (row5)
                 {
                     var unbannedText = Ui.Text(Ui.Box(row, 128, 58, 620, 22), seat.Unbanned, 13, T.Sign, TextAnchor.MiddleLeft);
-                    unbannedText.fontStyle = FontStyle.Bold;
+                    Typography.Strong(unbannedText);
                     unbannedText.resizeTextForBestFit = true;
                     unbannedText.resizeTextMinSize = 10;
                     unbannedText.resizeTextMaxSize = 13;
@@ -541,7 +541,7 @@ namespace YgoCampaign.Game
             var T = UiTheme.Current;
             if (T.IsAlley) AlleyMaterials.Header(_detail, 0, 0, 1000, 62, T.Sign);
             var title = Ui.Text(Ui.Box(_detail, 30, 10, 700, 48), name.ToUpperInvariant(), 32, T.Text, TextAnchor.MiddleLeft);
-            title.fontStyle = FontStyle.Bold;
+            Typography.Strong(title);
             T.Title(title);
         }
 
@@ -613,10 +613,10 @@ namespace YgoCampaign.Game
                 Ui.Image(block, running ? T.RowSelected : i % 2 == 0 ? T.RowA : T.RowB);
                 if (running) Ui.Image(Ui.Box(block, 0, 0, 4, blockH), T.Highlight).raycastTarget = false;
                 var name = Ui.Text(Ui.Box(block, 20, compact ? 4 : 10, 600, compact ? 34 : 40), spec.Name.ToUpperInvariant(), compact ? 22 : 26, unlocked ? T.Text : T.Text.WithAlpha(0.5f), TextAnchor.MiddleLeft);
-                name.fontStyle = FontStyle.Bold;
+                Typography.Strong(name);
                 T.Title(name);
                 if (record.Titles > 0)
-                    Ui.Text(Ui.Box(block, 620, compact ? 4 : 10, 300, compact ? 34 : 40), $"♛ {record.Titles} title{(record.Titles == 1 ? "" : "s")}", 18, T.Gold, TextAnchor.MiddleRight).fontStyle = FontStyle.Bold;
+                    Typography.Strong(Ui.Text(Ui.Box(block, 620, compact ? 4 : 10, 300, compact ? 34 : 40), $"♛ {record.Titles} title{(record.Titles == 1 ? "" : "s")}", 18, T.Gold, TextAnchor.MiddleRight));
                 var pay = Brackets.PayFor(kind);
                 var packs = Brackets.PacksFor(kind);
                 string packName = Brackets.PackNameFor(kind);
@@ -758,7 +758,7 @@ namespace YgoCampaign.Game
             var block = Ui.Box(_detail, 30, y, 940, h);
             Ui.Image(block, T.RowB);
             var name = Ui.Text(Ui.Box(block, 20, 6, 400, 34), "EXHIBITION", 22, T.Text, TextAnchor.MiddleLeft);
-            name.fontStyle = FontStyle.Bold;
+            Typography.Strong(name);
             T.Title(name);
             Ui.Text(Ui.Box(block, 420, 6, 500, 34), "watch only · no stakes, no DP, no posters", 14, T.TextDim, TextAnchor.MiddleRight);
             Ui.Text(Ui.Box(block, 20, 40, 900, 24), "Two headliners you've met, or a headliner against a splasher, CPU against CPU. Baz calls it, Mika streams it.", 14, T.TextSoft, TextAnchor.MiddleLeft);
@@ -773,7 +773,7 @@ namespace YgoCampaign.Game
             {
                 Ui.BoxButton(block, x, 74, 40, 46, "<", () => step(-1), 18);
                 var text = Ui.Text(Ui.Box(block, x + 44, 74, 246, 46), label, 16, T.Text);
-                text.fontStyle = FontStyle.Bold;
+                Typography.Strong(text);
                 text.resizeTextForBestFit = true;
                 text.resizeTextMinSize = 10;
                 text.resizeTextMaxSize = 16;
@@ -882,7 +882,7 @@ namespace YgoCampaign.Game
             Ui.Image(row, T.RowA);
             Silhouette(row, 12, 12, 144, o);
             var head = Ui.Text(Ui.Box(row, 172, 10, 600, 36), $"{o.Handle}  <color={T.VioletHex}>HOUSE</color>", 24, T.Text, TextAnchor.MiddleLeft);
-            head.fontStyle = FontStyle.Bold;
+            Typography.Strong(head);
             head.supportRichText = true;
             Ui.Text(Ui.Box(row, 172, 46, 600, 24), $"Deck: {_state.DeckTitle(o.Base)} · Elo {o.Elo:N0}", 15, T.TextFaint, TextAnchor.MiddleLeft);
             var puts = Ui.Text(Ui.Box(row, 172, 72, 590, 90),
@@ -895,7 +895,7 @@ namespace YgoCampaign.Game
             bool any = OrvelRows.Any(r => r.his != null);
             int tableIndex = index;
             if (spares.Count == 0)
-                Ui.Text(Ui.Box(row, 772, 0, 160, 168), "Orvel looks through your binder.\n“Nothing I'd take.”", 15, T.TextDim).fontStyle = FontStyle.Italic;
+                Typography.Italic(Ui.Text(Ui.Box(row, 772, 0, 160, 168), "Orvel looks through your binder.\n“Nothing I'd take.”", 15, T.TextDim));
             else Ui.BoxButton(row, 780, 54, 150, 60, "Duel", () => TryAlleyDuel(tableIndex), 22).targetGraphic.color = any ? T.Primary : T.Button;
 
             // Your side: the spare cards Orvel would take, cheapest first, and his slab against each.
@@ -962,13 +962,13 @@ namespace YgoCampaign.Game
             var plate = Ui.Box(rim, 2, 2, 178, 40);
             Ui.Image(plate, Ui.Hex("#4A403A")).raycastTarget = false;
             var word = Ui.Text(plate, "UNLISTED", 20, Ui.Hex("#D9CFC2"));
-            word.fontStyle = FontStyle.Bold;
+            Typography.Strong(word);
             word.raycastTarget = false;
             int pages = profile.UnlistedPages.Count;
             var count = Ui.Text(Ui.Box(binder, 26, 78, 182, 30), $"{pages} page{(pages == 1 ? "" : "s")}", 16, T.TextBody, TextAnchor.MiddleLeft);
             count.raycastTarget = false;
             var note = Ui.Text(Ui.Box(binder, 26, 108, 182, 44), "Decks beaten in the alley", 13, T.TextQuiet, TextAnchor.UpperLeft);
-            note.fontStyle = FontStyle.Italic;
+            Typography.Italic(note);
             note.raycastTarget = false;
             Ui.Clickable(binder, () =>
             {
@@ -995,7 +995,7 @@ namespace YgoCampaign.Game
             var profile = _state.Profile!;
             var pages = Unlisted.Pages(profile);
             var title = Ui.Text(Ui.Box(_detail, 30, 18, 940, 46), "UNLISTED", 30, T.Text, TextAnchor.MiddleLeft);
-            title.fontStyle = FontStyle.Bold;
+            Typography.Strong(title);
             Ui.Text(Ui.Box(_detail, 30, 64, 940, 26), "The contraband decks you've beaten in the alley, a page each, as you met them. They never count toward a cup.", 15, T.TextMuted, TextAnchor.MiddleLeft);
             if (pages.Count == 0 || _state.AlleyContext is not AlleyContext ctx) { UnlistedPageShown = null; return; }
             _unlistedPage = Mathf.Clamp(_unlistedPage, 0, pages.Count - 1);
@@ -1019,7 +1019,7 @@ namespace YgoCampaign.Game
                 Ui.Image(row, on ? T.RowSelected : i % 2 == 0 ? T.RowA : T.RowB);
                 if (on) Ui.Image(Ui.Box(row, 0, 0, 4, rowH - 6), T.Highlight).raycastTarget = false;
                 var name = Ui.Text(Ui.Box(row, 12, 2, 262, 24), page.Handle, 15, T.Text, TextAnchor.MiddleLeft);
-                name.fontStyle = FontStyle.Bold;
+                Typography.Strong(name);
                 name.resizeTextForBestFit = true;
                 name.resizeTextMinSize = 10;
                 name.resizeTextMaxSize = 15;
@@ -1039,7 +1039,7 @@ namespace YgoCampaign.Game
             face.gameObject.AddComponent<RectMask2D>();
             if (!Portraits.Place(face, who)) AlleyMaterials.Silhouette(face, T.TextDim);
             var handle = Ui.Text(Ui.Box(_detail, 462, 100, 510, 40), shown.Handle, 26, T.Text, TextAnchor.MiddleLeft);
-            handle.fontStyle = FontStyle.Bold;
+            Typography.Strong(handle);
             handle.resizeTextForBestFit = true;
             handle.resizeTextMinSize = 14;
             handle.resizeTextMaxSize = 26;

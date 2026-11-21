@@ -273,7 +273,7 @@ namespace YgoCampaign.Game
             // The alley's brackets: Baz's chalk under a brick header band.
             if (T.IsAlley) AlleyMaterials.Header(_view, 0, 0, 1920, 90, T.Sign);
             var title = Ui.Text(Ui.Box(_view, 40, 0, 900, 90), b.Name.ToUpperInvariant(), 34, T.Sign, TextAnchor.MiddleLeft);
-            title.fontStyle = FontStyle.Bold;
+            Typography.Strong(title);
             T.Title(title);
             var stage = b.Done ? "Finished" : b.YouOut ? $"{Brackets.PlacementText(place)} · {b.RoundName(round)}" : $"{b.RoundName(round)}";
             string rulesLine;
@@ -313,7 +313,7 @@ namespace YgoCampaign.Game
             }
             float vsTop = L.FinalY[0] + L.H + (b.FinalBestOf > 1 ? 24 : 0);
             var vs = Ui.Text(Ui.Box(_view, L.Columns[b.Rounds - 1], vsTop, L.W, L.FinalY[1] - vsTop), "VS", 26, T.TextDim);
-            vs.fontStyle = FontStyle.Bold;
+            Typography.Strong(vs);
             if (b.FinalBestOf > 1) Pips(b, L);
             Plaque(b, L, cup);
             Ladder(b, L, place);
@@ -487,10 +487,10 @@ namespace YgoCampaign.Game
             else if (e.You || !Portraits.PlaceHead(well, e.Character))
             {
                 var initial = Ui.Text(Ui.Box(well, 0, 0, L.Well, L.Well), e.You ? "YOU" : Initial(NameOf(cup, e)), e.You ? L.YouSize : L.InitialSize, T.TextMuted);
-                initial.fontStyle = FontStyle.Bold;
+                Typography.Strong(initial);
             }
             var name = Ui.Text(Ui.Box(box, L.TextX, L.NameY, L.TextW, L.NameH), NameOf(cup, e), L.NameSize, e.You ? T.Gold : T.Text, TextAnchor.MiddleLeft);
-            name.fontStyle = FontStyle.Bold;
+            Typography.Strong(name);
             name.resizeTextForBestFit = true;
             name.resizeTextMinSize = 10;
             name.resizeTextMaxSize = L.NameSize;
@@ -525,7 +525,7 @@ namespace YgoCampaign.Game
             var chip = Ui.Box(box, L.TextX, L.ChipY, L.TextW, L.ChipH);
             Ui.Image(chip, fill).raycastTarget = false;
             var t = Ui.Text(chip, text, L.ChipSize, ink);
-            t.fontStyle = FontStyle.Bold;
+            Typography.Strong(t);
         }
 
         /// <summary>
@@ -582,12 +582,12 @@ namespace YgoCampaign.Game
             Ui.Image(plaque, champ >= 0 ? T.Highlight : T.Inset);
             Ui.Image(Ui.Box(plaque, 2, 2, L.W - 4, L.H - 4), champ >= 0 ? T.GoldWash : T.Panel);
             float head = L.H * 8 / 96, line = L.H * 24 / 96;
-            Ui.Text(Ui.Box(plaque, 0, head, L.W, line), "♛ CHAMPION", L.ChipSize + 3, champ >= 0 ? T.Gold : T.Caption).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Box(plaque, 0, head, L.W, line), "♛ CHAMPION", L.ChipSize + 3, champ >= 0 ? T.Gold : T.Caption));
             var who = champ >= 0
                 ? (b.Slots[champ].You ? "You!" : NameOf(cup, b.Slots[champ]))
                 : $"+{Brackets.PlacementDp(b, 0):N0} DP · {Packs(PackName(b), PacksAt(b, 0))}";
             var t = Ui.Text(Ui.Box(plaque, 8, head + line + 4, L.W - 16, L.H - head - line - 10), who, champ >= 0 ? L.NameSize + 6 : L.NameSize - 1, champ >= 0 ? T.Text : T.Gold);
-            t.fontStyle = FontStyle.Bold;
+            Typography.Strong(t);
             t.resizeTextForBestFit = true;
             t.resizeTextMinSize = 10;
             t.resizeTextMaxSize = champ >= 0 ? L.NameSize + 6 : L.NameSize - 1;
@@ -638,7 +638,7 @@ namespace YgoCampaign.Game
             var panel = Ui.Box(_entry, 360, 90, 1200, 900);
             Ui.Image(panel, T.Panel);
             var title = Ui.Text(Ui.Box(panel, 30, 20, 1140, 48), Brackets.NameOf(c), 32, T.LibraryGold, TextAnchor.MiddleLeft);
-            title.fontStyle = FontStyle.Bold;
+            Typography.Strong(title);
             Ui.Text(Ui.Box(panel, 30, 68, 1140, 28), $"{rules.List?.Name ?? c.Banlist} list · cards out by {CampaignScreen.PoolMonth(c.Pool)}", 17, T.TextMuted, TextAnchor.MiddleLeft);
             Ui.Text(Ui.Box(panel, 30, 96, 1140, 28), "8 players, single elimination. You're seed 1 as the cup's champion: seeds 1 and 2 can only meet in the final.",
                 16, T.TextSoft, TextAnchor.MiddleLeft);
@@ -661,10 +661,10 @@ namespace YgoCampaign.Game
                 var well = Ui.Box(row, 4, 3, 40, 40);
                 Ui.Image(well, r.you ? T.Placeholder : T.Well);
                 well.gameObject.AddComponent<RectMask2D>();
-                if (r.you || !Portraits.PlaceHead(well, r.id)) Ui.Text(Ui.Box(well, 0, 0, 40, 40), Initial(r.name), 20, T.TextMuted).fontStyle = FontStyle.Bold;
-                Ui.Text(Ui.Box(row, 52, 0, 44, 46), $"#{r.seed}", 18, T.Gold, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+                if (r.you || !Portraits.PlaceHead(well, r.id)) Typography.Strong(Ui.Text(Ui.Box(well, 0, 0, 40, 40), Initial(r.name), 20, T.TextMuted));
+                Typography.Strong(Ui.Text(Ui.Box(row, 52, 0, 44, 46), $"#{r.seed}", 18, T.Gold, TextAnchor.MiddleLeft));
                 var name = Ui.Text(Ui.Box(row, 98, 0, 200, 46), r.name, 18, r.you ? T.Gold : T.Text, TextAnchor.MiddleLeft);
-                name.fontStyle = FontStyle.Bold;
+                Typography.Strong(name);
                 name.resizeTextForBestFit = true;
                 name.resizeTextMinSize = 12;
                 name.resizeTextMaxSize = 18;
@@ -802,7 +802,7 @@ namespace YgoCampaign.Game
             Ui.Image(panel, T.Panel);
             if (T.IsAlley) AlleyMaterials.Header(panel, 0, 0, 1200, 64, T.Sign);
             var title = Ui.Text(Ui.Box(panel, 30, 10, 1140, 48), spec.Name.ToUpperInvariant(), 32, T.Sign, TextAnchor.MiddleLeft);
-            title.fontStyle = FontStyle.Bold;
+            Typography.Strong(title);
             T.Title(title);
             bool noLimits = kind == Brackets.InvitationalKind;
             string packName = Brackets.PackNameFor(kind);
@@ -837,11 +837,11 @@ namespace YgoCampaign.Game
                     if (!(Portraits.GruntFor(o.Handle) is string grunt && Portraits.PlaceHead(face, grunt)))
                         AlleyMaterials.Silhouette(face, o.Tint == 0 ? T.TextDim : new Color(((o.Tint >> 16) & 0xFF) / 255f, ((o.Tint >> 8) & 0xFF) / 255f, (o.Tint & 0xFF) / 255f));
                 }
-                else if (e.You || !Portraits.PlaceHead(face, e.Character)) Ui.Text(Ui.Box(face, 0, 0, well, well), Initial(name), (int)(well / 2), T.TextMuted).fontStyle = FontStyle.Bold;
+                else if (e.You || !Portraits.PlaceHead(face, e.Character)) Typography.Strong(Ui.Text(Ui.Box(face, 0, 0, well, well), Initial(name), (int)(well / 2), T.TextMuted));
                 float x = well + 12;
-                Ui.Text(Ui.Box(row, x, 0, 44, rowH), $"#{e.Seed}", big, T.Gold, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+                Typography.Strong(Ui.Text(Ui.Box(row, x, 0, 44, rowH), $"#{e.Seed}", big, T.Gold, TextAnchor.MiddleLeft));
                 var who = Ui.Text(Ui.Box(row, x + 46, 0, 200, rowH), name, big, e.You ? T.Gold : T.Text, TextAnchor.MiddleLeft);
-                who.fontStyle = FontStyle.Bold;
+                Typography.Strong(who);
                 who.resizeTextForBestFit = true;
                 who.resizeTextMinSize = 10;
                 who.resizeTextMaxSize = big;

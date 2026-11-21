@@ -210,7 +210,7 @@ public static class ProjectSetup
 
     /// <summary>
     /// The license texts and notices every build carries (AGPL: the license and where the source is), shown by the game's
-    /// About screen: LICENSE.txt, LICENSING.md, THIRD_PARTY_NOTICES.md, the two LICENSES/ files, and SOURCE.txt, which
+    /// About screen: LICENSE.txt, LICENSING.md, THIRD_PARTY_NOTICES.md, the four LICENSES/ files (the two fonts' OFL among them), and SOURCE.txt, which
     /// names the commit the build was made from.
     /// </summary>
     private static void CopyLicenses(string to)
@@ -219,7 +219,7 @@ public static class ProjectSetup
         File.Copy(Path.Combine(RepoRoot, "LICENSE"), Path.Combine(to, "LICENSE.txt"), true);
         foreach (var name in new[] { "LICENSING.md", "THIRD_PARTY_NOTICES.md" })
             File.Copy(Path.Combine(RepoRoot, name), Path.Combine(to, name), true);
-        foreach (var name in new[] { "CC-BY-SA-4.0.txt", "UNITY-PERMISSION.md" })
+        foreach (var name in new[] { "CC-BY-SA-4.0.txt", "UNITY-PERMISSION.md", "OFL-1.1-Barlow.txt", "OFL-1.1-Noto.txt" })
             File.Copy(Path.Combine(RepoRoot, "LICENSES", name), Path.Combine(to, name), true);
         var commit = Git("rev-parse HEAD");
         bool changed = Git("status --porcelain --untracked-files=no --ignore-submodules=dirty").Length > 0;

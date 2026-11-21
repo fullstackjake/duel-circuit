@@ -68,7 +68,7 @@ namespace YgoCampaign.Game
             Ui.Image(panel, T.PanelDeep); // (it takes the pointer: a click on the panel isn't one on the scrim)
             var name = string.IsNullOrWhiteSpace(_deck.Name) ? "new deck" : _deck.Name.Trim();
             _leaveTitle = Label(28, 26, 504, 34, $"Save changes to {name}?", 22, TextAnchor.MiddleLeft, panel);
-            _leaveTitle.fontStyle = FontStyle.Bold;
+            Typography.Strong(_leaveTitle);
             _leaveTitle.color = T.Text;
             _leaveTitle.resizeTextForBestFit = true; // a long deck name shrinks rather than runs off
             _leaveTitle.resizeTextMinSize = 14;

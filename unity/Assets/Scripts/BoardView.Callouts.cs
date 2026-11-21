@@ -154,10 +154,10 @@ namespace YgoCampaign.Game
             Ui.Image(stripe, owner).raycastTarget = false;
 
             var num = Ui.Text(TopLeft(rt, "N", 8, 12, 40, 36), link > 0 ? link.ToString() : "•", 30, Ui.Hex("#FFC940"));
-            num.fontStyle = FontStyle.Bold;
+            Typography.Strong(num);
             // Whose play it is in words too, under its number (the stripe's color isn't the only sign).
             var who = Ui.Text(TopLeft(rt, "Who", 6, 48, 44, 18), OwnerTag(player), 14, new Color(0.8f, 0.84f, 0.92f));
-            who.fontStyle = FontStyle.Bold;
+            Typography.Strong(who);
             who.resizeTextForBestFit = true; // a six-letter name (when watching) still fits under the number
             who.resizeTextMinSize = 10;
             who.resizeTextMaxSize = 14;
@@ -167,14 +167,14 @@ namespace YgoCampaign.Game
             CardFace.Draw(thumb.gameObject.AddComponent<RawImage>(), code, info, new Vector2(48, 70));
 
             var name = Ui.Text(TopLeft(rt, "Name", TextLeft, 8, textW, 30), info.Name, 22, Color.white, TextAnchor.MiddleLeft);
-            name.fontStyle = FontStyle.Bold;
+            Typography.Strong(name);
             name.resizeTextForBestFit = true;
             name.resizeTextMinSize = 14;
             name.resizeTextMaxSize = 22;
             if (summary.Length > 0)
             {
                 var what = Ui.Text(TopLeft(rt, "Effect", TextLeft, 38, textW, 18), summary, 14, Ui.Hex("#9FD8FF"), TextAnchor.MiddleLeft);
-                what.fontStyle = FontStyle.Italic;
+                Typography.Italic(what);
             }
             var body = Ui.Text(TopLeft(rt, "Text", TextLeft, textTop, textW, textH), text, 15, new Color(0.86f, 0.89f, 0.95f), TextAnchor.UpperLeft);
             body.resizeTextForBestFit = true;
@@ -189,7 +189,7 @@ namespace YgoCampaign.Game
             contextRt.sizeDelta = new Vector2(-(TextLeft + TextRight), 18);
             contextRt.anchoredPosition = new Vector2((TextLeft - TextRight) / 2, 8);
             var context = Ui.Text(contextRt, "", 14, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
-            context.fontStyle = FontStyle.Italic;
+            Typography.Italic(context);
             foreach (var g in rt.GetComponentsInChildren<Graphic>()) g.raycastTarget = false;
 
             float now = Time.unscaledTime;

@@ -59,6 +59,10 @@ namespace YgoCampaign.Game
                 + "```\nTHE SOFTWARE IS PROVIDED \"AS IS\"\n```\n");
             File.WriteAllText(Path.Combine(testFolder, "SOURCE.txt"), "Duel Circuit 0.0.0\nBuilt from commit 0123456789abcdef0123456789abcdef01234567\n");
             if (!haveReal) LicenseFiles.FolderOverride = testFolder;
+            if (!haveReal) Debug.Log("about check: note the font licences aren't checked: this copy has no licence files of its own (the test folder is used)");
+            if (haveReal)
+                Report($"the font licences are there ({string.Join(", ", LicenseFiles.FindAll(LicenseFiles.Doc.Fonts).Select(Path.GetFileName))})",
+                    LicenseFiles.Find(LicenseFiles.Doc.Fonts) != null && LicenseFiles.FindAll(LicenseFiles.Doc.Fonts).Count == 2);
             Report($"the license files are read from {LicenseFiles.Folder} ({(haveReal ? "the game's own" : $"the game's own folder {gameFolder} has none: the test folder")})",
                 LicenseFiles.Find(LicenseFiles.Doc.License) != null);
 
@@ -104,7 +108,7 @@ namespace YgoCampaign.Game
                 "No card pictures ship", "ygopro-core", "Rules engine (ygopro-core), card scripts, card database and ban lists: Project Ignis (EDOPro)",
                 "Card-set data: YGOPRODeck", "Historic decks and ban lists: Format Library and yugiohmeta.com", "Made with Unity",
                 "Thank you, Project Ignis", "It couldn't exist without EDOPro",
-                "github.com/fullstackjake/duel-circuit",
+                "github.com/fullstackjake/duel-circuit", AboutScreen.FontCredit,
             }.Concat(AboutScreen.ButtonLabels).ToList();
             var missing = wanted.Where(w => !shown.Contains(w)).ToList();
             Report($"every notice shows ({wanted.Count} texts){(missing.Count > 0 ? ": missing " + string.Join(" | ", missing) : "")}", missing.Count == 0);

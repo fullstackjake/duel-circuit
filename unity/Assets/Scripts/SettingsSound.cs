@@ -57,7 +57,7 @@ namespace YgoCampaign.Game
         {
             var rt = Ui.Box(rows, 0, y, 1700, 94);
             Ui.Image(rt, Ui.Hex("#1A2030"));
-            Ui.Text(Ui.Box(rt, 30, 8, 500, 42), name, 26, Color.white, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Box(rt, 30, 8, 500, 42), name, 26, Color.white, TextAnchor.MiddleLeft));
             Ui.Text(Ui.Box(rt, 30, 50, 1100, 40), help, 15, new Color(0.72f, 0.76f, 0.86f), TextAnchor.UpperLeft);
             return rt;
         }

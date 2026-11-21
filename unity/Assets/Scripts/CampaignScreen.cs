@@ -189,8 +189,11 @@ namespace YgoCampaign.Game
                 new (string, int, string?)[] { ("99,999 cards (12,345 different) · 9,999 packs opened", 15, T.TextDimHex) },
             };
             FitWallet();
+            _dp.GetComponent<TabularDigits>()?.PrepareNow();
+            _dp.SetVerticesDirty();
             Canvas.ForceUpdateCanvases();
-            return (_dp.fontSize, _dp.preferredWidth, dp.sizeDelta.x);
+            // As drawn (tabular digits included): the ink's width from the text's mesh.
+            return (_dp.fontSize, _dp.GetComponent<TabularDigits>() is TabularDigits drawn ? drawn.DebugWidth : _dp.preferredWidth, dp.sizeDelta.x);
         }
 
         /// <summary>The wallet block's lines, each a run of (text, size, color or null for the block's gold).</summary>
@@ -212,7 +215,8 @@ namespace YgoCampaign.Game
             float Width((string text, int size, string? color) run)
             {
                 settings.fontSize = run.size;
-                return generator.GetPreferredWidth(run.text, settings) / _dp.pixelsPerUnit;
+                // As drawn: the wallet has tabular digits (TabularDigits), each as wide as the widest digit.
+                return generator.GetPreferredWidth(TabularDigits.AsDrawn(run.text, _dp.font), settings) / _dp.pixelsPerUnit;
             }
             float widest = _wallet.Max(line => line.Sum(Width));
             float tall = _wallet.Sum(line => line.Max(r => r.size)) * 1.2f;
@@ -236,9 +240,10 @@ namespace YgoCampaign.Game
             _root = Ui.Overlay(transform, "Campaign", 12);
             Ui.Image(_root, T.Base);
             Ui.Image(Ui.Box(_root, 0, 0, 1920, 90), T.Deep);
-            Ui.Text(Ui.Box(_root, 40, 0, 400, 90), "CAMPAIGN", 34, T.Sign, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Box(_root, 40, 0, 400, 90), "CAMPAIGN", 34, T.Sign, TextAnchor.MiddleLeft));
             _dp = Ui.Text(Ui.Box(_root, 280, 0, 484, 90), "", 24, T.Gold, TextAnchor.MiddleLeft);
             _dp.supportRichText = true;
+            Typography.Counter(_dp);
             // FitWallet sizes it: it never wraps (a wrapped line broke as "Level 43 · NG+1  4 / tokens").
             _dp.horizontalOverflow = HorizontalWrapMode.Overflow;
             _dp.verticalOverflow = VerticalWrapMode.Overflow;
@@ -301,7 +306,7 @@ namespace YgoCampaign.Game
         {
             var T = UiTheme.Current;
             _starters = Ui.Stretched("Starters", _root, Vector2.zero, Vector2.one);
-            Ui.Text(Ui.Box(_starters, 0, 130, 1920, 60), "Choose your starter deck", 38, T.Text).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Box(_starters, 0, 130, 1920, 60), "Choose your starter deck", 38, T.Text));
             Ui.Text(Ui.Box(_starters, 0, 192, 1920, 34), "You can build new decks from your collection at any time.", 18, T.TextMuted);
             BuildOptions();
             var starters = CampaignState.Starters;
@@ -331,11 +336,11 @@ namespace YgoCampaign.Game
                 {
                     var ribbon = Ui.Box(tile, 0, 0, width, 40);
                     Ui.Image(ribbon, T.Highlight);
-                    Ui.Text(ribbon, starter.Badge.ToUpperInvariant(), 18, T.OnAccent).fontStyle = FontStyle.Bold;
+                    Typography.Strong(Ui.Text(ribbon, starter.Badge.ToUpperInvariant(), 18, T.OnAccent));
                 }
                 if (starter.Tag.Length > 0)
-                    Ui.Text(Ui.Box(tile, 20, 356, width - 40, 34), starter.Tag, 16, T.TextQuiet).fontStyle = FontStyle.Italic;
-                Ui.Text(Ui.Box(tile, 20, 400, width - 40, 50), starter.Title, 30, T.Text).fontStyle = FontStyle.Bold;
+                    Typography.Italic(Ui.Text(Ui.Box(tile, 20, 356, width - 40, 34), starter.Tag, 16, T.TextQuiet));
+                Typography.Strong(Ui.Text(Ui.Box(tile, 20, 400, width - 40, 50), starter.Title, 30, T.Text));
                 Ui.Text(Ui.Box(tile, 30, 460, width - 60, 130), starter.Blurb, 18, T.TextSoft, TextAnchor.UpperCenter);
                 var pick = starter;
                 Ui.BoxButton(tile, (width - 360) / 2, 600, 360, 64, "Start with this deck", () => StartWith(pick), 20);
@@ -389,7 +394,7 @@ namespace YgoCampaign.Game
             Ui.Image(_newGame, T.Scrim.WithAlpha(0.75f));
             var panel = Ui.Box(_newGame, 560, 300, 800, 480);
             Ui.Image(panel, T.Panel);
-            Ui.Text(Ui.Box(panel, 0, 20, 800, 50), "New game", 32, T.Text).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Box(panel, 0, 20, 800, 50), "New game", 32, T.Text));
             var help = Ui.Text(Ui.Box(panel, 40, 300, 720, 110), "Highlight an option to see what it does.", 16, T.TextSoft, TextAnchor.UpperLeft);
             help.supportRichText = true;
             GameObject? first = null;
@@ -441,7 +446,7 @@ namespace YgoCampaign.Game
             Ui.Image(_locker, T.Scrim.WithAlpha(0.88f));
             var panel = Ui.Box(_locker, 300, 130, 1320, 820);
             Ui.Image(panel, T.Panel);
-            Ui.Text(Ui.Box(panel, 40, 18, 600, 50), "Locker", 32, T.Text, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Box(panel, 40, 18, 600, 50), "Locker", 32, T.Text, TextAnchor.MiddleLeft));
             bool mats = _lockerMats && profile.LibraryOpen;
             _lockerNote = Ui.Text(Ui.Box(panel, 40, 66, 1240, 30), mats
                     ? $"The mat on your half of the duel board; your opponent brings their own. A cleared Library cup sells its era's mat: {Cosmetics.MatPrice:N0} DP."
@@ -511,7 +516,7 @@ namespace YgoCampaign.Game
                     : fresh ? $"<color={T.GoodHex}>New · click to hang it</color>"
                     : $"<color={T.TextDimHex}>Click to hang it</color>";
                 var label = Ui.Text(Ui.Box(tile, 8, 262, 220, 30), unlocked ? name : $"{name} (locked)", 18, T.Text);
-                label.fontStyle = FontStyle.Bold;
+                Typography.Strong(label);
                 Ui.Text(Ui.Box(tile, 8, 292, 220, 36), line, 14, T.Text).supportRichText = true;
                 if (unlocked)
                 {
@@ -580,12 +585,12 @@ namespace YgoCampaign.Game
                     var chip = Ui.Box(preview, 6, 6, 64, 20);
                     Ui.Image(chip, T.Scrim.WithAlpha(0.6f)).raycastTarget = false;
                     var locked = Ui.Text(chip, "LOCKED", 11, Ui.Hex("#C9CED6")); // theme: kept, no role matches #C9CED6 (LOCKED on a mat preview)
-                    locked.fontStyle = FontStyle.Bold;
+                    Typography.Strong(locked);
                     locked.raycastTarget = false;
                 }
                 var c = cup < 0 ? null : library.Cups[cup];
                 var label = Ui.Text(Ui.Box(tile, 8, 118, 220, 50), c == null ? "Space\n<size=13>Default · free</size>" : $"{c.Era}\n<size=13>{c.Name}</size>", 18, T.Text);
-                label.fontStyle = FontStyle.Bold;
+                Typography.Strong(label);
                 label.supportRichText = true;
                 string line = chosen ? $"<color={T.GoldHex}>On your side</color>"
                     : owned ? $"<color={T.GoodHex}>Owned</color> · click to use"
@@ -706,7 +711,7 @@ namespace YgoCampaign.Game
             Ui.Image(_bounties, T.Scrim.WithAlpha(0.88f));
             var panel = Ui.Box(_bounties, 360, 210, 1200, 640);
             Ui.Image(panel, T.Panel);
-            Ui.Text(Ui.Box(panel, 40, 18, 900, 50), "Gus's bounty board", 32, T.Text, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Box(panel, 40, 18, 900, 50), "Gus's bounty board", 32, T.Text, TextAnchor.MiddleLeft));
             Ui.BoxButton(panel, 1040, 24, 120, 44, "Close", CloseBounties, 18);
             var band = _state.Unlocks.BoardBand(profile);
             var rows = _state.Unlocks.Board(profile);
@@ -721,10 +726,10 @@ namespace YgoCampaign.Game
                 var row = Ui.Box(panel, 40, 116 + i * 130, 1120, 116);
                 Ui.Image(row, r.Claimed ? T.RowWon : i % 2 == 0 ? T.RowA : T.RowB);
                 Ui.Image(Ui.Box(row, 0, 0, 6, 116), r.Claimed ? T.GoodStripe : T.Brass);
-                Ui.Text(Ui.Box(row, 28, 12, 880, 44), r.Bounty.Text, 22, T.Text, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+                Typography.Strong(Ui.Text(Ui.Box(row, 28, 12, 880, 44), r.Bounty.Text, 22, T.Text, TextAnchor.MiddleLeft));
                 Ui.Text(Ui.Box(row, 28, 60, 880, 40), r.Claimed ? "Claimed: Gus paid this one." : pays, 16, r.Claimed ? T.TextFaint : T.GoldSoft, TextAnchor.MiddleLeft);
                 var state = Ui.Text(Ui.Box(row, 920, 0, 180, 116), r.Claimed ? "CLAIMED" : "OPEN", 22, r.Claimed ? T.Good : T.Gold);
-                state.fontStyle = FontStyle.Bold;
+                Typography.Strong(state);
             }
             Ui.Text(Ui.Box(panel, 40, 520, 1120, 90),
                 "Bounties count in one-on-one circuit duels you win, not in Tag Cups, guests or the Library. A bounty pays a card your Recipe still needs "
@@ -797,7 +802,7 @@ namespace YgoCampaign.Game
             Ui.Image(_trade, T.Scrim.WithAlpha(0.88f));
             var panel = Ui.Box(_trade, 300, 130, 1320, 820);
             Ui.Image(panel, T.Panel);
-            Ui.Text(Ui.Box(panel, 40, 18, 1000, 50), $"A trade with {partner.Name}", 32, T.Text, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Box(panel, 40, 18, 1000, 50), $"A trade with {partner.Name}", 32, T.Text, TextAnchor.MiddleLeft));
             Ui.BoxButton(panel, 1160, 24, 120, 44, "Close", CloseTrade, 18);
             Ui.Text(Ui.Box(panel, 40, 66, 1240, 30),
                 $"Bond {TagPartners.DeckBond}: one trade. Pick a card from {partner.Name}'s decks, then give a spare copy worth at least as many Card Tokens.",
@@ -972,7 +977,7 @@ namespace YgoCampaign.Game
                 bool picked = (i == 1) == _eraLimited;
                 _ruleFills[i].color = picked ? T.TabOn : T.ButtonOff;
                 _ruleLabels[i].color = picked ? T.Gold : T.TextDim;
-                _ruleLabels[i].fontStyle = picked ? FontStyle.Bold : FontStyle.Normal;
+                Typography.Weight(_ruleLabels[i], picked);
             }
         }
 
@@ -1084,7 +1089,7 @@ namespace YgoCampaign.Game
                 {
                     Ui.Image(Ui.Box(_circuitList, 0, stripY, MapWidth, 42), T.Glass.WithAlpha(0.92f)).raycastTarget = false;
                     var title = Ui.Text(Ui.Box(_circuitList, 20, stripY + 4, 760, 34), bandText, 22, bandColor, TextAnchor.MiddleLeft);
-                    title.fontStyle = FontStyle.Bold;
+                    Typography.Strong(title);
                     title.supportRichText = true;
                     title.raycastTarget = false;
                 });
@@ -1214,14 +1219,14 @@ namespace YgoCampaign.Game
             var tab = Ui.Placed("Number", node, new Vector2(-size / 2 + 6, size / 2 - 6), new Vector2(number.Length > 2 ? 44 : 30, 26));
             Ui.Image(tab, open ? accent : new Color(0.3f, 0.32f, 0.38f)).raycastTarget = false;
             var num = Ui.Text(tab, number, 15, Ui.Hex("#121620"));
-            num.fontStyle = FontStyle.Bold;
+            Typography.Strong(num);
             // A dark tag behind the name and progress, so they read on any map picture.
             float tagWidth = Mathf.Min(330, name.Length * (size > 80 ? 9.5f : 8f) + 24);
             var backing = Ui.Placed("NameTag", node, new Vector2(0, -size / 2 - (progress.Length > 0 ? 25 : 16)), new Vector2(tagWidth, progress.Length > 0 ? 44 : 26));
             Ui.Image(backing, T.Glass.WithAlpha(0.72f)).raycastTarget = false;
             var label = Ui.Text(Ui.Placed("Name", node, new Vector2(0, -size / 2 - 16), new Vector2(320, 24)), name, size > 80 ? 17 : 14,
                 open ? T.Text : T.Text.WithAlpha(0.6f));
-            label.fontStyle = FontStyle.Bold;
+            Typography.Strong(label);
             label.raycastTarget = false;
             label.gameObject.AddComponent<Outline>().effectColor = T.Scrim.WithAlpha(0.8f);
             if (progress.Length > 0)
@@ -1272,7 +1277,7 @@ namespace YgoCampaign.Game
             var circuit = circuits.All[index];
             bool cleared = circuits.IsCleared(index, profile);
 
-            Ui.Text(Ui.Box(_detail, 30, 20, 940, 46), circuit.Name, 30, T.Text, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Box(_detail, 30, 20, 940, 46), circuit.Name, 30, T.Text, TextAnchor.MiddleLeft));
             Ui.Text(Ui.Box(_detail, 30, 66, 940, 28), circuit.Blurb, 16, T.TextMuted, TextAnchor.MiddleLeft);
             var prize = Ui.Text(Ui.Box(_detail, 30, 96, 940, 28),
                 cleared ? $"<color={T.GoldHex}>Cleared.</color> A rematch pays {Circuits.RepeatWinDp} DP." : $"Clear all {circuit.Matches.Count} matches: <color={T.GoldHex}>+{circuit.Prize:N0} DP prize</color>"
@@ -1296,11 +1301,11 @@ namespace YgoCampaign.Game
                 float tx = Portraits.Place(Ui.Box(row, 6, 4, 110, 108), c.Id) ? 124 : 20;
                 // The last match is the circuit's final: billed by name, with its own line before the deciding duel.
                 bool final = Circuits.IsFinal(circuit, m);
-                Ui.Text(Ui.Box(row, tx, 10, 600 - tx + 20, 34), final ? $"Final: {c.DisplayName}" : $"Match {m + 1}: {c.DisplayName}", 21, T.Text, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+                Typography.Strong(Ui.Text(Ui.Box(row, tx, 10, 600 - tx + 20, 34), final ? $"Final: {c.DisplayName}" : $"Match {m + 1}: {c.DisplayName}", 21, T.Text, TextAnchor.MiddleLeft));
                 Ui.Text(Ui.Box(row, tx, 44, 600 - tx + 20, 26), $"Deck: {_state.DeckTitle(match.Deck)} · {c.StyleSummary}", 14, T.TextFaint, TextAnchor.MiddleLeft);
                 var intro = final && circuit.FinalLine.Length > 0 ? circuit.FinalLine : c.IntroFor(circuit.Matches.Take(m).Any(earlier => earlier.Character.Id == c.Id));
                 if (intro.Length > 0)
-                    Ui.Text(Ui.Box(row, tx, 72, 600 - tx + 20, 36), $"“{intro}”", 14, T.Intro, TextAnchor.UpperLeft).fontStyle = FontStyle.Italic;
+                    Typography.Italic(Ui.Text(Ui.Box(row, tx, 72, 600 - tx + 20, 36), $"“{intro}”", 14, T.Intro, TextAnchor.UpperLeft));
                 // Same numbers as the results screen: the first win carries the bonus, a rematch pays RepeatWinDp. Above them,
                 // the deck's strength.
                 var stars = StrengthText.Stars(DeckStrength.StarsFor(_state.Ratings, match.Deck), T);
@@ -1333,7 +1338,7 @@ namespace YgoCampaign.Game
             Ui.Text(Ui.Box(_detail, 30, top, 400, 26), "YOUR DECK", 15, T.Caption, TextAnchor.MiddleLeft);
             Ui.BoxButton(_detail, 30, top + 32, 44, 44, "<", () => CycleDeck(-1), 20);
             var label = Ui.Text(Ui.Box(_detail, 80, top + 32, 380, 44), profile.Deck.Length > 0 ? CampaignState.SlugTitle(profile.Deck) : "(no deck)", 22, T.Text);
-            label.fontStyle = FontStyle.Bold;
+            Typography.Strong(label);
             Ui.BoxButton(_detail, 466, top + 32, 44, 44, ">", () => CycleDeck(+1), 20);
             Ui.BoxButton(_detail, 540, top + 32, 200, 44, "Edit deck", () => EditDeck?.Invoke(profile.Deck), 18);
             Ui.BoxButton(_detail, 760, top + 32, 200, 44, "New deck", () => EditDeck?.Invoke(null), 18);
@@ -1392,7 +1397,7 @@ namespace YgoCampaign.Game
             var circuits = _state.Circuits;
             var cup = circuits.TagCups[index];
             bool cleared = circuits.IsTagCupCleared(index, profile);
-            Ui.Text(Ui.Box(_detail, 30, 20, 940, 46), cup.Name, 30, T.GoldSoft, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Box(_detail, 30, 20, 940, 46), cup.Name, 30, T.GoldSoft, TextAnchor.MiddleLeft));
             Ui.Text(Ui.Box(_detail, 30, 66, 940, 28), cup.Blurb, 16, T.TextMuted, TextAnchor.MiddleLeft);
             var prize = Ui.Text(Ui.Box(_detail, 30, 94, 940, 28),
                 cleared ? $"<color={T.GoldHex}>Cleared.</color> A rematch pays {Circuits.RepeatWinDp} DP." : $"You and a partner against two. Clear all {cup.Matches.Count}: <color={T.GoldHex}>+{cup.Prize:N0} DP prize</color>",
@@ -1475,10 +1480,10 @@ namespace YgoCampaign.Game
                 Ui.Image(row, won ? T.RowWon : T.RowA);
                 bool faces = Portraits.Place(Ui.Box(row, 4, 4, 92, 100), lead.Character.Id) | Portraits.Place(Ui.Box(row, 70, 4, 92, 100), second.Character.Id);
                 float tx = faces ? 170 : 20;
-                Ui.Text(Ui.Box(row, tx, 10, 620 - tx, 34), $"Match {m + 1}: {lead.Character.Name} & {second.Character.Name}", 21, T.Text, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+                Typography.Strong(Ui.Text(Ui.Box(row, tx, 10, 620 - tx, 34), $"Match {m + 1}: {lead.Character.Name} & {second.Character.Name}", 21, T.Text, TextAnchor.MiddleLeft));
                 Ui.Text(Ui.Box(row, tx, 44, 620 - tx, 26), $"Decks: {_state.DeckTitle(lead.Deck)} + {_state.DeckTitle(second.Deck)}", 14, T.TextFaint, TextAnchor.MiddleLeft);
                 if (lead.Character.Intro.Length > 0)
-                    Ui.Text(Ui.Box(row, tx, 70, 620 - tx, 30), $"“{lead.Character.Intro}”", 14, T.Intro, TextAnchor.UpperLeft).fontStyle = FontStyle.Italic;
+                    Typography.Italic(Ui.Text(Ui.Box(row, tx, 70, 620 - tx, 30), $"“{lead.Character.Intro}”", 14, T.Intro, TextAnchor.UpperLeft));
                 // The pair's strength (their decks' mean), then the pay: a rematch pays RepeatWinDp.
                 var stars = StrengthText.Stars(DeckStrength.StarsFor(_state.Ratings, new[] { lead.Deck, second.Deck }), T);
                 var reward = (stars.Length > 0 ? stars + "\n" : "")
@@ -1576,7 +1581,7 @@ namespace YgoCampaign.Game
                 tab.targetGraphic.color = on ? T.TabOn : T.ButtonOff;
                 var label = tab.GetComponentInChildren<Text>();
                 label.color = on ? T.Gold : T.TextDim;
-                label.fontStyle = on ? FontStyle.Bold : FontStyle.Normal;
+                Typography.Weight(label, on);
             }
             _libraryTab.GetComponentInChildren<Text>().text = profile.Seen.Contains(LibrarySeen) ? "Library" : $"Library <color={T.GoodHex}>(new)</color>";
             var library = _state.Library;
@@ -1667,7 +1672,7 @@ namespace YgoCampaign.Game
                 Ui.Image(binder, cover);
                 Ui.Image(Ui.Box(binder, 0, 0, 14, BinderHeight), accent).raycastTarget = false;
                 var year = Ui.Text(Ui.Box(binder, 24, 8, 120, 40), cup.Era.ToString(), 32, accent, TextAnchor.MiddleLeft);
-                year.fontStyle = FontStyle.Bold;
+                Typography.Strong(year);
                 year.raycastTarget = false;
                 // The marks to earn, dim until earned.
                 var tick = Ui.Text(Ui.Box(binder, 148, 8, 32, 36), "✓", 26, cleared ? T.Good : T.Text.WithAlpha(0.18f));
@@ -1675,7 +1680,7 @@ namespace YgoCampaign.Game
                 var star = Ui.Text(Ui.Box(binder, 182, 8, 32, 36), "★", 26, stamped ? T.Gold : T.Text.WithAlpha(0.18f));
                 star.raycastTarget = false;
                 var name = Ui.Text(Ui.Box(binder, 24, 50, 190, 46), cup.Name, 16, T.Text, TextAnchor.UpperLeft);
-                name.fontStyle = FontStyle.Bold;
+                Typography.Strong(name);
                 name.raycastTarget = false;
                 if (Boss(cup) is CircuitMatch boss) Portraits.Place(Ui.Box(binder, 142, 84, 72, 72), boss.Character.Id);
                 int needed = cup.Matches.Count(m => !m.Champion);
@@ -1690,7 +1695,7 @@ namespace YgoCampaign.Game
                     Ui.Image(plateBox, stamped ? Ui.Hex("#D9B24C") : Ui.Hex("#B9C0CB")).raycastTarget = false;
                     Ui.Image(Ui.Box(plateBox, 0, 0, 120, 2), stamped ? Ui.Hex("#F3DC8C") : Ui.Hex("#E6EAF0")).raycastTarget = false;
                     var engraved = Ui.Text(Ui.Box(plateBox, 4, 2, 112, 32), plate, 13, stamped ? Ui.Hex("#20180A") : Ui.Hex("#1E232B"));
-                    engraved.fontStyle = FontStyle.Bold;
+                    Typography.Strong(engraved);
                     engraved.horizontalOverflow = HorizontalWrapMode.Wrap;
                     engraved.resizeTextForBestFit = true;
                     engraved.resizeTextMinSize = 11;
@@ -1740,7 +1745,7 @@ namespace YgoCampaign.Game
             bool champion = cup.Matches.Any(m => m.Champion);
 
             var cupTitle = Ui.Text(Ui.Box(_detail, 30, 20, 300, 46), cup.Name, 30, T.LibraryGold, TextAnchor.MiddleLeft);
-            cupTitle.fontStyle = FontStyle.Bold;
+            Typography.Strong(cupTitle);
             cupTitle.resizeTextForBestFit = true;
             cupTitle.resizeTextMinSize = 16;
             cupTitle.resizeTextMaxSize = 30;
@@ -1756,7 +1761,7 @@ namespace YgoCampaign.Game
             if (localsRunning)
             {
                 localsText.color = T.Gold;
-                localsText.fontStyle = FontStyle.Bold;
+                Typography.Strong(localsText);
             }
             // The cup's shop: its era mat and its binder's engraving once cleared, and the Library Trader (tokens for cards
             // out by the cup's pool month).
@@ -1808,7 +1813,7 @@ namespace YgoCampaign.Game
                 // The panel's header says the table is optional; a long name and title shrink to fit rather than cut off.
                 var title = match.Champion ? $"<color={T.VioletHex}>Champion's table:</color> {c.DisplayName}" : $"Match {m + 1}: {c.DisplayName}";
                 var head = Ui.Text(Ui.Box(row, tx, 8, 600 - tx + 20, 34), title, 21, T.Text, TextAnchor.MiddleLeft);
-                head.fontStyle = FontStyle.Bold;
+                Typography.Strong(head);
                 head.supportRichText = true;
                 head.resizeTextForBestFit = true;
                 head.resizeTextMinSize = 15;
@@ -1816,7 +1821,7 @@ namespace YgoCampaign.Game
                 Ui.Text(Ui.Box(row, tx, 42, 600 - tx + 20, 26), $"Deck: {_state.DeckTitle(match.Deck)} · {c.StyleSummary}", 14, T.TextFaint, TextAnchor.MiddleLeft);
                 var intro = c.IntroFor(cup.Matches.Take(m).Any(earlier => earlier.Character.Id == c.Id));
                 if (intro.Length > 0 && rowHeight >= 104)
-                    Ui.Text(Ui.Box(row, tx, 70, 600 - tx + 20, rowHeight - 74), $"“{intro}”", 14, T.Intro, TextAnchor.UpperLeft).fontStyle = FontStyle.Italic;
+                    Typography.Italic(Ui.Text(Ui.Box(row, tx, 70, 600 - tx + 20, rowHeight - 74), $"“{intro}”", 14, T.Intro, TextAnchor.UpperLeft));
                 // Same numbers as the results screen; ★ marks a win that counts toward the stamp.
                 var reward = won ? $"Won ×{profile.LibraryWins[key]}{(profile.LibraryBuilt.Contains(key) ? $" <color={T.GoldHex}>★</color>" : "")}\nRematch: +{Library.RepeatWinDp} DP"
                                  : $"First win: +{Library.WinDp + Circuits.FirstWinBonus} DP";
@@ -1983,12 +1988,12 @@ namespace YgoCampaign.Game
             var plaque = Ui.Box(frame, 2, 2, w - 4, h - 4);
             Ui.Image(plaque, open ? Ui.Hex("#3A2E14") : Ui.Hex("#2A2620"));
             var title = Ui.Text(Ui.Box(plaque, 20, 6, 320, 50), library.Final.Name.ToUpperInvariant(), 36, open ? T.GoldSoft : new Color(0.7f, 0.66f, 0.58f), TextAnchor.MiddleLeft);
-            title.fontStyle = FontStyle.Bold;
+            Typography.Strong(title);
             title.raycastTarget = false;
             if (!open)
             {
                 var locked = Ui.Text(Ui.Box(plaque, 250, 18, 90, 24), "LOCKED", 14, T.TextDim, TextAnchor.MiddleLeft);
-                locked.fontStyle = FontStyle.Bold;
+                Typography.Strong(locked);
                 locked.raycastTarget = false;
             }
             int cleared = library.ClearedCount(profile), roundsWon = Enumerable.Range(0, library.Rounds.Count).Count(r => library.FinalWon(profile, r));
@@ -2010,7 +2015,7 @@ namespace YgoCampaign.Game
                 var era = library.Cups[library.Rounds[r].Cup].Era;
                 var year = Ui.Text(pip, era >= 1000 ? "'" + (era % 100).ToString("00") : "?", 13,
                     roundWon ? Ui.Hex("#20180A") : isNext ? Ui.Hex("#FFC940") : new Color(1, 1, 1, open ? 0.6f : 0.35f));
-                year.fontStyle = FontStyle.Bold;
+                Typography.Strong(year);
                 year.raycastTarget = false;
             }
             Portraits.Place(Ui.Box(plaque, w - 112, 0, 100, 100), "ilse");
@@ -2034,7 +2039,7 @@ namespace YgoCampaign.Game
             var library = _state.Library;
             bool open = library.FinalOpen(profile), won = library.FinalCleared(profile);
             int next = library.FinalNext(profile);
-            Ui.Text(Ui.Box(_detail, 30, 14, 700, 54), library.Final.Name, 40, T.GoldSoft, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Box(_detail, 30, 14, 700, 54), library.Final.Name, 40, T.GoldSoft, TextAnchor.MiddleLeft));
             Portraits.Place(Ui.Box(_detail, 820, 4, 140, 140), "ilse");
             Ui.Text(Ui.Box(_detail, 30, 66, 940, 28), "Duchess Ilse's final: six eras in order, each under its own list and card pool.", 16,
                 T.TextMuted, TextAnchor.MiddleLeft);
@@ -2056,7 +2061,7 @@ namespace YgoCampaign.Game
                 Ui.Image(row, roundWon ? T.RowWon : playable ? T.RowPlayable : T.RowB);
                 float tx = Portraits.Place(Ui.Box(row, 6, 4, 78, rowHeight - 8), c.Id) ? 96 : 20;
                 var head = Ui.Text(Ui.Box(row, tx, 6, 600 - tx + 20, 32), $"Round {r + 1} · {cup.Era}: {c.DisplayName}", 20, T.Text, TextAnchor.MiddleLeft);
-                head.fontStyle = FontStyle.Bold;
+                Typography.Strong(head);
                 head.resizeTextForBestFit = true;
                 head.resizeTextMinSize = 14;
                 head.resizeTextMaxSize = 20;

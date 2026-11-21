@@ -8,8 +8,8 @@ namespace YgoCampaign.Game
     /// <summary>Small helpers for building uGUI from code, so the scene needs no hand-authored prefabs.</summary>
     public static class Ui
     {
-        private static Font? _font;
-        public static Font Font => _font ??= Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        /// <summary>The body face, Barlow Regular, which every text starts in (<see cref="Typography"/> has the others).</summary>
+        public static Font Font => Typography.Font(Face.Body);
 
         public static RectTransform Rect(string name, Transform parent)
         {
@@ -62,6 +62,18 @@ namespace YgoCampaign.Game
             return t;
         }
 
+        /// <summary>
+        /// A text at a role of the type scale (UiTheme.Size, in the role's face). <paramref name="reading"/>: a reading area
+        /// (card text, the duel log, dialogs, story), where Settings > Card text size scales Caption, Small and Body.
+        /// </summary>
+        public static Text Text(RectTransform rt, string text, TextRole role, Color color,
+            TextAnchor anchor = TextAnchor.MiddleCenter, bool reading = false)
+        {
+            var t = Text(rt, text, UiTheme.Size(role, reading), color, anchor);
+            t.font = Typography.Font(Typography.FaceOf(role));
+            return t;
+        }
+
         public static Button Button(Transform parent, string label, Vector2 center, Vector2 size, Action onClick)
         {
             var rt = Placed(label, parent, center, size);
@@ -69,7 +81,7 @@ namespace YgoCampaign.Game
             var button = rt.gameObject.AddComponent<Button>();
             button.targetGraphic = image;
             button.onClick.AddListener(() => { Sounds.Play("click"); onClick(); });
-            Text(Stretched("Label", rt, Vector2.zero, Vector2.one), label, 18, Color.white);
+            Text(Stretched("Label", rt, Vector2.zero, Vector2.one), label, 18, Color.white).font = Typography.Font(Face.Condensed); // buttons: the Label face
             UiHover.Attach(button);
             return button;
         }
@@ -111,7 +123,7 @@ namespace YgoCampaign.Game
             var button = rt.gameObject.AddComponent<Button>();
             button.targetGraphic = image;
             button.onClick.AddListener(() => { Sounds.Play("click"); onClick(); });
-            Text(rt, label, size, UiTheme.Current.Text);
+            Text(rt, label, size, UiTheme.Current.Text).font = Typography.Font(Face.Condensed); // buttons: the Label face
             UiHover.Attach(button);
             return button;
         }
@@ -154,7 +166,7 @@ namespace YgoCampaign.Game
             var hint = placeholderRt.gameObject.AddComponent<Text>();
             hint.font = Font;
             hint.fontSize = size;
-            hint.fontStyle = FontStyle.Italic;
+            Typography.Italic(hint);
             hint.color = new Color(1, 1, 1, 0.55f); // dim, but still readable (about 5:1 on the field's dark fill)
             hint.alignment = TextAnchor.MiddleLeft;
             hint.text = placeholder;

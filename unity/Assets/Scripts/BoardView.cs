@@ -70,7 +70,7 @@ namespace YgoCampaign.Game
                 else Emblem(plate);
             }
             else if (string.IsNullOrEmpty(characterId) || !Portraits.Place(plate, characterId, mirror: player == 1))
-                Ui.Text(Ui.Placed("You", plate, new Vector2(0, -10), new Vector2(300, 120)), "?", 64, new Color(1, 1, 1, 0.16f)).fontStyle = FontStyle.Bold;
+                Typography.Strong(Ui.Text(Ui.Placed("You", plate, new Vector2(0, -10), new Vector2(300, 120)), "?", 64, new Color(1, 1, 1, 0.16f)));
             // The portrait just placed is the last child (the old one is only destroyed at the end of the frame).
             else _portraitBase[player] = plate.GetChild(plate.childCount - 1).GetComponent<RawImage>();
             _moodUntil[player] = 0;
@@ -186,11 +186,11 @@ namespace YgoCampaign.Game
                 var edge = Ui.Placed("Owner", row, new Vector2(-(width - 8) / 2 + 2, 0), new Vector2(4, inner));
                 Ui.Image(edge, l.Controller == HumanSeat || (HumanSeat < 0 && l.Controller == 0) ? Ui.Hex("#4FA3FF") : Ui.Hex("#FF5A5A")).raycastTarget = false;
                 var num = Ui.Text(Ui.Placed("N", row, new Vector2(-(width - 8) / 2 + 20, 5), new Vector2(28, 24)), l.Number.ToString(), 18, Ui.Hex("#FFC940"));
-                num.fontStyle = FontStyle.Bold;
+                Typography.Strong(num);
                 num.raycastTarget = false;
                 // Whose link it is in words too, under its number (the stripe's color isn't the only sign).
                 var who = Ui.Text(Ui.Placed("Who", row, new Vector2(-(width - 8) / 2 + 20, -13), new Vector2(34, 12)), OwnerTag(l.Controller), 8, new Color(0.8f, 0.84f, 0.92f));
-                who.fontStyle = FontStyle.Bold;
+                Typography.Strong(who);
                 who.raycastTarget = false;
                 var thumb = Ui.Placed("Art", row, new Vector2(-(width - 8) / 2 + 52, 0), new Vector2(27, 39));
                 if (l.Code != 0)
@@ -204,7 +204,7 @@ namespace YgoCampaign.Game
                 // The name on one line: a size down to 9, then shortened with "…" (never a second, cut-off line).
                 var name = Ui.Text(Ui.Placed("Name", row, new Vector2(12, inner / 2 - 12), new Vector2(textW, 20)), info?.Name ?? "a card", 13,
                     negated ? new Color(1, 1, 1, 0.45f) : Color.white, TextAnchor.MiddleLeft);
-                name.fontStyle = FontStyle.Bold;
+                Typography.Strong(name);
                 name.raycastTarget = false;
                 (name.text, name.fontSize) = FitOneLine(name, name.text, textW, 13, 9);
                 var (mark, color) = l.State switch
@@ -217,7 +217,7 @@ namespace YgoCampaign.Game
                     _ => ("waiting", "#8A93A6"),
                 };
                 var state = Ui.Text(Ui.Placed("State", row, new Vector2((width - 8) / 2 - 36, 0), new Vector2(68, 36)), mark, 11, Ui.Hex(color));
-                state.fontStyle = FontStyle.Bold;
+                Typography.Strong(state);
                 state.raycastTarget = false;
                 rows.Add((row, h));
                 height += h;
@@ -411,7 +411,7 @@ namespace YgoCampaign.Game
             edge.effectColor = _plateAccent[player];
             edge.effectDistance = new Vector2(2, -2);
             var text = Ui.Text(bubble, line, 17, Ui.Hex("#1A1D26"));
-            text.fontStyle = FontStyle.BoldAndItalic;
+            Typography.Strong(text);
             text.rectTransform.offsetMin = new Vector2(12, 6);
             text.rectTransform.offsetMax = new Vector2(-12, -6);
             text.resizeTextForBestFit = true;
@@ -586,7 +586,7 @@ namespace YgoCampaign.Game
             Ui.Clickable((RectTransform)Ui.Image(root, new Color(0, 0, 0, 0.7f)).transform, CloseMoments);
             var panel = Ui.Placed("Panel", root, Vector2.zero, new Vector2(900, 900));
             Ui.Image(panel, Ui.Hex("#161B27"));
-            Ui.Text(Ui.Placed("Title", panel, new Vector2(-150, 420), new Vector2(560, 40)), "KEY MOMENTS", 24, Color.white, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Placed("Title", panel, new Vector2(-150, 420), new Vector2(560, 40)), "KEY MOMENTS", 24, Color.white, TextAnchor.MiddleLeft));
             Ui.Button(panel, "Close", new Vector2(370, 420), new Vector2(110, 38), CloseMoments);
             Ui.Text(Ui.Placed("Hint", panel, new Vector2(0, 388), new Vector2(840, 24)),
                 "Click a moment to jump to just before it; press Pause / Step or wait to see it happen.", 13, new Color(0.75f, 0.78f, 0.86f), TextAnchor.MiddleLeft);
@@ -611,7 +611,7 @@ namespace YgoCampaign.Game
                 var t = Ui.Text(row, text, heading ? 16 : 14, color, TextAnchor.MiddleLeft);
                 t.supportRichText = true;
                 t.rectTransform.offsetMin = new Vector2(12, 0);
-                if (heading) t.fontStyle = FontStyle.Bold;
+                if (heading) Typography.Strong(t);
                 Ui.Clickable(row, () => { CloseMoments(); MomentPicked?.Invoke(tick); });
                 y += heading ? 42 : 34;
             }
@@ -784,7 +784,7 @@ namespace YgoCampaign.Game
             innerRing.texture = BoardFx.Textures.Ring;
             innerRing.color = new Color(1, 1, 1, 0.35f);
             innerRing.raycastTarget = false;
-            _phaseLabel = Ui.Text(Ui.Stretched("Label", phaseRt, Vector2.zero, Vector2.one), "", 20, Color.white);
+            _phaseLabel = Typography.Hero(Typography.Counter(Ui.Text(Ui.Stretched("Label", phaseRt, Vector2.zero, Vector2.one), "", 20, Color.white)));
             _phaseLabel.supportRichText = true;
             Ui.Clickable(phaseRt, OpenPhasePicker);
 
@@ -817,7 +817,7 @@ namespace YgoCampaign.Game
             DrawHands();
             // While you wait: who the game is waiting on (the opponent, or effects resolving), never blank.
             _waiting = Ui.Text(Ui.Placed("Waiting", _field, new Vector2(Column * 4 + 18, -2 * Row - 50), new Vector2(220, 24)), "", 15, new Color(0.85f, 0.88f, 0.95f));
-            _waiting.fontStyle = FontStyle.Italic;
+            Typography.Italic(_waiting);
             _waiting.raycastTarget = true;
             _waiting.supportRichText = true;
             // A paused duel of yours says so, and a click resumes it (your own duels have no Pause button).
@@ -925,7 +925,7 @@ namespace YgoCampaign.Game
             // The headline sits on the middle line and the quote just under it (one block, not two far apart).
             _banner = Ui.Text(Ui.Stretched("Text", bannerRt, new Vector2(0, 0.48f), new Vector2(1, 0.96f)), "", 44, Color.white, TextAnchor.LowerCenter);
             _bannerQuote = Ui.Text(Ui.Stretched("Quote", bannerRt, new Vector2(0, 0.04f), new Vector2(1, 0.46f)), "", 20, new Color(0.85f, 0.87f, 0.9f), TextAnchor.UpperCenter);
-            _bannerQuote.fontStyle = FontStyle.Italic;
+            Typography.Italic(_bannerQuote);
             bannerRt.gameObject.SetActive(false);
             _bannerRoot = bannerRt;
             BuildPlayChrome(canvas, side, infoBg, infoRt, second);
@@ -1053,7 +1053,7 @@ namespace YgoCampaign.Game
                 var color = seat == 0 ? Ui.Hex("#4FA3FF") : Ui.Hex("#FF5A5A");
                 _duelTools.Add(Ui.Button(panel, "<", new Vector2(-238, y), new Vector2(32, 34), () => CharacterCycled?.Invoke(seat, -1)));
                 _pickName[seat] = Ui.Text(Ui.Placed($"Name{seat}", panel, new Vector2(-128, y), new Vector2(180, 34)), "", 18, color);
-                _pickName[seat].fontStyle = FontStyle.Bold;
+                Typography.Strong(_pickName[seat]);
                 _duelTools.Add(Ui.Button(panel, ">", new Vector2(-18, y), new Vector2(32, 34), () => CharacterCycled?.Invoke(seat, +1)));
                 _duelTools.Add(Ui.Button(panel, "<", new Vector2(28, y), new Vector2(32, 34), () => DeckCycled?.Invoke(seat, -1)));
                 _pickDeck[seat] = Ui.Text(Ui.Placed($"Deck{seat}", panel, new Vector2(122, y), new Vector2(150, 34)), "", 16, Color.white);
@@ -1569,7 +1569,7 @@ namespace YgoCampaign.Game
             _pileOpenedAt = Time.unscaledTime;
             var dim = Ui.Image(root, new Color(0, 0, 0, 0.78f));
             Ui.Clickable((RectTransform)dim.transform, () => { if (!JustOpened) ClosePileViewer(); });
-            Ui.Text(Ui.Placed("Title", root, new Vector2(0, 420), new Vector2(1200, 50)), title, 28, Color.white).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Placed("Title", root, new Vector2(0, 420), new Vector2(1200, 50)), title, 28, Color.white));
             Ui.Text(Ui.Placed("Hint", root, new Vector2(0, 382), new Vector2(1200, 30)), "Click a card to use it · hover to read it · Cancel to go back", 15, new Color(1, 1, 1, 0.55f));
             var view = Ui.Placed("View", root, new Vector2(0, -10), new Vector2(1240, 680));
             Ui.Image(view, new Color(0, 0, 0, 0.001f));
@@ -1603,7 +1603,7 @@ namespace YgoCampaign.Game
                     onClick: () => { ClosePileViewer(); Prompt.ClickChoice(index); }, highlight: true, onRightClick: () => PinCard(info));
                 var label = choice.Verb.Length > 0 ? choice.Verb : choice.Label;
                 var text = Ui.Text(Ui.Placed("Action", content, center + new Vector2(0, -size.y / 2 - 18), new Vector2(size.x + 24, 34)), label, 14, Ui.Hex("#FFC940"));
-                text.fontStyle = FontStyle.Bold;
+                Typography.Strong(text);
             }
             var scroll = view.gameObject.AddComponent<ScrollRect>();
             scroll.viewport = view;
@@ -1674,7 +1674,7 @@ namespace YgoCampaign.Game
             var dim = Ui.Image(root, new Color(0, 0, 0, 0.78f));
             // The second click of a double-click lands here: it doesn't close what the first one opened.
             Ui.Clickable((RectTransform)dim.transform, () => { if (!JustOpened) ClosePileViewer(); });
-            Ui.Text(Ui.Placed("Title", root, new Vector2(0, 420), new Vector2(1200, 50)), $"{title}  ({cards.Count})", 28, Color.white).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Placed("Title", root, new Vector2(0, 420), new Vector2(1200, 50)), $"{title}  ({cards.Count})", 28, Color.white));
             Ui.Text(Ui.Placed("Hint", root, new Vector2(0, 382), new Vector2(1200, 30)), "Hover a card to read it · scroll for more · click outside or press Esc to close", 15, new Color(1, 1, 1, 0.55f));
             var view = Ui.Placed("View", root, new Vector2(0, -30), new Vector2(1240, 760));
             Ui.Image(view, new Color(0, 0, 0, 0.001f));
@@ -1711,8 +1711,8 @@ namespace YgoCampaign.Game
                     // A card banished face-down: its back, for everyone.
                     var back = CardView.Create(content, center, size, card, null, owner, false, null, offField: true);
                     CardView.DrawBack(Ui.Stretched("Back", back.transform, Vector2.zero, Vector2.one));
-                    Ui.Text(Ui.Placed("FaceDown", back.transform, new Vector2(0, -size.y / 2 + 14), new Vector2(size.x, 22)), "face-down", 12,
-                        new Color(1, 1, 1, 0.75f)).fontStyle = FontStyle.Italic;
+                    Typography.Italic(Ui.Text(Ui.Placed("FaceDown", back.transform, new Vector2(0, -size.y / 2 + 14), new Vector2(size.x, 22)), "face-down", 12,
+                        new Color(1, 1, 1, 0.75f)));
                 }
             }
             if (list.Count == 0)
@@ -2021,7 +2021,7 @@ namespace YgoCampaign.Game
             var rt = Ui.Placed("Level", card, new Vector2(-HandCardSize.x / 2 + 17, -HandCardSize.y / 2 + 42), new Vector2(34, 40));
             bool rank = (info.Type & CardType.Xyz) != 0;
             var text = Ui.Text(rt, level.ToString(), FxSettings.Scaled(30), rank ? Ui.Hex("#D8DCE4") : Color.white);
-            text.fontStyle = FontStyle.BoldAndItalic;
+            Typography.Strong(text);
             text.raycastTarget = false;
             var outline = text.gameObject.AddComponent<Outline>();
             outline.effectColor = rank ? new Color(0.1f, 0.1f, 0.12f, 0.95f) : new Color(0.35f, 0.15f, 0, 0.95f);
@@ -2037,7 +2037,7 @@ namespace YgoCampaign.Game
             disc.texture = Icons.Round;
             disc.color = Ui.Hex("#B8862B");
             disc.raycastTarget = false;
-            Ui.Text(Ui.Stretched("P", badge, Vector2.zero, Vector2.one), "📌", 13, Color.white).raycastTarget = false;
+            Ui.Text(Ui.Stretched("P", badge, Vector2.zero, Vector2.one), "●", 13, Color.white).raycastTarget = false;
         }
 
         /// <summary>Whether a text field has the keyboard (so shortcut keys stay out of its way).</summary>
@@ -2163,7 +2163,7 @@ namespace YgoCampaign.Game
             var outline = glow.gameObject.AddComponent<Outline>();
             outline.effectColor = new Color(1f, 0.79f, 0.25f, 0.95f);
             outline.effectDistance = new Vector2(3, -3);
-            Ui.Text(Ui.Stretched("Label", rt, Vector2.zero, Vector2.one), "Place\nhere", 15, Ui.Hex("#161A23")).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Stretched("Label", rt, Vector2.zero, Vector2.one), "Place\nhere", 15, Ui.Hex("#161A23")));
             Ui.Clickable(rt, () => CardClicked(owner, location, sequence));
             Register(owner, location, sequence, rt);
         }
@@ -2436,7 +2436,7 @@ namespace YgoCampaign.Game
             edge.effectColor = ChangeColor;
             edge.effectDistance = new Vector2(1, -1);
             var t = Ui.Text(tag, text, 14, ChangeColor);
-            t.fontStyle = FontStyle.Bold;
+            Typography.Strong(t);
             t.raycastTarget = false;
             ChangeMarks++;
         }

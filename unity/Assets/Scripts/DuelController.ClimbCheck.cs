@@ -169,7 +169,7 @@ namespace YgoCampaign.Game
             {
                 var all = Texts(_campaignScreen);
                 return (all.Where(t => t.fontSize == 21 && (t.text.StartsWith("Match ") || t.text.StartsWith("Final: "))).ToList(),
-                    all.Where(t => t.fontSize == 14 && t.fontStyle == FontStyle.Italic && t.text.StartsWith("“")).ToList(),
+                    all.Where(t => t.fontSize == 14 && t.font == Typography.Font(Face.Italic) && t.text.StartsWith("“")).ToList(),
                     all.Where(t => t.fontSize == 16 && (t.text.Contains("First win: +") || t.text.Contains("Won ×"))).ToList(),
                     all.FirstOrDefault(t => Plain(t.text).StartsWith("Cleared.") || Plain(t.text).StartsWith("Clear all ")));
             }

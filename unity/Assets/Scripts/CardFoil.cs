@@ -329,7 +329,7 @@ namespace YgoCampaign.Game
                 mark = Ui.Stretched("RarityMark", image.transform, Vector2.zero, Vector2.one);
                 Ui.Image(mark, Color.black).raycastTarget = false;
                 label = Ui.Text(mark, "", 12, Color.white);
-                label.fontStyle = FontStyle.Bold;
+                Typography.Strong(label);
                 label.resizeTextForBestFit = true;
                 label.resizeTextMinSize = 5;
                 label.resizeTextMaxSize = 40;
@@ -441,7 +441,7 @@ namespace YgoCampaign.Game
                 _material.SetVector("_NameRect", rects.name);
                 _material.SetVector("_ArtRect", rects.art);
                 _material.SetVector("_AttrRect", rects.attr);
-                _material.SetVector("_StarsRect", rects.stars);
+                _material.SetVector("_StarsRect", fit == CardFit.Badged || PlainCards.HasChip(info, layout) ? rects.stars : Vector4.zero); // no empty lit chip on a Normal Spell or Trap
                 _material.SetVector("_TextRect", rects.text);
             }
             else

@@ -394,7 +394,7 @@ namespace YgoCampaign.Game
             head.anchorMax = new Vector2(1, 1);
             head.pivot = new Vector2(0.5f, 1);
             head.sizeDelta = new Vector2(0, 56);
-            Ui.Text(Ui.Placed("Title", head, new Vector2(-120, 0), new Vector2(280, 40)), "DUEL HISTORY", 20, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Placed("Title", head, new Vector2(-120, 0), new Vector2(280, 40)), "DUEL HISTORY", 20, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
             Ui.Button(head, "Close", new Vector2(220, 0), new Vector2(90, 36), ToggleHistory);
             var viewport = Ui.Rect("Viewport", _drawer);
             viewport.anchorMin = Vector2.zero;
@@ -466,13 +466,13 @@ namespace YgoCampaign.Game
             {
                 Ui.Image(face, new Color(0.1f, 0.12f, 0.18f, 1)).raycastTarget = false;
                 var label = e.Kind == HistoryKind.Damage ? $"−{e.Amount}" : e.Kind == HistoryKind.Recover ? $"+{e.Amount}" : e.Kind == HistoryKind.Set ? "SET" : "";
-                if (label.Length > 0) Ui.Text(face, label, 14, e.Kind == HistoryKind.Damage ? Ui.Hex("#FF8A8A") : Color.white).fontStyle = FontStyle.Bold;
+                if (label.Length > 0) Typography.Strong(Ui.Text(face, label, 14, e.Kind == HistoryKind.Damage ? Ui.Hex("#FF8A8A") : Color.white));
             }
             // Whose it is in words, on a band at the bottom; what happened as an icon in the corner.
             var band = Ui.Placed("Who", tile, new Vector2(0, -38 + 9.5f), new Vector2(56, 19));
             Ui.Image(band, new Color(0, 0, 0, 0.72f)).raycastTarget = false;
             var whose = Ui.Text(band, OwnerTag(e.Player), 13, Color.white);
-            whose.fontStyle = FontStyle.Bold;
+            Typography.Strong(whose);
             whose.resizeTextForBestFit = true; // a six-letter name still fits
             whose.resizeTextMinSize = 10;
             whose.resizeTextMaxSize = 13;
@@ -528,7 +528,7 @@ namespace YgoCampaign.Game
                 {
                     var turn = Ui.Box(_drawerRows, 0, y + 8, 540, 30);
                     Ui.Image(turn, new Color(1, 1, 1, 0.06f)).raycastTarget = false;
-                    Ui.Text(Ui.Box(turn, 12, 0, 500, 30), e.Text, 15, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+                    Typography.Strong(Ui.Text(Ui.Box(turn, 12, 0, 500, 30), e.Text, 15, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
                     y += 44;
                     continue;
                 }
@@ -550,7 +550,7 @@ namespace YgoCampaign.Game
                 var said = e.Text;
                 if (owner == "YOU" && said.StartsWith("You ", StringComparison.Ordinal)) said = said.Substring(4);
                 var tag = Ui.Text(Ui.Box(row, 58, 0, 52, 52), owner, 13, Ui.Hex("#9AA3B5"), TextAnchor.MiddleLeft);
-                tag.fontStyle = FontStyle.Bold;
+                Typography.Strong(tag);
                 tag.resizeTextForBestFit = true; // a six-letter name (when watching) still fits the column
                 tag.resizeTextMinSize = 10;
                 tag.resizeTextMaxSize = 13;

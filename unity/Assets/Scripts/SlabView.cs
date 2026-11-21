@@ -199,29 +199,29 @@ namespace YgoCampaign.Game
             Hex(label, "Gauge", at, l.Gauge, Ring);
             Hex(label, "GaugeInner", at, new Vector2(l.Gauge.x - 2 * l.Ring * 1.155f, l.Gauge.y - 2 * l.Ring), Umber);
             var number = Text(label, "Number", at, l.Gauge, stage == LabelStage.Sealed ? "" : copy.Slab.ToString(), l.Number, l.Number, Numeral, TextAnchor.MiddleCenter);
-            number.fontStyle = FontStyle.Bold;
+            Typography.Strong(number);
 
             float colW = l.To - l.From, colX = (l.From + l.To) / 2;
             string word = Grades.Word(copy.Slab).ToUpperInvariant();
             if (stage != LabelStage.Printed)
             {
                 var (seal, max, min) = size switch { Size.Full => ("SEALED · GAUGE & GILT", 14, 10), Size.Reveal => ("SEALED", 11, 9), _ => ("SEALED", 9, 8) };
-                Text(label, "Seal", new Vector2(colX, 0), new Vector2(colW, Mathf.Ceil(max * 1.25f)), seal, max, min, House).fontStyle = FontStyle.Bold;
+                Typography.Strong(Text(label, "Seal", new Vector2(colX, 0), new Vector2(colW, Mathf.Ceil(max * 1.25f)), seal, max, min, House));
             }
             else if (size == Size.Full)
             {
-                Text(label, "House", new Vector2(l.From + 52.5f, 20), new Vector2(105, 14), "GAUGE & GILT", 10, 10, House).fontStyle = FontStyle.Bold;
+                Typography.Strong(Text(label, "House", new Vector2(l.From + 52.5f, 20), new Vector2(105, 14), "GAUGE & GILT", 10, 10, House));
                 Text(label, "Cert", new Vector2((10 + l.To) / 2, 20), new Vector2(l.To - 10, 14), CertNumber(copy), 10, 10, House, TextAnchor.MiddleRight);
-                Text(label, "Grade", new Vector2(colX, 1), new Vector2(colW, 22), $"{word} {Grades.Glyph(copy.Slab)}", 18, 13, Umber).fontStyle = FontStyle.Bold;
+                Typography.Strong(Text(label, "Grade", new Vector2(colX, 1), new Vector2(colW, 22), $"{word} {Grades.Glyph(copy.Slab)}", 18, 13, Umber));
                 var name = Text(label, "Name", new Vector2(colX, -19), new Vector2(colW, 15), "", 12, 9, Brown);
                 name.text = FitOneLine(name, (info?.Name ?? "") + (setCode.Length > 0 ? $" · {setCode}" : ""));
             }
             else if (size == Size.Reveal)
             {
-                Text(label, "Grade", new Vector2(colX, 6), new Vector2(colW, 14), $"{word} {Grades.Glyph(copy.Slab)}", 12, 9, Umber).fontStyle = FontStyle.Bold;
-                Text(label, "House", new Vector2(colX, -7.5f), new Vector2(colW, 11), "GAUGE & GILT", 9, 9, House).fontStyle = FontStyle.Bold;
+                Typography.Strong(Text(label, "Grade", new Vector2(colX, 6), new Vector2(colW, 14), $"{word} {Grades.Glyph(copy.Slab)}", 12, 9, Umber));
+                Typography.Strong(Text(label, "House", new Vector2(colX, -7.5f), new Vector2(colW, 11), "GAUGE & GILT", 9, 9, House));
             }
-            else Text(label, "Grade", new Vector2(colX, 0), new Vector2(colW, 13), word, 10, 8, Umber).fontStyle = FontStyle.Bold;
+            else Typography.Strong(Text(label, "Grade", new Vector2(colX, 0), new Vector2(colW, 13), word, 10, 8, Umber));
 
             // The sticker (in the glass, so it takes the light): printed labels at Full and Reveal only.
             if (glass != null)

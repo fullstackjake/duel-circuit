@@ -724,9 +724,11 @@ namespace YgoCampaign.Game
             // `-climbcheck <folder>` (absolute; with -mods <empty folder>): billed finals, rematch pay, deck stars, the starter ribbon (DuelController.ClimbCheck).
             if (Arg("-climbcheck") is string climbCheck) StartCoroutine(ClimbCheck(climbCheck));
             if (Arg("-plaincheck") is string plainCheck) StartCoroutine(PlainCheck(plainCheck));
+            // `-typecheck <folder>` (absolute; with -mods <empty folder>, no pictures): the fonts, their coverage and licences (DuelController.TypeCheck).
+            if (Arg("-typecheck") is string typeCheck) StartCoroutine(TypeCheck(typeCheck));
 
             // Players start on the title screen; automated checks go straight to what they test.
-            var checks = new[] { "-autoshot", "-autoshot-end", "-editor", "-fxshots", "-replaycheck", "-campaigncheck", "-finalcheck", "-laddercheck", "-themecheck", "-shopcheck", "-alleycheck", "-tagcheck", "-boardcheck", "-matcheck", "-foilshowcase", "-gradeshowcase", "-slabreveal", "-artcheck", "-autoclick", "-p0", "-p1", "-layoutcheck", "-pilecheck", "-controlscheck", "-qaplay", "-qareplay", "-ordercheck", "-musiccheck", "-stylecheck", "-clickcheck", "-ydkcheck", "-searchcheck", "-focuscheck", "-editorcheck", "-aboutcheck", "-importcheck", "-soundcheck", "-climbcheck", "-plaincheck" };
+            var checks = new[] { "-autoshot", "-autoshot-end", "-editor", "-fxshots", "-replaycheck", "-campaigncheck", "-finalcheck", "-laddercheck", "-themecheck", "-shopcheck", "-alleycheck", "-tagcheck", "-boardcheck", "-matcheck", "-foilshowcase", "-gradeshowcase", "-slabreveal", "-artcheck", "-autoclick", "-p0", "-p1", "-layoutcheck", "-pilecheck", "-controlscheck", "-qaplay", "-qareplay", "-ordercheck", "-musiccheck", "-stylecheck", "-clickcheck", "-ydkcheck", "-searchcheck", "-focuscheck", "-editorcheck", "-aboutcheck", "-importcheck", "-soundcheck", "-climbcheck", "-plaincheck", "-typecheck" };
             PromptTiming = checks.Any(c => Array.IndexOf(args, c) >= 0); // checks log decisions left waiting
             // A check that throws stops its coroutine; without this the app would sit there forever. Fail and quit instead.
             if (PromptTiming)
@@ -738,7 +740,7 @@ namespace YgoCampaign.Game
                 };
             // Checks skip the coin toss (you go first) so their duels stay as they were; QA play tosses like a player.
             _autoToss = PromptTiming && Array.IndexOf(args, "-qaplay") < 0;
-            if (menuCheck != null || aboutCheck != null || importCheck != null || !checks.Any(c => Array.IndexOf(args, c) >= 0))
+            if (menuCheck != null || aboutCheck != null || importCheck != null || Arg("-typecheck") != null || !checks.Any(c => Array.IndexOf(args, c) >= 0))
             {
                 _paused = true;
                 UpdateControls();

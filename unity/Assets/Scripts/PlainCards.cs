@@ -278,7 +278,7 @@ namespace YgoCampaign.Game
             for (char c = '!'; c <= '~'; c++) chars.Append(c);
             for (char c = '\u00C0'; c <= '\u00FF'; c++) chars.Append(c);
             _drawing = true;
-            for (int px = 150; px <= 190; px += 4) Ui.Font.RequestCharactersInTexture(chars.ToString(), px, FontStyle.Bold);
+            for (int px = 150; px <= 190; px += 4) Typography.Font(Face.Strong).RequestCharactersInTexture(chars.ToString(), px, FontStyle.Normal);
             _drawing = false;
         }
 
@@ -397,6 +397,17 @@ namespace YgoCampaign.Game
 
         private static string Stat(int value) => CardDetail.Stat(value);
 
+        /// <summary>
+        /// Whether a plain face of this card shows its chip (a monster's level or rank, a Spell's or Trap's subtype): a Normal
+        /// Spell or Trap has none, so a foil mustn't light its place. A Thumb has no chip; a Compact Link shows its grid there.
+        /// </summary>
+        public static bool HasChip(CardInfo? info, CardLayout layout)
+        {
+            if (info == null || layout == CardLayout.Thumb) return false;
+            if ((info.Type & CardType.Monster) != 0) return layout != CardLayout.Compact || (info.Type & CardType.Link) == 0;
+            return SubtypeChip(info.Type) != null;
+        }
+
         /// <summary>A Spell's or Trap's subtype on its chip, or null for a Normal one.</summary>
         private static string? SubtypeChip(uint type) =>
             (type & 0x10000) != 0 ? "QUICK" : (type & 0x20000) != 0 ? "CONT" : (type & 0x40000) != 0 ? "EQUIP"
@@ -504,6 +515,7 @@ namespace YgoCampaign.Game
                 {
                     bool badged = fit == CardFit.Badged;
                     (_namePlate, _name) = Plate("Name", badged ? BadgedName : CompactName, TextAnchor.MiddleCenter);
+                    _name!.font = Typography.Font(Face.Condensed); // Compact names: Barlow Condensed SemiBold
                     _nameMax = 14;
                     _nameMin = 7;
                     _windowRect = badged ? BadgedWindow : CompactWindow;
@@ -514,11 +526,11 @@ namespace YgoCampaign.Game
                     _glyph = Raw("Glyph", Shrunk(disc, 0.72f), null);
                     var chip = badged ? new Vector4(0.42f, 0.80f, 0.94f, 0.95f) : CompactChip;
                     (_chip, _chipText) = Plate("Chip", chip, TextAnchor.MiddleCenter, chip: true);
-                    _chipText!.fontStyle = FontStyle.Bold;
+                    _chipText!.font = Typography.Font(Face.Condensed);
                     Best(_chipText, 6, 12);
                     _grid = Grid(badged ? Disc(0.83f, 0.875f, 0.22f) : Disc(0.30f, 0.37f, 0.30f), out _rating);
                     _footer = Words("Footer", Footer, 12, TextAnchor.MiddleCenter);
-                    _footer.fontStyle = FontStyle.Bold;
+                    _footer.font = Typography.Font(Face.Strong);
                     Best(_footer, 7, 12);
                     return;
                 }
@@ -530,7 +542,7 @@ namespace YgoCampaign.Game
                 _infoDisc = Raw("InfoDisc", RowDiscRect, Icons.Round);
                 _infoGlyph = Raw("InfoGlyph", Shrunk(RowDiscRect, 0.72f), null);
                 (_infoChip, _infoChipText) = Plate("InfoChip", RowChip, TextAnchor.MiddleCenter, chip: true);
-                _infoChipText!.fontStyle = FontStyle.Bold;
+                _infoChipText!.font = Typography.Font(Face.Condensed);
                 Best(_infoChipText, 6, full ? 15 : 11);
                 _typeLine = Words("TypeLine", new Vector4(RowChip.z + 0.02f, BigRow.y, BigRow.z, BigRow.w), full ? 15 : 11, TextAnchor.MiddleRight);
                 Best(_typeLine, 6, full ? 15 : 11);
@@ -554,7 +566,7 @@ namespace YgoCampaign.Game
                 _bodyMax = full ? 15 : 11;
                 _bodyMin = full ? 11 : 8;
                 _footer = Words("Footer", BigFooter, full ? 18 : 13, TextAnchor.MiddleLeft);
-                _footer.fontStyle = FontStyle.Bold;
+                _footer.font = Typography.Font(Face.Strong);
                 Best(_footer, 8, full ? 18 : 13);
                 var footerGrid = Disc(BigFooter.z - 0.08f, (BigFooter.y + BigFooter.w) / 2, 0.16f);
                 _grid = Grid(footerGrid, out _rating);
@@ -638,7 +650,7 @@ namespace YgoCampaign.Game
                     _cells[i] = Ui.Image(Ui.Stretched($"Cell{i}", grid, new Vector2(x0, y0), new Vector2(x1, y1)), Color.black);
                 }
                 rating = TextIn(Ui.Stretched("Rating", _cells[4].rectTransform, Vector2.zero, Vector2.one), 12, TextAnchor.MiddleCenter);
-                rating.fontStyle = FontStyle.Bold;
+                rating.font = Typography.Font(Face.Strong);
                 Best(rating, 5, 14);
                 return grid;
             }
@@ -707,7 +719,7 @@ namespace YgoCampaign.Game
                 CardView.FitWords(_name, nameWidth, _nameMax);
                 _name.resizeTextMinSize = Mathf.Min(_name.fontSize, _nameMin);
                 _name.horizontalOverflow = HorizontalWrapMode.Wrap;
-                Ui.Font.RequestCharactersInTexture(_name.text, Mathf.Max(1, Mathf.RoundToInt(_name.fontSize * scale)), FontStyle.Normal);
+                _name.font.RequestCharactersInTexture(_name.text, Mathf.Max(1, Mathf.RoundToInt(_name.fontSize * scale)), FontStyle.Normal);
 
                 string? chipText = null;
                 if (monster)
@@ -781,7 +793,8 @@ namespace YgoCampaign.Game
                 var box = boxRt.rect.size;
                 float pad = 0.025f * _w, innerW = box.x - 2 * pad, innerH = box.y - 1.2f * pad;
                 const float margin = 0.92f; // what the layout measure and the texture's pixel sizes may disagree by
-                _body!.fontStyle = italic ? FontStyle.Italic : FontStyle.Normal;
+                _body!.font = Typography.Font(italic ? Face.Italic : Face.Body);
+                _body.fontStyle = FontStyle.Normal;
                 _body.color = InkLight;
                 Best(_body, _bodyMin, _bodyMax);
                 _pendBody!.color = InkLight;

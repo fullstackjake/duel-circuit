@@ -146,20 +146,20 @@ namespace YgoCampaign.Game
             else
             {
                 _logoGlow = Glow(_logo, Vector2.zero, new Vector2(1500, 520), new Color(1f, 0.75f, 0.3f, 0.35f));
-                var title = Ui.Text(Ui.Placed("Title", _logo, new Vector2(0, 30), new Vector2(1600, 170)), GameInfo.Title, 140, Color.white);
-                title.fontStyle = FontStyle.Bold;
+                var title = Typography.Hero(Ui.Text(Ui.Placed("Title", _logo, new Vector2(0, 30), new Vector2(1600, 170)), GameInfo.Title, 140, Color.white));
+                Typography.Strong(title);
                 title.horizontalOverflow = HorizontalWrapMode.Overflow;
                 var outline = title.gameObject.AddComponent<Outline>();
                 outline.effectColor = Ui.Hex("#C8901E");
                 outline.effectDistance = new Vector2(4, -4);
                 title.gameObject.AddComponent<Shadow>().effectDistance = new Vector2(0, -10);
             }
-            Ui.Text(Ui.Placed("Subtitle", _logo, new Vector2(0, subtitleY), new Vector2(1200, 50)), GameInfo.Subtitle.ToUpperInvariant(), 30,
-                new Color(0.85f, 0.88f, 0.95f)).fontStyle = FontStyle.Italic;
+            Typography.Italic(Ui.Text(Ui.Placed("Subtitle", _logo, new Vector2(0, subtitleY), new Vector2(1200, 50)), GameInfo.Subtitle.ToUpperInvariant(), 30,
+                new Color(0.85f, 0.88f, 0.95f)));
 
             _pressGlow = Glow(_root, new Vector2(0, -250), new Vector2(900, 200), new Color(0.4f, 0.65f, 1f, 0.3f));
             _press = Ui.Text(Ui.Placed("Press", _root, new Vector2(0, -250), new Vector2(1200, 70)), "CLICK OR PRESS ANY KEY", 40, Color.white);
-            _press.fontStyle = FontStyle.Bold;
+            Typography.Strong(_press);
             _press.gameObject.AddComponent<Outline>().effectColor = new Color(0.2f, 0.4f, 0.9f, 0.8f);
 
             // The attract duel plays behind: the notice gets a strip of its own so it doesn't run over the hand.
@@ -411,8 +411,8 @@ namespace YgoCampaign.Game
             }
             else
             {
-                var title = Ui.Text(Ui.Box(_root, 110, 60, 1000, 110), GameInfo.Title, 76, Color.white, TextAnchor.MiddleLeft);
-                title.fontStyle = FontStyle.Bold;
+                var title = Typography.Hero(Ui.Text(Ui.Box(_root, 110, 60, 1000, 110), GameInfo.Title, 76, Color.white, TextAnchor.MiddleLeft));
+                Typography.Strong(title);
                 var outline = title.gameObject.AddComponent<Outline>();
                 outline.effectColor = Ui.Hex("#C8901E");
                 outline.effectDistance = new Vector2(3, -3);
@@ -430,7 +430,7 @@ namespace YgoCampaign.Game
                 var rt = Ui.Box(_root, 110, y, 760, h - 12);
                 var bg = Ui.Image(rt, Ui.Hex("#1A2030"));
                 var text = Ui.Text(Ui.Box(rt, 36, big ? 14 : 4, 700, big ? 70 : 40), label.ToUpperInvariant(), big ? 46 : 30, Color.white, TextAnchor.MiddleLeft);
-                text.fontStyle = FontStyle.Bold;
+                Typography.Strong(text);
                 var sub = Ui.Text(Ui.Box(rt, 38, big ? 86 : 44, 700, big ? 44 : 22), "", big ? 19 : 15, new Color(0.72f, 0.76f, 0.86f), TextAnchor.UpperLeft);
                 sub.supportRichText = true;
                 int index = i;
@@ -529,7 +529,7 @@ namespace YgoCampaign.Game
         {
             _root = Ui.Overlay(transform, "Settings", 36);
             Ui.Image(_root, Ui.Hex("#0B0E15"));
-            Ui.Text(Ui.Box(_root, 110, 60, 1000, 100), "SETTINGS", 60, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Box(_root, 110, 60, 1000, 100), "SETTINGS", 60, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
             // More settings than fit: the rows scroll.
             var viewport = Ui.Box(_root, 110, 180, 1700, 760);
             Ui.Image(viewport, new Color(0, 0, 0, 0.001f));
@@ -575,7 +575,7 @@ namespace YgoCampaign.Game
             float y = 0;
             void Heading(string text)
             {
-                Ui.Text(Ui.Box(_rows, 6, y + 10, 1000, 34), text, 18, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+                Typography.Strong(Ui.Text(Ui.Box(_rows, 6, y + 10, 1000, 34), text, 18, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
                 y += 48;
             }
             string OnOff(bool on) => on ? "On" : "Off";
@@ -583,7 +583,7 @@ namespace YgoCampaign.Game
             {
                 var rt = Ui.Box(_rows, 0, y, 1700, 94);
                 Ui.Image(rt, Ui.Hex("#1A2030"));
-                Ui.Text(Ui.Box(rt, 30, 8, 500, 42), name, 26, Color.white, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+                Typography.Strong(Ui.Text(Ui.Box(rt, 30, 8, 500, 42), name, 26, Color.white, TextAnchor.MiddleLeft));
                 Ui.Text(Ui.Box(rt, 30, 50, 1100, 40), help, 15, new Color(0.72f, 0.76f, 0.86f), TextAnchor.UpperLeft);
                 if (change != null) Ui.BoxButton(rt, 1260, 19, 400, 56, value, () => { change(); Refresh(); }, 20);
                 else Ui.Text(Ui.Box(rt, 1160, 0, 500, 94), value, 18, Color.white, TextAnchor.MiddleRight);

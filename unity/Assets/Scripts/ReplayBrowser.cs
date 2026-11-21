@@ -145,8 +145,7 @@ namespace YgoCampaign.Game
             var panel = Ui.Placed("Panel", _root, Vector2.zero, new Vector2(1240, 860));
             Ui.Image(panel, Ui.Hex("#1A1F2B"));
 
-            Ui.Text(Ui.Placed("Title", panel, new Vector2(-470, 395), new Vector2(260, 40)), "REPLAYS", 24, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft)
-                .fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Placed("Title", panel, new Vector2(-470, 395), new Vector2(260, 40)), "REPLAYS", 24, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
             Ui.Button(panel, "Close", new Vector2(560, 395), new Vector2(100, 40), Close);
 
             // Paste a code someone shared.

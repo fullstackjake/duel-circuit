@@ -121,7 +121,7 @@ namespace YgoCampaign.Game
                 var badge = Ui.Placed("Count", _columnLayer, new Vector2(x, 2 * Row + CardView.FieldSize.y / 2 + 14), new Vector2(here ? Column - 10 : ready ? 60 : 44, 24));
                 Ui.Image(badge, ready ? Ui.Hex("#5A4512") : new Color(0.06f, 0.08f, 0.12f, 0.9f));
                 var text = Ui.Text(badge, label, 14, ready ? Ui.Hex("#FFD86A") : Color.white);
-                text.fontStyle = FontStyle.Bold;
+                Typography.Strong(text);
                 var tip = badge.gameObject.AddComponent<TipOnHover>();
                 tip.Title = $"Column {c + 1}: {counts[c]} card{(counts[c] == 1 ? "" : "s")}";
                 tip.Body = "A column is a Main Monster Zone and a Spell & Trap Zone of each player, facing each other, and the Extra Monster Zone between them (2nd and 4th columns). "

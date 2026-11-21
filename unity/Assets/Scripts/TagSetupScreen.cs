@@ -47,12 +47,12 @@ namespace YgoCampaign.Game
             _decksFor = decksFor;
             _root = Ui.Overlay(transform, "TagSetup", 34);
             Ui.Image(_root, Ui.Hex("#0B0E15"));
-            Ui.Text(Ui.Box(_root, 110, 50, 1200, 90), "TAG DUEL", 60, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Box(_root, 110, 50, 1200, 90), "TAG DUEL", 60, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
             Ui.Text(Ui.Box(_root, 110, 138, 1700, 60),
                 "Two against two. Each team shares one field, one Graveyard and 8,000 LP; each duelist has their own Deck and hand. "
                 + "Turns go: your team's lead, theirs, your partner, theirs, and around again.", 18, new Color(0.75f, 0.78f, 0.86f), TextAnchor.UpperLeft);
             _slots = Ui.Box(_root, 110, 220, 1700, 640);
-            Ui.Text(Ui.Box(_root, 900, 470, 120, 80), "VS", 56, Color.white).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Box(_root, 900, 470, 120, 80), "VS", 56, Color.white));
             Ui.BoxButton(_root, 110, 920, 240, 64, "Back", () => { Close(); Back?.Invoke(); }, 22);
             Ui.BoxButton(_root, 1010, 920, 340, 64, "Random opponents", () => { Randomize(2); Randomize(3); Show(); }, 22);
             var start = Ui.BoxButton(_root, 1370, 920, 440, 64, "Start Tag Duel", () => { Close(); Start?.Invoke(_lineup); }, 26);
@@ -121,14 +121,14 @@ namespace YgoCampaign.Game
                 int c = _lineup.Characters[slot];
                 // A portrait column on the left; the seat's controls to its right.
                 if (c >= 0) Portraits.Place(Ui.Box(panel, 14, 14, 210, 280), _roster[c].Id, mirror: slot >= 2);
-                else Ui.Text(Ui.Box(panel, 14, 14, 210, 280), "YOU", 44, new Color(1, 1, 1, 0.18f)).fontStyle = FontStyle.Bold;
+                else Typography.Strong(Ui.Text(Ui.Box(panel, 14, 14, 210, 280), "YOU", 44, new Color(1, 1, 1, 0.18f)));
                 var who = c < 0 ? "You" : _roster[c].DisplayName;
                 var style = c < 0 ? "You play this seat; your partner plays theirs." : _roster[c].StyleSummary;
                 const float L = 236, W = 530;
                 Ui.Text(Ui.Box(panel, L, 20, W, 30), SlotTitles[slot], 16, new Color(1, 1, 1, 0.5f), TextAnchor.MiddleLeft);
                 Ui.BoxButton(panel, L, 58, 44, 56, "<", () => Cycle(s, -1), 24);
                 var whoText = Ui.Text(Ui.Box(panel, L + 50, 58, W - 100, 56), who, who.Length > 30 ? 20 : 25, Color.white);
-                whoText.fontStyle = FontStyle.Bold;
+                Typography.Strong(whoText);
                 Ui.BoxButton(panel, L + W - 44, 58, 44, 56, ">", () => Cycle(s, +1), 24);
                 Ui.Text(Ui.Box(panel, L, 120, W, 28), style, 15, new Color(0.75f, 0.78f, 0.86f));
                 Ui.BoxButton(panel, L, 160, 44, 52, "<", () => CycleDeck(s, -1), 24);
@@ -140,7 +140,7 @@ namespace YgoCampaign.Game
                     : _roster[c].Intro;
                 _quotes[slot] = said;
                 if (said.Length > 0)
-                    Ui.Text(Ui.Box(panel, L, 226, W, 60), $"“{said}”", 15, Ui.Hex("#F2E6B8")).fontStyle = FontStyle.Italic;
+                    Typography.Italic(Ui.Text(Ui.Box(panel, L, 226, W, 60), $"“{said}”", 15, Ui.Hex("#F2E6B8")));
             }
             _status.text = _lineup.YouPlay ? "You lead your team. When it's your partner's turn, they play it." : "Watching four duelists.";
         }

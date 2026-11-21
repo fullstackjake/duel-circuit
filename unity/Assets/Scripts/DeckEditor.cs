@@ -1058,7 +1058,7 @@ namespace YgoCampaign.Game
                 CardFoil.Tilting(raw);
             }
             var name = Label(420, 30, 800, 48, info.Name, 30, parent: panel);
-            name.fontStyle = FontStyle.Bold;
+            Typography.Strong(name);
             name.color = T.Text;
             Label(420, 80, 800, 28, Describe(info), 17, parent: panel).color = T.TextSoft;
             // The text, large, scrolling when long.
@@ -2555,7 +2555,7 @@ namespace YgoCampaign.Game
             const float MaxHeight = 1040;
             var panel = Box(root, 460, 20, 1000, MaxHeight);
             Ui.Image(panel, T.PanelDeep);
-            Label(24, 14, 600, 40, OwnedCards != null ? "YOUR CAMPAIGN DECKS" : "DECKS", 24, parent: panel).fontStyle = FontStyle.Bold;
+            Typography.Strong(Label(24, 14, 600, 40, OwnedCards != null ? "YOUR CAMPAIGN DECKS" : "DECKS", 24, parent: panel));
             var viewport = Box(panel, 20, 64, 960, MaxHeight - 64 - 90);
             Ui.Image(viewport, new Color(0, 0, 0, 0.001f)); // theme: kept, an invisible raycast catcher for scrolling
             viewport.gameObject.AddComponent<RectMask2D>();
@@ -2768,7 +2768,7 @@ namespace YgoCampaign.Game
                 float w = width * count / total;
                 var seg = Box(_charts, x, 30, w - 2, 34);
                 Ui.Image(seg, Ui.Hex(color)).raycastTarget = false;
-                if (w > 44) Ui.Text(seg, count.ToString(), 16, Color.white).fontStyle = FontStyle.Bold;
+                if (w > 44) Typography.Strong(Ui.Text(seg, count.ToString(), 16, Color.white));
                 x += w;
             }
             var legend = Label(14, 70, 440, 36, $"<color=#F0A060>■</color> {monsters} monsters  ({100 * monsters / total}%)    "
@@ -2810,7 +2810,7 @@ namespace YgoCampaign.Game
             rt.anchoredPosition = new Vector2(2, -2);
             rt.sizeDelta = new Vector2(20, 20);
             Ui.Image(rt, color).raycastTarget = false;
-            Ui.Text(rt, text, 13, Color.white).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(rt, text, 13, Color.white));
         }
 
         private void RunSearch()
@@ -2973,7 +2973,7 @@ namespace YgoCampaign.Game
                 {
                     var tag = Ui.Placed("InDeck", view.transform, new Vector2(ResultCard.x / 2 - 14, -ResultCard.y / 2 + 38), new Vector2(26, 22)); // above the stat strip
                     Ui.Image(tag, Ui.Hex("#13203A")).raycastTarget = false; // theme: kept, a badge on the card
-                    Ui.Text(tag, $"x{copies}", 13, CardView.Actionable).fontStyle = FontStyle.Bold;
+                    Typography.Strong(Ui.Text(tag, $"x{copies}", 13, CardView.Actionable));
                 }
                 // Under the card: how many you own (campaign), or its kind.
                 var under = OwnedCards != null && allowed > 0

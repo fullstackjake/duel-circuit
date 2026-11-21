@@ -33,7 +33,7 @@ namespace YgoCampaign.Game
             _root = Ui.Overlay(transform, "Structure", 15);
             Ui.Image(_root, Ui.Hex("#121620"));
             Ui.Image(Ui.Box(_root, 0, 0, 1920, 90), Ui.Hex("#0D1017"));
-            Ui.Text(Ui.Box(_root, 40, 0, 600, 90), "STRUCTURE DECKS", 34, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Box(_root, 40, 0, 600, 90), "STRUCTURE DECKS", 34, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
             _header = Ui.Text(Ui.Box(_root, 520, 0, 1000, 90), "", 24, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
             Ui.BoxButton(_root, 1720, 22, 160, 46, "Back", Close, 18);
             Ui.Text(Ui.Box(_root, 40, 100, 1840, 40),
@@ -91,7 +91,7 @@ namespace YgoCampaign.Game
                 }
                 var title = Title(name, deck);
                 float dim = open ? 1 : 0.4f;
-                Ui.Text(Ui.Box(tile, 146, 12, 560, 36), title, 24, new Color(1, 1, 1, dim), TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+                Typography.Strong(Ui.Text(Ui.Box(tile, 146, 12, 560, 36), title, 24, new Color(1, 1, 1, dim), TextAnchor.MiddleLeft));
                 Ui.Text(Ui.Box(tile, 146, 48, 560, 26), open ? $"{era} · {deck.Main.Count} main · {deck.Extra.Count} extra" : $"On sale when the shop reaches {era}",
                     15, new Color(0.7f, 0.74f, 0.82f, dim), TextAnchor.MiddleLeft);
                 Ui.Text(Ui.Box(tile, 146, 78, 730, 110), deck.Note("about"), 15, new Color(0.88f, 0.9f, 0.95f, dim), TextAnchor.UpperLeft);

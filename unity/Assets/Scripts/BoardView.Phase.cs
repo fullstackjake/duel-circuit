@@ -50,7 +50,7 @@ namespace YgoCampaign.Game
             var edge = panel.gameObject.AddComponent<Outline>();
             edge.effectColor = new Color(0.45f, 0.7f, 1f, 0.5f);
             edge.effectDistance = new Vector2(2, -2);
-            Ui.Text(Ui.Placed("Title", panel, new Vector2(0, 130), new Vector2(1000, 40)), "Change phase", 26, Color.white).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(Ui.Placed("Title", panel, new Vector2(0, 130), new Vector2(1000, 40)), "Change phase", 26, Color.white));
 
             ushort now = _lastBoard?.Phase ?? 0;
             int current = now switch

@@ -74,7 +74,7 @@ namespace YgoCampaign.Game
             outline.effectColor = new Color(0.55f, 0.78f, 1f, 0.55f);
             outline.effectDistance = new Vector2(1, -1);
             _title = Ui.Text(Top("Title", 14), "", 17, Ui.Hex("#8CC8FF"), TextAnchor.UpperLeft);
-            _title.fontStyle = FontStyle.Bold;
+            Typography.Strong(_title);
             _title.verticalOverflow = VerticalWrapMode.Overflow;
             _body = Ui.Text(Top("Meaning", 40), "", 15, Ui.Hex("#D8DEE8"), TextAnchor.UpperLeft);
             _body.verticalOverflow = VerticalWrapMode.Overflow;

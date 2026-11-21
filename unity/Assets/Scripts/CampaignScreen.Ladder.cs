@@ -55,11 +55,11 @@ namespace YgoCampaign.Game
             var plaque = Ui.Box(frame, 2, 2, w - 4, LadderPlaqueHeight - 4);
             Ui.Image(plaque, open ? Ui.Hex("#1E2530") : Ui.Hex("#22242A"));
             var title = Ui.Text(Ui.Box(plaque, 18, 4, 330, 30), "THE CHAMPION'S LADDER", 22, open ? Ui.Hex("#DCE4F0") : new Color(0.62f, 0.64f, 0.68f), TextAnchor.MiddleLeft);
-            title.fontStyle = FontStyle.Bold;
+            Typography.Strong(title);
             title.raycastTarget = false;
             // theme: kept, the plaque's cool line (Library material, no role)
             var tag = Ui.Text(Ui.Box(plaque, 18, 32, 330, 22), "Past the binders", 13, new Color(0.7f, 0.74f, 0.8f), TextAnchor.MiddleLeft);
-            tag.fontStyle = FontStyle.Italic;
+            Typography.Italic(tag);
             tag.raycastTarget = false;
             int climbed = ladder.Climbed(state);
             var next = ladder.Next(profile, state, _state.Library);
@@ -108,7 +108,7 @@ namespace YgoCampaign.Game
             var list = _state.LadderRules.List?.Name;
 
             var title = Ui.Text(Ui.Box(_detail, 30, 12, 700, 46), "THE CHAMPION'S LADDER", 32, T.LibraryGold, TextAnchor.MiddleLeft);
-            title.fontStyle = FontStyle.Bold;
+            Typography.Strong(title);
             Ui.Text(Ui.Box(_detail, 30, 56, 940, 24), "Past the binders. One duel a rung: beat the holder above you to take theirs. Every holder plays at full strength.",
                 14, T.TextMuted, TextAnchor.MiddleLeft);
             var standing = !open ? $"<color={T.WarnHex}>Locked: {ladder.LockReason(profile, library)}.</color>"
@@ -136,7 +136,7 @@ namespace YgoCampaign.Game
             {
                 var foot = Ui.Text(Ui.Box(_detail, 30, after - 4, 940, 20), open ? "▲ You: at the foot of the ladder" : "The foot of the ladder", 13,
                     open ? T.Highlight : T.TextDim, TextAnchor.MiddleLeft);
-                foot.fontStyle = FontStyle.Bold;
+                Typography.Strong(foot);
                 LadderRows.Add(foot.text);
             }
             float deckTop = Math.Max(after + 18, 714);
@@ -161,13 +161,13 @@ namespace YgoCampaign.Game
             if (isNext || yours) Ui.Image(Ui.Box(row, 0, 0, 4, h), isNext ? T.Highlight : T.Good).raycastTarget = false;
             var badge = Ui.Text(Ui.Box(row, 8, 0, 52, h), seat.IsVisitor ? "VISIT" : seat.Rung.ToString(), seat.IsVisitor ? 12 : 22,
                 seat.IsVisitor ? T.Warn : isNext ? T.Highlight : beaten ? T.Good : T.TextBody);
-            badge.fontStyle = FontStyle.Bold;
+            Typography.Strong(badge);
             var face = Ui.Box(row, 62, 1, h - 2, h - 2);
             Ui.Image(face, T.Well);
             face.gameObject.AddComponent<RectMask2D>();
             SeatFace(face, profile, seat, 30);
             var name = Ui.Text(Ui.Box(row, 114, 1, 330, 24), SeatName(profile, seat, true), 16, T.Text, TextAnchor.MiddleLeft);
-            name.fontStyle = FontStyle.Bold;
+            Typography.Strong(name);
             name.resizeTextForBestFit = true;
             name.resizeTextMinSize = 11;
             name.resizeTextMaxSize = 16;
@@ -186,7 +186,7 @@ namespace YgoCampaign.Game
                     Ui.Image(pip, p < won ? Ui.Hex("#D9B24C") : isNext && p == won ? Ui.Hex("#FFC940") : Ui.Hex("#3A3428")).raycastTarget = false;
                     if (isNext && p == won) Ui.Image(Ui.Box(pip, 2, 2, 22, 18), Ui.Hex("#2B2716")).raycastTarget = false;
                     var n = Ui.Text(pip, (p + 1).ToString(), 12, p < won ? Ui.Hex("#20180A") : isNext && p == won ? Ui.Hex("#FFC940") : new Color(1, 1, 1, 0.5f));
-                    n.fontStyle = FontStyle.Bold;
+                    Typography.Strong(n);
                     n.raycastTarget = false;
                 }
             }
@@ -223,7 +223,7 @@ namespace YgoCampaign.Game
         {
             if (!_state.Ladder.Unmet(profile, seat)) { Portraits.Place(box, seat.Character.Id); return; }
             var mark = Ui.Text(box, "?", size, UiTheme.Current.Text.WithAlpha(0.35f));
-            mark.fontStyle = FontStyle.Bold;
+            Typography.Strong(mark);
             mark.raycastTarget = false;
         }
 

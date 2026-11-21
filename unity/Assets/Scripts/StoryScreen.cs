@@ -87,7 +87,7 @@ namespace YgoCampaign.Game
             // The name plate lines up with the text column under it.
             _plate = Ui.Image(Ui.Box(box, 280, -26, 560, 52), Ui.Hex("#2A3448"));
             _name = Ui.Text(Ui.Box(box, 300, -26, 540, 52), "", 24, Color.white, TextAnchor.MiddleLeft);
-            _name.fontStyle = FontStyle.Bold;
+            Typography.Strong(_name);
             _text = Ui.Text(Ui.Box(box, 280, 50, 1270, 230), "", 27, new Color(0.93f, 0.94f, 0.97f), TextAnchor.UpperLeft);
             _text.supportRichText = true;
             _hint = Ui.Text(Ui.Box(box, 280, 290, 900, 34), "", 18, new Color(1, 1, 1, 0.7f), TextAnchor.MiddleLeft);

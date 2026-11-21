@@ -8,6 +8,7 @@ Set up first with [BUILDING.md](BUILDING.md); for decks, characters and art, see
 - [The CPU duelists](#the-cpu-duelists)
 - [The harness](#the-harness)
 - [App checks](#app-checks)
+- [Fonts and text](#fonts-and-text)
 - [Sound and music](#sound-and-music)
 - [Historic decks](#historic-decks)
 - [Replays](#replays)
@@ -325,10 +326,11 @@ run, so working beside it can't press anything in the check. Its window still co
 | `-searchcheck <folder>` | The deck editor's card search (71 steps): chips, pickers, More filters, scopes; exact words first (`destroy all` puts Dark Hole and Raigeki on the first page), the chip showing what was typed, the real count and the "first 2,000" page label, the "No cards match" note with Clear all (it keeps the scope), an empty Favorites' own note |
 | `-focuscheck <folder>` | (77 steps) The deck editor's click to focus and change signals, through a test mouse and keyboard: pointing, clicks, Shift and right clicks, a 3 px wobble, the ring after a removal, keys in every text field, Enter / Delete / arrows / Page keys, the wheel, a search keeping the focus, the test hand, the messages and their Undo, reduced motion, the sounds asked for (logged as `editor sound:`), a card not owned in the campaign, Sort and Clear writing the status line, no ring under the test hand, "▼ more" on its own strip, Enter on a Side Deck copy adding to the Side Deck, a deck opened from the list mid-message |
 | `-editorcheck <folder>` | The deck editor's quick fixes (65 steps), through a test mouse, keyboard and gamepad: the unsaved dot and the "Save changes?" question for Back, New, Decks..., Esc and the controller's B (Save, Don't save, Cancel, the recovery copy, Save's own bar); the newest TCG list in free play, a deck's own list, the hand-picked list and the `banlist` note a save writes, the amber "No limits" line, the campaign editor unchanged; Ctrl/Cmd+S, Z, Y, F, `/` and Esc in and out of text fields and under overlays; the red badges and the clickable problem lines; no ownership line in free play; Esc leaving a duel board's reader alone. Needs `-mods <empty folder>` |
-| `-aboutcheck <folder> [-aboutlicenses <folder>]` | The About screen: every notice, the license and third-party readers, missing files, keys, controller and mouse; it never opens a browser or Finder |
+| `-aboutcheck <folder> [-aboutlicenses <folder>]` | The About screen: every notice (the fonts' credit line among them), the license and third-party readers, missing files, keys, controller and mouse; it never opens a browser or Finder. It also checks that the app's own `licenses` folder holds both font licences (a note when it has no licence files of its own and the test folder is used) |
 | `-ydkcheck <folder> -ydkfile <.ydk> -ydkfixture <.ydk>` | Importing `.ydk` files from paths |
 | `-importcheck <folder>` | The Import Cards screen: the menu and screen layout, a zip, loose pictures and bad names, Keep mine and Replace them, HD, the card back, Cancel. It makes its own flat-colour pictures and never opens the file dialog |
 | `-plaincheck <folder>` | (34 steps) The plain card renderer: every layout and card kind drawn and not blank, light writing on every plate, names kept whole and clear of the editor's badges, the text box, foil regions and the rarity mark, pictures still winning (it makes its own flat-colour test pictures), the opponent's cards read upright, face-down cards untouched, the time and memory budget, the cache and the hidden studio. Needs `-mods <empty folder>`, `-pics <empty folder>` and `-hdpics off`; it fails at once if it finds pictures |
+| `-typecheck <folder>` | The fonts (see [Fonts and text](#fonts-and-text)). Needs `-mods <empty folder>`, `-pics <empty folder>` and `-hdpics off`. Steps: each face loads its own font file and the alley's stencil lookup finds none; every character in the glyph corpus and in every card's name and text is drawn by some font (with a control character no font has, so the test can fail), and a note says which font draws each symbol; the corpus carries its hash; `Strong`, `Italic` and `Weight` pick the right face; fixed-width digits hold their places through an LP roll, in three alignments, with colour tags, over two lines and at mixed sizes (and don't without the effect); on the title, menu, Settings, About, campaign, shop, van, board and concede dialog no text has a faux weight or draws in the built-in font; hero numbers are marked; a long wallet stays inside its box; About credits the fonts and the third-party reader ends with both licences. It also lists the script lines that still use rich-text `<b>` or `<i>` (a note, not a failure). Run it at 1280x720, 1920x1080 and 3024x1964 |
 | `-artcheck <folder>` | Card picture load times and memory (needs an HD picture folder) |
 | `-editor <deck> -versioncheck <folder>` | Switching card versions in the editor |
 
@@ -376,6 +378,65 @@ Other launch options for checks and screenshots:
 | `-fxshots <folder>` | A screenshot of each kind of animation, then quit |
 | `-hdpics <folder>` / `-hdpics off`, `-pics <folder>` | HD or EDOPro picture folders for this run only |
 | `-qaplay <folder> [-qagames N]` | Plays the campaign like a player, logging every problem (seeds are fixed, so two fresh runs play the same duels) |
+
+## Fonts and text
+
+The game's text is Barlow (reading) and Barlow Condensed (titles, buttons, numbers), with Noto Sans Symbols 2 for symbols
+Barlow doesn't have. All six files are SIL OFL 1.1, unmodified, in `unity/Assets/Resources/GameFonts/` (not
+`Resources/Fonts/`, which is the Back Alley stencil's folder). Their licences are in `LICENSES/`, copied into every
+build's `licenses` folder and shown in About's third-party reader; the sources and checksums are in
+[THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md). Code is `unity/Assets/Scripts/Typography.cs`.
+
+Only the fonts and the helpers below are built. The type scale (`TextRole`, `UiTheme.Floor` = 14, `UiTheme.Size`,
+`UiTheme.RoleFor`) is defined in `UiTheme.cs`, but no text size was changed to match it yet: screens still use their
+literal sizes until the spec's R2 and R3 are built (`docs/dev/TYPE-AND-FONTS-SPEC-2026-11-21.md`).
+
+**Putting text on screen.**
+
+| You want | You write |
+|---|---|
+| Body text at a literal size (as before) | `Ui.Text(rt, text, 18, color)`: Barlow Regular at that size |
+| Text at a scale role | `Ui.Text(rt, text, TextRole.Body, color)`: the role's size and face. `reading: true` for card text, the log and dialogs (Settings > Card text size scales those only) |
+| Bold | `Typography.Strong(text)`. Never `FontStyle.Bold` |
+| Italic (quotes, flavour text, hints) | `Typography.Italic(text)`. Never `FontStyle.Italic` |
+| Bold that can be switched off (a picked tab) | `Typography.Weight(text, on)`: it puts back the face the text had |
+| A number that changes while it's on screen (LP, DP, pile counts, prices) | `Typography.Counter(text)`: fixed-width digits |
+| A number outside the scale (LP, pile counts, the turn disc, the results' DP total) | `Typography.Hero(text)`: marks it; the R2 layout rule will skip it (`Typography.IsHero`) |
+| A main-street or alley title | `UiTheme.Current.Title(text)` (Barlow Condensed Bold; the alley's stencil when it's there) |
+
+Each weight is its own font file, so there is no synthesized bold. `Strong` picks Barlow SemiBold, or Barlow Condensed
+Bold for condensed text and for text at size 30 and up (the Title and Display roles). Buttons use Barlow Condensed
+SemiBold. `Strong` is always upright: there is no bold italic. Rich text `<b>` and `<i>` still draw as synthesized
+styles on Barlow: about 100 script lines use them, listed as `# faux` lines in the glyph corpus. Don't add more; use a
+separate text with `Strong` or `Italic`.
+
+**Missing fonts.** If a face's file isn't in a build, that face draws in Unity's built-in font with a warning in the log,
+and `Strong` and `Italic` use the built-in font's own bold and italic. `-typecheck` fails when a file is missing.
+
+**Symbols and other scripts.** Unity draws a character Barlow lacks from each face's fallback list (set in the font's
+import settings): Noto Sans Symbols 2 first (stars, triangles, shapes), then named system fonts (Helvetica Neue, Arial,
+Segoe UI Symbol, Segoe UI, Yu Gothic, Meiryo, Microsoft YaHei, MS Gothic, Hiragino Sans, PingFang SC and others) for
+arrows, Greek letters, the katakana middle dot and CJK characters. A character outside the Basic Multilingual Plane (an
+emoji) can't be drawn by legacy `Text`: use a drawn icon or a BMP symbol (the pin badge is "●" for this reason).
+`-typecheck` says which font draws each fallback character. This is confirmed in a built Mac app; Windows is not tested
+yet.
+
+**Fixed-width digits.** `TabularDigits` gives every digit the width of the widest digit at its size, so "1111" is as wide
+as "8888" and a rolling number doesn't shift sideways. Code that places something after a counter should measure it with
+`TabularDigits.PreferredWidth(text)`, not `text.preferredWidth`.
+
+**The glyph corpus.** `unity/Assets/Resources/glyph-corpus.txt` lists every non-ASCII character the game's own strings use
+(string and char literals in `unity/Assets/Scripts/`, every file in `campaign/` and `personalities/`), and the
+rich-text `<b>`/`<i>` lines. `-typecheck` checks that some font draws each one. Run this after adding a symbol or other
+non-ASCII character to a string:
+
+```bash
+python3 tools/glyph_corpus.py
+python3 tools/glyph_corpus.py --check
+```
+
+The first rewrites the file; `--check` writes nothing and exits 1 when the file is stale. `harness --texts-check` runs
+the same check and fails on a stale corpus. Commit the new file with your change.
 
 ## Sound and music
 
@@ -580,6 +641,7 @@ harness --texts-check
 python3 tools/check_history_decks.py
 ```
 
+`--texts-check` also fails when the glyph corpus is stale: rerun `python3 tools/glyph_corpus.py` (see [Fonts and text](#fonts-and-text)).
 Each ends with its own summary; none should report a failure. For changes to the game's screens, run the matching
 [app checks](#app-checks). For bot changes, compare before and after with `--matrix`, `--rate-decks` or the study that
 fits, using the same seeds. [CONTRIBUTING.md](../CONTRIBUTING.md) has the rest (content rules, how to send it).

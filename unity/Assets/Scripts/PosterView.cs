@@ -32,7 +32,7 @@ namespace YgoCampaign.Game
             // The title band.
             Image(root, "Band", new Vector2(0, 128), new Vector2(222, 46), ink);
             var title = Ui.Text(Ui.Placed("Title", root, new Vector2(0, 128), new Vector2(210, 42)), poster.Title.ToUpperInvariant(), 26, Ui.Hex("#FBF6EA"));
-            title.fontStyle = FontStyle.Bold;
+            Typography.Strong(title);
             title.resizeTextForBestFit = true;
             title.resizeTextMinSize = 14;
             title.resizeTextMaxSize = 26;
@@ -59,7 +59,7 @@ namespace YgoCampaign.Game
             if (tagline)
             {
                 var line = Ui.Text(Ui.Placed("Tagline", root, new Vector2(0, -141), new Vector2(222, 28)), poster.Tagline, 12, Ui.Hex("#4A4034"));
-                line.fontStyle = FontStyle.Italic;
+                Typography.Italic(line);
                 line.resizeTextForBestFit = true;
                 line.resizeTextMinSize = 8;
                 line.resizeTextMaxSize = 12;

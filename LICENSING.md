@@ -33,7 +33,8 @@ This page is a summary, not legal advice. The license texts are what count.
 | Rules engine, card scripts, card database, ban lists | `vendor/` | Their own licenses | [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) |
 | Built rules engine | `unity/Assets/Plugins/` | AGPL-3.0-or-later (ygopro-core) and MIT (parts of ygopro-core, Lua) | [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) |
 | Code of Conduct | `CODE_OF_CONDUCT.md` | Contributor Covenant 2.1, CC BY 4.0 | [contributor-covenant.org](https://www.contributor-covenant.org) |
-| License texts | `LICENSE`, `LICENSES/CC-BY-SA-4.0.txt` | Copied word for word; their own terms | — |
+| Fonts | `unity/Assets/Resources/GameFonts/` | SIL OFL 1.1, their own terms | [LICENSES/OFL-1.1-Barlow.txt](LICENSES/OFL-1.1-Barlow.txt), [LICENSES/OFL-1.1-Noto.txt](LICENSES/OFL-1.1-Noto.txt) |
+| License texts | `LICENSE`, `LICENSES/CC-BY-SA-4.0.txt`, `LICENSES/OFL-1.1-Barlow.txt`, `LICENSES/OFL-1.1-Noto.txt` | Copied word for word; their own terms | — |
 
 A file that has its own license notice follows that notice.
 

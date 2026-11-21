@@ -800,7 +800,7 @@ namespace YgoCampaign.Game
             var y = Mathf.Clamp(at.y + (at.y < 0 ? 170 : -170), -380, 380);
             var rt = Ui.Placed("SummonName", _layer, new Vector2(0, y), new Vector2(1200, 90));
             var label = Ui.Text(rt, text, 58, WithAlpha(color, 0));
-            label.fontStyle = FontStyle.BoldAndItalic;
+            Typography.Strong(label);
             label.gameObject.AddComponent<Outline>().effectDistance = new Vector2(3, -3);
             Animate(delay, duration, t =>
             {
@@ -882,7 +882,7 @@ namespace YgoCampaign.Game
             var disc = Sprite("Disc", Textures.Glow, Vector2.zero, new Vector2(64, 64), Ui.Hex("#FFC940"));
             disc.rectTransform.SetParent(badge, false);
             var num = Ui.Text(Ui.Stretched("N", badge, Vector2.zero, Vector2.one), e.ChainLink.ToString(), 26, Color.white);
-            num.fontStyle = FontStyle.Bold;
+            Typography.Strong(num);
             num.gameObject.AddComponent<Outline>().effectDistance = new Vector2(2, -2);
             badge.localScale = Vector3.zero;
             Animate(delay + 0.25f * Tempo, 0.25f * Tempo, t => badge.localScale = Vector3.one * EaseOutBack(t));
@@ -1002,7 +1002,7 @@ namespace YgoCampaign.Game
         {
             var rt = Ui.Placed("BigText", _layer, new Vector2(0, y), new Vector2(1400, 140));
             var t = Ui.Text(rt, text, 84, new Color(color.r, color.g, color.b, 0));
-            t.fontStyle = FontStyle.BoldAndItalic;
+            Typography.Strong(t);
             t.gameObject.AddComponent<Outline>().effectDistance = new Vector2(4, -4);
             Animate(delay, duration, k =>
             {
@@ -1056,7 +1056,7 @@ namespace YgoCampaign.Game
                 CardFoil.Tilting(picture);
             }
             var name = Ui.Text(Ui.Placed("Name", band, new Vector2(240, 20), new Vector2(760, 90)), info.Name.ToUpperInvariant(), 46, new Color(1, 1, 1, 0));
-            name.fontStyle = FontStyle.BoldAndItalic;
+            Typography.Strong(name);
             name.resizeTextForBestFit = true;
             name.resizeTextMinSize = 20;
             name.resizeTextMaxSize = 46;
@@ -1096,7 +1096,7 @@ namespace YgoCampaign.Game
                 var bar = Ui.Image(strip, new Color(1f, 0.85f, 0.1f, 0));
                 var label = Ui.Text(Ui.Placed("T", strip, Vector2.zero, new Vector2(1100, 70)), "FINAL BLOW!  FINAL BLOW!  FINAL BLOW!", 40, new Color(0.8f, 0.1f, 0.1f, 0));
                 label.rectTransform.localRotation = Quaternion.Euler(0, 0, side * 90);
-                label.fontStyle = FontStyle.BoldAndItalic;
+                Typography.Strong(label);
                 int s = side;
                 Animate(delay, duration, k =>
                 {
@@ -1121,7 +1121,7 @@ namespace YgoCampaign.Game
             var rt = Ui.Placed("Banner", _layer, new Vector2(0, y), new Vector2(1400, 86));
             var bar = Ui.Image(rt, WithAlpha(color, 0));
             var label = Ui.Text(Ui.Stretched("T", rt, Vector2.zero, Vector2.one), text, 52, new Color(1, 1, 1, 0));
-            label.fontStyle = FontStyle.BoldAndItalic;
+            Typography.Strong(label);
             label.gameObject.AddComponent<Outline>().effectDistance = new Vector2(3, -3);
             Animate(delay, duration, t =>
             {
@@ -1183,7 +1183,7 @@ namespace YgoCampaign.Game
             var group = card.gameObject.AddComponent<CanvasGroup>();
             var foil = card.GetComponentInChildren<CardFoil>();
             var caption = Ui.Text(Ui.Placed("Caption", _layer, center + new Vector2(0, -200), new Vector2(700, 40)), info.Name, 26, Color.white);
-            caption.fontStyle = FontStyle.Bold;
+            Typography.Strong(caption);
             caption.gameObject.AddComponent<Outline>().effectDistance = new Vector2(2, -2);
 
             float inEnd = 0.22f, outStart = 0.82f;
@@ -1217,7 +1217,7 @@ namespace YgoCampaign.Game
             Sound(delay, effectOnly ? "negate_effect" : "negate");
             var text = Ui.Text(Ui.Placed("Negated", _layer, new Vector2(0, 0), new Vector2(760, 90)), effectOnly ? "EFFECT NEGATED" : "NEGATED", 64,
                 effectOnly ? Ui.Hex("#C78CFF") : Ui.Hex("#FF4D4D"));
-            text.fontStyle = FontStyle.Bold;
+            Typography.Strong(text);
             text.gameObject.AddComponent<Outline>().effectDistance = new Vector2(3, -3);
             var rt = text.rectTransform;
             Animate(delay, duration, t =>
@@ -1332,7 +1332,7 @@ namespace YgoCampaign.Game
 
             var holder = Ui.Placed("LpChange", _layer, start, new Vector2(500, 120));
             var text = Ui.Text(holder, label, size, color);
-            text.fontStyle = FontStyle.Bold;
+            Typography.Strong(text);
             text.gameObject.AddComponent<Outline>().effectDistance = new Vector2(3, -3);
             text.gameObject.AddComponent<Shadow>().effectDistance = new Vector2(0, -6);
             Animate(delay, duration, t =>
@@ -1354,7 +1354,7 @@ namespace YgoCampaign.Game
             Started?.Invoke("floater");
             var rt = Ui.Placed("Floater", _layer, at, new Vector2(200, 34));
             var label = Ui.Text(rt, text, 22, color);
-            label.fontStyle = FontStyle.Bold;
+            Typography.Strong(label);
             label.raycastTarget = false;
             label.gameObject.AddComponent<Outline>().effectDistance = new Vector2(2, -2);
             Animate(0, 1.3f * Tempo, t =>

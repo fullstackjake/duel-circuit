@@ -35,7 +35,11 @@ namespace YgoCampaign.Game
             "• Rules engine (ygopro-core), card scripts, card database and ban lists: Project Ignis (EDOPro).\n"
             + "• Card-set data: YGOPRODeck.\n"
             + "• Historic decks and ban lists: Format Library and yugiohmeta.com.\n"
+            + "• " + FontCredit + "\n"
             + "• Made with Unity.";
+
+        /// <summary>The fonts' credit (SIL OFL 1.1: their licences follow the third-party notices in the reader).</summary>
+        public const string FontCredit = "Fonts: Barlow by Jeremy Tribby, Noto Sans Symbols 2 by the Noto Project (SIL Open Font License).";
 
         /// <summary>
         /// Thanks to Project Ignis, under the credits (owner, 2026-11-12). It says what the game owes them and nothing
@@ -100,7 +104,7 @@ namespace YgoCampaign.Game
             _main = Ui.Stretched("Main", _root, Vector2.zero, Vector2.one);
 
             var title = Ui.Box(_main, 110, 60, 1000, 100);
-            Ui.Text(title, "ABOUT", 60, T.Sign, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(title, "ABOUT", 60, T.Sign, TextAnchor.MiddleLeft));
             _layout.Add(("title", title));
             Block("name", 110, 180, 900, 50, $"Duel Circuit   {GameInfo.Version}", 34, T.Text, bold: true);
             Block("copyright", 110, 232, 900, 30, Copyright, 20, T.TextBody);
@@ -111,8 +115,8 @@ namespace YgoCampaign.Game
             Block("disclaimer", 110, 646, 900, 110, Disclaimer, 20, T.TextSoft);
 
             Heading("credits heading", 1080, 290, 730, "CREDITS");
-            Block("credits", 1080, 326, 730, 140, Credits, 20, T.TextSoft);
-            Block("thanks", 1080, 480, 730, 110, Thanks, 20, T.Text);
+            Block("credits", 1080, 326, 730, 190, Credits, 20, T.TextSoft);
+            Block("thanks", 1080, 520, 730, 84, Thanks, 20, T.Text);
             Heading("source heading", 1080, 610, 730, "SOURCE CODE");
             var built = LicenseFiles.BuiltFrom();
             Block("source", 1080, 646, 730, 150,
@@ -139,7 +143,7 @@ namespace YgoCampaign.Game
             var rt = Ui.Box(_main, x, y, w, h);
             var t = Ui.Text(rt, text, size, color, TextAnchor.UpperLeft);
             t.supportRichText = false;
-            if (bold) t.fontStyle = FontStyle.Bold;
+            if (bold) Typography.Strong(t);
             _layout.Add((what, rt));
             return t;
         }
@@ -147,7 +151,7 @@ namespace YgoCampaign.Game
         private void Heading(string what, float x, float y, float w, string text)
         {
             var rt = Ui.Box(_main, x, y, w, 30);
-            Ui.Text(rt, text, 19, UiTheme.Current.Gold, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(rt, text, 19, UiTheme.Current.Gold, TextAnchor.MiddleLeft));
             _layout.Add((what, rt));
         }
 
@@ -159,7 +163,7 @@ namespace YgoCampaign.Game
             // A reading column 1200 wide in the middle (the texts' lines stay a comfortable length).
             const float x = 360, w = 1200;
             _readerTitle = Ui.Text(Ui.Box(_reader, x, 40, w, 70), "", 44, T.Sign, TextAnchor.MiddleLeft);
-            _readerTitle.fontStyle = FontStyle.Bold;
+            Typography.Strong(_readerTitle);
             _readerFrom = Ui.Text(Ui.Box(_reader, x, 112, w, 30), "", 15, T.TextMuted, TextAnchor.MiddleLeft);
             _readerFrom.supportRichText = false;
             _readerFrom.resizeTextForBestFit = true; // a long folder path shrinks to fit
@@ -218,11 +222,18 @@ namespace YgoCampaign.Game
                 LicenseFiles.Find(LicenseFiles.Doc.License), LicenseFiles.Find(LicenseFiles.Doc.UnityPermission));
         }
 
-        /// <summary>Third-party notices: THIRD_PARTY_NOTICES.md, made plain.</summary>
+        /// <summary>The heading of the font licences in the third-party reader, after the notices.</summary>
+        public const string FontLicencesHeading = "FONT LICENCES (SIL OPEN FONT LICENSE 1.1)";
+
+        /// <summary>Third-party notices: THIRD_PARTY_NOTICES.md, made plain, then the fonts' licences (owner decision N3).</summary>
         public void ShowNotices()
         {
             var text = LicenseFiles.Read(LicenseFiles.Doc.ThirdParty, out bool found);
-            ShowReader("Third-party notices", text, found, 40, LicenseFiles.Find(LicenseFiles.Doc.ThirdParty));
+            var fonts = LicenseFiles.Read(LicenseFiles.Doc.Fonts, out _);
+            text += "\n\n\n────────────────────────────────────────\n\n" + FontLicencesHeading + "\n\n" + fonts;
+            // "Found" is the notices' file: the font licences after them don't stand in for it (a missing one says where it is online).
+            ShowReader("Third-party notices", text, found, 40,
+                new[] { LicenseFiles.Find(LicenseFiles.Doc.ThirdParty) }.Concat(LicenseFiles.FindAll(LicenseFiles.Doc.Fonts)).ToArray());
         }
 
         private void ShowReader(string title, string text, bool found, int margin, params string?[] files)

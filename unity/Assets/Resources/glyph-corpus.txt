@@ -1,0 +1,148 @@
+# Glyph corpus: every non-ASCII character in the game's own strings (unity/Assets/Scripts literals, campaign/,
+# personalities/), one per line with the first file it came from. Written by tools/glyph_corpus.py: rerun it when
+# strings change (--texts-check fails on a stale corpus). Read by the game's -typecheck. Don't edit by hand.
+# chars-sha256: a4b38e3d794b37aced252274bb5199b7b0b9823e39399ab158a6ec0a72f4a56a
+# faux unity/Assets/Scripts/BoardFx.cs:848: $"<b>{(e.ChainLink > 0 ? $"Chain Link {e.ChainLink} · " : "")}{info.Name}</b>\n{effect}", 14, new Co
+# faux unity/Assets/Scripts/BoardView.CheckField.cs:102: var text = Ui.Text(_checkPill, _checkSticky ? "Checking the field   <b>▲ Back</b>" : "Checking the f
+# faux unity/Assets/Scripts/BoardView.cs:630: Row(icon + m.Text + (lesson ? "   <b>← the lesson's key turn</b>" : ""), m.Tick, color, m.Kind == Yg
+# faux unity/Assets/Scripts/BoardView.cs:656: var t = Ui.Text(Ui.Placed("T", banner, new Vector2(-72, 32), new Vector2(452, 26)), $"<b>LESSON</b> 
+# faux unity/Assets/Scripts/BoardView.cs:696: _responsesLabel.text = _holding ? "<color=#7FD3FF><b>ASKING</b></color>" : $"Chain: <color={color}><
+# faux unity/Assets/Scripts/BoardView.cs:1388: _phaseLabel.text = $"<size=17>{TurnText(board.Turn, compact: true)}</size>\n<b>{phase}</b>";
+# faux unity/Assets/Scripts/BoardView.cs:1974: return $"<b><color=#FFC940>Turn {turn.Groups[1].Value} · {turn.Groups[2].Value}</color></b>   LP {tu
+# faux unity/Assets/Scripts/BoardView.cs:1976: return result.Success ? $"<b><color=#FFC940>{result.Groups[1].Value}</color></b>" : line;
+# faux unity/Assets/Scripts/BoardView.cs:2359: _handsLabel.text = HandsMode == 0 ? "Hands: <b><color=#5FE1FF>BOTH</color></b>" : $"Hand: <b><color=
+# faux unity/Assets/Scripts/BoardView.cs:2572: : IsPaused?.Invoke() == true ? "<color=#FFC940><b>Paused</b></color> · click to resume"
+# faux unity/Assets/Scripts/BracketScreen.cs:744: return "<b>A Prize Pack:</b>\n" + string.Join("\n", parts) + "\nPrize cards sell for nothing: they'r
+# faux unity/Assets/Scripts/BracketScreen.cs:939: return "<b>A Contraband Pack</b> (sealed by Moth):\n"
+# faux unity/Assets/Scripts/BracketScreen.cs:962: return "<b>A No Limits Pack</b> (sealed by Moth):\n"
+# faux unity/Assets/Scripts/CampaignScenes.cs:617: var deck = Ui.Text(Ui.Box(panel, 30, 490, deckWidth, 36), $"Deck: <b>{side.Deck}</b>{(side.DeckNote.
+# faux unity/Assets/Scripts/CampaignScenes.cs:946: Ui.Text(pip, r.Progress[i] ? $"{r.ProgressItem} {i + 1}\n<b>WON</b>" : $"{r.ProgressItem} {i + 1}\n-
+# faux unity/Assets/Scripts/CampaignScreen.Alley.cs:477: : stakeCard?.Flag == Ante.PennyFlag ? $"Puts up: <b>{seat.Stake}</b> · <color={T.TextDimHex}>Penny p
+# faux unity/Assets/Scripts/CampaignScreen.Alley.cs:479: ? $"Puts up: <b>{seat.Stake}</b> · <color={T.GoldHex}>{seat.StakeValue:N0} DP</color>"
+# faux unity/Assets/Scripts/CampaignScreen.Alley.cs:912: + (his != null ? $"he'd put up <b>{_state.StakeText(his)}</b> · <color={T.GoldHex}>{_state.StakeValu
+# faux unity/Assets/Scripts/CampaignScreen.Alley.cs:977: _status.text = "<b>Unlisted</b>: Hollis keeps a page for every contraband deck you've beaten downsta
+# faux unity/Assets/Scripts/CampaignScreen.Alley.cs:1088: _status.text = $"Built <b>{name}</b> from your cards ({changes} change{(changes == 1 ? "" : "s")} fo
+# faux unity/Assets/Scripts/CampaignScreen.Ladder.cs:84: ? "<b>The Champion's Ladder</b>: one duel a rung, every holder at full strength. Beat the holder abo
+# faux unity/Assets/Scripts/CampaignScreen.Ladder.cs:85: : $"<b>The Champion's Ladder</b>: locked. {ladder.LockReason(profile, _state.Library)}.";
+# faux unity/Assets/Scripts/CampaignScreen.Ladder.cs:116: : $"Your rung: <b>{climbed}</b> of {ladder.Rungs.Count}. First climb of a rung <color={T.GoldHex}>+{
+# faux unity/Assets/Scripts/CampaignScreen.cs:123: _status.text = $"<color={T.GoodHex}>New poster:</color> <b>{pinned.Title}</b> is in your Locker. Han
+# faux unity/Assets/Scripts/CampaignScreen.cs:381: "<b>Start over.</b> A brand-new campaign: pick a starter deck again, with a fresh collection, 1,000 
+# faux unity/Assets/Scripts/CampaignScreen.cs:384: "<b>New Game+.</b> The circuits start over from the first one (and the shop's era with them), but yo
+# faux unity/Assets/Scripts/CampaignScreen.cs:556: _status.text = poster == null ? "Your plate shows the emblem." : $"Your plate shows <b>{poster.Title
+# faux unity/Assets/Scripts/CampaignScreen.cs:611: if (cup < 0) { Cosmetics.PickMat(profile, ""); _state.Save(); return "Your side shows the <b>space m
+# faux unity/Assets/Scripts/CampaignScreen.cs:618: return $"Your side shows the <b>{c.Era} mat</b> in your next duel. Switch mats in the Locker.";
+# faux unity/Assets/Scripts/CampaignScreen.cs:943: "<b>The shop's way.</b> Build any deck from what you own: nobody checks a ban list, and Card Tokens 
+# faux unity/Assets/Scripts/CampaignScreen.cs:946: "<b>The history way: Historic Rules (era-limited cards).</b> Your team plays by each circuit's real 
+# faux unity/Assets/Scripts/CampaignScreen.cs:1427: Ui.Text(Ui.Box(_detail, 280, 128, 560, 44), $"<b>{partner.DisplayName}</b>  <color={T.TextDimHex}>({
+# faux unity/Assets/Scripts/CampaignScreen.cs:1723: _status.text = $"<b>{cup.Name}</b>: your deck answers to {cup.Banlist} and cards out by {PoolMonth(c
+# faux unity/Assets/Scripts/CardDetail.cs:455: string open = $"<b><color={TermColor}>", close = "</color></b>";
+# faux unity/Assets/Scripts/CardDetail.cs:677: + (CarriesOriginal(c) ? $" · <color={UiTheme.Current.GoldSoftHex}><b>ORIGINAL TEXT</b></color>" : ""
+# faux unity/Assets/Scripts/DeckEditor.Feedback.cs:171: var head = $"<b>{name} {n}</b>";
+# faux unity/Assets/Scripts/DeckEditor.Feedback.cs:173: head += $" <color={(d.delta > 0 ? T.GoodHex : T.BadHex)}><b>({(d.delta > 0 ? "+" : "−")}{Math.Abs(d.
+# faux unity/Assets/Scripts/DeckEditor.cs:1091: lines.Add(own == 0 ? $"<color={T.BadHex}>You don't own it.</color> Get it {WhereToGet?.Invoke(key) ?
+# faux unity/Assets/Scripts/DeckEditor.cs:1297: lines.Add($"<b>{arch.name}</b>: {keys.Count - missing.Count} of its {keys.Count} key cards in the de
+# faux unity/Assets/Scripts/DeckEditor.cs:1915: Label(10, 0, 240, 40, $"This replaces most of <b>{name}</b>.", 13, parent: bar).supportRichText = tr
+# faux unity/Assets/Scripts/DeckEditor.cs:2502: Label(10, 0, 640, 34, $"Unsaved changes to <b>{name}</b> from {when} were kept.", 14, parent: bar).s
+# faux unity/Assets/Scripts/DeckEditor.cs:2692: var story = $"<b>{_deck.Note("era")}{(_deck.Note("tier").Length > 0 ? " · " + _deck.Note("tier") : "
+# faux unity/Assets/Scripts/DeckEditor.cs:2693: if (_deck.Note("about").Length > 0) story += $"<b>How it worked:</b> {_deck.Note("about")}\n";
+# faux unity/Assets/Scripts/DeckEditor.cs:2694: if (_deck.Note("why").Length > 0) story += $"<b>Why it mattered:</b> {_deck.Note("why")}\n";
+# faux unity/Assets/Scripts/DeckEditor.cs:3125: _detail.text = $"In deck: <b>{CopiesInDeck(info.Code)}</b>{(notOwned ? "" : ownLine)}{draw}{(note.Le
+# faux unity/Assets/Scripts/DeckEditor.cs:3197: _odds.text = "Select a card and press <b>Mark starter</b> for each card that can start your combo. S
+# faux unity/Assets/Scripts/DeckEditor.cs:3202: + $"At least one: <b>{OpeningOdds.AtLeastOne(_deck.Main.Count, hits, 5):P1}</b> going first (5 cards
+# faux unity/Assets/Scripts/DeckEditor.cs:3203: + $"<b>{OpeningOdds.AtLeastOne(_deck.Main.Count, hits, 6):P1}</b> going second (6)";
+# faux unity/Assets/Scripts/DeckEditor.cs:3297: + $"<b>You won {_tester.Wins} ({pct(_tester.Wins, done):F0}%)</b>\n"
+# faux unity/Assets/Scripts/DuelController.Alley.cs:196: _alleyVersusChip = theirs != null ? $"THEIR STAKE   <b>{_campaign.StakeText(theirs)}</b>  ·  <color=
+# faux unity/Assets/Scripts/DuelController.Alley.cs:311: $"YOUR CARD   <b>{_campaign.CopyText(_orvelPick)}</b>  ·  <color={T.GoldHex}>{profile.Collection.Val
+# faux unity/Assets/Scripts/DuelController.Alley.cs:496: + $"Stakes won <b>{profile.AnteWins}</b> · lost <b>{profile.AnteLosses}</b>",
+# faux unity/Assets/Scripts/DuelController.Brackets.cs:623: r.Record = (who.Id == BackAlley.RegularId ? "" : $"Against {who.Name}: <b>{wins}</b> win{(wins == 1 
+# faux unity/Assets/Scripts/DuelController.Brackets.cs:770: if (alley) { _campaignScreen.OpenChalkboard($"<b>{reward.Name}</b>: {reward.Summary}."); return; }
+# faux unity/Assets/Scripts/DuelController.Brackets.cs:772: _campaignScreen.Open($"<b>{reward.Name}</b>: {reward.Summary}.");
+# faux unity/Assets/Scripts/DuelController.Guests.cs:301: r.Record = $"Against {g.Character.Name}: <b>{wins}</b> win{(wins == 1 ? "" : "s")}, <b>{losses}</b> 
+# faux unity/Assets/Scripts/DuelController.Ladder.cs:211: r.Record = $"Against {seat.Character.Name}: <b>{wins}</b> win{(wins == 1 ? "" : "s")}, <b>{losses}</
+# faux unity/Assets/Scripts/DuelController.Scouting.cs:142: Label = "Play your own copy", Note = $"You built <b>{quote.Existing}</b> from this recipe: play it a
+# faux unity/Assets/Scripts/DuelController.Scouting.cs:143: Act = () => Picked(quote.Existing, measuredHere ? $"<b>{quote.Existing}</b> is picked: your own deck
+# faux unity/Assets/Scripts/DuelController.Scouting.cs:151: var what = price > 0 ? $"Buy the {cards} card{(cards == 1 ? "" : "s")} you're missing and play <b>{t
+# faux unity/Assets/Scripts/DuelController.Scouting.cs:152: : $"Build <b>{title}</b> from your cards as your own deck.";
+# faux unity/Assets/Scripts/DuelController.Scouting.cs:160: ConfirmNote = $"Buys {cards} card{(cards == 1 ? "" : "s")} and makes <b>{title} (recipe)</b> your ca
+# faux unity/Assets/Scripts/DuelController.Scouting.cs:166: ? $"Bought {cards} card{(cards == 1 ? "" : "s")} ({price:N0} DP) and built <b>{name}</b>, now your c
+# faux unity/Assets/Scripts/DuelController.Scouting.cs:167: : $"Built <b>{name}</b> from your cards, now your campaign deck{Paid}");
+# faux unity/Assets/Scripts/DuelController.ThemeCheck.cs:92: Progress = new List<bool> { true, false, false }, Record = "Against Ryo: <b>1</b> win, <b>0</b> loss
+# faux unity/Assets/Scripts/DuelController.TypeCheck.cs:409: Note($"script lines with <b> or <i> (faux weight on Barlow; a note until R2 ends): {fauxLines.Count}
+# faux unity/Assets/Scripts/DuelController.TypeCheck.cs:410: var tagged = scanned.Where(t => t.supportRichText && (t.text.Contains("<b>") || t.text.Contains("<i>
+# faux unity/Assets/Scripts/DuelController.TypeCheck.cs:411: Note($"texts with <b> or <i> on the screens seen: {(tagged.Count == 0 ? "none" : string.Join(", ", t
+# faux unity/Assets/Scripts/DuelController.cs:479: : $"Continue: <b>{c.Name}</b> ({won}/{c.Matches.Count} won) · <color=#FFC940>{profile.Dp:N0} DP</col
+# faux unity/Assets/Scripts/DuelController.cs:1401: r.Record = $"Against {opponent.Name}: <b>{wins}</b> win{(wins == 1 ? "" : "s")}, <b>{losses}</b> los
+# faux unity/Assets/Scripts/DuelController.cs:1478: r.Record = $"Against {opponent.Name}: <b>{wins}</b> win{(wins == 1 ? "" : "s")}, <b>{losses}</b> los
+# faux unity/Assets/Scripts/DuelController.cs:5962: r.Record = $"Against {opponent.Name}: <b>{wins}</b> win{(wins == 1 ? "" : "s")}, <b>{losses}</b> los
+# faux unity/Assets/Scripts/GradingDeskScreen.cs:232: $"<b><size=26>{info?.Name}</size></b>\n{CardFoil.ColoredName(copy.Rarity)}\n<color={Grades.Color(cop
+# faux unity/Assets/Scripts/GradingDeskScreen.cs:261: var t = Ui.Text(inner, $"<b>{(express ? "Express" : "Standard")}</b> · {fee:N0} DP\n<size=14>{(expre
+# faux unity/Assets/Scripts/GradingDeskScreen.cs:531: $"<b><size=26>{info?.Name}</size></b>\n{(CardDetail.PrintingLine(l.Copy) is { Length: > 0 } printed 
+# faux unity/Assets/Scripts/GradingDeskScreen.cs:675: _confirm.Open(_root, $"Buy <b>{_cards.Get(l.Copy.Code)?.Name}</b> ({Grades.Describe(l.Copy)}) for {l
+# faux unity/Assets/Scripts/PromptDialogs.cs:597: result.Append($"<b><color=#FFC940>{name.Value}</color></b>");
+# faux unity/Assets/Scripts/RecipeBookScreen.Mine.cs:174: $"<b>{_cards.Get(w.Key)?.Name ?? w.Key.ToString()}</b> x{w.Value - Profile.Collection.Count(w.Key)}:
+# faux unity/Assets/Scripts/RecipeBookScreen.Mine.cs:224: _status.text = $"Delete your recipe <b>{name}</b>? Click Delete again to confirm (decks you built fr
+# faux unity/Assets/Scripts/RecipeBookScreen.Mine.cs:258: _status.text = $"Built <b>{deckName}</b> from your cards ({result.Changes.Count - 1} changes for car
+# faux unity/Assets/Scripts/RecipeBookScreen.cs:282: _confirm.Open(_root, $"Buy a recipe pack of <b>{Title(r, deck)}</b> for {price:N0} DP?", "Buy", () =
+# faux unity/Assets/Scripts/RecipeBookScreen.cs:309: $"Beat <b>{r.Owner.DisplayName}</b> in <b>{r.Where}</b> ({circuit.Band}) to unlock the deck they pla
+# faux unity/Assets/Scripts/RecipeBookScreen.cs:357: ? (about.Length > 0 ? $"<b>How it worked:</b> {about}\n" : "") + (why.Length > 0 ? $"<b>Why it matte
+# faux unity/Assets/Scripts/RecipeBookScreen.cs:358: : $"<i>\"{r.Owner.Intro}\"</i>\n{DeckRules.Breakdown(deck.Main, _cards)}";
+# faux unity/Assets/Scripts/RecipeBookScreen.cs:419: $"<b>{_cards.Get(w.Key)?.Name ?? w.Key.ToString()}</b> x{w.Value - Profile.Collection.Count(w.Key)}:
+# faux unity/Assets/Scripts/RecipeBookScreen.cs:440: _status.text = $"Saved <b>{name}</b>. "
+# faux unity/Assets/Scripts/RecipeBookScreen.cs:459: _status.text = $"<b>Recipe pack ({Title(r, deck)}):</b> {string.Join(", ", names)}.  {Profile.Dp:N0}
+# faux unity/Assets/Scripts/RecipeBookScreen.cs:528: _status.text = $"Built <b>{name}</b> from your cards ({result.Changes.Count - 1} changes for cards y
+# faux unity/Assets/Scripts/ShopScreen.cs:1209: _cardInfo.text = $"<b><size=22>{info.Name}</size></b>\n{CardFoil.ColoredName(rarity)}{condition}" + 
+# faux unity/Assets/Scripts/ShopScreen.cs:1484: _confirm.Open(_root, $"Buy a pack of <b>{set.Info.Name}</b> for {set.Price:N0} DP?", "Buy", () => Bu
+# faux unity/Assets/Scripts/ShopScreen.cs:1522: _cardInfo.text = $"<b><size=22>Card {i + 1} of {_pack.Count}</size></b>\nFace down. Enter (or a clic
+# faux unity/Assets/Scripts/StoryScreen.cs:144: if (narration) _full = $"<i>{_full}</i>";
+# faux unity/Assets/Scripts/StoryScreen.cs:251: if (visible.StartsWith("<i>") && !visible.EndsWith("</i>")) visible += "</i>";
+# faux unity/Assets/Scripts/StoryScreen.cs:252: _text.text = visible.Replace("<i></i>", "");
+# faux unity/Assets/Scripts/TraderScreen.cs:374: _confirm.Open(_root, $"Trade {(cost == 1 ? "a Card Token" : $"{cost} Card Tokens")} for <b>{info.Nam
+# faux unity/Assets/Scripts/VanScreen.cs:398: + (shelf && l.Restored ? $"\n<color={T.SignHex}><b>{RestoredTag}</b></color> · a card a list took, o
+# faux unity/Assets/Scripts/VanScreen.cs:399: if (shelf) Facts(250, 60, $"<color={T.GoldSoftHex}>Odile:</color> <i>“Authenticated by the Loupe.”</
+# faux unity/Assets/Scripts/VanScreen.cs:718: _confirm.Open(_root, $"Buy <b>{_cards.Get(l.Copy.Code)?.Name}</b> ({Grades.Describe(l.Copy)}) for {l
+# faux unity/Assets/Scripts/VanScreen.cs:725: _confirm.Open(_root, $"Buy back your <b>{_cards.Get(r.Copy.Code)?.Name}</b> for {r.Price:N0} DP?", "
+# faux unity/Assets/Scripts/VanScreen.cs:733: _confirm.Open(_root, $"Sell <b>{_cards.Get(copy.Code)?.Name}</b> ({CardFoil.ColoredName(copy.Rarity)
+ 	unity/Assets/Scripts/BracketScreen.cs
+°	unity/Assets/Scripts/DuelController.PlainCheck.cs
+±	campaign/peak-ratings.txt
+·	unity/Assets/Scripts/BoardView.CheckField.cs
+»	unity/Assets/Scripts/BoardView.Skip.cs
+À	unity/Assets/Scripts/PlainCards.cs
+Æ	unity/Assets/Scripts/DuelController.TypeCheck.cs
+×	unity/Assets/Scripts/CampaignScreen.Alley.cs
+ç	unity/Assets/Scripts/DuelController.TypeCheck.cs
+ï	unity/Assets/Scripts/DuelController.TypeCheck.cs
+ÿ	unity/Assets/Scripts/PlainCards.cs
+Œ	unity/Assets/Scripts/DuelController.TypeCheck.cs
+–	campaign/history.json
+—	unity/Assets/Scripts/BracketScreen.cs
+’	campaign/history.json
+“	unity/Assets/Scripts/BoardView.cs
+”	unity/Assets/Scripts/BoardView.cs
+•	unity/Assets/Scripts/AboutScreen.cs
+…	unity/Assets/Scripts/BoardView.cs
+‹	unity/Assets/Scripts/DeckEditor.cs
+›	unity/Assets/Scripts/DeckEditor.cs
+←	unity/Assets/Scripts/BoardView.cs
+→	unity/Assets/Scripts/BoardView.cs
+−	unity/Assets/Scripts/BoardView.Panel.cs
+≈	unity/Assets/Scripts/DuelController.TypeCheck.cs
+⊘	unity/Assets/Scripts/CardView.cs
+─	unity/Assets/Scripts/AboutScreen.cs
+■	unity/Assets/Scripts/BoardView.cs
+▲	unity/Assets/Scripts/BoardView.CheckField.cs
+▶	unity/Assets/Scripts/BoardView.cs
+▸	unity/Assets/Scripts/CardDetail.cs
+▼	unity/Assets/Scripts/BoardView.Phase.cs
+◆	unity/Assets/Scripts/CampaignScreen.Alley.cs
+○	unity/Assets/Scripts/BracketScreen.cs
+●	unity/Assets/Scripts/BoardView.cs
+★	campaign/history.json
+☆	campaign/ocg-imports.txt
+♛	unity/Assets/Scripts/BracketScreen.cs
+⛓	unity/Assets/Scripts/BoardView.cs
+✓	unity/Assets/Scripts/BoardView.Columns.cs
+✕	unity/Assets/Scripts/BoardView.Skip.cs
+✗	unity/Assets/Scripts/BoardView.cs
+✦	unity/Assets/Scripts/BoardView.cs
+⬢	unity/Assets/Scripts/CardView.cs

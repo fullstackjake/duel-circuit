@@ -11,14 +11,23 @@ namespace YgoCampaign.Game
     /// <summary>
     /// The license texts and notices the About screen shows (AGPL section 5(d): how to view a copy of the license).
     /// A built game carries them in StreamingAssets/licenses (ProjectSetup copies them: LICENSE.txt, LICENSING.md,
-    /// THIRD_PARTY_NOTICES.md, CC-BY-SA-4.0.txt, UNITY-PERMISSION.md, SOURCE.txt); in the Unity editor they're read from the
+    /// THIRD_PARTY_NOTICES.md, CC-BY-SA-4.0.txt, UNITY-PERMISSION.md, the fonts' OFL-1.1-Barlow.txt and OFL-1.1-Noto.txt, SOURCE.txt); in the Unity editor they're read from the
     /// repo checkout (LICENSE, LICENSES/...). A file that isn't there reads as a line saying where to find it online.
     /// </summary>
     public static class LicenseFiles
     {
         public const string SourceUrl = "https://github.com/fullstackjake/duel-circuit";
 
-        public enum Doc { License, UnityPermission, ThirdParty, Licensing, CcBySa, Source }
+        /// <summary>The documents. <see cref="Doc.Fonts"/> is two files, the SIL Open Font License as Barlow and as Noto Sans
+        /// Symbols 2 ship it, read one after the other.</summary>
+        public enum Doc { License, UnityPermission, ThirdParty, Licensing, CcBySa, Source, Fonts }
+
+        /// <summary>The font licences' files, in reading order (each by the build's name, then the repo's).</summary>
+        private static readonly string[][] FontFiles =
+        {
+            new[] { "OFL-1.1-Barlow.txt", Path.Combine("LICENSES", "OFL-1.1-Barlow.txt") },
+            new[] { "OFL-1.1-Noto.txt", Path.Combine("LICENSES", "OFL-1.1-Noto.txt") },
+        };
 
         /// <summary>For checks: read from this folder instead (null: the game's own).</summary>
         public static string? FolderOverride;
@@ -47,6 +56,7 @@ namespace YgoCampaign.Game
             Doc.ThirdParty => new[] { "THIRD_PARTY_NOTICES.md" },
             Doc.Licensing => new[] { "LICENSING.md" },
             Doc.CcBySa => new[] { "CC-BY-SA-4.0.txt", Path.Combine("LICENSES", "CC-BY-SA-4.0.txt") },
+            Doc.Fonts => FontFiles[0],
             _ => new[] { "SOURCE.txt" },
         };
 
@@ -58,14 +68,35 @@ namespace YgoCampaign.Game
             Doc.ThirdParty => SourceUrl + "/blob/main/THIRD_PARTY_NOTICES.md",
             Doc.Licensing => SourceUrl + "/blob/main/LICENSING.md",
             Doc.CcBySa => SourceUrl + "/blob/main/LICENSES/CC-BY-SA-4.0.txt",
+            Doc.Fonts => SourceUrl + "/tree/main/LICENSES",
             _ => SourceUrl,
         };
 
-        /// <summary>The document's file, or null when this copy of the game doesn't have it.</summary>
+        /// <summary>
+        /// The document's file, or null when this copy of the game doesn't have it. For <see cref="Doc.Fonts"/>: the first
+        /// of its two files, and only when both are there (<see cref="FindAll"/> gives both).
+        /// </summary>
         public static string? Find(Doc doc)
         {
+            if (doc == Doc.Fonts)
+            {
+                var all = FindAll(doc);
+                return all.Count == FontFiles.Length ? all[0] : null;
+            }
+            return FindIn(Names(doc));
+        }
+
+        /// <summary>Every file of the document that this copy has (two for <see cref="Doc.Fonts"/>, else at most one).</summary>
+        public static IReadOnlyList<string> FindAll(Doc doc)
+        {
+            if (doc != Doc.Fonts) return Find(doc) is string one ? new[] { one } : Array.Empty<string>();
+            return FontFiles.Select(FindIn).Where(p => p != null).Select(p => p!).ToList();
+        }
+
+        private static string? FindIn(string[] names)
+        {
             var folder = Folder;
-            foreach (var name in Names(doc))
+            foreach (var name in names)
             {
                 var path = Path.Combine(folder, name);
                 if (File.Exists(path)) return path;
@@ -80,6 +111,22 @@ namespace YgoCampaign.Game
         public static string Read(Doc doc, out bool found)
         {
             found = false;
+            if (doc == Doc.Fonts)
+            {
+                // Each font's licence in turn (its copyright line first); a missing one says where it is online.
+                var parts = new List<string>();
+                foreach (var names in FontFiles)
+                {
+                    var file = FindIn(names);
+                    string? body = null;
+                    try { body = file != null ? File.ReadAllText(file) : null; }
+                    catch (IOException) { }
+                    catch (UnauthorizedAccessException) { }
+                    if (body == null) parts.Add($"{names[0]} isn't in this copy of the game. Read it online: {OnlineUrl(doc)}");
+                    else { found = true; parts.Add(body.Replace("\r\n", "\n").Replace('\r', '\n').Replace("\t", "    ").Replace("\f", "").TrimEnd()); }
+                }
+                return string.Join("\n\n\n", parts);
+            }
             var path = Find(doc);
             string text;
             try { text = path != null ? File.ReadAllText(path) : ""; }

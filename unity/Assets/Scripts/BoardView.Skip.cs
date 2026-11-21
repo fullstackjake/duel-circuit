@@ -77,7 +77,7 @@ namespace YgoCampaign.Game
             edge.effectColor = new Color(0.5f, 0.75f, 1f, 0.6f);
             edge.effectDistance = new Vector2(1.5f, -1.5f);
             var head = Ui.Text(Ui.Placed("Title", panel, new Vector2(-20, height / 2 - 22), new Vector2(700, 28)), title, 17, Ui.Hex("#8CC8FF"), TextAnchor.MiddleLeft);
-            head.fontStyle = FontStyle.Bold;
+            Typography.Strong(head);
             float y = height / 2 - 50;
             if (lines.Count > MaxLines)
             {

@@ -87,7 +87,7 @@ namespace YgoCampaign.Game
             _header = Box("Header");
             _headerImage = Ui.Image(_header, Ui.Hex("#2A3140"));
             _name = Ui.Text(Ui.Stretched("Name", _header, Vector2.zero, Vector2.one), "", 20, Color.white, TextAnchor.MiddleLeft);
-            _name.fontStyle = FontStyle.Bold;
+            Typography.Strong(_name);
             _name.rectTransform.offsetMin = new Vector2(10, 0);
             _name.rectTransform.offsetMax = new Vector2(-40, 0);
             _name.resizeTextForBestFit = true;
@@ -121,7 +121,7 @@ namespace YgoCampaign.Game
             _rarityRt.sizeDelta = new Vector2(44, 22);
             _rarityImage = Ui.Image(_rarityRt, Ui.Hex("#E07A1F"));
             _rarity = Ui.Text(_rarityRt, "", 14, Color.white);
-            _rarity.fontStyle = FontStyle.Bold;
+            Typography.Strong(_rarity);
 
             // Artwork: the card's next art style (right-click: the previous one).
             _styleChip = Ui.Rect("Artwork", _artRt);
@@ -132,7 +132,7 @@ namespace YgoCampaign.Game
             Ui.Image(_styleChip, new Color(0.04f, 0.05f, 0.08f, 0.85f));
             _styleChip.gameObject.AddComponent<Outline>().effectColor = new Color(1f, 0.79f, 0.25f, 0.7f);
             _styleLabel = Ui.Text(Ui.Stretched("Label", _styleChip, Vector2.zero, Vector2.one), "", reading ? 19 : 13, Ui.Hex("#FFC940"));
-            _styleLabel.fontStyle = FontStyle.Bold;
+            Typography.Strong(_styleLabel);
             _styleLabel.raycastTarget = false;
             _styleLabel.resizeTextForBestFit = true;
             _styleLabel.resizeTextMinSize = 9;
@@ -156,7 +156,7 @@ namespace YgoCampaign.Game
                 image.raycastTarget = false;
                 var value = Ui.Text(Ui.Stretched("Value", row, Vector2.zero, Vector2.one), "", 24, Color.white, TextAnchor.MiddleLeft);
                 value.rectTransform.offsetMin = new Vector2(34, 0);
-                value.fontStyle = FontStyle.Bold;
+                Typography.Strong(value);
                 value.supportRichText = true;
                 value.resizeTextForBestFit = true;
                 value.resizeTextMinSize = 12;
@@ -170,7 +170,7 @@ namespace YgoCampaign.Game
             _typeBar = Box("TypeBar");
             _typeImage = Ui.Image(_typeBar, Ui.Hex("#2A3140"));
             _type = Ui.Text(Ui.Stretched("Type", _typeBar, Vector2.zero, Vector2.one), "", 16, Color.white, TextAnchor.MiddleLeft);
-            _type.fontStyle = FontStyle.Bold;
+            Typography.Strong(_type);
             _type.rectTransform.offsetMin = new Vector2(8, 0);
             _type.rectTransform.offsetMax = new Vector2(-30, 0); // room for the "?" chip
             _type.resizeTextForBestFit = true;
@@ -213,7 +213,7 @@ namespace YgoCampaign.Game
             chipDisc.texture = Icons.Round;
             chipDisc.color = new Color(0, 0, 0, 0.35f);
             var chipText = Ui.Text(Ui.Stretched("Q", _helpChip, Vector2.zero, Vector2.one), "?", 15, Ui.Hex(TermColor));
-            chipText.fontStyle = FontStyle.Bold;
+            Typography.Strong(chipText);
             var tip = _helpChip.gameObject.AddComponent<TipOnHover>();
             tip.Title = "Reading card text";
             tip.Body = CardGlossary.ReadingHelp;
@@ -689,7 +689,7 @@ namespace YgoCampaign.Game
             band.name = "Original";
             Ui.Image(band, T.GlassSoft.WithAlpha(0.9f)).raycastTarget = false;
             var text = Ui.Text(band, tag, 10, T.GoldSoft);
-            text.fontStyle = FontStyle.Bold;
+            Typography.Strong(text);
             text.resizeTextForBestFit = true;
             text.resizeTextMinSize = 7;
             text.resizeTextMaxSize = 10;
@@ -803,7 +803,7 @@ namespace YgoCampaign.Game
             edge.effectColor = speed ? Ui.Hex("#FFC940") : archetype ? new Color(0.55f, 0.75f, 1f, 0.6f) : new Color(1, 1, 1, 0.25f);
             edge.effectDistance = new Vector2(1, -1);
             var text = Ui.Text(Ui.Stretched("Label", chip, Vector2.zero, Vector2.one), label, FxSettings.Scaled(13), speed ? Ui.Hex("#FFD86A") : Ui.Hex("#D8DEE8"));
-            text.fontStyle = speed ? FontStyle.Bold : FontStyle.Normal;
+            Typography.Weight(text, speed);
             text.horizontalOverflow = HorizontalWrapMode.Overflow;
             text.raycastTarget = false;
             bg.raycastTarget = true;
@@ -951,7 +951,7 @@ namespace YgoCampaign.Game
             var more = Ui.Stretched("More", h._strip, Vector2.zero, Vector2.one);
             more.offsetMax = new Vector2(-BarWidth - 6, 0);
             h._more = Ui.Text(more, "▼ more", 12, T.TextSoft, TextAnchor.MiddleRight);
-            h._more.fontStyle = FontStyle.Bold;
+            Typography.Strong(h._more);
             // The bar: a faint track and its thumb, at the box's right edge.
             h._track = Ui.Stretched("Bar", view, new Vector2(1, 0), Vector2.one);
             h._track.offsetMin = new Vector2(-BarWidth - 1, 2);

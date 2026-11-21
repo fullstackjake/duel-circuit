@@ -9,3 +9,4 @@
 *.dylib binary
 *.bin binary
 *.cdb binary
+*.ttf binary

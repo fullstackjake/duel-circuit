@@ -28,7 +28,7 @@ namespace YgoCampaign.Game
         {
             float y = 0;
             var heading = Ui.Text(Ui.Box(_list, 6, y + 8, 400, 28), "MY RECIPES", 16, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
-            heading.fontStyle = FontStyle.Bold;
+            Typography.Strong(heading);
             Ui.BoxButton(_list, 470, y + 6, 156, 32, "Import .ydk", PickYdk, 15);
             y += 44;
             if (mine.Count == 0)
@@ -44,9 +44,9 @@ namespace YgoCampaign.Game
                 Ui.Image(row, name == _mine ? Ui.Hex("#2E3A55") : Ui.Hex("#1E2535"));
                 var badge = Ui.Box(row, 8, 6, 64, 64);
                 Ui.Image(badge, Ui.Hex("#232A3A")).raycastTarget = false;
-                Ui.Text(badge, "YDK", 16, Ui.Hex("#FFC940")).fontStyle = FontStyle.Bold;
+                Typography.Strong(Ui.Text(badge, "YDK", 16, Ui.Hex("#FFC940")));
                 var title = Ui.Text(Ui.Box(row, 84, 8, 390, 30), name, 19, Color.white, TextAnchor.MiddleLeft);
-                title.fontStyle = FontStyle.Bold;
+                Typography.Strong(title);
                 title.resizeTextForBestFit = true;
                 title.resizeTextMinSize = 12;
                 title.resizeTextMaxSize = 19;
@@ -90,7 +90,7 @@ namespace YgoCampaign.Game
             }
             var list = _state.MyRecipeList;
             var title = Ui.Text(Ui.Box(_detail, 16, 18, 840, 46), name, 32, Color.white, TextAnchor.MiddleLeft);
-            title.fontStyle = FontStyle.Bold;
+            Typography.Strong(title);
             title.resizeTextForBestFit = true;
             title.resizeTextMinSize = 18;
             title.resizeTextMaxSize = 32;
@@ -161,7 +161,7 @@ namespace YgoCampaign.Game
                 {
                     var tag = Ui.Placed("Over", _detail, new Vector2(x - 590, 445 - y + size.y / 2 - 8), new Vector2(54, 16));
                     Ui.Image(tag, Ui.Hex("#B8432F")).raycastTarget = false;
-                    Ui.Text(tag, allowed == 0 ? "BANNED" : $"LIMIT {allowed}", 10, Color.white).fontStyle = FontStyle.Bold;
+                    Typography.Strong(Ui.Text(tag, allowed == 0 ? "BANNED" : $"LIMIT {allowed}", 10, Color.white));
                 }
             }
             if (groups.Count > perRow * rows)

@@ -151,7 +151,7 @@ namespace YgoCampaign.Game
             _main = Ui.Stretched("Main", _root, Vector2.zero, Vector2.one);
 
             var title = Ui.Box(_main, 110, 60, 1000, 100);
-            Ui.Text(title, "IMPORT CARDS", 60, T.Sign, TextAnchor.MiddleLeft).fontStyle = FontStyle.Bold;
+            Typography.Strong(Ui.Text(title, "IMPORT CARDS", 60, T.Sign, TextAnchor.MiddleLeft));
             _layout.Add(("title", "page", title));
             Label(_main, "page", "privacy", 110, 168, 1700, 30, Privacy, 18, T.TextSoft);
 
@@ -221,7 +221,7 @@ namespace YgoCampaign.Game
             var rt = Ui.Box(parent, x, y, w, h);
             var t = Ui.Text(rt, text, size, color, anchor);
             t.supportRichText = false;
-            if (bold) t.fontStyle = FontStyle.Bold;
+            if (bold) Typography.Strong(t);
             _layout.Add((what, group, rt));
             return t;
         }

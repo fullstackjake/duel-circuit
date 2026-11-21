@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace YgoCampaign.Game
 {
+    /// <summary>The type scale's roles (docs/dev/TYPE-AND-FONTS-SPEC-2026-11-21.md, section 1): one scale for both themes.</summary>
+    public enum TextRole { Caption, Small, Body, Label, Subhead, Heading, Title, Display }
+
     /// <summary>
     /// Every color role the shell screens use (Campaign, Shop, Trader, Results, Versus and the deck editor's frame),
     /// in two themes: <see cref="MainStreet"/> (today's colors, unchanged) and <see cref="BackAlley"/> (wet asphalt,
@@ -393,6 +396,29 @@ namespace YgoCampaign.Game
 
         // ---------- Type ----------
 
+        /// <summary>The smallest shell text, at 1080 (9.3 px at 1280x720).</summary>
+        public const int Floor = 14;
+
+        private static readonly int[] RoleSizes = { 14, 16, 18, 20, 22, 26, 34, 60 };
+
+        /// <summary>The role's size at 1080; reading roles times FxSettings.TextScale when <paramref name="reading"/>.</summary>
+        public static int Size(TextRole role, bool reading = false)
+        {
+            int size = RoleSizes[(int)role];
+            return reading && role <= TextRole.Body ? Mathf.RoundToInt(size * FxSettings.TextScale) : size;
+        }
+
+        /// <summary>The mapping rule for a literal size (section 1): the nearest role, ties go up, never below Caption.</summary>
+        public static TextRole RoleFor(int literal) =>
+            literal <= 14 ? TextRole.Caption
+            : literal <= 16 ? TextRole.Small
+            : literal <= 18 ? TextRole.Body
+            : literal <= 20 ? TextRole.Label
+            : literal <= 23 ? TextRole.Subhead
+            : literal <= 29 ? TextRole.Heading
+            : literal <= 46 ? TextRole.Title
+            : TextRole.Display;
+
         private static Font? _stencil;
         private static bool _stencilLooked;
 
@@ -416,15 +442,15 @@ namespace YgoCampaign.Game
         }
 
         /// <summary>
-        /// A title in this theme's title face (the map's node names, panel titles, the van's plate; never body text): in the
-        /// alley the stencil font, or until it's supplied the default font in bold with +2 letter spacing. Main street: as is.
+        /// A title in this theme's title face (the map's node names, panel titles, the van's plate; never body text): Barlow
+        /// Condensed Bold; in the alley the stencil font when it's there, else Barlow Condensed Bold with +2 letter spacing.
         /// </summary>
         public UnityEngine.UI.Text Title(UnityEngine.UI.Text text)
         {
-            if (!IsAlley) return text;
-            if (TitleFont is Font stencil) { text.font = stencil; return text; }
-            text.fontStyle = FontStyle.Bold;
-            if (text.GetComponent<LetterSpacing>() == null) text.gameObject.AddComponent<LetterSpacing>().Spacing = 2;
+            text.fontStyle = FontStyle.Normal;
+            if (IsAlley && TitleFont is Font stencil) { text.font = stencil; return text; }
+            text.font = Typography.Font(Face.CondensedBold);
+            if (IsAlley && text.GetComponent<LetterSpacing>() == null) text.gameObject.AddComponent<LetterSpacing>().Spacing = 2;
             return text;
         }
 

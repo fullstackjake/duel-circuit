@@ -372,7 +372,7 @@ namespace YgoCampaign.Game
                 var strip = Ui.Stretched("NegatedTag", root, new Vector2(0, 0.6f), new Vector2(1, 0.78f));
                 Ui.Image(strip, new Color(0.35f, 0.08f, 0.45f, 0.92f)).raycastTarget = false;
                 var label = Ui.Text(strip, "⊘ NEGATED", 11, Color.white);
-                label.fontStyle = FontStyle.Bold;
+                Typography.Strong(label);
                 label.raycastTarget = false;
                 label.resizeTextForBestFit = true;
                 label.resizeTextMinSize = 7;
@@ -398,7 +398,7 @@ namespace YgoCampaign.Game
                 badge.sizeDelta = new Vector2(30, 22);
                 Ui.Image(badge, new Color(0.1f, 0.3f, 0.5f, 0.95f)).raycastTarget = false;
                 var t = Ui.Text(badge, $"⬢{card.Counters}", 13, Color.white);
-                t.fontStyle = FontStyle.Bold;
+                Typography.Strong(t);
                 t.raycastTarget = false;
             }
         }
@@ -457,7 +457,7 @@ namespace YgoCampaign.Game
                 stripBack.sprite = SlabTextures.RoundBottom(0.028f * height);
                 stripBack.type = Image.Type.Sliced;
                 var stripText = Ui.Text(strip, StatLine(card, info, size.x >= MinWidthForLevel), 11, Color.white);
-                stripText.fontStyle = FontStyle.Bold;
+                Typography.Strong(stripText);
                 stripText.supportRichText = true;
                 // Shrinks to fit rather than cutting off "2500/2000" (or a ▲ changed stat) on narrow hand cards; on the
                 // narrowest cards (the deck editor's list) the Level gives way so ATK/DEF always fit at a readable size.
@@ -585,7 +585,7 @@ namespace YgoCampaign.Game
                     if (part.name == "Star") part.gameObject.SetActive(false);
                 // The count big on the pile itself (Link Evolution): readable at a glance across the table.
                 var number = Ui.Text(Ui.Stretched("Number", slot, Vector2.zero, Vector2.one), count.ToString(), FxSettings.Scaled(34), Color.white);
-                number.fontStyle = FontStyle.Bold;
+                Typography.Hero(Typography.Counter(Typography.Strong(number)));
                 number.raycastTarget = false;
                 var outline = number.gameObject.AddComponent<Outline>();
                 outline.effectColor = new Color(0, 0, 0, 0.95f);

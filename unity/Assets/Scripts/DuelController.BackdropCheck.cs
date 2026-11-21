@@ -95,10 +95,29 @@ namespace YgoCampaign.Game
             // One frame in: the long frame is clamped, so the corkboard has barely begun to show.
             float firstStep = _storyScreen.DebugFadeAlpha;
             bool fading = _storyScreen.DebugFading && _storyScreen.DebugSettledBackdrop == firstTexture;
+            // The fade advances by each frame's unscaled time clamped to StoryScreen.MaxStep (1/30 s): sum the same clamped steps
+            // frame by frame, so the check measures in the fade's own clock (wall time and Unity's frame times can disagree by
+            // tens of ms on this Mac, which put the wall-clock reading at 0.54 s against a 0.54 s floor).
+            const float maxStep = 1f / 30;
+            var clock = new float[2]; // the fade's clock so far, frames counted: summed every frame, the shot's frames included
+            IEnumerator Count()
+            {
+                while (_storyScreen.DebugFading)
+                {
+                    yield return null;
+                    clock[0] += Mathf.Min(Time.unscaledDeltaTime, maxStep);
+                    clock[1]++;
+                }
+            }
+            var counting = StartCoroutine(Count());
             yield return new WaitForSecondsRealtime(StoryScreen.FadeSeconds * 0.45f);
             yield return shot("story-epilogue-crossfade");
             bool midway = _storyScreen.DebugFading;
             while (_storyScreen.DebugFading && Time.realtimeSinceStartup < fadeStart + 5) yield return null;
+            yield return null; // the counter's last frame
+            StopCoroutine(counting);
+            float fadeClock = clock[0];
+            int frames = (int)clock[1];
             float took = Time.realtimeSinceStartup - fadeStart;
             long coldMs = StoryBackdrops.PaintMs.TryGetValue(StoryPlaces.Corkboard, out var ms) ? ms : -1;
             yield return new WaitForSecondsRealtime(0.2f);
@@ -112,9 +131,17 @@ namespace YgoCampaign.Game
             report($"the Every Era epilogue's {epilogue.Count} scenes play in two places ({string.Join(" then ", epilogue.Select(PlaceOf))}): the backdrop crossfades "
                    + $"from {firstPlace} to {secondPlace} ({fades} crossfade; fading over the old one {fading}, midway {midway}, settled {settled})",
                 epilogue.Count == 2 && firstPlace == StoryPlaces.BackRoom && secondPlace == StoryPlaces.Corkboard && fades == 1 && fading && midway && settled);
+            // The floor: before fadeStart one step (the cold frame, clamped to exactly maxStep) is already taken, so the rest of the
+            // fade needs FadeSeconds - maxStep of its own clock (the last step can only overshoot, never fall short); 1 ms for the
+            // float sum. In frames, at most maxStep a frame, that is at least 17 frames whatever the frame rate, so a fade that
+            // jumps (done in a frame or two) fails on both counts. The shots (the capture frame wasn't counted before) and wall
+            // time stay bounded above by 1.5 s.
+            float floor = StoryScreen.FadeSeconds - maxStep - 0.001f;
+            int fewestFrames = Mathf.CeilToInt(floor / maxStep);
             report($"a cold place's crossfade doesn't jump: the corkboard painted on the click ({coldMs} ms), {firstStep:F3} shown after that frame, "
-                   + $"the fade done in {took:F2} s (its time {StoryScreen.FadeSeconds} s; at most 1.5 s with the shots)",
-                coldMs >= 0 && firstStep <= 0.1f && took >= StoryScreen.FadeSeconds * 0.9f && took <= 1.5f);
+                   + $"then {fadeClock:F3} s of the fade's own clock over {frames} frames (at least {floor:F3} s and {fewestFrames} frames; its time {StoryScreen.FadeSeconds} s, "
+                   + $"one {maxStep:F3} s step taken on the cold frame), {took:F2} s on the wall clock (at most 1.5 s with the shots)",
+                coldMs >= 0 && firstStep <= 0.1f && fadeClock >= floor && frames >= fewestFrames && took <= 1.5f);
 
             // Reduced motion: the same two, the backdrop swapped at once.
             FxSettings.ReducedMotionOverride = true;
