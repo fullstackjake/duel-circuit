@@ -22,16 +22,29 @@ UI polish ideas live in [UI-ROADMAP.md](UI-ROADMAP.md); the post-game's phases i
 
 ## The climb (built 2026-11-21; docs/dev/THE-CLIMB-SPEC-2026-11-20.md)
 
-- [ ] **Early skills, next (decided 2026-11-21).** This build ships Novice and Intermediate at 0.85. A follow-up data round
-  sets both bands to 1.0 (full strength) and gives easier decks to the circuits that fall under their band at 1.0
-  (measured: Small Engines, Xyz and Link, Link Age at 29-38%); the CPU starts planning at skill 0.9, which is the jump.
-  Numbers: the spec's "As measured".
+- [x] **Early skills: full strength** (done 2026-11-21; spec "As built", "Full strength"). All 24 Novice and Intermediate
+  characters at 1.0 and three new deck swaps; five of six circuits are in their harder bands and no match is under 20%.
+  The 1.0 data is in the working tree, not committed.
+  - Decided (owner, 2026-11-21): after the full-strength data round (all 24 Novice and Intermediate characters at 1.0;
+    starter decks then win 46-50% in Novice and 37-41% in Intermediate, and no own-theme easier decks exist), the Game
+    Designer plans the deck choices that bring those bands into band, allowing a deck outside a character's theme or a
+    different character where needed; one more data round follows. The 1.0 data is in the working tree, not committed;
+    the committed game stays at 0.85 until then.
+  - [ ] **Trap Masters Cup is about 3 points easy** (65.1 against a ceiling of 62). Kept: without the swap its Domain
+    Monarch match was under the floor.
+  - [ ] **The stars come from deck ratings, which don't match measured difficulty in these bands** (owner: keep for now;
+    later derive them from measured rows).
+  - [ ] **Not re-measured at 1.0:** the Novice Tag Cup and Nocturne's tag duel (`--wall-study` doesn't play them); the
+    Library cups, the other Tag Cups and the guests where the raised characters play; `--difficulty`; Mekk-Knight.
+  - [ ] **Domain Monarch and Floowandereeze recipes** are now met only in Library cups, so they are winnable only after the
+    campaign.
+  - [ ] **Ostrand's `partner:` line** still says "Try to carry yourself like a Monarch." (left as is).
 - [x] **"Best first deck"** stays on Warrior's Charge (decided 2026-11-21): the measured rule picked Legendary Dragons with a
   skilled pilot, and a beginner needs the kinder start.
 - [ ] **Loss-farming (Game Designer).** Conceding in a match you haven't won still pays level-up DP (about 110 DP a duel
   late on); a rematch's level-ups pay tokens only. Left for now (owner, 2026-11-21).
 - [ ] **Not re-measured after the skill raise:** the Library cups (their Stuck? odds read a little easy until the tuning
-  pass's Library step), the Tag Cups, the guests and two tag partners now play at 0.85 too. Mekk-Knight after the changes.
+  pass's Library step); see the full-strength list above for the rest.
 - [ ] **Not verified:** a real played duel ending in a rematch (the checks go through the engine and the screens).
 - [ ] **From the evidence pass (docs/dev/EVIDENCE-2026-11-21.md, section 5; all low):**
   - `-climbcheck` refuses a folder with a save, but the game has already migrated and rewritten that save on load (finding 1).
@@ -42,13 +55,35 @@ UI polish ideas live in [UI-ROADMAP.md](UI-ROADMAP.md); the post-game's phases i
   - After New Game+, a "once" guest beaten before pays the full win rate without the prize (as built; flagged for the
     owner: does he expect 150?).
 
+## Plain cards (built 2026-11-21; docs/dev/PLAIN-CARDS-SPEC-2026-11-20.md, "As built")
+
+Built and reviewed (one fix round). The Evidence Collector's report is
+[EVIDENCE-2026-11-21b.md](EVIDENCE-2026-11-21b.md). Open:
+
+- [ ] **Text is small** (docs/dev/EVIDENCE-2026-11-21b.md, finding 3). Inside Standard plain cards it is about 5 px at
+  1280x720 and can't be read; deck-tile and field-card names are 6-7 px. The type scale build is where this gets fixed.
+- [ ] **Sparkle foil hides a name** (evidence, finding 8): a whole-card sparkle foil can make a plain card's name hard to
+  read in the editor.
+- [ ] **The hand's big Level digit** now sits partly over the "LV n" chip (evidence, finding 5; the glyph is clear of it).
+- [ ] **`-themecheck`'s story crossfade step** fails now and then at exactly its 0.54 s floor (evidence, finding 6; old):
+  widen its margin.
+- [ ] **Weak steps:** the evidence report's list of steps that could pass with their feature broken is its section 7.
+- [ ] **The Spell glyph can read like a wifi symbol.** Look at a redraw.
+- [ ] **The collection editor shows one more face than its check expects.** Unexplained; most likely the card detail's
+  face.
+- [ ] **Weak audit steps** (from the review): counts that can't come up short, and an expected count of 0 for the box
+  summary and for the theme check's Card Trader, so they can't fail on a missing card.
+- [ ] **Not tested** (evidence report): a real 4K screen (the largest run was 3024x1964), whether any tile is blank one
+  second after the editor opens, real mouse input. Also not verified: the rarity mark's tilt on a moving pointer, Windows.
+- [ ] **Re-check the "QCSR 25" mark** (the Card looks item below: invisible on full-text cards) on plain cards.
+
 ## Next specs (decided 2026-11-21)
 
-- [ ] **Plain cards** (docs/dev/PLAIN-CARDS-SPEC-2026-11-20.md): specced; it starts next (owner, 2026-11-21).
+- [x] **Plain cards** (docs/dev/PLAIN-CARDS-SPEC-2026-11-20.md): built 2026-11-21 (section above).
 - [ ] **From the game review** (docs/dev/PRODUCTION-REVIEW-GAME-2026-11-20.md), each its own spec: Vera's rival matches,
   the Champion's Circuit (New Game+), Hollis's lessons, Gus's puzzle book.
-- [ ] **From the UI review** (docs/dev/PRODUCTION-REVIEW-UI-2026-11-20.md), each its own spec: the type scale, fonts,
-  pack opening and results.
+- [ ] **From the UI review** (docs/dev/PRODUCTION-REVIEW-UI-2026-11-20.md), each its own spec: the type scale and
+  fonts (the owner picks one of the three font pairs in the Plain cards spec's appendix), then pack opening and results.
 
 ## Deck editor (click to focus, 2026-11-19; docs/dev/EDITOR-CLICK-FOCUS-SPEC-2026-11-19.md)
 

@@ -5,7 +5,7 @@ aggression: 0.7
 caution: 0.35
 patience: 0.4
 spending: 0.7
-skill: 0.85
+skill: 1.0
 decks: blackwing
 intro: Feathers fly fast. Try to keep up.
 win: One gust and the field was mine.

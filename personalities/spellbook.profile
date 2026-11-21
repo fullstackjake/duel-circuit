@@ -5,8 +5,8 @@ aggression: 0.3
 caution: 0.7
 patience: 0.75
 spending: 0.4
-skill: 0.85
-decks: spellbook, spellcasters-command
+skill: 1.0
+decks: spellbook
 intro: I saw this duel coming nights ago. Sit. Let's see how much of it you can change.
 win: It was written. I only turned the pages.
 lose: A page I didn't foresee.

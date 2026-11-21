@@ -5,7 +5,7 @@ aggression: 0.7
 caution: 0.35
 patience: 0.4
 spending: 0.7
-skill: 0.85
+skill: 1.0
 decks: gouki
 intro: Every Gouki that falls tags in another. Ding ding!
 win: Extra Link! Down for the count!

@@ -61,40 +61,40 @@ circuit: Underdog Open
 band: Novice
 era: 2011
 banlist: TCG March 2011
-blurb: Frog FTK, Six Samurai, Spellcaster's Command and Burning Abyss: underdogs from 2005 to 2014.
+blurb: Frog FTK, Six Samurai, Spellbooks and Burning Abyss: decks from 2010 to 2014.
 prize: 1400
 finalline: Every poem needs a last canto. Tonight, I write yours.
 match: frog-ftk frog-ftk
 match: six-samurai six-samurai
-match: spellbook spellcasters-command
+match: spellbook spellbook
 match: burning-abyss burning-abyss
-was: 3 spellbook spellbook
 
 circuit: Trap Masters Cup
 band: Novice
 era: 2011
 banlist: TCG March 2011
-blurb: Machine Re-Volt, Domain Monarch, Zoodiac and Altergeist: machines, monarchs and trap walls from 2008 to 2018.
+blurb: Machine Re-Volt, a stall wall, Zoodiac and Altergeist: machines and trap walls from 2005 to 2018.
 prize: 1600
 finalline: Final process loaded. I ran this match a thousand times. You lost most of them.
 match: geargia machine-re-volt
-match: domain-monarch domain-monarch
+match: domain-monarch stall-burn
 match: zoodiac zoodiac
 match: altergeist altergeist
 was: 1 geargia geargia
+was: 2 domain-monarch domain-monarch
 
 circuit: Small Engines Invitational
 band: Novice
 era: 2011
 banlist: TCG March 2011
-blurb: Floowandereeze, Runick Spright, Purrely and Junk Synchron: small monsters that add up, from 2008 to 2026.
+blurb: Dragunity, Runick Spright, Purrely and Yummy: small monsters and the birds that carry them.
 prize: 1800
 finalline: And for dessert, the chef's special: the final! I hope you saved room.
-match: floowandereeze floowandereeze
+match: floowandereeze dragunity-legion
 match: runick-spright runick-spright
 match: purrely purrely
-match: yummy synchron
-was: 4 yummy yummy
+match: yummy yummy
+was: 1 floowandereeze floowandereeze
 
 circuit: Synchro Dawn Classic
 band: Intermediate
@@ -124,13 +124,14 @@ circuit: Link Age Open
 band: Intermediate
 era: 2015
 banlist: TCG April 2015
-blurb: Pendulum Magicians, Sky Striker, Salamangreat and Maliss: decks from 2018 to 2025.
+blurb: Pendulum Magicians, Machine Re-Volt, Salamangreat and Maliss: decks from 2005 to 2025.
 prize: 2400
 finalline: Last door in Wonderland, and it's ever so small. Only one of us gets through.
 match: pendulum-magician pendulum-magician
-match: sky-striker sky-striker
+match: sky-striker machine-re-volt
 match: salamangreat salamangreat
 match: maliss maliss
+was: 2 sky-striker sky-striker
 
 circuit: Golden Age Championship
 band: Advanced

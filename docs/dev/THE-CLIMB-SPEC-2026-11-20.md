@@ -581,6 +581,93 @@ the owner's word.
 
 Machine time: D0 64 min, D0b 34, D2 19, D3 61, D4 38, D5 39 (13 min of rows, 34 of `--difficulty`): about 4.3 h.
 
+### Round 2: full strength, then decks only (owner, 2026-11-21)
+
+Decided (owner, 2026-11-21): all 24 Novice and Intermediate duelists play at **skill 1.0**; difficulty then moves by deck
+choice only. Harness `build/bin/snap-climb2` (copy of `build/bin/evidence2`, commit 4e1b492), run from the scratch root
+`build/climb/root2/` with the same stand-in copy; raw output in `build/climb/runs2/`. Checked: its first 24 duels of each
+Synchro Dawn match at 48 a match are identical to round 1's 1.0 run, so round 1's 1.0 rows stand unrerun.
+
+**Changes, in order:**
+1. Skills 0.85 → 1.0 (24 profiles).
+2. **Undone:** Small Engines match 4 back to `yummy yummy` (synchron 1,527 → yummy 1,198); Underdog Open match 3 back to
+   `spellbook spellbook` (spellcasters-command 1,399 → spellbook 1,180). Their `was:` lines, blurbs, `featured.txt`
+   shelves and `decks:` lines are back as at 3b36438. Sage's deck-neutral `intro:`/`win:` stay.
+3. Kept: Trap Masters Cup match 1 `geargia machine-re-volt` (`was: 1 geargia geargia`): that circuit is in band at 1.0.
+4. No own-theme swap (rule b) exists for the remaining walls (below), so no new swap.
+
+**Gate rows at 1.0** (w / z; seeds 1+2; 48 a match where marked):
+
+| Circuit (target) | 1.0, round 1 decks | Now | In band |
+|---|---|---|---|
+| Underdog Open (50-65) | 46.9 / 49.0 | 47.1 (48) / 51.6 (48) | zombies only |
+| Trap Masters Cup (50-65) | 52.1 / 55.2 | unchanged | both |
+| Small Engines (50-65) | 31.2 / 34.9 | 39.6 / 42.7 | neither |
+| Synchro Dawn (45-60) | 44.3 / 54.7 | 41.7 (48) / 54.7 | zombies only |
+| Xyz and Link (45-60) | 34.9 / 38.5 | unchanged | neither |
+| Link Age (45-60) | 32.8 / 29.2 | unchanged | neither |
+
+Classic at 1.0, now: Underdog 34.9, Trap Masters 42.7, Small Engines 26.0, Synchro Dawn 33.9, Xyz and Link 26.0, Link Age
+18.8. Beginner rows are D0's.
+
+**Per-match walls** (warriors s1/s2, zombies s1/s2, win %): Underdog Open six-samurai 29/25, 25/20; Small Engines
+floowandereeze 29/12, 41/45 and runick-spright 29/16, 25/29; Synchro Dawn (warriors) teledad 41/37, lightsworn 50/33;
+Xyz and Link qliphort 29/20, 25/20, gouki 33/33, 25/33, dino-rabbit 37/33, 41/41; Link Age every match 8-50 (maliss
+29/33, 8/33). None of these characters has a weaker rated deck of its own theme in `decks/`. The one near-miss,
+Dinosaur's Rage (1,252) for Bunny Rex, has no Laggia, which his `intro:` and `win:` name.
+
+**Gate-row means by band** (warriors / zombies / classic): Beginner 72.9 / 81.6 / 50.4; Novice at 0.85 78.6 / 80.2 / 58.0
+→ now 46.3 / 49.8 / 34.5; Intermediate at 0.85 76.7 / 78.6 / 57.5 → now 36.5 / 40.8 / 26.2. Deck Elo means: Beginner
+1,385, Novice 1,263, Intermediate 1,374. The climb now falls band by band in win rate, Novice and Intermediate mostly
+under their floors.
+
+`--difficulty --games 12 --seed 1` after, Beginner to Link Age: 39, 39, 53, 44, 19, 25, 10, 6, 12, 8; overall 23% (46 min).
+
+Machine time this round: about 2.1 h (rows 1.4 h, `--difficulty` 0.8 h).
+
+### Round 3: decks for the walls (owner, 2026-11-21)
+
+Followed [THE-CLIMB-FULL-STRENGTH-PLAN-2026-11-21.md](THE-CLIMB-FULL-STRENGTH-PLAN-2026-11-21.md) with the owner's harder
+targets in place of its own. Decided (owner, 2026-11-21): bands for the gate mean (warriors and zombies, seeds 1 and 2)
+are Underdog Open 48-65, Trap Masters Cup 46-62, Small Engines 43-58, Synchro Dawn 40-55, Xyz and Link 35-50, Link Age
+35-48; no match under 20% (finals included); a swap only where a circuit is under its floor or a match under 20%.
+Harness and root as round 2; raw output in `build/climb/runs3/` (`X-*` are runs with seats 1 and 4, discarded when the
+targets changed).
+
+**Seats** (gate mean of the match over w1 / w2 / z1 / z2):
+
+| # | Seat | Round 2 | Tried | Outcome |
+|---|---|---|---|---|
+| 1 | Underdog Open 2, Isamu | six-samurai 25.0 | (warriors 56.2, before the new targets) | not needed: circuit in band, no match under 20; undone |
+| 2 | Trap Masters Cup 2, Ostrand | domain-monarch 19.0 | stall-burn 65.6 (circuit 65.1); fallback classic 79.2 (circuit 68.5) | **stall-burn kept**: both over the ceiling, the smaller overshoot; without a swap the match is under 20 |
+| 3 | Small Engines 1, Juniper | floowandereeze 31.8 | dragunity-legion 44.8 (circuit 44.3) | **kept** |
+| 4 | Small Engines 2, Huginn | runick-spright 25.0 | not tried | not needed (seat 3 brought the circuit into band) |
+| 5 | Xyz and Link 3, Unit QL-1 | qliphort 24.0 | not tried | not needed (circuit 36.7 in band, no match under 20) |
+| 6 | Link Age 2, Ace Raye | sky-striker 25.0 | mekk-knight 25.0 (circuit 31.0); fallback machine-re-volt 54.2 (circuit 38.3) | **machine-re-volt kept** |
+| 7 | Link Age 1, Ozzie | pendulum-magician 31.2 | not tried | not needed (circuit 38.3 ≥ 35) |
+
+**The six circuits** (warriors / zombies, seeds 1+2; gate mean; owner's band):
+
+| Circuit | Warriors | Zombies | Gate mean | Band | Verdict | Lowest match |
+|---|---|---|---|---|---|---|
+| Underdog Open | 47.1 (48 a match) | 51.6 (48 a match) | 49.4 | 48-65 | in | six-samurai 25.0 |
+| Trap Masters Cup | 64.1 | 66.1 | 65.1 | 46-62 | 3.1 over | machine-re-volt 54.2 |
+| Small Engines | 44.3 | 44.3 | 44.3 | 43-58 | in (1.3 over the floor) | runick-spright 25.0 |
+| Synchro Dawn | 41.7 (48 a match) | 54.7 | 48.2 | 40-55 | in | lightsworn 46.9 |
+| Xyz and Link | 34.9 | 38.5 | 36.7 | 35-50 | in | qliphort 24.0 |
+| Link Age | 38.5 | 38.0 | 38.3 | 35-48 | in | maliss (final) 26.0 |
+
+No match is under 20. Classic, seed 1 only: Trap Masters Cup 53.1, Small Engines 31.2, Link Age 26.0 (others as round 2).
+Order: Underdog Open 49.4 → Trap Masters Cup 65.1 is a step up of 15.7 (reported); Small Engines 44.3 → Synchro Dawn 48.2
+(+3.9) and Xyz and Link 36.7 → Link Age 38.3 (+1.6) are within the 5 allowed.
+
+**Band means** (gate mean): Beginner 77.3 (unchanged); Novice 48.1 → 52.9; Intermediate 38.6 → 41.1.
+
+`--wall-study` only plays the Expert and Master Tag Cups and Seraph (`WallStudy.cs:128-141`), so the Novice Tag Cup and
+Nocturne's tag duel weren't measured. `--difficulty` wasn't re-run this round.
+
+Machine time: about 1.3 h (rows 1.1 h, of which 10 min discarded; checks and `--arbitrage` 0.2 h).
+
 ## Owner decisions (recommendation first)
 
 1. **The early curve.** Decided (owner, 2026-11-20): swap decks and keep circuits, then raise Novice and Intermediate
@@ -685,3 +772,57 @@ owner's save (and its 9 backups) and the QA save keep their match wins, cleared 
 `formerrecipe:` keys (where the match was won) and 3 done marks; the real folders' file times are unchanged. Its four low
 findings and its list of weak steps (its sections 5 and 6) are in `TODO.md`; none blocks the commit. One thing it flags as
 built: after New Game+, a "once" guest beaten before pays the full win rate without the prize.
+
+### Full strength (2026-11-21)
+
+This block supersedes the swaps and skills described above (Sage's and Praline's swaps are undone; the skills are 1.0, not
+0.85). Numbers are from "As measured", rounds 2 and 3; the plan is
+[THE-CLIMB-FULL-STRENGTH-PLAN-2026-11-21.md](THE-CLIMB-FULL-STRENGTH-PLAN-2026-11-21.md).
+
+Decided (owner, 2026-11-21): both bands go to skill 1.0 and difficulty is tuned by deck choice; the Game Designer plans the
+swaps, with decks outside a character's theme allowed; the drafted lines are accepted as drafted; recipes must stay
+winnable; stars stay as they are. The targets are harder than the plan's: per-circuit bands for the mean of the two gate
+starters of 48-65 (Underdog Open), 46-62 (Trap Masters Cup), 43-58 (Small Engines), 40-55 (Synchro Dawn), 35-50 (Xyz and
+Link) and 35-48 (Link Age), and no single match under 20%.
+
+What the data is now:
+
+- All 24 Novice and Intermediate characters are at skill 1.0.
+- Undone: Sage's Spellbook swap (Underdog Open, match 3 is `spellbook spellbook` again) and Praline's Yummy swap (Small
+  Engines, match 4 is `yummy yummy`). Sage's deck-neutral lines stay.
+- Kept: Gage's Machine Re-Volt (Trap Masters Cup, match 1).
+- Three new swaps (each leaves a `was:` line): Ostrand's Domain Monarch to Stall Burn (Trap Masters Cup, match 2); Juniper's
+  Floowandereeze to Dragunity Legion (Small Engines, match 1); Ace Raye's Sky Striker to Machine Re-Volt (Link Age Open,
+  match 2; the plan's first choice, Mekk-Knight, changed nothing: 25.0 either way).
+- New lines. Ostrand: intro "My domain, my rules. Nothing crosses it.", win "Bow before the throne.", lose "An emperor
+  knows when to yield. Rarely." Juniper: intro "Every flock has a leader. Mine has wings and a lance.", win "The flock
+  flies home. You stay grounded." Ace Raye: intro "Pilot's seat, full throttle. Try to keep up.", win "Target down.
+  Mission complete."
+- Blurbs in `circuits.txt`: Trap Masters Cup "Machine Re-Volt, a stall wall, Zoodiac and Altergeist: machines and trap
+  walls from 2005 to 2018."; Small Engines "Dragunity, Runick Spright, Purrely and Yummy: small monsters and the birds that
+  carry them."; Link Age "Pendulum Magicians, Machine Re-Volt, Salamangreat and Maliss: decks from 2005 to 2025." (Underdog
+  Open's blurb is back to its old text.)
+
+Result (round 3; warriors and zombies, seeds 1 and 2; gate mean against the band; lowest match):
+
+| Circuit | Gate mean | Band | Lowest match |
+|---|---|---|---|
+| Underdog Open | 49.4 | 48-65 | six-samurai 25.0 |
+| Trap Masters Cup | 65.1 | 46-62 (3.1 over) | machine-re-volt 54.2 |
+| Small Engines | 44.3 | 43-58 | runick-spright 25.0 |
+| Synchro Dawn | 48.2 | 40-55 | lightsworn 46.9 |
+| Xyz and Link | 36.7 | 35-50 | qliphort 24.0 |
+| Link Age | 38.3 | 35-48 | maliss (final) 26.0 |
+
+Band means (gate mean): Beginner 77.3 (unchanged), Novice 48.1 to 52.9, Intermediate 38.6 to 41.1. No match is under 20.
+The one miss: Trap Masters Cup, about 3 points over its ceiling. It stays: without a swap its Domain Monarch match was
+under the floor (19.0), and the fallback (classic) overshot more.
+
+Recipes: none lost. Domain Monarch and Floowandereeze are now met only in Library cups.
+
+Tests: the harness's climb steps now read the swaps from the data's `was:` lines (they were hard-coded to the first three
+swaps and failed 24 steps after this round). A save from the first build keeps its old recipes and gets the three new
+swaps.
+
+Not measured: the Novice Tag Cup and Nocturne's tag duel at 1.0 (`--wall-study` doesn't cover them); the Library cups, the
+other Tag Cups and the guests where the raised characters play; `--difficulty` for this round; Mekk-Knight.

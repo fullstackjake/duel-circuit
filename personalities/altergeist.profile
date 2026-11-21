@@ -5,7 +5,7 @@ aggression: 0.3
 caution: 0.7
 patience: 0.75
 spending: 0.4
-skill: 0.85
+skill: 1.0
 decks: altergeist
 intro: My traps are programs. And they've already run.
 win: Every move you made was negated. Lovely.

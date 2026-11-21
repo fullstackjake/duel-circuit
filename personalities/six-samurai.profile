@@ -5,7 +5,7 @@ aggression: 0.5
 caution: 0.5
 patience: 0.55
 spending: 0.5
-skill: 0.85
+skill: 1.0
 decks: six-samurai
 intro: Six blades, one will. Draw yours.
 win: The Gateway stays open, and you fall.

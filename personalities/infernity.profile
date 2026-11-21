@@ -5,7 +5,7 @@ aggression: 0.7
 caution: 0.35
 patience: 0.4
 spending: 0.7
-skill: 0.85
+skill: 1.0
 decks: infernity
 intro: My hand is empty. That's when I'm strongest.
 win: Nothing in hand, everything on the field.

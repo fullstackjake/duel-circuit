@@ -5,7 +5,7 @@ aggression: 0.7
 caution: 0.35
 patience: 0.4
 spending: 0.7
-skill: 0.85
+skill: 1.0
 decks: teledad
 intro: Emergency Teleport, Destiny Draw, Dark Armed Dragon. Simple.
 win: Expensive deck, cheap win.
