@@ -86,18 +86,18 @@ namespace YgoCampaign.Game
             _root = Ui.Overlay(transform, "GradingDesk", 15);
             Ui.Image(_root, Ui.Hex("#141821"));
             Ui.Image(Ui.Box(_root, 0, 0, 1920, 90), Ui.Hex("#0D1017"));
-            Typography.Strong(Ui.Text(Ui.Box(_root, 40, 0, 680, 90), "GAUGE & GILT · GRADING DESK", 34, Ui.Hex("#EFE6D2"), TextAnchor.MiddleLeft));
-            _dp = Ui.Text(Ui.Box(_root, 760, 0, 400, 90), "", 24, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
-            Ui.BoxButton(_root, 1720, 22, 160, 46, "Back", Close, 18);
+            Typography.Strong(Ui.Text(Ui.Box(_root, 40, 0, 680, 90), "GAUGE & GILT · GRADING DESK", TextRole.Title, Ui.Hex("#EFE6D2"), TextAnchor.MiddleLeft));
+            _dp = Ui.Text(Ui.Box(_root, 760, 0, 400, 90), "", TextRole.Heading, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
+            Ui.BoxButton(_root, 1720, 22, 160, 46, "Back", Close, TextRole.Label);
             _tabs = Ui.Box(_root, 40, 104, 900, 48);
-            _searchBox = Ui.Input(Ui.Box(_root, 40, 168, 820, 44), "Search your copies by name", 16, v => { _search = v; _page = 0; Show(_tab); }).gameObject;
+            _searchBox = Ui.Input(Ui.Box(_root, 40, 168, 820, 44), "Search your copies by name", UiTheme.Size(TextRole.Small), v => { _search = v; _page = 0; Show(_tab); }).gameObject;
             _list = Ui.Box(_root, 40, 222, 820, PerPage * 70);
-            _prev = Ui.BoxButton(_root, 40, 940, 140, 40, "< Prev", () => { _page--; Show(_tab); }).gameObject;
-            _pageLabel = Ui.Text(Ui.Box(_root, 190, 940, 480, 40), "", 16, Color.white);
-            _next = Ui.BoxButton(_root, 720, 940, 140, 40, "Next >", () => { _page++; Show(_tab); }).gameObject;
+            _prev = Ui.BoxButton(_root, 40, 940, 140, 40, "< Prev", () => { _page--; Show(_tab); }, TextRole.Label).gameObject;
+            _pageLabel = Ui.Text(Ui.Box(_root, 190, 940, 480, 40), "", TextRole.Small, Color.white);
+            _next = Ui.BoxButton(_root, 720, 940, 140, 40, "Next >", () => { _page++; Show(_tab); }, TextRole.Label).gameObject;
             _detail = Ui.Box(_root, 900, 168, 980, 822);
             Ui.Image(_detail, Ui.Hex("#1A1F2B"));
-            _status = Ui.Text(Ui.Box(_root, 40, 1010, 1840, 50), "", 16, Color.white, TextAnchor.MiddleLeft);
+            _status = Ui.Text(Ui.Box(_root, 40, 1010, 1840, 50), "", TextRole.Small, Color.white, TextAnchor.MiddleLeft);
             _status.supportRichText = true;
         }
 
@@ -118,7 +118,7 @@ namespace YgoCampaign.Game
             for (int i = 0; i < 3; i++)
             {
                 var t = (Tab)i;
-                var button = Ui.BoxButton(_tabs, i * 208, 0, 200, 48, names[i], () => Show(t), 18);
+                var button = Ui.BoxButton(_tabs, i * 208, 0, 200, 48, names[i], () => Show(t), TextRole.Label);
                 button.targetGraphic.color = t == tab ? Ui.Hex("#2E3A55") : Ui.Hex("#1E2535");
                 button.GetComponentInChildren<Text>().supportRichText = true;
                 if (t == tab) Ui.Image(Ui.Box(_tabs, i * 208, 45, 200, 3), Ui.Hex("#C9A04A")).raycastTarget = false;
@@ -168,25 +168,25 @@ namespace YgoCampaign.Game
             {
                 var box = Ui.Box(row, 8, 18, 28, 28);
                 Ui.Image(box, Ui.Hex("#0E1220"));
-                Ui.Text(box, picked ? "✓" : "", 20, Ui.Hex("#FFC940"));
+                Ui.Text(box, picked ? "✓" : "", TextRole.Label, Ui.Hex("#FFC940"));
                 x = 44;
             }
             Thumb(row, new Vector2(x + 20 - 410, 0), new Vector2(40, 58), copy, info);
-            var name = Ui.Text(Ui.Box(row, x + 52, 4, 500, 26), info?.Name ?? copy.Code.ToString(), 17, Color.white, TextAnchor.MiddleLeft);
+            var name = Ui.Text(Ui.Box(row, x + 52, 4, 500, 26), info?.Name ?? copy.Code.ToString(), TextRole.Body, Color.white, TextAnchor.MiddleLeft);
             name.raycastTarget = false;
             var line = Ui.Text(Ui.Box(row, x + 52, 32, 520, 26),
-                $"{CardFoil.ColoredName(copy.Rarity)} · <color={Grades.Color(copy.Shown)}>{Grades.Glyph(copy.Shown)} {Grades.Describe(copy)}</color>", 13, Color.white, TextAnchor.MiddleLeft);
+                $"{CardFoil.ColoredName(copy.Rarity)} · <color={Grades.Color(copy.Shown)}>{Grades.Glyph(copy.Shown)} {Grades.Describe(copy)}</color>", TextRole.Caption, Color.white, TextAnchor.MiddleLeft);
             line.supportRichText = true;
             line.raycastTarget = false;
             string right;
             if (tab == Tab.Sell)
             {
                 var blocked = SellDesk.Blocked(Profile, copy, _state.NeededByDecks);
-                right = blocked == null ? $"Pays {Collection.SellPrice(copy):N0} DP\n<size=12><color=#8A8F9A>{SellReason(copy)}</color></size>"
-                    : $"<size=13><color=#8A8F9A>{blocked}</color></size>";
+                right = blocked == null ? $"Pays {Collection.SellPrice(copy):N0} DP\n<size=14><color=#8A8F9A>{SellReason(copy)}</color></size>"
+                    : $"<size=14><color=#8A8F9A>{blocked}</color></size>";
             }
             else right = $"{Collection.Value(copy):N0} DP";
-            var value = Ui.Text(Ui.Box(row, 600, 0, 208, 64), right, 17, Ui.Hex("#FFC940"), TextAnchor.MiddleRight);
+            var value = Ui.Text(Ui.Box(row, 600, 0, 208, 64), right, TextRole.Body, Ui.Hex("#FFC940"), TextAnchor.MiddleRight);
             value.supportRichText = true;
             value.raycastTarget = false;
             Ui.Clickable(row, () =>
@@ -222,7 +222,7 @@ namespace YgoCampaign.Game
             if (copy != null && (copy.AtDesk || !Collection.All.Contains(copy))) copy = _selected = null;
             if (copy == null)
                 Ui.Text(Ui.Box(_detail, 30, 20, 920, 60), "Pick a copy on the left. A Raw copy goes into a sealed slab with its exact grade; a slab can be cracked and tried again.",
-                    17, new Color(0.8f, 0.83f, 0.9f), TextAnchor.UpperLeft);
+                    TextRole.Body, new Color(0.8f, 0.83f, 0.9f), TextAnchor.UpperLeft);
             else
             {
                 var info = _cards.Get(copy.Code);
@@ -230,11 +230,11 @@ namespace YgoCampaign.Game
                 else Thumb(_detail, new Vector2(-490 + 30 + 120, 411 - 20 - 175), new Vector2(240, 350), copy, info);
                 var facts = Ui.Text(Ui.Box(_detail, 300, 20, 650, 160),
                     $"<b><size=26>{info?.Name}</size></b>\n{CardFoil.ColoredName(copy.Rarity)}\n<color={Grades.Color(copy.Shown)}>{Grades.Glyph(copy.Shown)} {Grades.Describe(copy)}</color>\n"
-                    + $"Worth now <color=#FFC940>{Collection.Value(copy):N0} DP</color>", 17, Color.white, TextAnchor.UpperLeft);
+                    + $"Worth now <color=#FFC940>{Collection.Value(copy):N0} DP</color>", TextRole.Body, Color.white, TextAnchor.UpperLeft);
                 facts.supportRichText = true;
 
                 // What comes back: the odds (a Raw copy's never show its number).
-                Ui.Text(Ui.Box(_detail, 300, 190, 600, 20), "WHAT COMES BACK", 13, new Color(1, 1, 1, 0.5f), TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(_detail, 300, 190, 600, 20), "WHAT COMES BACK", TextRole.Caption, new Color(1, 1, 1, 0.5f), TextAnchor.MiddleLeft);
                 var parts = copy.IsSlab
                     ? new[] { (100 - GradingDesk.OddsHigher, $"stays {copy.Slab}: {100 - GradingDesk.OddsHigher}%", "#C9A04A"), (GradingDesk.OddsHigher, $"{Math.Min(10, copy.Slab + 1)}: {GradingDesk.OddsHigher}%", "#7BD88F") }
                     : new[] { (GradingDesk.OddsLower, $"one lower {GradingDesk.OddsLower}%", "#5A6478"), (GradingDesk.OddsSame, $"its true grade {GradingDesk.OddsSame}%", "#C9A04A"), (GradingDesk.OddsHigher, $"one higher {GradingDesk.OddsHigher}%", "#7BD88F") };
@@ -243,11 +243,11 @@ namespace YgoCampaign.Game
                 {
                     float w = 600 * pct / 100f;
                     Ui.Image(Ui.Box(_detail, bx, 214, w - 2, 28), Ui.Hex(color)).raycastTarget = false;
-                    var l = Ui.Text(Ui.Box(_detail, bx, 246, Math.Max(w, 120), 20), label, 13, Color.white, TextAnchor.MiddleLeft);
+                    var l = Ui.Text(Ui.Box(_detail, bx, 246, Math.Max(w, 120), 20), label, TextRole.Caption, Color.white, TextAnchor.MiddleLeft);
                     l.horizontalOverflow = HorizontalWrapMode.Overflow;
                     bx += w;
                 }
-                if (copy.IsSlab) Ui.Text(Ui.Box(_detail, 300, 268, 600, 20), $"never lower than {copy.Slab}", 13, new Color(0.8f, 0.83f, 0.9f), TextAnchor.MiddleLeft);
+                if (copy.IsSlab) Ui.Text(Ui.Box(_detail, 300, 268, 600, 20), $"never lower than {copy.Slab}", TextRole.Caption, new Color(0.8f, 0.83f, 0.9f), TextAnchor.MiddleLeft);
 
                 // Standard or express.
                 for (int i = 0; i < 2; i++)
@@ -258,11 +258,11 @@ namespace YgoCampaign.Game
                     Ui.Image(card, _express == express ? Ui.Hex("#C9A04A") : Ui.Hex("#1E2535"));
                     var inner = Ui.Box(card, 2, 2, 296, 92);
                     Ui.Image(inner, _express == express ? Ui.Hex("#2A2418") : Ui.Hex("#1E2535"));
-                    var t = Ui.Text(inner, $"<b>{(express ? "Express" : "Standard")}</b> · {fee:N0} DP\n<size=14>{(express ? "back now" : $"back after {GradingDesk.Turnaround} duels")}</size>", 18, Color.white);
+                    var t = Ui.Text(inner, $"<b>{(express ? "Express" : "Standard")}</b> · {fee:N0} DP\n<size=14>{(express ? "back now" : $"back after {GradingDesk.Turnaround} duels")}</size>", TextRole.Body, Color.white);
                     t.supportRichText = true;
                     Ui.Clickable(card, () => { _express = express; Show(_tab); }, style: HoverStyle.Tile);
                 }
-                Ui.Text(Ui.Box(_detail, 30, 500, 920, 20), "Fee by value: under 300 → 100 · under 900 → 300 · under 2,000 → 1,000 · 2,000 and up → 2,500", 12, new Color(0.6f, 0.65f, 0.75f), TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(_detail, 30, 500, 920, 20), "Fee by value: under 300 → 100 · under 900 → 300 · under 2,000 → 1,000 · 2,000 and up → 2,500", TextRole.Caption, new Color(0.6f, 0.65f, 0.75f), TextAnchor.MiddleLeft);
 
                 var blocked = GradingDesk.Blocked(Profile, copy, _express, _state.NeededByDecks);
                 int cost = GradingDesk.FeeFor(Collection, copy, _express);
@@ -270,26 +270,26 @@ namespace YgoCampaign.Game
                 if (blocked == null && decks.Count > 0 && !_express)
                 {
                     var warn = Ui.Text(Ui.Box(_detail, 30, 526, 920, 22),
-                        $"<color=#E3A21A>▲ {CampaignState.SlugTitle(decks[0])}{(decks.Count > 1 ? $" and {decks.Count - 1} more" : "")} plays another copy while this one's away.</color>", 14, Color.white, TextAnchor.MiddleLeft);
+                        $"<color=#E3A21A>▲ {CampaignState.SlugTitle(decks[0])}{(decks.Count > 1 ? $" and {decks.Count - 1} more" : "")} plays another copy while this one's away.</color>", TextRole.Caption, Color.white, TextAnchor.MiddleLeft);
                     warn.supportRichText = true;
                 }
                 if (blocked != null)
                 {
-                    var why = Ui.Text(Ui.Box(_detail, 30, 526, 920, 22), $"<color=#FF8A8A>▲ {blocked}</color>", 14, Color.white, TextAnchor.MiddleLeft);
+                    var why = Ui.Text(Ui.Box(_detail, 30, 526, 920, 22), $"<color=#FF8A8A>▲ {blocked}</color>", TextRole.Caption, Color.white, TextAnchor.MiddleLeft);
                     why.supportRichText = true;
                 }
                 var key = $"grade:{copy.Id}:{_express}";
                 bool armed = _armed == key && Time.unscaledTime - _armedAt < 5;
                 var submit = Ui.BoxButton(_detail, 30, 556, 440, 70,
                     armed ? $"Confirm · {cost:N0} DP" : copy.IsSlab ? $"Crack and resubmit · {cost:N0} DP" : $"Send to Gauge & Gilt · {cost:N0} DP",
-                    () => Submit(copy, key), 22);
+                    () => Submit(copy, key), TextRole.Subhead);
                 submit.targetGraphic.color = blocked != null ? Ui.Hex("#2A3448") : armed ? Ui.Hex("#FFC940") : Ui.Hex("#B8432F");
                 if (armed) submit.GetComponentInChildren<Text>().color = Ui.Hex("#161B27");
                 if (copy.IsSlab)
                 {
                     var crackKey = $"crack:{copy.Id}";
                     bool crackArmed = _armed == crackKey && Time.unscaledTime - _armedAt < 5;
-                    Ui.BoxButton(_detail, 490, 556, 300, 70, crackArmed ? "Crack: it becomes Raw again" : "Crack · free", () => Crack(copy, crackKey), 18);
+                    Ui.BoxButton(_detail, 490, 556, 300, 70, crackArmed ? "Crack: it becomes Raw again" : "Crack · free", () => Crack(copy, crackKey), TextRole.Label);
                 }
             }
             AtTheDesk();
@@ -309,7 +309,7 @@ namespace YgoCampaign.Game
         private void AtTheDesk()
         {
             var away = GradingDesk.AtDesk(Profile).OrderBy(c => c.ReadyAt).ToList();
-            Ui.Text(Ui.Box(_detail, 30, 650, 920, 20), away.Count == 0 ? "AT THE DESK · nothing yet" : "AT THE DESK", 13, new Color(1, 1, 1, 0.5f), TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(_detail, 30, 650, 920, 20), away.Count == 0 ? "AT THE DESK · nothing yet" : "AT THE DESK", TextRole.Caption, new Color(1, 1, 1, 0.5f), TextAnchor.MiddleLeft);
             for (int i = 0; i < away.Count && i < 2; i++)
             {
                 var copy = away[i];
@@ -319,12 +319,12 @@ namespace YgoCampaign.Game
                 Thumb(row, new Vector2(-460 + 24, 0), new Vector2(34, 50), copy, info);
                 int left = GradingDesk.DuelsLeft(Profile, copy);
                 bool ready = GradingDesk.IsReady(Profile, copy);
-                Ui.Text(Ui.Box(row, 52, 0, 520, 56), $"{info?.Name}\n<size=13>{(ready ? "Ready" : $"Standard · back in {left} duel{(left == 1 ? "" : "s")}")}</size>", 16, Color.white, TextAnchor.MiddleLeft).supportRichText = true;
+                Ui.Text(Ui.Box(row, 52, 0, 520, 56), $"{info?.Name}\n<size=14>{(ready ? "Ready" : $"Standard · back in {left} duel{(left == 1 ? "" : "s")}")}</size>", TextRole.Small, Color.white, TextAnchor.MiddleLeft).supportRichText = true;
                 for (int p = 0; p < GradingDesk.Turnaround; p++)
                     Ui.Image(Ui.Box(row, 600 + p * 20, 21, 14, 14), p < GradingDesk.Turnaround - left ? Ui.Hex("#C9A04A") : Ui.Hex("#3A4256")).raycastTarget = false;
-                if (ready) Ui.BoxButton(row, 770, 8, 140, 40, "Collect", () => Collect(copy), 16).targetGraphic.color = Ui.Hex("#B8432F");
+                if (ready) Ui.BoxButton(row, 770, 8, 140, 40, "Collect", () => Collect(copy), TextRole.Label).targetGraphic.color = Ui.Hex("#B8432F");
             }
-            if (away.Count > 2) Ui.Text(Ui.Box(_detail, 30, 800, 920, 20), $"…and {away.Count - 2} more", 13, new Color(0.6f, 0.65f, 0.75f), TextAnchor.MiddleLeft);
+            if (away.Count > 2) Ui.Text(Ui.Box(_detail, 30, 800, 920, 20), $"…and {away.Count - 2} more", TextRole.Caption, new Color(0.6f, 0.65f, 0.75f), TextAnchor.MiddleLeft);
         }
 
         private bool Arm(string key)
@@ -405,17 +405,17 @@ namespace YgoCampaign.Game
                     if (beat == SlabReveal.Beat.Number)
                     {
                         PackSounds.SlabNumber(copy.Rarity, copy.Slab);
-                        var echo = Ui.Text(Ui.Placed("Echo", overlay, new Vector2(0, 380), new Vector2(300, 140)), copy.Slab.ToString(), 96, Ui.Hex("#F3E3B5"));
+                        var echo = Ui.Text(Ui.Placed("Echo", overlay, new Vector2(0, 380), new Vector2(300, 140)), copy.Slab.ToString(), TextRole.Display, Ui.Hex("#F3E3B5"));
                         Typography.Strong(echo);
                         StartCoroutine(Fade(echo, 0.5f));
                         return;
                     }
                     Sounds.Play("level_up", 0.5f);
                     var worth = Ui.Text(Ui.Placed("Worth", overlay, new Vector2(0, -300), new Vector2(900, 30)),
-                        $"Worth now <color=#FFC940>{Collection.Value(copy):N0} DP</color>", 18, Color.white);
+                        $"Worth now <color=#FFC940>{Collection.Value(copy):N0} DP</color>", TextRole.Body, Color.white);
                     worth.supportRichText = true;
                     Say(copy.Slab >= 10 ? "Gem Mint. I don't say that often." : copy.Slab >= 9 ? "Mint. A clean card." : copy.Slab >= 7 ? "Near Mint. Honest wear." : "It is what it is. The slab keeps it that way.");
-                    Ui.BoxButton(overlay, 760, 960, 400, 60, _reveals.Count > 0 ? $"Next slab ({_reveals.Count} left)" : "To collection", () => _revealDone = true, 20).targetGraphic.color = Ui.Hex("#B8432F");
+                    Ui.BoxButton(overlay, 760, 960, 400, 60, _reveals.Count > 0 ? $"Next slab ({_reveals.Count} left)" : "To collection", () => _revealDone = true, TextRole.Label).targetGraphic.color = Ui.Hex("#B8432F");
                 });
                 while (!_revealDone && _overlay != null) yield return null;
                 if (_overlay == null) yield break;
@@ -442,19 +442,19 @@ namespace YgoCampaign.Game
         {
             var picks = _picks.Where(c => Collection.All.Contains(c)).ToList();
             Ui.Text(Ui.Box(_detail, 30, 20, 920, 24), picks.Count == 0 ? "SELLING NOTHING YET · tick copies on the left" : $"SELLING {picks.Count} COP{(picks.Count == 1 ? "Y" : "IES")}",
-                13, new Color(1, 1, 1, 0.5f), TextAnchor.MiddleLeft);
+                TextRole.Caption, new Color(1, 1, 1, 0.5f), TextAnchor.MiddleLeft);
             for (int i = 0; i < picks.Count && i < 12; i++)
                 Ui.Text(Ui.Box(_detail, 30, 52 + i * 30, 920, 28), $"{_cards.Get(picks[i].Code)?.Name} · {CardFoil.ColoredName(picks[i].Rarity)} · pays <color=#FFC940>{Collection.SellPrice(picks[i]):N0} DP</color>",
-                    16, Color.white, TextAnchor.MiddleLeft).supportRichText = true;
+                    TextRole.Small, Color.white, TextAnchor.MiddleLeft).supportRichText = true;
             int total = picks.Sum(Collection.SellPrice);
-            Ui.Text(Ui.Box(_detail, 30, 520, 920, 40), $"You get {total:N0} DP", 28, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
-            Ui.Text(Ui.Box(_detail, 30, 562, 920, 24), $"DP after: {Profile.Dp + total:N0}", 16, new Color(0.8f, 0.83f, 0.9f), TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(_detail, 30, 520, 920, 40), $"You get {total:N0} DP", TextRole.Heading, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(_detail, 30, 562, 920, 24), $"DP after: {Profile.Dp + total:N0}", TextRole.Small, new Color(0.8f, 0.83f, 0.9f), TextAnchor.MiddleLeft);
             Ui.Text(Ui.Box(_detail, 30, 600, 920, 40), "The desk pays 25% of a copy's value, never more than half of what you paid for it. Gifts (your starter, the trader, rewards) aren't for sale; "
-                + "neither is a copy one of your decks needs.", 13, new Color(0.54f, 0.56f, 0.6f), TextAnchor.UpperLeft);
+                + "neither is a copy one of your decks needs.", TextRole.Caption, new Color(0.54f, 0.56f, 0.6f), TextAnchor.UpperLeft);
             if (picks.Count == 0) return;
             var key = "sell:" + string.Join(",", picks.Select(c => c.Id).OrderBy(x => x));
             bool armed = _armed == key && Time.unscaledTime - _armedAt < 5;
-            var sell = Ui.BoxButton(_detail, 30, 720, 440, 70, armed ? $"Confirm: sell {picks.Count}" : $"Sell {picks.Count} cop{(picks.Count == 1 ? "y" : "ies")} · +{total:N0} DP", () => Sell(picks, key), 22);
+            var sell = Ui.BoxButton(_detail, 30, 720, 440, 70, armed ? $"Confirm: sell {picks.Count}" : $"Sell {picks.Count} cop{(picks.Count == 1 ? "y" : "ies")} · +{total:N0} DP", () => Sell(picks, key), TextRole.Subhead);
             sell.targetGraphic.color = armed ? Ui.Hex("#FFC940") : Ui.Hex("#B8432F");
             if (armed) sell.GetComponentInChildren<Text>().color = Ui.Hex("#161B27");
         }
@@ -477,7 +477,7 @@ namespace YgoCampaign.Game
             _pageLabel.text = "";
             var listings = _state.MarketListings();
             int refresh = UsedMarket.DuelsToRefresh(Profile);
-            var countdown = Ui.Text(Ui.Box(_tabs, 640, 0, 260, 48), $"New listings in {refresh} duel{(refresh == 1 ? "" : "s")}", 16, Color.white, TextAnchor.MiddleLeft);
+            var countdown = Ui.Text(Ui.Box(_tabs, 640, 0, 260, 48), $"New listings in {refresh} duel{(refresh == 1 ? "" : "s")}", TextRole.Small, Color.white, TextAnchor.MiddleLeft);
             countdown.horizontalOverflow = HorizontalWrapMode.Overflow;
             // The grid takes the list's place and more: 6 across, 4 down.
             for (int i = 0; i < listings.Count; i++)
@@ -498,14 +498,12 @@ namespace YgoCampaign.Game
                     star.raycastTarget = false;
                 }
                 var chip = Ui.Text(Ui.Box(tile, 4, 104, 122, 18),
-                    l.Copy.IsSlab ? $"<color=#2B2118>{Grades.Glyph(l.Copy.Slab)} {Grades.Label(l.Copy.Slab)}</color>" : $"<color={Grades.Color(l.Copy.Shown)}>{Grades.Glyph(l.Copy.Shown)} {Grades.Word(l.Copy.Shown)}</color>", 11, Color.white);
+                    l.Copy.IsSlab ? $"<color=#2B2118>{Grades.Glyph(l.Copy.Slab)} {Grades.Label(l.Copy.Slab)}</color>" : $"<color={Grades.Color(l.Copy.Shown)}>{Grades.Glyph(l.Copy.Shown)} {Grades.Word(l.Copy.Shown)}</color>", TextRole.Caption, Color.white);
                 chip.supportRichText = true;
                 if (l.Copy.IsSlab) Ui.Image(Ui.Box(tile, 24, 104, 82, 18), Ui.Hex("#EFE6D2")).transform.SetSiblingIndex(chip.transform.GetSiblingIndex());
-                var name = Ui.Text(Ui.Box(tile, 4, 122, 122, 28), info?.Name ?? "", 11, Color.white, TextAnchor.UpperCenter);
-                name.resizeTextForBestFit = true;
-                name.resizeTextMinSize = 8;
-                name.resizeTextMaxSize = 11;
-                Typography.Strong(Ui.Text(Ui.Box(tile, 4, 150, 122, 18), l.Sold ? "SOLD" : $"{l.Price:N0} DP", 14, l.Sold ? Ui.Hex("#8A8F9A") : Ui.Hex("#FFC940")));
+                // One line at the floor, cut with "…" (two don't fit over the price at 14; the tile shows the card).
+                Ui.OneLine(Ui.Text(Ui.Box(tile, 4, 123, 122, 26), info?.Name ?? "", TextRole.Caption, Color.white));
+                Typography.Strong(Ui.Text(Ui.Box(tile, 4, 150, 122, 18), l.Sold ? "SOLD" : $"{l.Price:N0} DP", TextRole.Caption, l.Sold ? Ui.Hex("#8A8F9A") : Ui.Hex("#FFC940")));
                 if (l.Sold) tile.gameObject.AddComponent<CanvasGroup>().alpha = 0.4f;
                 var pick = l;
                 int at = i;
@@ -517,11 +515,11 @@ namespace YgoCampaign.Game
         private void MarketDetail(List<Listing> listings)
         {
             var l = _listing == null ? null : listings.FirstOrDefault(x => x.Slot == _listing.Slot);
-            Ui.BoxButton(_detail, 30, 740, 300, 46, "Special order…", SpecialOrder, 18);
+            Ui.BoxButton(_detail, 30, 740, 300, 46, "Special order…", SpecialOrder, TextRole.Label);
             if (l == null)
             {
                 Ui.Text(Ui.Box(_detail, 30, 20, 920, 80), "Second-hand copies of real printings at their value: more of them worn than a pack's, some in slabs. "
-                    + "Stars mark cards on your wishlist.", 17, new Color(0.8f, 0.83f, 0.9f), TextAnchor.UpperLeft);
+                    + "Stars mark cards on your wishlist.", TextRole.Body, new Color(0.8f, 0.83f, 0.9f), TextAnchor.UpperLeft);
                 return;
             }
             var info = _cards.Get(l.Copy.Code);
@@ -530,17 +528,17 @@ namespace YgoCampaign.Game
             var facts = Ui.Text(Ui.Box(_detail, 300, 20, 650, 200),
                 $"<b><size=26>{info?.Name}</size></b>\n{(CardDetail.PrintingLine(l.Copy) is { Length: > 0 } printed ? printed : SetCode(l.Copy))} · {CardFoil.ColoredName(l.Copy.Rarity)}\n"
                 + $"<color={Grades.Color(l.Copy.Shown)}>{Grades.Glyph(l.Copy.Shown)} {Grades.Describe(l.Copy)}</color>\nPrice = value <color=#FFC940>{l.Price:N0} DP</color>",
-                17, Color.white, TextAnchor.UpperLeft);
+                TextRole.Body, Color.white, TextAnchor.UpperLeft);
             facts.supportRichText = true;
             var blocked = UsedMarket.Blocked(Profile, l);
-            if (blocked != null) { Ui.Text(Ui.Box(_detail, 300, 230, 650, 24), $"<color=#FF8A8A>▲ {blocked}</color>", 14, Color.white, TextAnchor.MiddleLeft).supportRichText = true; return; }
+            if (blocked != null) { Ui.Text(Ui.Box(_detail, 300, 230, 650, 24), $"<color=#FF8A8A>▲ {blocked}</color>", TextRole.Caption, Color.white, TextAnchor.MiddleLeft).supportRichText = true; return; }
             var key = $"buy:{l.Slot}:{UsedMarket.Epoch(Profile)}";
             bool armed = _armed == key && Time.unscaledTime - _armedAt < 5;
             var buy = Ui.BoxButton(_detail, 30, 640, 440, 70, armed ? $"Confirm · {l.Price:N0} DP" : $"Buy · {l.Price:N0} DP", () =>
             {
                 if (!Arm(key)) return;
                 BuyListing(l);
-            }, 22);
+            }, TextRole.Subhead);
             buy.targetGraphic.color = armed ? Ui.Hex("#FFC940") : Ui.Hex("#B8432F");
             if (armed) buy.GetComponentInChildren<Text>().color = Ui.Hex("#161B27");
         }
@@ -566,8 +564,8 @@ namespace YgoCampaign.Game
             Ui.Image(_overlay, new Color(0, 0, 0, 0.75f));
             var panel = Ui.Box(_overlay, 510, 230, 900, 620);
             Ui.Image(panel, Ui.Hex("#1A1F2B"));
-            Typography.Strong(Ui.Text(Ui.Box(panel, 30, 16, 840, 40), "Special order", 28, Color.white, TextAnchor.MiddleLeft));
-            Ui.Text(Ui.Box(panel, 30, 56, 840, 24), "Any printing but a card's commonest, Raw Near Mint, at its value plus half. It's here as soon as you pay.", 14, new Color(0.8f, 0.83f, 0.9f), TextAnchor.MiddleLeft);
+            Typography.Strong(Ui.Text(Ui.Box(panel, 30, 16, 840, 40), "Special order", TextRole.Heading, Color.white, TextAnchor.MiddleLeft));
+            Ui.Text(Ui.Box(panel, 30, 56, 840, 24), "Any printing but a card's commonest, Raw Near Mint, at its value plus half. It's here as soon as you pay.", TextRole.Caption, new Color(0.8f, 0.83f, 0.9f), TextAnchor.MiddleLeft);
             var results = Ui.Box(panel, 30, 140, 840, 400);
             void Find(string text)
             {
@@ -579,7 +577,7 @@ namespace YgoCampaign.Game
                 for (int i = 0; i < matches.Count; i++)
                 {
                     var info = matches[i];
-                    Ui.Text(Ui.Box(results, 0, i * 66, 300, 60), info.Name, 16, Color.white, TextAnchor.MiddleLeft);
+                    Ui.Text(Ui.Box(results, 0, i * 66, 300, 60), info.Name, TextRole.Small, Color.white, TextAnchor.MiddleLeft);
                     var options = UsedMarket.Orderable(info.Code, _state.Printings!, _cards).Take(4).ToList();
                     for (int k = 0; k < options.Count; k++)
                     {
@@ -598,13 +596,13 @@ namespace YgoCampaign.Game
                             Destroy(_overlay!.gameObject);
                             _overlay = null;
                             Show(_tab);
-                        }, 12);
+                        }, TextRole.Label);
                         b.GetComponentInChildren<Text>().resizeTextForBestFit = true;
                     }
                 }
             }
-            Ui.Input(Ui.Box(panel, 30, 90, 840, 40), "Search a card the campaign's duelists play", 16, Find);
-            Ui.BoxButton(panel, 720, 560, 150, 44, "Close", () => { Destroy(_overlay!.gameObject); _overlay = null; }, 16);
+            Ui.Input(Ui.Box(panel, 30, 90, 840, 40), "Search a card the campaign's duelists play", UiTheme.Size(TextRole.Small), Find);
+            Ui.BoxButton(panel, 720, 560, 150, 44, "Close", () => { Destroy(_overlay!.gameObject); _overlay = null; }, TextRole.Label);
         }
 
         // ---- The keyboard ------------------------------------------------------------------------------

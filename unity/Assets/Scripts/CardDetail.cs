@@ -86,13 +86,13 @@ namespace YgoCampaign.Game
             }
             _header = Box("Header");
             _headerImage = Ui.Image(_header, Ui.Hex("#2A3140"));
-            _name = Ui.Text(Ui.Stretched("Name", _header, Vector2.zero, Vector2.one), "", 20, Color.white, TextAnchor.MiddleLeft);
+            _name = Ui.Text(Ui.Stretched("Name", _header, Vector2.zero, Vector2.one), "", TextRole.Label, Color.white, TextAnchor.MiddleLeft);
             Typography.Strong(_name);
             _name.rectTransform.offsetMin = new Vector2(10, 0);
             _name.rectTransform.offsetMax = new Vector2(-40, 0);
             _name.resizeTextForBestFit = true;
-            _name.resizeTextMinSize = 12;
-            _name.resizeTextMaxSize = 20;
+            _name.resizeTextMinSize = UiTheme.Floor;
+            _name.resizeTextMaxSize = UiTheme.Size(TextRole.Label);
             Shadow(_name);
             var disc = Ui.Rect("Attribute", _header);
             disc.anchorMin = disc.anchorMax = new Vector2(1, 0.5f);
@@ -120,7 +120,7 @@ namespace YgoCampaign.Game
             _rarityRt.anchoredPosition = new Vector2(4, 8);
             _rarityRt.sizeDelta = new Vector2(44, 22);
             _rarityImage = Ui.Image(_rarityRt, Ui.Hex("#E07A1F"));
-            _rarity = Ui.Text(_rarityRt, "", 14, Color.white);
+            _rarity = Ui.Text(_rarityRt, "", TextRole.Caption, Color.white);
             Typography.Strong(_rarity);
 
             // Artwork: the card's next art style (right-click: the previous one).
@@ -131,12 +131,12 @@ namespace YgoCampaign.Game
             _styleChip.sizeDelta = reading ? new Vector2(220, 40) : new Vector2(124, 24);
             Ui.Image(_styleChip, new Color(0.04f, 0.05f, 0.08f, 0.85f));
             _styleChip.gameObject.AddComponent<Outline>().effectColor = new Color(1f, 0.79f, 0.25f, 0.7f);
-            _styleLabel = Ui.Text(Ui.Stretched("Label", _styleChip, Vector2.zero, Vector2.one), "", reading ? 19 : 13, Ui.Hex("#FFC940"));
+            _styleLabel = Ui.Text(Ui.Stretched("Label", _styleChip, Vector2.zero, Vector2.one), "", reading ? TextRole.Label : TextRole.Caption, Ui.Hex("#FFC940"));
             Typography.Strong(_styleLabel);
             _styleLabel.raycastTarget = false;
             _styleLabel.resizeTextForBestFit = true;
-            _styleLabel.resizeTextMinSize = 9;
-            _styleLabel.resizeTextMaxSize = reading ? 19 : 13;
+            _styleLabel.resizeTextMinSize = UiTheme.Floor;
+            _styleLabel.resizeTextMaxSize = _styleLabel.fontSize;
             Ui.Clickable(_styleChip, () => CycleStyle(+1), () => CycleStyle(-1));
             _styleTip = _styleChip.gameObject.AddComponent<TipOnHover>();
             _styleTip.Title = "Artwork";
@@ -154,28 +154,28 @@ namespace YgoCampaign.Game
                 icon.sizeDelta = new Vector2(26, 26);
                 var image = icon.gameObject.AddComponent<RawImage>();
                 image.raycastTarget = false;
-                var value = Ui.Text(Ui.Stretched("Value", row, Vector2.zero, Vector2.one), "", 24, Color.white, TextAnchor.MiddleLeft);
+                var value = Ui.Text(Ui.Stretched("Value", row, Vector2.zero, Vector2.one), "", TextRole.Heading, Color.white, TextAnchor.MiddleLeft);
                 value.rectTransform.offsetMin = new Vector2(34, 0);
                 Typography.Strong(value);
                 value.supportRichText = true;
                 value.resizeTextForBestFit = true;
-                value.resizeTextMinSize = 12;
-                value.resizeTextMaxSize = 24;
+                value.resizeTextMinSize = UiTheme.Floor;
+                value.resizeTextMaxSize = UiTheme.Size(TextRole.Heading);
                 _rows.Add((row, image, value));
             }
-            _version = Ui.Text(Ui.Rect("Version", _stats), "", 14, Ui.Hex("#FFB347"), TextAnchor.UpperLeft);
-            _printing = Ui.Text(Ui.Rect("Printing", _stats), "", 14, new Color(0.75f, 0.78f, 0.85f), TextAnchor.UpperLeft);
+            _version = Ui.Text(Ui.Rect("Version", _stats), "", TextRole.Caption, Ui.Hex("#FFB347"), TextAnchor.UpperLeft);
+            _printing = Ui.Text(Ui.Rect("Printing", _stats), "", TextRole.Caption, new Color(0.75f, 0.78f, 0.85f), TextAnchor.UpperLeft);
             _printing.supportRichText = true;
 
             _typeBar = Box("TypeBar");
             _typeImage = Ui.Image(_typeBar, Ui.Hex("#2A3140"));
-            _type = Ui.Text(Ui.Stretched("Type", _typeBar, Vector2.zero, Vector2.one), "", 16, Color.white, TextAnchor.MiddleLeft);
+            _type = Ui.Text(Ui.Stretched("Type", _typeBar, Vector2.zero, Vector2.one), "", TextRole.Small, Color.white, TextAnchor.MiddleLeft);
             Typography.Strong(_type);
             _type.rectTransform.offsetMin = new Vector2(8, 0);
             _type.rectTransform.offsetMax = new Vector2(-30, 0); // room for the "?" chip
             _type.resizeTextForBestFit = true;
-            _type.resizeTextMinSize = 10;
-            _type.resizeTextMaxSize = 16;
+            _type.resizeTextMinSize = UiTheme.Floor;
+            _type.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
             Shadow(_type);
 
             _tagRow = Box("Tags");
@@ -190,7 +190,7 @@ namespace YgoCampaign.Game
             _textContent.pivot = new Vector2(0.5f, 1);
             _textContent.offsetMin = new Vector2(8, -10);
             _textContent.offsetMax = new Vector2(-8, -6);
-            _text = Ui.Text(_textContent, "", 16, Ui.Hex("#D8DEE8"), TextAnchor.UpperLeft);
+            _text = Ui.Text(_textContent, "", TextRole.Small, Ui.Hex("#D8DEE8"), TextAnchor.UpperLeft);
             _text.supportRichText = true;
             _text.verticalOverflow = VerticalWrapMode.Overflow;
             _text.raycastTarget = true;
@@ -212,7 +212,7 @@ namespace YgoCampaign.Game
             var chipDisc = _helpChip.gameObject.AddComponent<RawImage>();
             chipDisc.texture = Icons.Round;
             chipDisc.color = new Color(0, 0, 0, 0.35f);
-            var chipText = Ui.Text(Ui.Stretched("Q", _helpChip, Vector2.zero, Vector2.one), "?", 15, Ui.Hex(TermColor));
+            var chipText = Ui.Text(Ui.Stretched("Q", _helpChip, Vector2.zero, Vector2.one), "?", TextRole.Small, Ui.Hex(TermColor));
             Typography.Strong(chipText);
             var tip = _helpChip.gameObject.AddComponent<TipOnHover>();
             tip.Title = "Reading card text";
@@ -220,20 +220,20 @@ namespace YgoCampaign.Game
             Ui.Clickable(_textView, () => { if (_shown != null) Clicked?.Invoke(_shown); });
             _art.raycastTarget = true;
             Ui.Clickable(_artRt, () => { if (_shown != null) Clicked?.Invoke(_shown); });
-            _hint = Ui.Text(Ui.Stretched("Hint", root, Vector2.zero, Vector2.one), "Hover a card to read it.", 16, new Color(0.85f, 0.87f, 0.9f), TextAnchor.UpperLeft);
+            _hint = Ui.Text(Ui.Stretched("Hint", root, Vector2.zero, Vector2.one), "Hover a card to read it.", TextRole.Small, new Color(0.85f, 0.87f, 0.9f), TextAnchor.UpperLeft);
             if (reading)
             {
-                _name.fontSize = _name.resizeTextMaxSize = 30;
+                _name.fontSize = _name.resizeTextMaxSize = UiTheme.Size(TextRole.Title);
                 disc.sizeDelta = new Vector2(42, 42);
                 disc.anchoredPosition = new Vector2(-28, 0);
                 ((RectTransform)rim.transform).sizeDelta = new Vector2(46, 46);
                 fill.sizeDelta = new Vector2(40, 40);
                 _name.rectTransform.offsetMin = new Vector2(18, 0);
                 _name.rectTransform.offsetMax = new Vector2(-60, 0);
-                _type.fontSize = _type.resizeTextMaxSize = 22;
+                _type.fontSize = _type.resizeTextMaxSize = UiTheme.Size(TextRole.Subhead);
                 _type.rectTransform.offsetMin = new Vector2(14, 0);
-                _version.fontSize = 16;
-                _printing.fontSize = 15;
+                _version.fontSize = UiTheme.Size(TextRole.Small);
+                _printing.fontSize = UiTheme.Size(TextRole.Small);
                 foreach (var (_, icon, value) in _rows)
                 {
                     icon.rectTransform.sizeDelta = new Vector2(36, 36);
@@ -592,7 +592,7 @@ namespace YgoCampaign.Game
                 float textTop = headerH + gap + 56 + (tagsH > 0 ? tagsH + 4 : 0);
                 Place(_textView, statX, textTop, statW, WholeLines(size.y - textTop - BottomReserve));
             }
-            foreach (var (_, _, value) in _rows) value.resizeTextMaxSize = full ? 24 : 15;
+            foreach (var (_, _, value) in _rows) value.resizeTextMaxSize = UiTheme.Size(full ? TextRole.Heading : TextRole.Small);
             RefitArt();
         }
 
@@ -685,15 +685,20 @@ namespace YgoCampaign.Game
             var tag = OriginalTag(c);
             if (tag.Length == 0) return;
             var T = UiTheme.Current;
-            var band = Ui.Box(tile, x, y, w, 16);
+            var band = Ui.Box(tile, x, y - 2, w, 18);
             band.name = "Original";
             Ui.Image(band, T.GlassSoft.WithAlpha(0.9f)).raycastTarget = false;
-            var text = Ui.Text(band, tag, 10, T.GoldSoft);
+            var text = Ui.Text(band, tag, TextRole.Caption, T.GoldSoft);
             Typography.Strong(text);
-            text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = 7;
-            text.resizeTextMaxSize = 10;
             text.raycastTarget = false;
+            // At the floor a narrow tile has no room for "ORIGINAL TEXT · 2004": "ORIGINAL · 2004", then cut with "…".
+            Ui.OneLine(text);
+            if (text.text.EndsWith("…") && tag.Contains("ORIGINAL TEXT"))
+            {
+                text.text = tag.Replace("ORIGINAL TEXT", "ORIGINAL");
+                text.fontSize = UiTheme.Size(TextRole.Caption);
+                Ui.OneLine(text);
+            }
         }
 
         /// <summary>For checks: the copies lines shown for the card on show (no markup); "" outside the campaign.</summary>
@@ -705,13 +710,32 @@ namespace YgoCampaign.Game
         /// </summary>
         private void FitPrinting()
         {
-            // Your copies: up to three short lines, shrunk to fit rather than cut.
+            // Your copies: up to three short lines, shrunk to fit down to the floor; past that the last lines go and the
+            // last kept one ends in "…" (a narrow column: the board's detail at 1280x720).
+            _printing.fontSize = UiTheme.Size(_reading ? TextRole.Small : TextRole.Caption);
             _printing.resizeTextForBestFit = _copiesText.Length > 0;
-            _printing.resizeTextMinSize = 9;
-            _printing.resizeTextMaxSize = Mathf.Max(9, _printing.fontSize);
+            _printing.resizeTextMinSize = UiTheme.Floor;
+            _printing.resizeTextMaxSize = _printing.fontSize;
             if (_copiesText.Length > 0)
             {
                 _printing.text = _copiesText;
+                float space = _printing.rectTransform.rect.height;
+                if (space <= 0 || HeightAt(_printing, _copiesText, UiTheme.Floor) <= space + 0.5f) return;
+                var kept = _copiesText.Split('\n').ToList();
+                while (kept.Count > 1 && HeightAt(_printing, string.Join("\n", kept) + " …", UiTheme.Floor) > space + 0.5f) kept.RemoveAt(kept.Count - 1);
+                string head = string.Join("\n", kept.Take(kept.Count - 1));
+                string last = kept[kept.Count - 1];
+                string Join(string l) => (head.Length > 0 ? head + "\n" : "") + l;
+                if (HeightAt(_printing, Join(last + " …"), UiTheme.Floor) > space + 0.5f)
+                {
+                    last = System.Text.RegularExpressions.Regex.Replace(last, "<.*?>", "");
+                    while (last.Length > 1 && HeightAt(_printing, Join(last + "…"), UiTheme.Floor) > space + 0.5f) last = last.Substring(0, last.Length - 1);
+                    last = last.TrimEnd(' ', '·') + "…";
+                }
+                else last += " …";
+                _printing.resizeTextForBestFit = false;
+                _printing.fontSize = UiTheme.Floor;
+                _printing.text = Join(last);
                 return;
             }
             _printing.text = _printingFull;
@@ -729,6 +753,15 @@ namespace YgoCampaign.Game
             // Still too long: the set code alone, then what's left.
             var code = lines[0].Split(new[] { "  " }, StringSplitOptions.None)[0];
             _printing.text = code + " …" + rest;
+        }
+
+        /// <summary>A text's height (layout units) for <paramref name="s"/> at <paramref name="size"/> in its box's width.</summary>
+        private static float HeightAt(Text t, string s, int size)
+        {
+            var settings = t.GetGenerationSettings(new Vector2(t.rectTransform.rect.width, 0));
+            settings.resizeTextForBestFit = false;
+            settings.fontSize = size;
+            return t.cachedTextGeneratorForLayout.GetPreferredHeight(s, settings) / t.pixelsPerUnit;
         }
 
         /// <summary>
@@ -764,7 +797,7 @@ namespace YgoCampaign.Game
             PlaceTags(w);
             y += tagsH + (tagsH > 0 ? 8 : 0);
             Place(_textView, x, y, w, size.y - y - 20);
-            foreach (var (_, _, value) in _rows) value.resizeTextMaxSize = 32;
+            foreach (var (_, _, value) in _rows) value.resizeTextMaxSize = UiTheme.Size(TextRole.Title);
         }
 
         /// <summary>
@@ -802,7 +835,7 @@ namespace YgoCampaign.Game
             var edge = chip.gameObject.AddComponent<Outline>();
             edge.effectColor = speed ? Ui.Hex("#FFC940") : archetype ? new Color(0.55f, 0.75f, 1f, 0.6f) : new Color(1, 1, 1, 0.25f);
             edge.effectDistance = new Vector2(1, -1);
-            var text = Ui.Text(Ui.Stretched("Label", chip, Vector2.zero, Vector2.one), label, FxSettings.Scaled(13), speed ? Ui.Hex("#FFD86A") : Ui.Hex("#D8DEE8"));
+            var text = Ui.Text(Ui.Stretched("Label", chip, Vector2.zero, Vector2.one), label, UiTheme.Size(TextRole.Caption, reading: true), speed ? Ui.Hex("#FFD86A") : Ui.Hex("#D8DEE8"));
             Typography.Weight(text, speed);
             text.horizontalOverflow = HorizontalWrapMode.Overflow;
             text.raycastTarget = false;
@@ -950,7 +983,7 @@ namespace YgoCampaign.Game
             fade.raycastTarget = false;
             var more = Ui.Stretched("More", h._strip, Vector2.zero, Vector2.one);
             more.offsetMax = new Vector2(-BarWidth - 6, 0);
-            h._more = Ui.Text(more, "▼ more", 12, T.TextSoft, TextAnchor.MiddleRight);
+            h._more = Ui.Text(more, "▼ more", TextRole.Caption, T.TextSoft, TextAnchor.MiddleRight);
             Typography.Strong(h._more);
             // The bar: a faint track and its thumb, at the box's right edge.
             h._track = Ui.Stretched("Bar", view, new Vector2(1, 0), Vector2.one);

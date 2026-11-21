@@ -154,17 +154,17 @@ namespace YgoCampaign.Game
                 outline.effectDistance = new Vector2(4, -4);
                 title.gameObject.AddComponent<Shadow>().effectDistance = new Vector2(0, -10);
             }
-            Typography.Italic(Ui.Text(Ui.Placed("Subtitle", _logo, new Vector2(0, subtitleY), new Vector2(1200, 50)), GameInfo.Subtitle.ToUpperInvariant(), 30,
+            Typography.Italic(Ui.Text(Ui.Placed("Subtitle", _logo, new Vector2(0, subtitleY), new Vector2(1200, 50)), GameInfo.Subtitle.ToUpperInvariant(), TextRole.Title,
                 new Color(0.85f, 0.88f, 0.95f)));
 
             _pressGlow = Glow(_root, new Vector2(0, -250), new Vector2(900, 200), new Color(0.4f, 0.65f, 1f, 0.3f));
-            _press = Ui.Text(Ui.Placed("Press", _root, new Vector2(0, -250), new Vector2(1200, 70)), "CLICK OR PRESS ANY KEY", 40, Color.white);
+            _press = Ui.Text(Ui.Placed("Press", _root, new Vector2(0, -250), new Vector2(1200, 70)), "CLICK OR PRESS ANY KEY", TextRole.Title, Color.white);
             Typography.Strong(_press);
             _press.gameObject.AddComponent<Outline>().effectColor = new Color(0.2f, 0.4f, 0.9f, 0.8f);
 
             // The attract duel plays behind: the notice gets a strip of its own so it doesn't run over the hand.
             Ui.Image(Ui.Box(_root, 0, 1028, 1920, 52), new Color(0, 0, 0, 0.75f)).raycastTarget = false;
-            Ui.Text(Ui.Box(_root, 30, 1040, 1860, 30), $"{GameInfo.Version}   ·   {GameInfo.Notice}", 14, new Color(1, 1, 1, 0.6f));
+            Ui.Text(Ui.Box(_root, 30, 1040, 1860, 30), $"{GameInfo.Version}   ·   {GameInfo.Notice}", TextRole.Caption, new Color(1, 1, 1, 0.6f));
         }
 
         /// <summary>The title wall's plain cards: the starter decks' showcase cards, then the built-in decks' (CampaignScenes.ShowcaseOf).</summary>
@@ -429,9 +429,10 @@ namespace YgoCampaign.Game
                 var h = big ? 150f : 80f;
                 var rt = Ui.Box(_root, 110, y, 760, h - 12);
                 var bg = Ui.Image(rt, Ui.Hex("#1A2030"));
-                var text = Ui.Text(Ui.Box(rt, 36, big ? 14 : 4, 700, big ? 70 : 40), label.ToUpperInvariant(), big ? 46 : 30, Color.white, TextAnchor.MiddleLeft);
+                // The first item stands out: Title (34) against Heading (26) for the rest (it was 46 against 30 before the scale).
+                var text = Ui.Text(Ui.Box(rt, 36, big ? 14 : 6, 700, big ? 70 : 36), label.ToUpperInvariant(), big ? TextRole.Title : TextRole.Heading, Color.white, TextAnchor.MiddleLeft);
                 Typography.Strong(text);
-                var sub = Ui.Text(Ui.Box(rt, 38, big ? 86 : 44, 700, big ? 44 : 22), "", big ? 19 : 15, new Color(0.72f, 0.76f, 0.86f), TextAnchor.UpperLeft);
+                var sub = Ui.Text(Ui.Box(rt, 38, big ? 84 : 44, 700, big ? 50 : 22), "", big ? UiTheme.Size(TextRole.Label) : UiTheme.Size(TextRole.Small), new Color(0.72f, 0.76f, 0.86f), TextAnchor.UpperLeft);
                 sub.supportRichText = true;
                 int index = i;
                 Ui.Clickable(rt, () => Choose(index), hover: () => Focus(index));
@@ -440,10 +441,10 @@ namespace YgoCampaign.Game
             }
 
             _showcase = Ui.Placed("Showcase", _root, new Vector2(470, 40), new Vector2(380, 554));
-            _stats = Ui.Text(Ui.Placed("Stats", _root, new Vector2(470, -300), new Vector2(700, 90)), "", 17, new Color(0.8f, 0.83f, 0.9f));
+            _stats = Ui.Text(Ui.Placed("Stats", _root, new Vector2(470, -300), new Vector2(700, 90)), "", TextRole.Body, new Color(0.8f, 0.83f, 0.9f));
             _stats.supportRichText = true;
             _notice = Ui.Box(_root, 30, 1040, 1860, 30);
-            Ui.Text(_notice, $"{GameInfo.Version}   ·   {GameInfo.Notice}", 14, new Color(1, 1, 1, 0.6f));
+            Ui.Text(_notice, $"{GameInfo.Version}   ·   {GameInfo.Notice}", TextRole.Caption, new Color(1, 1, 1, 0.6f));
         }
 
         private void ShowCard()
@@ -529,7 +530,7 @@ namespace YgoCampaign.Game
         {
             _root = Ui.Overlay(transform, "Settings", 36);
             Ui.Image(_root, Ui.Hex("#0B0E15"));
-            Typography.Strong(Ui.Text(Ui.Box(_root, 110, 60, 1000, 100), "SETTINGS", 60, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
+            Typography.Strong(Ui.Text(Ui.Box(_root, 110, 60, 1000, 100), "SETTINGS", TextRole.Display, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
             // More settings than fit: the rows scroll.
             var viewport = Ui.Box(_root, 110, 180, 1700, 760);
             Ui.Image(viewport, new Color(0, 0, 0, 0.001f));
@@ -549,8 +550,8 @@ namespace YgoCampaign.Game
             var fade = Ui.Box(_root, 110, 180 + 760 - 48, 1700, 48).gameObject.AddComponent<RawImage>();
             fade.texture = FadeTexture(Ui.Hex("#0B0E15"));
             fade.raycastTarget = false;
-            Ui.BoxButton(_root, 110, 960, 240, 60, "Back", Back, 22);
-            Ui.Text(Ui.Box(_root, 30, 1040, 1860, 30), $"{GameInfo.Version}   ·   {GameInfo.Notice}", 14, new Color(1, 1, 1, 0.6f));
+            Ui.BoxButton(_root, 110, 960, 240, 60, "Back", Back, TextRole.Subhead);
+            Ui.Text(Ui.Box(_root, 30, 1040, 1860, 30), $"{GameInfo.Version}   ·   {GameInfo.Notice}", TextRole.Caption, new Color(1, 1, 1, 0.6f));
             _root.gameObject.SetActive(false);
         }
 
@@ -575,7 +576,7 @@ namespace YgoCampaign.Game
             float y = 0;
             void Heading(string text)
             {
-                Typography.Strong(Ui.Text(Ui.Box(_rows, 6, y + 10, 1000, 34), text, 18, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
+                Typography.Strong(Ui.Text(Ui.Box(_rows, 6, y + 10, 1000, 34), text, TextRole.Body, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
                 y += 48;
             }
             string OnOff(bool on) => on ? "On" : "Off";
@@ -583,10 +584,10 @@ namespace YgoCampaign.Game
             {
                 var rt = Ui.Box(_rows, 0, y, 1700, 94);
                 Ui.Image(rt, Ui.Hex("#1A2030"));
-                Typography.Strong(Ui.Text(Ui.Box(rt, 30, 8, 500, 42), name, 26, Color.white, TextAnchor.MiddleLeft));
-                Ui.Text(Ui.Box(rt, 30, 50, 1100, 40), help, 15, new Color(0.72f, 0.76f, 0.86f), TextAnchor.UpperLeft);
-                if (change != null) Ui.BoxButton(rt, 1260, 19, 400, 56, value, () => { change(); Refresh(); }, 20);
-                else Ui.Text(Ui.Box(rt, 1160, 0, 500, 94), value, 18, Color.white, TextAnchor.MiddleRight);
+                Typography.Strong(Ui.Text(Ui.Box(rt, 30, 8, 500, 42), name, TextRole.Heading, Color.white, TextAnchor.MiddleLeft));
+                Ui.Text(Ui.Box(rt, 30, 50, 1100, 40), help, TextRole.Small, new Color(0.72f, 0.76f, 0.86f), TextAnchor.UpperLeft);
+                if (change != null) Ui.BoxButton(rt, 1260, 19, 400, 56, value, () => { change(); Refresh(); }, TextRole.Label);
+                else Ui.Text(Ui.Box(rt, 1160, 0, 500, 94), value, TextRole.Body, Color.white, TextAnchor.MiddleRight);
                 y += 104;
             }
             Heading("GAME");

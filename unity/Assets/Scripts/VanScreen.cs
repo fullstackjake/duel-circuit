@@ -137,23 +137,23 @@ namespace YgoCampaign.Game
             Ui.Image(face, T.Well);
             if (!Portraits.Place(face, "moth")) AlleyMaterials.Silhouette(face, T.TextDim);
             // The van's sign (neon is for signs), and the plate under it.
-            _sign = Ui.Text(Ui.Box(_root, 126, 16, 600, 28), "MOTH'S VAN", 18, UiTheme.NeonCyan, TextAnchor.MiddleLeft);
+            _sign = Ui.Text(Ui.Box(_root, 126, 16, 600, 28), "MOTH'S VAN", TextRole.Body, UiTheme.NeonCyan, TextAnchor.MiddleLeft);
             T.Title(_sign);
             _sign.gameObject.AddComponent<Outline>().effectColor = UiTheme.NeonCyan.WithAlpha(0.35f);
-            _plate = Ui.Text(Ui.Box(_root, 126, 42, 640, 56), "UNDER THE COUNTER", 34, T.Sign, TextAnchor.MiddleLeft);
+            _plate = Ui.Text(Ui.Box(_root, 126, 42, 640, 56), "UNDER THE COUNTER", TextRole.Title, T.Sign, TextAnchor.MiddleLeft);
             T.Title(_plate);
-            _dp = Typography.Counter(Ui.Text(Ui.Box(_root, 780, 12, 900, 92), "", 24, T.Gold, TextAnchor.MiddleLeft));
+            _dp = Typography.Counter(Ui.Text(Ui.Box(_root, 780, 12, 900, 92), "", TextRole.Heading, T.Gold, TextAnchor.MiddleLeft));
             _dp.supportRichText = true;
-            Ui.BoxButton(_root, 1720, 34, 160, 46, "Back", Close, 18).targetGraphic.color = T.Button;
+            Ui.BoxButton(_root, 1720, 34, 160, 46, "Back", Close, TextRole.Label).targetGraphic.color = T.Button;
             _tabs = Ui.Box(_root, 40, 118, 1840, 48);
-            _searchBox = Ui.Input(Ui.Box(_root, 40, 178, 820, 44), "Search your copies by name", 16, v => { _search = v; _page = 0; Show(_tab); }).gameObject;
+            _searchBox = Ui.Input(Ui.Box(_root, 40, 178, 820, 44), "Search your copies by name", UiTheme.Size(TextRole.Small), v => { _search = v; _page = 0; Show(_tab); }).gameObject;
             _list = Ui.Box(_root, 40, 180, 820, 760);
-            _prev = Ui.BoxButton(_root, 40, 950, 140, 40, "< Prev", () => { _page--; Show(_tab); }).gameObject;
-            _pageLabel = Ui.Text(Ui.Box(_root, 190, 950, 480, 40), "", 16, T.TextMuted);
-            _next = Ui.BoxButton(_root, 720, 950, 140, 40, "Next >", () => { _page++; Show(_tab); }).gameObject;
+            _prev = Ui.BoxButton(_root, 40, 950, 140, 40, "< Prev", () => { _page--; Show(_tab); }, TextRole.Label).gameObject;
+            _pageLabel = Ui.Text(Ui.Box(_root, 190, 950, 480, 40), "", TextRole.Small, T.TextMuted);
+            _next = Ui.BoxButton(_root, 720, 950, 140, 40, "Next >", () => { _page++; Show(_tab); }, TextRole.Label).gameObject;
             _detail = Ui.Box(_root, 900, 180, 980, 810);
             Ui.Image(_detail, T.Panel);
-            _status = Ui.Text(Ui.Box(_root, 40, 1004, 1840, 54), "", 17, T.TextSoft, TextAnchor.MiddleLeft);
+            _status = Ui.Text(Ui.Box(_root, 40, 1004, 1840, 54), "", TextRole.Body, T.TextSoft, TextAnchor.MiddleLeft);
             _status.supportRichText = true;
             _root.gameObject.SetActive(open);
         }
@@ -179,13 +179,13 @@ namespace YgoCampaign.Game
             _tab = tab;
             int held = Profile.AnteLive?.Held ?? 0;
             _dp.text = $"{Profile.Dp:N0} DP" + (held > 0 ? $" <size=18><color={T.TextDimHex}>({held:N0} held)</color></size>" : "")
-                       + $"   <size=17><color={T.TextDimHex}>{Collection.Total:N0} cards</color></size>";
+                       + $"   <size=18><color={T.TextDimHex}>{Collection.Total:N0} cards</color></size>";
             Clear(_tabs);
             var names = new[] { "Shelf", "Used & graded", "Sell" };
             for (int i = 0; i < names.Length; i++)
             {
                 var t = (Tab)i;
-                var button = Ui.BoxButton(_tabs, i * 248, 0, 240, 48, names[i], () => Show(t), 18);
+                var button = Ui.BoxButton(_tabs, i * 248, 0, 240, 48, names[i], () => Show(t), TextRole.Label);
                 button.targetGraphic.color = t == tab ? T.TabOn : T.ButtonOff;
                 var label = button.GetComponentInChildren<Text>();
                 label.color = t == tab ? T.Gold : T.TextDim;
@@ -264,22 +264,22 @@ namespace YgoCampaign.Game
         /// <summary>A card's name over its facts, in the strong face (its own text: rich-text bold would be a faux weight).</summary>
         private void CardName(float y, string? name)
         {
-            var t = Typography.Strong(Ui.Text(Ui.Box(_detail, 300, y, 650, 32), name ?? "", 26, UiTheme.Current.Text, TextAnchor.UpperLeft));
+            var t = Typography.Strong(Ui.Text(Ui.Box(_detail, 300, y, 650, 32), name ?? "", TextRole.Heading, UiTheme.Current.Text, TextAnchor.UpperLeft));
             t.supportRichText = false;
             t.resizeTextForBestFit = true; // a long name shrinks rather than wraps into the facts
             t.resizeTextMinSize = 16;
-            t.resizeTextMaxSize = 26;
+            t.resizeTextMaxSize = UiTheme.Size(TextRole.Heading);
         }
 
         private Text Facts(float y, float h, string text, int size = 17)
         {
-            var t = Ui.Text(Ui.Box(_detail, 300, y, 650, h), text, size, UiTheme.Current.Text, TextAnchor.UpperLeft);
+            var t = Ui.Text(Ui.Box(_detail, 300, y, 650, h), text, UiTheme.Mapped(size), UiTheme.Current.Text, TextAnchor.UpperLeft);
             t.supportRichText = true;
             return t;
         }
 
         private void Blocked(float y, string why) =>
-            Ui.Text(Ui.Box(_detail, 30, y, 920, 24), $"<color={UiTheme.Current.BadHex}>▲ {why}</color>", 15, UiTheme.Current.Text, TextAnchor.MiddleLeft).supportRichText = true;
+            Ui.Text(Ui.Box(_detail, 30, y, 920, 24), $"<color={UiTheme.Current.BadHex}>▲ {why}</color>", TextRole.Small, UiTheme.Current.Text, TextAnchor.MiddleLeft).supportRichText = true;
 
         /// <summary>The armed-twice action button: red, then gold to confirm within 5 seconds.</summary>
         private void ActionButton(float x, float y, float w, string label, string confirm, string key, Action act)
@@ -297,7 +297,7 @@ namespace YgoCampaign.Game
                 }
                 _armed = null;
                 act();
-            }, 22);
+            }, TextRole.Subhead);
             button.targetGraphic.color = armed ? T.Highlight : T.Primary;
             if (armed) button.GetComponentInChildren<Text>().color = T.OnAccent;
         }
@@ -317,11 +317,11 @@ namespace YgoCampaign.Game
             if (picked) Ui.Image(Ui.Box(tile, 0, 0, w, 3), T.Highlight).raycastTarget = false;
             // A note over the card (the shelf's "Authenticated by the Loupe"), in italics.
             float top = note.Length > 0 ? 26 : 8, cardH = h - 68 - top, cardW = cardH * 0.69f;
-            if (note.Length > 0) Typography.Italic(Ui.Text(Ui.Box(tile, 4, 5, w - 8, 18), note, 12, T.TextQuiet, l.Restored ? TextAnchor.MiddleLeft : TextAnchor.MiddleCenter));
+            if (note.Length > 0) Typography.Italic(Ui.Text(Ui.Box(tile, 4, 5, w - 8, 18), note, TextRole.Caption, T.TextQuiet, l.Restored ? TextAnchor.MiddleLeft : TextAnchor.MiddleCenter));
             // A restored slot (a peak build's own banned card, once the wall is open): RESTORED, in No Limits' sign ink (as UNBANNED).
             if (l.Restored)
             {
-                var tag = Ui.Text(Ui.Box(tile, 4, 5, w - 8, 18), RestoredTag, 12, T.Sign, TextAnchor.MiddleRight);
+                var tag = Ui.Text(Ui.Box(tile, 4, 5, w - 8, 18), RestoredTag, TextRole.Caption, T.Sign, TextAnchor.MiddleRight);
                 Typography.Strong(tag);
                 tag.gameObject.name = RestoredTag;
             }
@@ -329,13 +329,12 @@ namespace YgoCampaign.Game
             // A listing printing an original text (spec 4.2): "ORIGINAL TEXT · 2004" over the card, above its stats.
             CardDetail.OriginalBand(tile, l.Copy, 4, top + cardH - 38, w - 8);
             var chip = Ui.Text(Ui.Box(tile, 4, h - 70, w - 8, 18), l.Copy.IsSlab ? $"{Grades.Glyph(l.Copy.Slab)} Grade {l.Copy.Slab}" : $"<color={Grades.Color(l.Copy.Shown)}>{Grades.Glyph(l.Copy.Shown)} {Grades.Word(l.Copy.Shown)}</color>",
-                12, T.Text);
+                TextRole.Caption, T.Text);
             chip.supportRichText = true;
-            var name = Ui.Text(Ui.Box(tile, 4, h - 52, w - 8, 28), info?.Name ?? "", 12, T.Text, TextAnchor.UpperCenter);
-            name.resizeTextForBestFit = true;
-            name.resizeTextMinSize = 8;
-            name.resizeTextMaxSize = 12;
-            var price = Ui.Text(Ui.Box(tile, 4, h - 24, w - 8, 20), l.Sold ? "SOLD" : $"{l.Price:N0} DP", 14, l.Sold ? T.TextDim : T.Gold);
+            // One line at the floor, cut with "…" (two don't fit over the price at 14; the tile opens the card).
+            var name = Ui.Text(Ui.Box(tile, 4, h - 50, w - 8, 24), info?.Name ?? "", TextRole.Caption, T.Text, TextAnchor.MiddleCenter);
+            Ui.OneLine(name);
+            var price = Ui.Text(Ui.Box(tile, 4, h - 24, w - 8, 20), l.Sold ? "SOLD" : $"{l.Price:N0} DP", TextRole.Caption, l.Sold ? T.TextDim : T.Gold);
             Typography.Strong(price);
             price.supportRichText = true;
             if (l.Sold) tile.gameObject.AddComponent<CanvasGroup>().alpha = 0.4f;
@@ -350,7 +349,7 @@ namespace YgoCampaign.Game
             var T = UiTheme.Current;
             var shelf = _state.VanShelf();
             int refresh = MothsVan.DuelsToRefresh(Profile, shelf: true);
-            Ui.Text(Ui.Box(_tabs, 1460, 0, 380, 48), $"New stock in {refresh} alley duel{(refresh == 1 ? "" : "s")}", 16, T.TextMuted, TextAnchor.MiddleRight);
+            Ui.Text(Ui.Box(_tabs, 1460, 0, 380, 48), $"New stock in {refresh} alley duel{(refresh == 1 ? "" : "s")}", TextRole.Small, T.TextMuted, TextAnchor.MiddleRight);
             for (int i = 0; i < shelf.Count; i++)
             {
                 var l = shelf[i];
@@ -361,7 +360,7 @@ namespace YgoCampaign.Game
                 var tile = Tile(_list, (i % 3) * 276, (i / 3) * 384, 264, 372, l, picked, "Authenticated by the Loupe", click);
                 Spot(tile, click, picked, () => AskBuy(pick, shelf: true));
             }
-            if (shelf.Count == 0) Ui.Text(Ui.Box(_list, 0, 0, 820, 60), "The freezer's empty tonight.", 18, T.TextMuted, TextAnchor.UpperLeft);
+            if (shelf.Count == 0) Ui.Text(Ui.Box(_list, 0, 0, 820, 60), "The freezer's empty tonight.", TextRole.Body, T.TextMuted, TextAnchor.UpperLeft);
             // The pick only while it's still that slab on this shelf (the wall opening or a restock re-draws it: MothsVan.Buy
             // refuses a listing that's gone), so a stale tile is never offered for sale.
             var l2 = _shelfPick == null ? null : shelf.FirstOrDefault(x => SameListing(x, _shelfPick));
@@ -371,7 +370,7 @@ namespace YgoCampaign.Game
                 Ui.Text(Ui.Box(_detail, 30, 20, 920, 120), $"Slabs of cards banned somewhere, sometime: grade 9 or 10, Secret Rare and up, worth {AlleyEconomy.ShelfMinValue:N0} DP or more. "
                     + $"Moth's price is {AlleyEconomy.ShelfMarkup:0.#}× the value, rounded up to 500. New stock every {AlleyEconomy.ShelfEvery} alley duels."
                     + (shelf.Any(x => x.Restored) ? $" The {RestoredTag} slots are the peak builds' own banned cards, off the depot." : ""),
-                    17, T.TextSoft, TextAnchor.UpperLeft);
+                    TextRole.Body, T.TextSoft, TextAnchor.UpperLeft);
                 return;
             }
             ListingDetail(l2, shelf: true);
@@ -440,7 +439,7 @@ namespace YgoCampaign.Game
             var T = UiTheme.Current;
             var listings = _state.VanUsed();
             int refresh = MothsVan.DuelsToRefresh(Profile, shelf: false);
-            Ui.Text(Ui.Box(_tabs, 1460, 0, 380, 48), $"New listings in {refresh} duel{(refresh == 1 ? "" : "s")}", 16, T.TextMuted, TextAnchor.MiddleRight);
+            Ui.Text(Ui.Box(_tabs, 1460, 0, 380, 48), $"New listings in {refresh} duel{(refresh == 1 ? "" : "s")}", TextRole.Small, T.TextMuted, TextAnchor.MiddleRight);
             // One scrolling column: the rail, the used contraband, the HELD row.
             var rail = Profile.Rail.OrderBy(r => r.ExpiresAt).ToList();
             bool heldRow = MothsVan.HeldShown(Profile);
@@ -451,11 +450,11 @@ namespace YgoCampaign.Game
             _usedContent = content;
             content.anchoredPosition = new Vector2(0, Mathf.Clamp(_usedScrollY, 0, Math.Max(0, height - 760)));
             float y = 0;
-            Ui.Text(Ui.Box(content, 0, y, 820, 26), "MOTH'S RAIL · your cards, until their clocks run out", 13, T.Caption, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(content, 0, y, 820, 26), "MOTH'S RAIL · your cards, until their clocks run out", TextRole.Caption, T.Caption, TextAnchor.MiddleLeft);
             y += 30;
             if (rail.Count == 0)
             {
-                Ui.Text(Ui.Box(content, 0, y, 820, railRow - 6), "Nothing of yours on the hooks.", 16, T.TextMuted, TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(content, 0, y, 820, railRow - 6), "Nothing of yours on the hooks.", TextRole.Small, T.TextMuted, TextAnchor.MiddleLeft);
                 y += railRow;
             }
             foreach (var r in rail)
@@ -466,10 +465,10 @@ namespace YgoCampaign.Game
                 Ui.Image(row, picked ? T.RowSelected : T.RowB);
                 Ui.Image(Ui.Box(row, 0, 0, 4, railRow - 6), picked ? T.Highlight : T.Brass).raycastTarget = false;
                 Thumb(row, new Vector2(-410 + 34, 0), new Vector2(38, 56), r.Copy);
-                var line = Ui.Text(Ui.Box(row, 66, 0, 740, railRow - 6), RailLine(r), 17, T.Text, TextAnchor.MiddleLeft);
+                var line = Ui.Text(Ui.Box(row, 66, 0, 740, railRow - 6), RailLine(r), TextRole.Body, T.Text, TextAnchor.MiddleLeft);
                 line.resizeTextForBestFit = true;
-                line.resizeTextMinSize = 12;
-                line.resizeTextMaxSize = 17;
+                line.resizeTextMinSize = UiTheme.Floor;
+                line.resizeTextMaxSize = UiTheme.Size(TextRole.Body);
                 Action pickRail = () =>
                 {
                     _railPick = entry;
@@ -482,7 +481,7 @@ namespace YgoCampaign.Game
                 y += railRow;
             }
             y += 10;
-            Ui.Text(Ui.Box(content, 0, y, 820, 26), $"USED CONTRABAND · at value, slabs up to {AlleyEconomy.VanUsedSlabMax}", 13, T.Caption, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(content, 0, y, 820, 26), $"USED CONTRABAND · at value, slabs up to {AlleyEconomy.VanUsedSlabMax}", TextRole.Caption, T.Caption, TextAnchor.MiddleLeft);
             y += 30;
             for (int i = 0; i < listings.Count; i++)
             {
@@ -500,7 +499,7 @@ namespace YgoCampaign.Game
                 Ui.Image(row, T.Well);
                 Ui.Image(Ui.Box(row, 0, 0, 4, railRow - 6), T.Locked).raycastTarget = false;
                 Thumb(row, new Vector2(-410 + 34, 0), new Vector2(38, 56), new CardCopy { Code = MothsVan.HeldCode, Grade = MothsVan.HeldGrade }, faceDown: true);
-                Typography.Strong(Ui.Text(Ui.Box(row, 66, 0, 740, railRow - 6), HeldRowLabel, 17, T.TextDim, TextAnchor.MiddleLeft));
+                Typography.Strong(Ui.Text(Ui.Box(row, 66, 0, 740, railRow - 6), HeldRowLabel, TextRole.Body, T.TextDim, TextAnchor.MiddleLeft));
                 Action held = () => Say("van:held");
                 Ui.Clickable(row, held, style: HoverStyle.Row);
                 Spot(row, held, false);
@@ -517,7 +516,7 @@ namespace YgoCampaign.Game
             {
                 Ui.Text(Ui.Box(_detail, 30, 20, 920, 120), $"Your cards on the rail first: a card you lost at Orvel's Table hangs here at {AlleyEconomy.RailMarkup:0.#}× its value "
                     + $"for {AlleyEconomy.RailDuels} duels, then Moth sells it. Below, second-hand contraband at its value: Raw at the used odds, slabs up to {AlleyEconomy.VanUsedSlabMax}.",
-                    17, T.TextSoft, TextAnchor.UpperLeft);
+                    TextRole.Body, T.TextSoft, TextAnchor.UpperLeft);
                 return;
             }
             ListingDetail(l, shelf: false);
@@ -599,17 +598,17 @@ namespace YgoCampaign.Game
                 Ui.Image(row, picked ? T.RowSelected : i % 2 == 0 ? T.RowA : T.RowB);
                 var box = Ui.Box(row, 8, 18, 28, 28);
                 Ui.Image(box, T.Well);
-                Ui.Text(box, picked ? "✓" : "", 20, T.Gold);
+                Ui.Text(box, picked ? "✓" : "", TextRole.Label, T.Gold);
                 Thumb(row, new Vector2(44 + 20 - 410, 0), new Vector2(40, 58), copy);
-                Ui.Text(Ui.Box(row, 96, 4, 500, 26), info?.Name ?? copy.Code.ToString(), 17, T.Text, TextAnchor.MiddleLeft);
-                Ui.Text(Ui.Box(row, 96, 32, 500, 26), $"{CardFoil.ColoredName(copy.Rarity)} · {GradeLine(copy)}", 13, T.Text, TextAnchor.MiddleLeft).supportRichText = true;
+                Ui.Text(Ui.Box(row, 96, 4, 500, 26), info?.Name ?? copy.Code.ToString(), TextRole.Body, T.Text, TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(row, 96, 32, 500, 26), $"{CardFoil.ColoredName(copy.Rarity)} · {GradeLine(copy)}", TextRole.Caption, T.Text, TextAnchor.MiddleLeft).supportRichText = true;
                 var blocked = SellDesk.Blocked(Profile, copy, _state.NeededByDecks);
                 var right = Ui.Text(Ui.Box(row, 560, 0, 248, 64),
-                    blocked == null ? $"Pays {Collection.SellPrice(copy):N0} DP" : $"<size=13><color={T.TextDimHex}>{blocked}</color></size>", 17, T.Gold, TextAnchor.MiddleRight);
+                    blocked == null ? $"Pays {Collection.SellPrice(copy):N0} DP" : $"<size=14><color={T.TextDimHex}>{blocked}</color></size>", TextRole.Body, T.Gold, TextAnchor.MiddleRight);
                 right.supportRichText = true;
                 right.resizeTextForBestFit = true;
-                right.resizeTextMinSize = 10;
-                right.resizeTextMaxSize = 17;
+                right.resizeTextMinSize = UiTheme.Floor;
+                right.resizeTextMaxSize = UiTheme.Size(TextRole.Body);
                 int index = _page * PerPage + i;
                 if (_keys.Used && index == _cursor) MarkRow(row);
                 Ui.Clickable(row, () => TogglePick(copy, index), hover: () => _keys.Point(index), style: HoverStyle.Row);
@@ -644,15 +643,15 @@ namespace YgoCampaign.Game
             var T = UiTheme.Current;
             var picks = _picks.Where(c => Collection.All.Contains(c)).ToList();
             Ui.Text(Ui.Box(_detail, 30, 20, 920, 24), picks.Count == 0 ? "SELLING NOTHING YET · tick copies on the left" : $"SELLING {picks.Count} COP{(picks.Count == 1 ? "Y" : "IES")}",
-                13, T.Caption, TextAnchor.MiddleLeft);
+                TextRole.Caption, T.Caption, TextAnchor.MiddleLeft);
             for (int i = 0; i < picks.Count && i < 12; i++)
                 Ui.Text(Ui.Box(_detail, 30, 52 + i * 30, 920, 28), $"{_cards.Get(picks[i].Code)?.Name} · {CardFoil.ColoredName(picks[i].Rarity)} · pays <color={T.GoldHex}>{Collection.SellPrice(picks[i]):N0} DP</color>",
-                    16, T.Text, TextAnchor.MiddleLeft).supportRichText = true;
+                    TextRole.Small, T.Text, TextAnchor.MiddleLeft).supportRichText = true;
             int total = picks.Sum(Collection.SellPrice);
-            Ui.Text(Ui.Box(_detail, 30, 520, 920, 40), $"You get {total:N0} DP", 28, T.Gold, TextAnchor.MiddleLeft);
-            Ui.Text(Ui.Box(_detail, 30, 562, 920, 24), $"DP after: {Profile.Dp + total:N0}", 16, T.TextSoft, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(_detail, 30, 520, 920, 40), $"You get {total:N0} DP", TextRole.Heading, T.Gold, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(_detail, 30, 562, 920, 24), $"DP after: {Profile.Dp + total:N0}", TextRole.Small, T.TextSoft, TextAnchor.MiddleLeft);
             Ui.Text(Ui.Box(_detail, 30, 600, 920, 60), "Moth pays what the Sell desk pays: 25% of a copy's value, never more than half of what you paid for it. "
-                + "Cards won at a table, gifts and prizes pay nothing; a copy one of your decks needs isn't for sale.", 13, T.TextQuiet, TextAnchor.UpperLeft);
+                + "Cards won at a table, gifts and prizes pay nothing; a copy one of your decks needs isn't for sale.", TextRole.Caption, T.TextQuiet, TextAnchor.UpperLeft);
             if (picks.Count == 0) return;
             var key = "sell:" + string.Join(",", picks.Select(c => c.Id).OrderBy(x => x));
             ActionButton(30, 700, 440, $"Sell {picks.Count} cop{(picks.Count == 1 ? "y" : "ies")} · +{total:N0} DP", $"Confirm: sell {picks.Count}", key, () => SellCopies(picks));

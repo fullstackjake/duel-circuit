@@ -222,6 +222,16 @@ namespace YgoCampaign.Game
             Report($"the built-in font is no face (FaceOfFont: {Typography.FaceOfFont(Typography.Builtin)?.ToString() ?? "none"}); every face's file is in the build",
                 Typography.FaceOfFont(Typography.Builtin) == null && faces.All(Typography.Has));
             var roleText = Ui.Text(Ui.Box(probeRoot, 100, 300, 900, 60), "Label", TextRole.Label, Color.white);
+            // (R2 fix round) Ui.OneLine's cut keeps rich-text colours and bold (closing them after the "…"), a literal "<", and
+            // whole surrogate pairs.
+            {
+                string tags = Ui.Cut("<color=#FF0000>Red name</color> · <b>Bold part</b>", 12, true);
+                string less = Ui.Cut("Deck <3 forever", 7, true);
+                string emoji = new string(new[] { (char)0xD83D, (char)0xDE00 });
+                string pair = Ui.Cut("Ab" + emoji + "cd", 3, true);
+                Report($"a cut keeps its tags (\"{tags}\"), a literal < (\"{less}\") and a whole surrogate pair ({pair.Length} chars)",
+                    tags == "<color=#FF0000>Red name</color> · <b>B…</b>" && less == "Deck <3…" && pair == "Ab" + emoji + "…");
+            }
             Report($"Ui.Text at a role: Label is {roleText.fontSize} in {roleText.font.name}; RoleFor 13 → {UiTheme.RoleFor(13)}, 15 → {UiTheme.RoleFor(15)}, 24 → {UiTheme.RoleFor(24)}, 47 → {UiTheme.RoleFor(47)}; Size(Body, reading) {UiTheme.Size(TextRole.Body, true)} at text scale {FxSettings.TextScale}",
                 roleText.fontSize == 20 && roleText.font == Typography.Font(Face.Condensed) && UiTheme.RoleFor(13) == TextRole.Caption && UiTheme.RoleFor(15) == TextRole.Small
                 && UiTheme.RoleFor(24) == TextRole.Heading && UiTheme.RoleFor(47) == TextRole.Display && UiTheme.Floor == 14
@@ -380,8 +390,9 @@ namespace YgoCampaign.Game
             yield return Shot("van");
             yield return Scan("the van");
             var vanNames = FindObjectsByType<Text>(FindObjectsSortMode.None).Where(t => t.isActiveAndEnabled && t.fontSize == 26 && t.resizeTextForBestFit && !t.supportRichText && t.text.Length > 0).ToList();
+            // (R2: the name is at Heading, a condensed role, so its strong face is Barlow Condensed Bold.)
             Report($"the van's card name has its own text in the strong face ({string.Join(", ", vanNames.Select(t => $"\"{t.text}\" {t.font.name}"))})",
-                vanNames.Count > 0 && vanNames.All(t => t.font == Typography.Font(Face.Strong)));
+                vanNames.Count > 0 && vanNames.All(t => t.font == Typography.Font(Face.CondensedBold)));
             _van.Hide();
             _shop.Close(); // (its Closed event opens the campaign screen)
             _campaignScreen.Close(); // the board must be the screen scanned

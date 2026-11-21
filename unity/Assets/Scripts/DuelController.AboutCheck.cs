@@ -36,6 +36,7 @@ namespace YgoCampaign.Game
             IEnumerator Shot(string name)
             {
                 ScreenCapture.CaptureScreenshot(Path.Combine(folder, $"about-{name}.png"));
+                yield return TextRule($"about-{name}", Report);
                 yield return null;
                 yield return null;
             }

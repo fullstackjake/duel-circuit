@@ -63,11 +63,11 @@ namespace YgoCampaign.Game
             _root = root;
             Ui.Image(root, Ui.Hex("#161A23"));
 
-            _title = Ui.Text(Row("Title", 6, 40), "", 16, Color.white, TextAnchor.UpperLeft);
+            _title = Ui.Text(Row("Title", 6, 40), "", TextRole.Small, Color.white, TextAnchor.UpperLeft);
             Typography.Strong(_title);
             _title.supportRichText = true;
-            _detail = Ui.Text(Row("Detail", 46, 18), "", 13, new Color(0.78f, 0.8f, 0.86f), TextAnchor.UpperLeft);
-            _status = Ui.Text(Row("Status", 64, 18), "", 13, Ui.Hex("#FF7A7A"), TextAnchor.UpperLeft);
+            _detail = Ui.Text(Row("Detail", 46, 18), "", TextRole.Caption, new Color(0.78f, 0.8f, 0.86f), TextAnchor.UpperLeft);
+            _status = Ui.Text(Row("Status", 64, 18), "", TextRole.Caption, Ui.Hex("#FF7A7A"), TextAnchor.UpperLeft);
 
             for (int i = 0; i < PerPage; i++)
             {
@@ -78,18 +78,16 @@ namespace YgoCampaign.Game
                 int slot = i;
                 button.onClick.AddListener(() => ClickSlot(slot));
                 UiHover.Attach(button);
-                var label = Ui.Text(rt, "", 14, Color.white, TextAnchor.MiddleLeft);
+                var label = Ui.Text(rt, "", TextRole.Caption, Color.white, TextAnchor.MiddleLeft);
                 label.rectTransform.offsetMin = new Vector2(10, 0);
-                label.horizontalOverflow = HorizontalWrapMode.Wrap;
-                label.resizeTextForBestFit = true;
-                label.resizeTextMinSize = 10;
-                label.resizeTextMaxSize = 14;
+                label.rectTransform.offsetMax = new Vector2(-6, 0);
+                label.horizontalOverflow = HorizontalWrapMode.Wrap; // a long label wraps and its row grows (Refresh)
                 _slots.Add((button, image, label));
             }
 
             float pagerY = 84 + PerPage * (ButtonHeight + 4) + 2;
             _prev = SmallButton("< Prev", new Vector2(0.02f, 0), new Vector2(0.24f, 0), pagerY, () => { _page--; Refresh(); });
-            _pageLabel = Ui.Text(Row("Page", pagerY, 26, 0.26f, 0.5f), "", 13, new Color(1, 1, 1, 0.6f));
+            _pageLabel = Ui.Text(Row("Page", pagerY, 26, 0.26f, 0.5f), "", TextRole.Caption, new Color(1, 1, 1, 0.6f));
             _next = SmallButton("Next >", new Vector2(0.5f, 0), new Vector2(0.72f, 0), pagerY, () => { _page++; Refresh(); });
             _showAll = SmallButton("Show all", new Vector2(0.74f, 0), new Vector2(0.98f, 0), pagerY, () => Filter(null));
 
@@ -177,8 +175,8 @@ namespace YgoCampaign.Game
 
         private void ClickSlot(int slot)
         {
-            int i = _page * PerPage + slot;
-            if (i >= _visible.Count) return;
+            int i = PageStart(_page) + slot;
+            if (slot >= RowsOn(_page) || i >= _visible.Count) return;
             // A toggle clicked again within a moment (a long frame, a bounce) is the same click: it would untick the pick.
             if (_set != null && _set.Mode != ChoiceMode.Single && ClickGuard.Repeat(_set, _visible[i])) return;
             ClickChoice(_visible[i]);
@@ -252,18 +250,31 @@ namespace YgoCampaign.Game
             if (_filtered) detail = $"Actions for that card. {detail}".Trim();
             _detail.text = detail;
 
-            int pages = Math.Max(1, (_visible.Count + PerPage - 1) / PerPage);
+            Paginate(set);
+            int pages = _pageStarts.Count;
             _page = Mathf.Clamp(_page, 0, pages - 1);
+            float y = 84;
             for (int slot = 0; slot < PerPage; slot++)
             {
-                int i = _page * PerPage + slot;
+                int i = PageStart(_page) + slot;
                 var (button, image, label) = _slots[slot];
-                button.gameObject.SetActive(i < _visible.Count);
-                if (i >= _visible.Count) continue;
+                bool on = slot < RowsOn(_page);
+                button.gameObject.SetActive(on);
+                if (!on) continue;
                 var choice = set.Choices[_visible[i]];
-                label.text = choice.Label;
+                var (text, h) = _rows[i];
+                label.text = text;
+                SetTop((RectTransform)button.transform, y, h);
+                y += h + 4;
                 image.color = _toggled.Contains(_visible[i]) ? Toggled : choice.AlreadySelected ? Picked : Idle;
             }
+            // The pager and the action buttons sit under the rows, wherever the rows end.
+            float pagerY = Mathf.Max(y + 2, 84 + PerPage * (ButtonHeight + 4) + 2);
+            if (pagerY + 62 > Room) pagerY = y + 2;
+            foreach (var b in new[] { _prev, _next, _showAll }) SetTop((RectTransform)b.transform, pagerY, 28);
+            SetTop((RectTransform)_pageLabel.transform, pagerY, 26);
+            foreach (var b in new[] { _confirm, _finish, _cancel }) SetTop((RectTransform)b.transform, pagerY + 32, 28);
+            foreach (var (b, _) in _pinned) SetTop((RectTransform)b.transform, pagerY + 32, 28);
 
             _prev.gameObject.SetActive(pages > 1);
             _next.gameObject.SetActive(pages > 1);
@@ -280,8 +291,8 @@ namespace YgoCampaign.Game
             var cancelLabel = _cancel.GetComponentInChildren<Text>();
             cancelLabel.text = set.IsChain ? "Don't chain" : "Cancel";
             cancelLabel.resizeTextForBestFit = true; // the longer word fits the narrow column
-            cancelLabel.resizeTextMinSize = 10;
-            cancelLabel.resizeTextMaxSize = 14;
+            cancelLabel.resizeTextMinSize = UiTheme.Floor;
+            cancelLabel.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
             _confirm.GetComponentInChildren<Text>().text = PromptDialogs.KindOf(set) == "field" ? "Confirm" : "Select";
             for (int i = 0; i < _pinned.Count; i++)
             {
@@ -291,6 +302,75 @@ namespace YgoCampaign.Game
             }
             Refreshed?.Invoke();
         }
+
+        /// <summary>Each visible choice's label as shown (cut only past three lines) and its row's height.</summary>
+        private readonly List<(string text, float height)> _rows = new List<(string, float)>();
+        /// <summary>Where each page starts in the visible choices: as many rows as fit the panel, at most six.</summary>
+        private readonly List<int> _pageStarts = new List<int>();
+        private readonly TextGenerator _measure = new TextGenerator();
+
+        private int PageStart(int page) => page >= 0 && page < _pageStarts.Count ? _pageStarts[page] : _visible.Count;
+        private int RowsOn(int page) => Math.Min(PageStart(page + 1), _visible.Count) - PageStart(page);
+
+        /// <summary>The panel's height for the rows, the pager and the action buttons (from the top).</summary>
+        private float Room => _root.rect.height > 0 ? _root.rect.height : 84 + PerPage * (ButtonHeight + 4) + 64;
+
+        private float LabelHeight(Text label, string s)
+        {
+            var settings = label.GetGenerationSettings(new Vector2(label.rectTransform.rect.width, 0));
+            settings.resizeTextForBestFit = false;
+            return _measure.GetPreferredHeight(s, settings) / label.pixelsPerUnit;
+        }
+
+        /// <summary>
+        /// Lays the choices out in pages: each label wraps (its row grows to fit, up to three lines); a longer one keeps its
+        /// start and its end around a "…", so two labels that differ only at the end still read apart.
+        /// </summary>
+        private void Paginate(ChoiceSet set)
+        {
+            _rows.Clear();
+            _pageStarts.Clear();
+            var label = _slots[0].label;
+            float line = LabelHeight(label, "Ag");
+            foreach (int v in _visible)
+            {
+                string text = set.Choices[v].Label;
+                if (LabelHeight(label, text) > 3 * line + 1) text = MiddleCut(label, text, 3 * line + 1);
+                _rows.Add((text, Mathf.Max(ButtonHeight, Mathf.Ceil(LabelHeight(label, text)) + 8)));
+            }
+            float room = Room - 84 - 64;
+            float used = 0;
+            int onPage = 0;
+            _pageStarts.Add(0);
+            for (int i = 0; i < _rows.Count; i++)
+            {
+                float h = _rows[i].height + 4;
+                if (onPage > 0 && (onPage == PerPage || used + h > room)) { _pageStarts.Add(i); used = 0; onPage = 0; }
+                used += h;
+                onPage++;
+            }
+        }
+
+        /// <summary>The text cut in the middle ("start … end") to fit <paramref name="height"/>.</summary>
+        private string MiddleCut(Text label, string text, float height)
+        {
+            int tail = Math.Min(24, text.Length / 3);
+            string end = text.Substring(text.Length - tail);
+            string start = text.Substring(0, text.Length - tail);
+            while (start.Length > 1 && LabelHeight(label, start.TrimEnd() + " … " + end) > height)
+                start = start.Substring(0, char.IsLowSurrogate(start[start.Length - 1]) ? start.Length - 2 : start.Length - 1);
+            return start.TrimEnd() + " … " + end;
+        }
+
+        private static void SetTop(RectTransform rt, float top, float height)
+        {
+            rt.offsetMin = new Vector2(rt.offsetMin.x, -top - height);
+            rt.offsetMax = new Vector2(rt.offsetMax.x, -top);
+        }
+
+        /// <summary>For checks: the decision list's rows on this page as shown (label, row height).</summary>
+        public List<(string label, float height)> DebugRows =>
+            _slots.Where(s => s.button.gameObject.activeSelf).Select(s => (s.label.text, ((RectTransform)s.button.transform).rect.height)).ToList();
 
         /// <summary>A full-width (or partial) row positioned from the top of the panel.</summary>
         private RectTransform Row(string name, float top, float height, float xMin = 0.02f, float xMax = 0.98f)
@@ -311,7 +391,7 @@ namespace YgoCampaign.Game
             var button = rt.gameObject.AddComponent<Button>();
             button.targetGraphic = image;
             button.onClick.AddListener(() => { Sounds.Play("click"); onClick(); });
-            Ui.Text(rt, label, 14, Color.white);
+            Ui.Text(rt, label, TextRole.Caption, Color.white);
             UiHover.Attach(button);
             return button;
         }

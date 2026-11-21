@@ -44,15 +44,16 @@ namespace YgoCampaign.Game
         {
             W = 300, H = 96, Columns = new float[] { 60, 435, 810, 1185, 1560 }, FirstY = new float[] { 180, 290, 500, 610 }, FinalY = new float[] { 317, 473 },
             PlaqueY = 600, CaptionY = 128, Well = 80, TextX = 96, NameY = 6, NameH = 24, DeckY = 30, DeckH = 20, EloY = 50, EloH = 18, ChipY = 70, ChipH = 20,
-            NameSize = 18, DeckSize = 14, EloSize = 13, ChipSize = 13, InitialSize = 36, YouSize = 22, UndecidedSize = 15,
+            NameSize = 18, DeckSize = 14, EloSize = 14, ChipSize = 14, InitialSize = 34, YouSize = 22, UndecidedSize = 16,
         };
 
         /// <summary>16 players: seven columns of 240×72 slots, the round of 16 at the edges (pairs 8 px apart, 26 between pairs).</summary>
         private static readonly Layout Sixteen = new Layout
         {
             W = 240, H = 72, Columns = new float[] { 30, 300, 570, 840, 1110, 1380, 1650 }, FirstY = new float[] { 150, 230, 328, 408, 506, 586, 684, 764 },
-            FinalY = new float[] { 326, 480 }, PlaqueY = 606, CaptionY = 110, Well = 56, TextX = 70, NameY = 3, NameH = 20, DeckY = 23, DeckH = 15,
-            EloY = 38, EloH = 14, ChipY = 54, ChipH = 15, NameSize = 16, DeckSize = 12, EloSize = 11, ChipSize = 11, InitialSize = 26, YouSize = 16, UndecidedSize = 13,
+            // The type scale's floor (14) in a 72-high slot: four lines of 17-20 (the Elo line drops its "Elo" word, see Slot).
+            FinalY = new float[] { 326, 480 }, PlaqueY = 606, CaptionY = 110, Well = 56, TextX = 70, NameY = 1, NameH = 20, DeckY = 21, DeckH = 17,
+            EloY = 37, EloH = 17, ChipY = 54, ChipH = 17, NameSize = 16, DeckSize = 14, EloSize = 14, ChipSize = 14, InitialSize = 26, YouSize = 16, UndecidedSize = 14,
         };
 
         private static Layout LayoutOf(Bracket b) => b.Size == 16 ? Sixteen : Eight;
@@ -272,7 +273,7 @@ namespace YgoCampaign.Game
             Ui.Image(Ui.Box(_view, 0, 0, 1920, 90), T.Deep);
             // The alley's brackets: Baz's chalk under a brick header band.
             if (T.IsAlley) AlleyMaterials.Header(_view, 0, 0, 1920, 90, T.Sign);
-            var title = Ui.Text(Ui.Box(_view, 40, 0, 900, 90), b.Name.ToUpperInvariant(), 34, T.Sign, TextAnchor.MiddleLeft);
+            var title = Ui.Text(Ui.Box(_view, 40, 0, 900, 90), b.Name.ToUpperInvariant(), TextRole.Title, T.Sign, TextAnchor.MiddleLeft);
             Typography.Strong(title);
             T.Title(title);
             var stage = b.Done ? "Finished" : b.YouOut ? $"{Brackets.PlacementText(place)} · {b.RoundName(round)}" : $"{b.RoundName(round)}";
@@ -284,7 +285,7 @@ namespace YgoCampaign.Game
                 rulesLine = $"{(rules?.List?.Name ?? cup?.Banlist ?? "")} list, cards out by {CampaignScreen.PoolMonth(cup?.Pool ?? "")}";
             }
             // (The alley's header has tape across its right end: the line stops short of it.)
-            var sub = Ui.Text(Ui.Box(_view, 900, 0, T.IsAlley ? 780 : 980, 90), $"{stage}  ·  {rulesLine}  ·  <color={T.GoldHex}>{profile.Dp:N0} DP</color>", 18, T.TextMuted, TextAnchor.MiddleRight);
+            var sub = Ui.Text(Ui.Box(_view, 900, 0, T.IsAlley ? 780 : 980, 90), $"{stage}  ·  {rulesLine}  ·  <color={T.GoldHex}>{profile.Dp:N0} DP</color>", TextRole.Body, T.TextMuted, TextAnchor.MiddleRight);
             sub.supportRichText = true;
 
             // Column captions: the first round at the edges, the final in the middle.
@@ -294,7 +295,7 @@ namespace YgoCampaign.Game
                 bool final = r == b.Rounds - 1;
                 var caption = final ? (b.FinalBestOf > 1 ? $"FINAL · BEST OF {b.FinalBestOf}" : "FINAL")
                     : b.RoundName(r) == "Round of 16" ? "ROUND OF 16" : b.RoundName(r).ToUpperInvariant() + "S";
-                Ui.Text(Ui.Box(_view, L.Columns[c], L.CaptionY, L.W, 30), caption, 16, final ? T.GoldSoft : T.Caption);
+                Ui.Text(Ui.Box(_view, L.Columns[c], L.CaptionY, L.W, 30), caption, TextRole.Small, final ? T.GoldSoft : T.Caption);
             }
 
             // The lines first, so the slots sit on them: dim, then the paths walked lit gold.
@@ -312,18 +313,18 @@ namespace YgoCampaign.Game
                 }
             }
             float vsTop = L.FinalY[0] + L.H + (b.FinalBestOf > 1 ? 24 : 0);
-            var vs = Ui.Text(Ui.Box(_view, L.Columns[b.Rounds - 1], vsTop, L.W, L.FinalY[1] - vsTop), "VS", 26, T.TextDim);
+            var vs = Ui.Text(Ui.Box(_view, L.Columns[b.Rounds - 1], vsTop, L.W, L.FinalY[1] - vsTop), "VS", TextRole.Heading, T.TextDim);
             Typography.Strong(vs);
             if (b.FinalBestOf > 1) Pips(b, L);
             Plaque(b, L, cup);
             Ladder(b, L, place);
 
             // What's happening, then the buttons.
-            var line = Ui.Text(Ui.Box(_view, 60, 868, 1800, 56), _message.Length > 0 ? _message : Situation(b, cup, yours, round, place), 20, T.TextSoft);
+            var line = Ui.Text(Ui.Box(_view, 60, 868, 1800, 56), _message.Length > 0 ? _message : Situation(b, cup, yours, round, place), TextRole.Label, T.TextSoft);
             line.supportRichText = true;
             line.resizeTextForBestFit = true;
             line.resizeTextMinSize = 14;
-            line.resizeTextMaxSize = 20;
+            line.resizeTextMaxSize = UiTheme.Size(TextRole.Label);
             Buttons(b, cup, yours, round, place);
         }
 
@@ -335,7 +336,7 @@ namespace YgoCampaign.Game
             _pips = (Row(b.FinalGamesA), Row(b.FinalGamesB));
             for (int k = 0; k < 2; k++)
             {
-                var pips = Ui.Text(Ui.Box(_view, L.Columns[b.Rounds - 1], L.FinalY[k] + L.H + 2, L.W, 22), k == 0 ? _pips.a : _pips.b, 18, T.TextDim);
+                var pips = Ui.Text(Ui.Box(_view, L.Columns[b.Rounds - 1], L.FinalY[k] + L.H + 2, L.W, 22), k == 0 ? _pips.a : _pips.b, TextRole.Body, T.TextDim);
                 pips.supportRichText = true;
                 pips.raycastTarget = false;
             }
@@ -396,37 +397,37 @@ namespace YgoCampaign.Game
         private void Buttons(Bracket b, Circuit? cup, int yours, int round, int place)
         {
             var T = UiTheme.Current;
-            Ui.BoxButton(_view, 60, 966, 180, 56, "Back", () => BackClicked?.Invoke(), 20).targetGraphic.color = T.Button;
+            Ui.BoxButton(_view, 60, 966, 180, 56, "Back", () => BackClicked?.Invoke(), TextRole.Label).targetGraphic.color = T.Button;
             if (_hidden.Count > 0) return; // the results are still coming in
             bool bo3 = b.FinalBestOf > 1;
             if (yours >= 0)
             {
                 var label = yours == b.Final && bo3 ? $"Duel: Final, game {b.FinalGamesA + b.FinalGamesB + 1}" : $"Duel: {b.RoundName(b.RoundOf(yours))}";
-                var duel = Ui.BoxButton(_view, 760, 950, 400, 76, label, () => DuelClicked?.Invoke(), 28);
+                var duel = Ui.BoxButton(_view, 760, 950, 400, 76, label, () => DuelClicked?.Invoke(), TextRole.Heading);
                 duel.targetGraphic.color = T.Primary;
                 var them = b.Slots[b.Opponent(yours)];
                 var scout = new List<(string, string)> { (NameOf(cup, them), them.Deck) };
-                Ui.BoxButton(_view, 1180, 960, 200, 56, "Scout", () => ScoutClicked?.Invoke(scout), 20).targetGraphic.color = T.Button;
+                Ui.BoxButton(_view, 1180, 960, 200, 56, "Scout", () => ScoutClicked?.Invoke(scout), TextRole.Label).targetGraphic.color = T.Button;
             }
             else if (b.Done)
             {
                 int packs = PacksAt(b, Math.Max(0, place));
                 var label = packs > 0 ? $"Open {(packs == 1 ? "your " + PackName(b) : Packs(PackName(b), packs))}" : "Finish";
-                Ui.BoxButton(_view, 760, 950, 400, 76, label, () => FinishClicked?.Invoke(), 26).targetGraphic.color = T.Primary;
+                Ui.BoxButton(_view, 760, 950, 400, 76, label, () => FinishClicked?.Invoke(), TextRole.Heading).targetGraphic.color = T.Primary;
                 // A held-back Invitational (its No Limits Packs can't be opened here): settle it now, as a launch would, the
                 // packs owed until they can be opened.
                 if (HeldBack(b).Length > 0)
-                    Ui.BoxButton(_view, 1180, 960, 360, 56, SettleLabel, () => SettleClicked?.Invoke(), 20).targetGraphic.color = T.Button;
+                    Ui.BoxButton(_view, 1180, 960, 360, 56, SettleLabel, () => SettleClicked?.Invoke(), TextRole.Label).targetGraphic.color = T.Button;
             }
             else if (b.YouOut)
             {
                 bool cpuFinal = round == b.Rounds - 1 && b.Pending(b.Final);
                 var watch = bo3 ? $"Watch game {b.FinalGamesA + b.FinalGamesB + 1}" : "Watch the final";
                 var other = cpuFinal
-                    ? Ui.BoxButton(_view, 600, 954, 340, 68, watch, () => WatchClicked?.Invoke(), 24)
-                    : Ui.BoxButton(_view, 600, 954, 340, 68, "Follow the bracket", Follow, 24);
+                    ? Ui.BoxButton(_view, 600, 954, 340, 68, watch, () => WatchClicked?.Invoke(), TextRole.Heading)
+                    : Ui.BoxButton(_view, 600, 954, 340, 68, "Follow the bracket", Follow, TextRole.Heading);
                 other.targetGraphic.color = T.Button;
-                Ui.BoxButton(_view, 980, 954, 340, 68, "Skip to end", Skip, 24).targetGraphic.color = T.Primary;
+                Ui.BoxButton(_view, 980, 954, 340, 68, "Skip to end", Skip, TextRole.Heading).targetGraphic.color = T.Primary;
             }
         }
 
@@ -492,20 +493,21 @@ namespace YgoCampaign.Game
             var name = Ui.Text(Ui.Box(box, L.TextX, L.NameY, L.TextW, L.NameH), NameOf(cup, e), L.NameSize, e.You ? T.Gold : T.Text, TextAnchor.MiddleLeft);
             Typography.Strong(name);
             name.resizeTextForBestFit = true;
-            name.resizeTextMinSize = 10;
+            name.resizeTextMinSize = UiTheme.Floor;
             name.resizeTextMaxSize = L.NameSize;
-            if (b.Size == 8) name.resizeTextMinSize = 12;
             var deck = Ui.Text(Ui.Box(box, L.TextX, L.DeckY, L.TextW, L.DeckH), e.Deck.Length > 0 ? _state.DeckTitle(e.Deck) : "Your deck", L.DeckSize, T.TextFaint, TextAnchor.MiddleLeft);
-            deck.resizeTextForBestFit = true;
-            deck.resizeTextMinSize = Math.Min(10, L.DeckSize);
-            deck.resizeTextMaxSize = L.DeckSize;
+            Ui.OneLine(deck); // a long deck name ends in "…" (the slot's scouting report has it whole)
             // An out-of-towner (a No Limits pilot at the Alley Brawl, docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 8) is marked as one;
             // at the Invitational the pilots play their own peak builds, so they aren't (BackAlley.OutOfTowners' test).
             bool outOfTown = !e.You && e.Splash == null && _state.AlleyData.FindBuild(e.Character) is Headliner oot && e.Deck != oot.Deck;
-            var eloLine = Ui.Text(Ui.Box(box, L.TextX, L.EloY, L.TextW, L.EloH), (e.Elo > 0 ? $"#{e.Seed} · Elo {e.Elo:N0}" : $"#{e.Seed} · unrated") + (outOfTown ? " · out of town" : ""),
+            // "#4 · Elo 1,414"; where that line doesn't fit a 16 slot at the floor, "Elo" goes ("#4 · 1,414": the entry dialog
+            // spells it out).
+            string EloText(bool word) => (e.Elo > 0 ? $"#{e.Seed} · {(word ? "Elo " : "")}{e.Elo:N0}" : $"#{e.Seed} · unrated") + (outOfTown ? " · out of town" : "");
+            bool withWord = b.Size != 16 || Ui.LineWidth(EloText(true), Typography.Font(Face.Body), UiTheme.Floor) <= L.TextW - 2;
+            var eloLine = Ui.Text(Ui.Box(box, L.TextX, L.EloY, L.TextW, L.EloH), EloText(withWord),
                 L.EloSize, outOfTown ? T.Sign : T.TextQuiet, TextAnchor.MiddleLeft);
             eloLine.resizeTextForBestFit = true;
-            eloLine.resizeTextMinSize = 8;
+            eloLine.resizeTextMinSize = UiTheme.Floor;
             eloLine.resizeTextMaxSize = L.EloSize;
             if (outOfTown) _outOfTowners.Add(e.Character);
             if (live) Chip(box, L, "▶ YOUR MATCH", T.Primary, T.Text);
@@ -581,16 +583,16 @@ namespace YgoCampaign.Game
             int champ = Shown(b, b.Final);
             Ui.Image(plaque, champ >= 0 ? T.Highlight : T.Inset);
             Ui.Image(Ui.Box(plaque, 2, 2, L.W - 4, L.H - 4), champ >= 0 ? T.GoldWash : T.Panel);
-            float head = L.H * 8 / 96, line = L.H * 24 / 96;
-            Typography.Strong(Ui.Text(Ui.Box(plaque, 0, head, L.W, line), "♛ CHAMPION", L.ChipSize + 3, champ >= 0 ? T.Gold : T.Caption));
+            float head = L.H * 8 / 96, line = Mathf.Max(L.H * 24 / 96, 22); // a line at the floor's size and up needs 22
+            Typography.Strong(Ui.Text(Ui.Box(plaque, 0, head, L.W, line), "♛ CHAMPION", UiTheme.Mapped(L.ChipSize + 3), champ >= 0 ? T.Gold : T.Caption));
             var who = champ >= 0
                 ? (b.Slots[champ].You ? "You!" : NameOf(cup, b.Slots[champ]))
                 : $"+{Brackets.PlacementDp(b, 0):N0} DP · {Packs(PackName(b), PacksAt(b, 0))}";
-            var t = Ui.Text(Ui.Box(plaque, 8, head + line + 4, L.W - 16, L.H - head - line - 10), who, champ >= 0 ? L.NameSize + 6 : L.NameSize - 1, champ >= 0 ? T.Text : T.Gold);
+            var t = Ui.Text(Ui.Box(plaque, 8, head + line + 4, L.W - 16, L.H - head - line - 10), who, UiTheme.Mapped(champ >= 0 ? L.NameSize + 6 : L.NameSize - 1), champ >= 0 ? T.Text : T.Gold);
             Typography.Strong(t);
             t.resizeTextForBestFit = true;
-            t.resizeTextMinSize = 10;
-            t.resizeTextMaxSize = champ >= 0 ? L.NameSize + 6 : L.NameSize - 1;
+            t.resizeTextMinSize = UiTheme.Floor;
+            t.resizeTextMaxSize = t.fontSize;
         }
 
         /// <summary>What each placement pays (halved once a loaner played), yours marked once you have one.</summary>
@@ -608,11 +610,11 @@ namespace YgoCampaign.Game
             }
             if (b.Loaned) rows.Add($"<color={T.WarnHex}>A loaner played: placement DP halved</color>");
             float x = L.Columns[b.Rounds - 1];
-            var ladder = Ui.Text(Ui.Box(_view, x - 30, L.PlaqueY + L.H + 14, L.W + 60, 140), string.Join("\n", rows), 15, T.TextMuted, TextAnchor.UpperCenter);
+            var ladder = Ui.Text(Ui.Box(_view, x - 30, L.PlaqueY + L.H + 14, L.W + 60, 140), string.Join("\n", rows), TextRole.Small, T.TextMuted, TextAnchor.UpperCenter);
             ladder.supportRichText = true;
             ladder.resizeTextForBestFit = true;
-            ladder.resizeTextMinSize = 11;
-            ladder.resizeTextMaxSize = 15;
+            ladder.resizeTextMinSize = UiTheme.Floor;
+            ladder.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
         }
 
         // ---- The entry dialog --------------------------------------------------------------------------------------------
@@ -637,14 +639,14 @@ namespace YgoCampaign.Game
             Ui.Image(_entry, T.Scrim.WithAlpha(0.75f)); // blocks the screen under it
             var panel = Ui.Box(_entry, 360, 90, 1200, 900);
             Ui.Image(panel, T.Panel);
-            var title = Ui.Text(Ui.Box(panel, 30, 20, 1140, 48), Brackets.NameOf(c), 32, T.LibraryGold, TextAnchor.MiddleLeft);
+            var title = Ui.Text(Ui.Box(panel, 30, 20, 1140, 48), Brackets.NameOf(c), TextRole.Title, T.LibraryGold, TextAnchor.MiddleLeft);
             Typography.Strong(title);
-            Ui.Text(Ui.Box(panel, 30, 68, 1140, 28), $"{rules.List?.Name ?? c.Banlist} list · cards out by {CampaignScreen.PoolMonth(c.Pool)}", 17, T.TextMuted, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(panel, 30, 68, 1140, 28), $"{rules.List?.Name ?? c.Banlist} list · cards out by {CampaignScreen.PoolMonth(c.Pool)}", TextRole.Body, T.TextMuted, TextAnchor.MiddleLeft);
             Ui.Text(Ui.Box(panel, 30, 96, 1140, 28), "8 players, single elimination. You're seed 1 as the cup's champion: seeds 1 and 2 can only meet in the final.",
-                16, T.TextSoft, TextAnchor.MiddleLeft);
+                TextRole.Small, T.TextSoft, TextAnchor.MiddleLeft);
 
             // The field: you, then the seven CPUs by seed (Elo, highest first).
-            Ui.Text(Ui.Box(panel, 30, 136, 660, 26), "THE FIELD", 15, T.Caption, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(panel, 30, 136, 660, 26), "THE FIELD", TextRole.Small, T.Caption, TextAnchor.MiddleLeft);
             var field = Brackets.LocalsField(_state.Library, cup, _state.Ratings);
             double yourElo = _state.Ratings.TryGetValue(Loaners.RecipeOf(profile.Deck), out var elo) ? elo : 0;
             var rows = new List<(string id, int seed, string name, string deck, double elo, bool you)>
@@ -661,62 +663,62 @@ namespace YgoCampaign.Game
                 var well = Ui.Box(row, 4, 3, 40, 40);
                 Ui.Image(well, r.you ? T.Placeholder : T.Well);
                 well.gameObject.AddComponent<RectMask2D>();
-                if (r.you || !Portraits.PlaceHead(well, r.id)) Typography.Strong(Ui.Text(Ui.Box(well, 0, 0, 40, 40), Initial(r.name), 20, T.TextMuted));
-                Typography.Strong(Ui.Text(Ui.Box(row, 52, 0, 44, 46), $"#{r.seed}", 18, T.Gold, TextAnchor.MiddleLeft));
-                var name = Ui.Text(Ui.Box(row, 98, 0, 200, 46), r.name, 18, r.you ? T.Gold : T.Text, TextAnchor.MiddleLeft);
+                if (r.you || !Portraits.PlaceHead(well, r.id)) Typography.Strong(Ui.Text(Ui.Box(well, 0, 0, 40, 40), Initial(r.name), TextRole.Label, T.TextMuted));
+                Typography.Strong(Ui.Text(Ui.Box(row, 52, 0, 44, 46), $"#{r.seed}", TextRole.Body, T.Gold, TextAnchor.MiddleLeft));
+                var name = Ui.Text(Ui.Box(row, 98, 0, 200, 46), r.name, TextRole.Body, r.you ? T.Gold : T.Text, TextAnchor.MiddleLeft);
                 Typography.Strong(name);
                 name.resizeTextForBestFit = true;
-                name.resizeTextMinSize = 12;
-                name.resizeTextMaxSize = 18;
-                var deck = Ui.Text(Ui.Box(row, 300, 0, 240, 46), r.deck, 15, T.TextFaint, TextAnchor.MiddleLeft);
+                name.resizeTextMinSize = UiTheme.Floor;
+                name.resizeTextMaxSize = UiTheme.Size(TextRole.Body);
+                var deck = Ui.Text(Ui.Box(row, 300, 0, 240, 46), r.deck, TextRole.Small, T.TextFaint, TextAnchor.MiddleLeft);
                 deck.resizeTextForBestFit = true;
-                deck.resizeTextMinSize = 11;
-                deck.resizeTextMaxSize = 15;
-                Ui.Text(Ui.Box(row, 540, 0, 110, 46), r.elo > 0 ? $"Elo {r.elo:N0}" : "unrated", 15, T.TextQuiet, TextAnchor.MiddleRight);
+                deck.resizeTextMinSize = UiTheme.Floor;
+                deck.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
+                Ui.Text(Ui.Box(row, 540, 0, 110, 46), r.elo > 0 ? $"Elo {r.elo:N0}" : "unrated", TextRole.Small, T.TextQuiet, TextAnchor.MiddleRight);
             }
-            Ui.Text(Ui.Box(panel, 30, 568, 660, 26), "Quarter-finals: 1 v 8 · 4 v 5 · 2 v 7 · 3 v 6", 15, T.TextQuiet, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(panel, 30, 568, 660, 26), "Quarter-finals: 1 v 8 · 4 v 5 · 2 v 7 · 3 v 6", TextRole.Small, T.TextQuiet, TextAnchor.MiddleLeft);
 
             // The prize ladder.
-            Ui.Text(Ui.Box(panel, 730, 136, 440, 26), "PRIZES", 15, T.Caption, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(panel, 730, 136, 440, 26), "PRIZES", TextRole.Small, T.Caption, TextAnchor.MiddleLeft);
             for (int p = 0; p < Brackets.LocalsPay.Length; p++)
             {
                 int packs = Brackets.LocalsPacks[p];
                 var row = Ui.Box(panel, 730, 166 + p * 50, 440, 46);
                 Ui.Image(row, p == 0 ? T.GoldWash : p % 2 == 0 ? T.RowA : T.RowB);
                 Ui.Text(Ui.Box(row, 14, 0, 200, 46), p == 0 ? "♛ Champion" : Places[p],
-                    17, p == 0 ? T.Gold : T.Text, TextAnchor.MiddleLeft);
+                    TextRole.Body, p == 0 ? T.Gold : T.Text, TextAnchor.MiddleLeft);
                 Ui.Text(Ui.Box(row, 200, 0, 226, 46), $"+{Brackets.LocalsPay[p]:N0} DP" + (packs > 0 ? $" · {packs} Prize Pack{(packs > 1 ? "s" : "")}" : ""),
-                    17, T.Gold, TextAnchor.MiddleRight);
+                    TextRole.Body, T.Gold, TextAnchor.MiddleRight);
             }
             // What a Prize Pack holds, with its odds, before the entry is paid (SHOP-REWORK-SPEC section 5).
             // It has the column down to the rule line (shrinking only if it must), with the entry price right under it.
-            var prize = Ui.Text(Ui.Box(panel, 730, 376, 440, 186), PrizeOddsText(cup), 14, T.TextSoft, TextAnchor.UpperLeft);
+            var prize = Ui.Text(Ui.Box(panel, 730, 376, 440, 186), PrizeOddsText(cup), TextRole.Caption, T.TextSoft, TextAnchor.UpperLeft);
             prize.supportRichText = true;
             prize.lineSpacing = 1.05f;
             float prizeHeight = Mathf.Ceil(prize.preferredHeight);
             if (prizeHeight > 186)
             {
                 prize.resizeTextForBestFit = true;
-                prize.resizeTextMinSize = 12;
-                prize.resizeTextMaxSize = 14;
+                prize.resizeTextMinSize = UiTheme.Floor;
+                prize.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
                 prizeHeight = 186;
             }
             Ui.Text(Ui.Box(panel, 730, 376 + prizeHeight + 10, 440, 32), $"Entry: <color={T.GoldHex}>{Brackets.LocalsEntry:N0} DP</color> (not refunded) · you have {profile.Dp:N0} DP",
-                17, T.Text, TextAnchor.UpperLeft).supportRichText = true;
+                TextRole.Body, T.Text, TextAnchor.UpperLeft).supportRichText = true;
 
             // Your deck, every round.
             var problems = _library.Contains(profile.Deck) ? _state.Problems(_library.Load(profile.Deck), rules) : new List<DeckProblem>();
             // CPUs bring their decks as built (the owner's rule everywhere): say so, or a Forbidden card across the table reads as unfair.
             var rule = $"<color={T.WarnHex}>Your deck must be legal each round; loaners halve placement DP. The others bring their decks as built.</color>"
                        + (problems.Count > 0 ? $" <color={T.BadHex}>{_state.DeckTitle(profile.Deck)} isn't legal here now: {problems[0].Message}</color> Fix it, or borrow a loaner on each round's versus screen." : "");
-            var ruleText = Ui.Text(Ui.Box(panel, 30, 612, 1140, 60), rule, 17, T.TextSoft, TextAnchor.UpperLeft);
+            var ruleText = Ui.Text(Ui.Box(panel, 30, 612, 1140, 60), rule, TextRole.Body, T.TextSoft, TextAnchor.UpperLeft);
             ruleText.supportRichText = true;
-            _entryNote = Ui.Text(Ui.Box(panel, 30, 680, 1140, 40), "", 17, T.Bad, TextAnchor.MiddleLeft);
+            _entryNote = Ui.Text(Ui.Box(panel, 30, 680, 1140, 40), "", TextRole.Body, T.Bad, TextAnchor.MiddleLeft);
             _entryNote.supportRichText = true;
 
-            var enter = Ui.BoxButton(panel, 330, 790, 320, 72, $"Enter · {Brackets.LocalsEntry:N0} DP", () => EnterClicked(cup), 24);
+            var enter = Ui.BoxButton(panel, 330, 790, 320, 72, $"Enter · {Brackets.LocalsEntry:N0} DP", () => EnterClicked(cup), TextRole.Heading);
             enter.targetGraphic.color = T.Primary;
-            Ui.BoxButton(panel, 680, 798, 200, 56, "Cancel", CloseEntry, 20).targetGraphic.color = T.Button;
+            Ui.BoxButton(panel, 680, 798, 200, 56, "Cancel", CloseEntry, TextRole.Label).targetGraphic.color = T.Button;
         }
 
         /// <summary>
@@ -801,27 +803,27 @@ namespace YgoCampaign.Game
             var panel = Ui.Box(_entry, 360, 90, 1200, 900);
             Ui.Image(panel, T.Panel);
             if (T.IsAlley) AlleyMaterials.Header(panel, 0, 0, 1200, 64, T.Sign);
-            var title = Ui.Text(Ui.Box(panel, 30, 10, 1140, 48), spec.Name.ToUpperInvariant(), 32, T.Sign, TextAnchor.MiddleLeft);
+            var title = Ui.Text(Ui.Box(panel, 30, 10, 1140, 48), spec.Name.ToUpperInvariant(), TextRole.Title, T.Sign, TextAnchor.MiddleLeft);
             Typography.Strong(title);
             T.Title(title);
             bool noLimits = kind == Brackets.InvitationalKind;
             string packName = Brackets.PackNameFor(kind);
-            Ui.Text(Ui.Box(panel, 30, 68, 1140, 28), (noLimits ? "No list · three of anything" : "Alley list") + " · no Ban Passes · your own decks only · turn 40, higher LP wins · no stakes: the entry and placement only", 16, T.TextMuted, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(panel, 30, 68, 1140, 28), (noLimits ? "No list · three of anything" : "Alley list") + " · no Ban Passes · your own decks only · turn 40, higher LP wins · no stakes: the entry and placement only", TextRole.Small, T.TextMuted, TextAnchor.MiddleLeft);
             var preview = AlleyPreview(profile, kind);
             int yourSeed = preview?.Slots.FirstOrDefault(s => s.You)?.Seed ?? 1;
             var about = spec.Size == 16
                 ? $"{spec.Size} players, single elimination; the final is best of {Math.Max(1, spec.FinalBestOf)}. {(noLimits ? "The top seat" : "The reigning champion")} is seed 1 and you're seed {yourSeed}: you can only meet in the final."
                 : $"{spec.Size} players, single elimination. You're seed {yourSeed}; the field is {(BackAlley.BrawlTable(profile, _state.AlleyData) is int bt && bt >= 0 ? _state.AlleyData.Tables[bt].Name + "'s" : "the alley's")} regulars, splashed as at the table.";
-            Ui.Text(Ui.Box(panel, 30, 96, 1140, 28), about, 16, T.TextSoft, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(panel, 30, 96, 1140, 28), about, TextRole.Small, T.TextSoft, TextAnchor.MiddleLeft);
 
             // The field by seed: you, the CPUs (Elo; a splash regular's base plus its table's splash gain).
-            Ui.Text(Ui.Box(panel, 30, 136, 660, 26), "THE FIELD", 15, T.Caption, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(panel, 30, 136, 660, 26), "THE FIELD", TextRole.Small, T.Caption, TextAnchor.MiddleLeft);
             _entryNames.Clear();
             var seeded = preview?.Slots.OrderBy(s => s.Seed).ToList() ?? new List<BracketEntrant>();
             _entryRows = seeded.Count;
             bool tall = seeded.Count <= 8;
             float step = tall ? 50 : 26, rowH = tall ? 46 : 24, well = tall ? 40 : 22;
-            int big = tall ? 18 : 14, small = tall ? 15 : 12;
+            int big = tall ? UiTheme.Size(TextRole.Body) : UiTheme.Size(TextRole.Caption), small = tall ? UiTheme.Size(TextRole.Small) : UiTheme.Size(TextRole.Caption);
             for (int i = 0; i < seeded.Count; i++)
             {
                 var e = seeded[i];
@@ -837,13 +839,13 @@ namespace YgoCampaign.Game
                     if (!(Portraits.GruntFor(o.Handle) is string grunt && Portraits.PlaceHead(face, grunt)))
                         AlleyMaterials.Silhouette(face, o.Tint == 0 ? T.TextDim : new Color(((o.Tint >> 16) & 0xFF) / 255f, ((o.Tint >> 8) & 0xFF) / 255f, (o.Tint & 0xFF) / 255f));
                 }
-                else if (e.You || !Portraits.PlaceHead(face, e.Character)) Typography.Strong(Ui.Text(Ui.Box(face, 0, 0, well, well), Initial(name), (int)(well / 2), T.TextMuted));
+                else if (e.You || !Portraits.PlaceHead(face, e.Character)) Typography.Strong(Ui.Text(Ui.Box(face, 0, 0, well, well), Initial(name), Mathf.Max(UiTheme.Floor, (int)(well / 2)), T.TextMuted));
                 float x = well + 12;
                 Typography.Strong(Ui.Text(Ui.Box(row, x, 0, 44, rowH), $"#{e.Seed}", big, T.Gold, TextAnchor.MiddleLeft));
                 var who = Ui.Text(Ui.Box(row, x + 46, 0, 200, rowH), name, big, e.You ? T.Gold : T.Text, TextAnchor.MiddleLeft);
                 Typography.Strong(who);
                 who.resizeTextForBestFit = true;
-                who.resizeTextMinSize = 10;
+                who.resizeTextMinSize = UiTheme.Floor;
                 who.resizeTextMaxSize = big;
                 // An out-of-towner's deck is Alley-legal for the night (one of everything; the rest stays in the toploader).
                 // (At the Invitational the builds play their own No Limits decks: no "out of town" there.)
@@ -851,23 +853,21 @@ namespace YgoCampaign.Game
                 var deckTitle = e.You ? _state.DeckTitle(profile.Deck) : e.Splash != null ? $"{_state.DeckTitle(e.Splash.Base)}, splashed"
                     : outOfTown ? $"{_state.DeckTitle(e.Deck)} · out of town" : _state.DeckTitle(e.Deck);
                 var deck = Ui.Text(Ui.Box(row, x + 250, 0, 300 - x, rowH), deckTitle, small, T.TextFaint, TextAnchor.MiddleLeft);
-                deck.resizeTextForBestFit = true;
-                deck.resizeTextMinSize = 9;
-                deck.resizeTextMaxSize = small;
+                Ui.OneLine(deck, UiTheme.Floor); // shrinks to the floor, then ends in "…"
                 Ui.Text(Ui.Box(row, 550, 0, 100, rowH), e.Elo > 0 ? $"Elo {e.Elo:N0}" : "unrated", small, T.TextQuiet, TextAnchor.MiddleRight);
             }
             if (preview == null)
-                Ui.Text(Ui.Box(panel, 30, 166, 660, 46), "The field can't be drawn here (an alley table's decks are missing).", 15, T.Bad, TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(panel, 30, 166, 660, 46), "The field can't be drawn here (an alley table's decks are missing).", TextRole.Small, T.Bad, TextAnchor.MiddleLeft);
             // The first round's pairings by seed (slots 2m and 2m+1 in bracket order).
             var order = Brackets.OrderFor(spec.Size);
             var firstRound = string.Join(" · ", Enumerable.Range(0, spec.Size / 2).Select(m => $"{order[2 * m]} v {order[2 * m + 1]}"));
-            var pairing = Ui.Text(Ui.Box(panel, 30, tall ? 568 : 586, 660, 24), $"{(spec.Size == 16 ? "Round of 16" : "Quarter-finals")}: {firstRound}", tall ? 15 : 13, T.TextQuiet, TextAnchor.MiddleLeft);
+            var pairing = Ui.Text(Ui.Box(panel, 30, tall ? 568 : 586, 660, 24), $"{(spec.Size == 16 ? "Round of 16" : "Quarter-finals")}: {firstRound}", tall ? TextRole.Small : TextRole.Caption, T.TextQuiet, TextAnchor.MiddleLeft);
             pairing.resizeTextForBestFit = true;
-            pairing.resizeTextMinSize = 10;
-            pairing.resizeTextMaxSize = tall ? 15 : 13;
+            pairing.resizeTextMinSize = UiTheme.Floor;
+            pairing.resizeTextMaxSize = pairing.fontSize;
 
             // The prize ladder: DP and Contraband Packs (the Invitational's No Limits Packs); a first title's Card Tokens (the Open's, the Invitational's).
-            Ui.Text(Ui.Box(panel, 730, 136, 440, 26), "PRIZES", 15, T.Caption, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(panel, 730, 136, 440, 26), "PRIZES", TextRole.Small, T.Caption, TextAnchor.MiddleLeft);
             var pay = Brackets.PayFor(kind);
             var packsFor = Brackets.PacksFor(kind);
             float prizeStep = pay.Length > 4 ? 40 : 50, prizeH = prizeStep - 4;
@@ -877,34 +877,34 @@ namespace YgoCampaign.Game
                 int packs = p < packsFor.Length ? packsFor[p] : 0;
                 var row = Ui.Box(panel, 730, 166 + p * prizeStep, 440, prizeH);
                 Ui.Image(row, p == 0 ? T.GoldWash : p % 2 == 0 ? T.RowA : T.RowB);
-                Ui.Text(Ui.Box(row, 14, 0, 170, prizeH), p == 0 ? "♛ Champion" : Places[p], 17, p == 0 ? T.Gold : T.Text, TextAnchor.MiddleLeft);
-                var paid = Ui.Text(Ui.Box(row, 170, 0, 256, prizeH), $"+{pay[p]:N0} DP" + (packs > 0 ? $" · {Packs(packName, packs)}" : ""), 17, T.Gold, TextAnchor.MiddleRight);
+                Ui.Text(Ui.Box(row, 14, 0, 170, prizeH), p == 0 ? "♛ Champion" : Places[p], TextRole.Body, p == 0 ? T.Gold : T.Text, TextAnchor.MiddleLeft);
+                var paid = Ui.Text(Ui.Box(row, 170, 0, 256, prizeH), $"+{pay[p]:N0} DP" + (packs > 0 ? $" · {Packs(packName, packs)}" : ""), TextRole.Body, T.Gold, TextAnchor.MiddleRight);
                 paid.resizeTextForBestFit = true;
-                paid.resizeTextMinSize = 11;
-                paid.resizeTextMaxSize = 17;
+                paid.resizeTextMinSize = UiTheme.Floor;
+                paid.resizeTextMaxSize = UiTheme.Size(TextRole.Body);
             }
             float y = 166 + pay.Length * prizeStep + 4;
             if (firstTokens > 0)
             {
-                Ui.Text(Ui.Box(panel, 730, y, 440, 22), $"Your first title here: +{firstTokens} Card Token{(firstTokens > 1 ? "s" : "")}", 14, T.GoldSoft, TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(panel, 730, y, 440, 22), $"Your first title here: +{firstTokens} Card Token{(firstTokens > 1 ? "s" : "")}", TextRole.Caption, T.GoldSoft, TextAnchor.MiddleLeft);
                 y += 24;
             }
             // What a Contraband Pack holds, with its odds, before the entry is paid (as the Locals show a Prize Pack's).
             float room = 590 - y;
-            var odds = Ui.Text(Ui.Box(panel, 730, y + 4, 440, room), noLimits ? NoLimitsOddsText() : ContrabandOddsText(), 14, T.TextSoft, TextAnchor.UpperLeft);
+            var odds = Ui.Text(Ui.Box(panel, 730, y + 4, 440, room), noLimits ? NoLimitsOddsText() : ContrabandOddsText(), TextRole.Caption, T.TextSoft, TextAnchor.UpperLeft);
             odds.supportRichText = true;
             odds.lineSpacing = 1.05f;
             float oddsHeight = Mathf.Ceil(odds.preferredHeight);
             if (oddsHeight > room)
             {
                 odds.resizeTextForBestFit = true;
-                odds.resizeTextMinSize = 11;
-                odds.resizeTextMaxSize = 14;
+                odds.resizeTextMinSize = UiTheme.Floor;
+                odds.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
                 oddsHeight = room;
             }
             int entry = Brackets.EntryFor(kind);
             Ui.Text(Ui.Box(panel, 730, y + 4 + oddsHeight + 8, 440, 32), $"Entry: <color={T.GoldHex}>{entry:N0} DP</color> (not refunded) · you have {profile.Dp:N0} DP",
-                17, T.Text, TextAnchor.UpperLeft).supportRichText = true;
+                TextRole.Body, T.Text, TextAnchor.UpperLeft).supportRichText = true;
 
             // Your deck: the kind's rules bind it every round (the Alley list; the Invitational's, No Limits'), and it has to be one of your own.
             var problems = !_state.AlleyDeckChoices().Contains(profile.Deck)
@@ -912,17 +912,17 @@ namespace YgoCampaign.Game
                 : _state.AlleyProblems(_library.Load(profile.Deck), _state.AlleyBracketRules(kind));
             var rule = $"<color={T.WarnHex}>Your deck must be legal under {(noLimits ? "the No Limits rules (no list, three of anything)" : "the Alley list")} each round, and your own: no loaners. The others bring their decks as built. Leaving a duel counts as a loss.</color>"
                        + (problems.Count > 0 ? $" <color={T.BadHex}>{_state.DeckTitle(profile.Deck)} isn't legal here now: {problems[0].Message}</color> Fix it, or pick another of yours on each round's versus screen." : "");
-            var ruleText = Ui.Text(Ui.Box(panel, 30, 640, 1140, 60), rule, 17, T.TextSoft, TextAnchor.UpperLeft);
+            var ruleText = Ui.Text(Ui.Box(panel, 30, 640, 1140, 60), rule, TextRole.Body, T.TextSoft, TextAnchor.UpperLeft);
             ruleText.supportRichText = true;
-            _entryNote = Ui.Text(Ui.Box(panel, 30, 706, 1140, 40), "", 17, T.Bad, TextAnchor.MiddleLeft);
+            _entryNote = Ui.Text(Ui.Box(panel, 30, 706, 1140, 40), "", TextRole.Body, T.Bad, TextAnchor.MiddleLeft);
             _entryNote.supportRichText = true;
 
-            var enter = Ui.BoxButton(panel, 330, 790, 320, 72, $"Enter · {entry:N0} DP", () => EnterAlleyClicked(kind), 24);
+            var enter = Ui.BoxButton(panel, 330, 790, 320, 72, $"Enter · {entry:N0} DP", () => EnterAlleyClicked(kind), TextRole.Heading);
             enter.targetGraphic.color = T.Primary;
             // No field drawn, nothing to enter (EnterAlley would refuse it anyway, and charge nothing).
             enter.interactable = preview != null;
             _entryEnterable = preview != null;
-            Ui.BoxButton(panel, 680, 798, 200, 56, "Cancel", CloseEntry, 20).targetGraphic.color = T.Button;
+            Ui.BoxButton(panel, 680, 798, 200, 56, "Cancel", CloseEntry, TextRole.Label).targetGraphic.color = T.Button;
         }
 
         /// <summary>

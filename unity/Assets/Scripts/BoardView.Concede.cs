@@ -42,8 +42,8 @@ namespace YgoCampaign.Game
             var edge = panel.gameObject.AddComponent<Outline>();
             edge.effectColor = new Color(1f, 0.45f, 0.4f, 0.6f);
             edge.effectDistance = new Vector2(2, -2);
-            Typography.Strong(Ui.Text(Ui.Placed("Title", panel, new Vector2(0, 78), new Vector2(600, 44)), "Concede the duel?", 30, Color.white));
-            Ui.Text(Ui.Placed("Body", panel, new Vector2(0, 26), new Vector2(600, 30)), "It ends now and counts as a loss.", 18,
+            Typography.Strong(Ui.Text(Ui.Placed("Title", panel, new Vector2(0, 78), new Vector2(600, 44)), "Concede the duel?", TextRole.Title, Color.white));
+            Ui.Text(Ui.Placed("Body", panel, new Vector2(0, 26), new Vector2(600, 30)), "It ends now and counts as a loss.", TextRole.Body,
                 new Color(1, 1, 1, 0.75f)).raycastTarget = false;
             var concede = Ui.Button(panel, "Concede", new Vector2(-130, -66), new Vector2(220, 54), ConfirmConcede);
             concede.GetComponent<Image>().color = Ui.Hex("#B23A32");

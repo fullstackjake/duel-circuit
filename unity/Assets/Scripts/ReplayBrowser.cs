@@ -145,11 +145,11 @@ namespace YgoCampaign.Game
             var panel = Ui.Placed("Panel", _root, Vector2.zero, new Vector2(1240, 860));
             Ui.Image(panel, Ui.Hex("#1A1F2B"));
 
-            Typography.Strong(Ui.Text(Ui.Placed("Title", panel, new Vector2(-470, 395), new Vector2(260, 40)), "REPLAYS", 24, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
+            Typography.Strong(Ui.Text(Ui.Placed("Title", panel, new Vector2(-470, 395), new Vector2(260, 40)), "REPLAYS", TextRole.Heading, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
             Ui.Button(panel, "Close", new Vector2(560, 395), new Vector2(100, 40), Close);
 
             // Paste a code someone shared.
-            _code = Ui.Input(Ui.Placed("Code", panel, new Vector2(-150, 340), new Vector2(880, 40)), "Paste a replay code (YGOR1:...)", 15,
+            _code = Ui.Input(Ui.Placed("Code", panel, new Vector2(-150, 340), new Vector2(880, 40)), "Paste a replay code (YGOR1:...)", UiTheme.Size(TextRole.Small),
                 onSubmit: _ => WatchCode(_code.text));
             Ui.Button(panel, "Paste", new Vector2(365, 340), new Vector2(120, 40), () =>
             {
@@ -158,12 +158,12 @@ namespace YgoCampaign.Game
             });
             Ui.Button(panel, "Watch code", new Vector2(515, 340), new Vector2(150, 40), () => WatchCode(_code.text));
 
-            _status = Ui.Text(Ui.Placed("Status", panel, new Vector2(0, 295), new Vector2(1180, 30)), "", 14,
+            _status = Ui.Text(Ui.Placed("Status", panel, new Vector2(0, 295), new Vector2(1180, 30)), "", TextRole.Caption,
                 new Color(0.75f, 0.78f, 0.85f), TextAnchor.MiddleLeft);
             _list = Ui.Placed("List", panel, new Vector2(0, -20), new Vector2(1180, 9 * 64));
 
             Ui.Button(panel, "< Prev", new Vector2(-200, -380), new Vector2(120, 40), () => { _page--; ShowPage(); });
-            _pageLabel = Ui.Text(Ui.Placed("Page", panel, new Vector2(0, -380), new Vector2(200, 40)), "", 16, Color.white);
+            _pageLabel = Ui.Text(Ui.Placed("Page", panel, new Vector2(0, -380), new Vector2(200, 40)), "", TextRole.Small, Color.white);
             Ui.Button(panel, "Next >", new Vector2(200, -380), new Vector2(120, 40), () => { _page++; ShowPage(); });
         }
 
@@ -182,7 +182,7 @@ namespace YgoCampaign.Game
             if (_entries.Count == 0)
             {
                 Ui.Text(Ui.Placed("Empty", _list, Vector2.zero, new Vector2(1000, 60)),
-                    "No replays yet. Finish a duel, or press Save replay during one.", 18, new Color(1, 1, 1, 0.6f));
+                    "No replays yet. Finish a duel, or press Save replay during one.", TextRole.Body, new Color(1, 1, 1, 0.6f));
                 return;
             }
             for (int row = 0; row < PerPage; row++)
@@ -194,11 +194,11 @@ namespace YgoCampaign.Game
                 var rt = Ui.Placed("Row", _list, new Vector2(0, y), new Vector2(1180, 58));
                 Ui.Image(rt, row % 2 == 0 ? Ui.Hex("#20273A") : Ui.Hex("#1C2232"));
                 var r = entry.Replay;
-                Ui.Text(Ui.Placed("Name", rt, new Vector2(-235, 10), new Vector2(690, 26)), TitleOf(r), 16, Color.white, TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Placed("Name", rt, new Vector2(-235, 10), new Vector2(690, 26)), TitleOf(r), TextRole.Small, Color.white, TextAnchor.MiddleLeft);
                 var tag = entry.Recent ? "recent" : "<color=#FFC940>saved</color>";
                 var human = r.HumanSeat >= 0 ? " · you played" : "";
                 var meta = Ui.Text(Ui.Placed("Meta", rt, new Vector2(-235, -14), new Vector2(690, 22)),
-                    $"{r.Date:ddd d MMM yyyy, HH:mm} · {tag}{human} · {r.Responses.Count} moves", 13, new Color(0.7f, 0.74f, 0.82f), TextAnchor.MiddleLeft);
+                    $"{r.Date:ddd d MMM yyyy, HH:mm} · {tag}{human} · {r.Responses.Count} moves", TextRole.Caption, new Color(0.7f, 0.74f, 0.82f), TextAnchor.MiddleLeft);
                 meta.supportRichText = true;
                 Ui.Button(rt, "Watch", new Vector2(215, 0), new Vector2(110, 40), () =>
                 {

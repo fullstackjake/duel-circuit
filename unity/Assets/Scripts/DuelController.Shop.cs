@@ -26,6 +26,7 @@ namespace YgoCampaign.Game
             System.Collections.IEnumerator Shot(string name)
             {
                 ScreenCapture.CaptureScreenshot(Path.Combine(folder, $"shop-{name}.png"));
+                yield return TextRule($"shop-{name}", Report);
                 yield return null; // taken at the end of this frame
                 yield return null;
             }

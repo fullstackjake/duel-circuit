@@ -327,11 +327,11 @@ namespace YgoCampaign.Game
             var panel = Ui.Placed("Panel", _root, Vector2.zero, new Vector2(760, 240));
             Ui.Image(panel, T.Panel);
             Ui.Image(Ui.Placed("Edge", panel, new Vector2(0, 118), new Vector2(760, 4)), T.Gold).raycastTarget = false;
-            _question = Ui.Text(Ui.Placed("Question", panel, new Vector2(0, 40), new Vector2(700, 110)), question, 24, T.Text);
+            _question = Ui.Text(Ui.Placed("Question", panel, new Vector2(0, 40), new Vector2(700, 110)), question, TextRole.Heading, T.Text);
             _question.supportRichText = true;
             _question.resizeTextForBestFit = true;
             _question.resizeTextMinSize = 16;
-            _question.resizeTextMaxSize = 24;
+            _question.resizeTextMaxSize = UiTheme.Size(TextRole.Heading);
             _ok = Ui.Button(panel, $"{yesLabel}  (Enter)", new Vector2(-170, -70), new Vector2(320, 60), Confirm);
             _ok.targetGraphic.color = T.Primary;
             _cancel = Ui.Button(panel, "Cancel  (Esc)", new Vector2(170, -70), new Vector2(320, 60), Close);

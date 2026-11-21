@@ -50,7 +50,7 @@ namespace YgoCampaign.Game
             var edge = panel.gameObject.AddComponent<Outline>();
             edge.effectColor = new Color(0.45f, 0.7f, 1f, 0.5f);
             edge.effectDistance = new Vector2(2, -2);
-            Typography.Strong(Ui.Text(Ui.Placed("Title", panel, new Vector2(0, 130), new Vector2(1000, 40)), "Change phase", 26, Color.white));
+            Typography.Strong(Ui.Text(Ui.Placed("Title", panel, new Vector2(0, 130), new Vector2(1000, 40)), "Change phase", TextRole.Heading, Color.white));
 
             ushort now = _lastBoard?.Phase ?? 0;
             int current = now switch
@@ -75,9 +75,9 @@ namespace YgoCampaign.Game
                 group.alpha = reachable || i == current ? 1f : 0.32f;
                 group.interactable = group.blocksRaycasts = reachable;
                 if (i == current)
-                    Ui.Text(Ui.Placed("Here", panel, new Vector2(x, 92), new Vector2(60, 30)), "▼", 24, Color.white).raycastTarget = false;
+                    Ui.Text(Ui.Placed("Here", panel, new Vector2(x, 92), new Vector2(60, 30)), "▼", TextRole.Heading, Color.white).raycastTarget = false;
             }
-            Ui.Text(Ui.Placed("Keys", panel, new Vector2(0, -98), new Vector2(1000, 24)), "B: Battle Phase  ·  M: Main Phase 2  ·  E: end your turn  ·  Esc: cancel", 14,
+            Ui.Text(Ui.Placed("Keys", panel, new Vector2(0, -98), new Vector2(1000, 24)), "B: Battle Phase  ·  M: Main Phase 2  ·  E: end your turn  ·  Esc: cancel", TextRole.Caption,
                 new Color(1, 1, 1, 0.5f)).raycastTarget = false;
             Ui.Button(panel, "Cancel", new Vector2(0, -136), new Vector2(240, 44), ClosePhasePicker);
             root.SetAsLastSibling();

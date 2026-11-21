@@ -60,10 +60,10 @@ namespace YgoCampaign.Game
             _root = Ui.Overlay(transform, "RecipeBook", 15);
             Ui.Image(_root, Ui.Hex("#121620"));
             Ui.Image(Ui.Box(_root, 0, 0, 1920, 90), Ui.Hex("#0D1017"));
-            Typography.Strong(Ui.Text(Ui.Box(_root, 40, 0, 400, 90), "RECIPE BOOK", 34, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
-            _header = Ui.Text(Ui.Box(_root, 380, 0, 1200, 90), "", 20, Ui.Hex("#FFD86B"), TextAnchor.MiddleLeft);
+            Typography.Strong(Ui.Text(Ui.Box(_root, 40, 0, 400, 90), "RECIPE BOOK", TextRole.Title, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
+            _header = Ui.Text(Ui.Box(_root, 380, 0, 1200, 90), "", TextRole.Label, Ui.Hex("#FFD86B"), TextAnchor.MiddleLeft);
             _header.supportRichText = true;
-            Ui.BoxButton(_root, 1720, 22, 160, 46, "Back", Close, 18);
+            Ui.BoxButton(_root, 1720, 22, 160, 46, "Back", Close, TextRole.Label);
 
             var viewport = Ui.Box(_root, 40, 110, 640, 890);
             Ui.Image(viewport, new Color(0, 0, 0, 0.001f));
@@ -82,7 +82,7 @@ namespace YgoCampaign.Game
 
             _detail = Ui.Box(_root, 700, 110, 1180, 890);
             Ui.Image(_detail, Ui.Hex("#1A1F2B"));
-            _status = Ui.Text(Ui.Box(_root, 40, 1012, 1840, 50), "", 16, new Color(0.8f, 0.83f, 0.9f), TextAnchor.MiddleLeft);
+            _status = Ui.Text(Ui.Box(_root, 40, 1012, 1840, 50), "", TextRole.Small, new Color(0.8f, 0.83f, 0.9f), TextAnchor.MiddleLeft);
             _status.supportRichText = true;
         }
 
@@ -167,7 +167,7 @@ namespace YgoCampaign.Game
                 if (circuit.Band != band)
                 {
                     band = circuit.Band;
-                    var heading = Ui.Text(Ui.Box(_list, 6, y + 8, 620, 28), band.ToUpperInvariant(), 16, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
+                    var heading = Ui.Text(Ui.Box(_list, 6, y + 8, 620, 28), band.ToUpperInvariant(), TextRole.Small, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
                     Typography.Strong(heading);
                     y += 40;
                 }
@@ -199,12 +199,12 @@ namespace YgoCampaign.Game
             if (Portraits.PlaceHead(face, r.Owner.Id) && face.GetChild(face.childCount - 1).GetComponent<RawImage>() is RawImage portrait)
                 portrait.color = open ? Color.white : new Color(0.18f, 0.18f, 0.22f);
             var deck = open ? Load(r) : null;
-            var name = Ui.Text(Ui.Box(row, 84, 8, 380, 30), open ? Title(r, deck) : "???", 19, open ? Color.white : new Color(1, 1, 1, 0.45f), TextAnchor.MiddleLeft);
+            var name = Ui.Text(Ui.Box(row, 84, 8, 380, 30), open ? Title(r, deck) : "???", TextRole.Label, open ? Color.white : new Color(1, 1, 1, 0.45f), TextAnchor.MiddleLeft);
             Typography.Strong(name);
             // An open recipe's owner line ends with the deck's strength (none when it isn't rated).
             var stars = open ? StrengthText.Stars(DeckStrength.StarsFor(_state.Ratings, r.Deck), UiTheme.Current) : "";
-            Ui.Text(Ui.Box(row, 84, 40, 400, 26), open ? $"{r.Owner.Name}{(r.Boss ? "  ·  <color=#FFC940>boss</color>" : "")}{(stars.Length > 0 ? "  ·  " + stars : "")}" : $"Beat {r.Owner.Name} in {r.Where}",
-                14, new Color(0.72f, 0.76f, 0.84f, open ? 1 : 0.6f), TextAnchor.MiddleLeft).supportRichText = true;
+            Ui.OneLine(Ui.Text(Ui.Box(row, 84, 40, 400, 26), open ? $"{r.Owner.Name}{(r.Boss ? "  ·  <color=#FFC940>boss</color>" : "")}{(stars.Length > 0 ? "  ·  " + stars : "")}" : $"Beat {r.Owner.Name} in {r.Where}",
+                TextRole.Caption, new Color(0.72f, 0.76f, 0.84f, open ? 1 : 0.6f), TextAnchor.MiddleLeft)).supportRichText = true;
             if (open && deck != null)
             {
                 var (owned, wanted) = Ownership(r, deck);
@@ -212,7 +212,7 @@ namespace YgoCampaign.Game
                 var back = Ui.Box(row, 490, 30, 120, 12);
                 Ui.Image(back, new Color(0, 0, 0, 0.5f)).raycastTarget = false;
                 Ui.Image(Ui.Box(back, 0, 0, 120 * frac, 12), frac >= 1 ? Ui.Hex("#7BD88F") : Ui.Hex("#5FA8E8")).raycastTarget = false;
-                Ui.Text(Ui.Box(row, 490, 44, 120, 22), $"own {Mathf.RoundToInt(frac * 100)}%", 13, new Color(0.8f, 0.84f, 0.92f));
+                Ui.Text(Ui.Box(row, 490, 44, 120, 22), $"own {Mathf.RoundToInt(frac * 100)}%", TextRole.Caption, new Color(0.8f, 0.84f, 0.92f));
             }
             else if (!open)
             {
@@ -225,7 +225,7 @@ namespace YgoCampaign.Game
             {
                 var tag = Ui.Box(row, 490, 6, 50, 20);
                 Ui.Image(tag, Ui.Hex("#2F8F4A")).raycastTarget = false;
-                Typography.Strong(Ui.Text(tag, "NEW", 12, Color.white));
+                Typography.Strong(Ui.Text(tag, "NEW", TextRole.Caption, Color.white));
             }
             Ui.Clickable(row, () => { _selected = index; _mine = null; Refresh(); }, hover: () => _keys.Point(index), style: HoverStyle.Row);
         }
@@ -304,11 +304,11 @@ namespace YgoCampaign.Game
 
             if (!open)
             {
-                Typography.Strong(Ui.Text(Ui.Box(_detail, 270, 30, 880, 50), "Locked recipe", 30, Color.white, TextAnchor.MiddleLeft));
+                Typography.Strong(Ui.Text(Ui.Box(_detail, 270, 30, 880, 50), "Locked recipe", TextRole.Title, Color.white, TextAnchor.MiddleLeft));
                 var how = Ui.Text(Ui.Box(_detail, 270, 90, 880, 120),
                     $"Beat <b>{r.Owner.DisplayName}</b> in <b>{r.Where}</b> ({circuit.Band}) to unlock the deck they play there.\n\n"
                     + (Circuits.IsUnlocked(r.Circuit, Profile) ? "That circuit is open now." : $"That circuit opens later on the map."),
-                    18, new Color(0.82f, 0.85f, 0.92f), TextAnchor.UpperLeft);
+                    TextRole.Body, new Color(0.82f, 0.85f, 0.92f), TextAnchor.UpperLeft);
                 how.supportRichText = true;
                 return;
             }
@@ -317,21 +317,21 @@ namespace YgoCampaign.Game
             var deck = Load(r);
             if (deck == null)
             {
-                Ui.Text(Ui.Box(_detail, 270, 30, 880, 50), $"{r.Deck} (deck file missing)", 22, Color.white, TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(_detail, 270, 30, 880, 50), $"{r.Deck} (deck file missing)", TextRole.Subhead, Color.white, TextAnchor.MiddleLeft);
                 return;
             }
             var list = List(r);
-            var title = Ui.Text(Ui.Box(_detail, 270, 18, 890, 46), Title(r, deck), 32, Color.white, TextAnchor.MiddleLeft);
+            var title = Ui.Text(Ui.Box(_detail, 270, 18, 890, 46), Title(r, deck), TextRole.Title, Color.white, TextAnchor.MiddleLeft);
             Typography.Strong(title);
             title.resizeTextForBestFit = true;
             title.resizeTextMinSize = 18;
-            title.resizeTextMaxSize = 32;
+            title.resizeTextMaxSize = UiTheme.Size(TextRole.Title);
             var era = deck.Note("era");
             var by = Ui.Text(Ui.Box(_detail, 270, 64, 890, 26),
                 // The strength first, then whose deck and where (a long line takes two, below).
                 (DeckStrength.StarsFor(_state.Ratings, r.Deck) is int strength && strength > 0 ? "Strength " + StrengthText.Stars(strength, UiTheme.Current) + "  ·  " : "")
                 + $"{r.Owner.DisplayName}'s deck  ·  {r.Where}" + (era.Length > 0 ? $"  ·  <color=#FFC940>{era}{(deck.Note("tier").Length > 0 ? $", {deck.Note("tier")}" : "")}</color>" : ""),
-                15, new Color(0.75f, 0.78f, 0.86f), TextAnchor.MiddleLeft);
+                TextRole.Small, new Color(0.75f, 0.78f, 0.86f), TextAnchor.MiddleLeft);
             by.supportRichText = true;
             // A line too long for its box (a former recipe's "where", a long circuit name) takes two, broken at a separator at its
             // size; the ban line and the story move down by that line (the story keeps its bottom, as it fits itself).
@@ -344,11 +344,11 @@ namespace YgoCampaign.Game
                     : _state.Profile?.EraLimited == true ? "Plays with no ban list (house rules)." : "Lent as built: ban lists only apply in era-limited play.")
                 + (now == null || now.Name == list.Name ? "" : changes.Count == 0 ? $"   ·   As a loaner under {now.Name}: unchanged"
                     : $"   ·   As a loaner under {now.Name}: <color=#FF8A8A>{string.Join(", ", changes.Take(2).Select(c => c.Replace("Removed ", "−")))}{(changes.Count > 2 ? $" (+{changes.Count - 2})" : "")}</color>"),
-                14, Ui.Hex("#E3A21A"), TextAnchor.MiddleLeft);
+                TextRole.Caption, Ui.Hex("#E3A21A"), TextAnchor.MiddleLeft);
             banLine.supportRichText = true;
             banLine.resizeTextForBestFit = true;
-            banLine.resizeTextMinSize = 10;
-            banLine.resizeTextMaxSize = 14;
+            banLine.resizeTextMinSize = UiTheme.Floor;
+            banLine.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
 
             // Its story, from the deck's notes.
             var about = deck.Note("about");
@@ -356,20 +356,20 @@ namespace YgoCampaign.Game
             var story = about.Length > 0 || why.Length > 0
                 ? (about.Length > 0 ? $"<b>How it worked:</b> {about}\n" : "") + (why.Length > 0 ? $"<b>Why it mattered:</b> {why}" : "")
                 : $"<i>\"{r.Owner.Intro}\"</i>\n{DeckRules.Breakdown(deck.Main, _cards)}";
-            var storyText = Ui.Text(Ui.Box(_detail, 270, 120 + grow, 600, 140 - grow), story, 15, new Color(0.86f, 0.88f, 0.93f), TextAnchor.UpperLeft);
+            var storyText = Ui.Text(Ui.Box(_detail, 270, 120 + grow, 600, 140 - grow), story, TextRole.Small, new Color(0.86f, 0.88f, 0.93f), TextAnchor.UpperLeft);
             storyText.supportRichText = true;
             storyText.resizeTextForBestFit = true;
-            storyText.resizeTextMinSize = 11;
-            storyText.resizeTextMaxSize = 15;
+            storyText.resizeTextMinSize = UiTheme.Floor;
+            storyText.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
 
             // How much of it you own.
             var (owned, wanted) = Ownership(r, deck);
             float frac = wanted == 0 ? 0 : (float)owned / wanted;
-            Ui.Text(Ui.Box(_detail, 270, 268, 300, 24), "YOU OWN", 13, new Color(1, 1, 1, 0.5f), TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(_detail, 270, 268, 300, 24), "YOU OWN", TextRole.Caption, new Color(1, 1, 1, 0.5f), TextAnchor.MiddleLeft);
             var bar = Ui.Box(_detail, 270, 294, 600, 18);
             Ui.Image(bar, new Color(0, 0, 0, 0.5f));
             Ui.Image(Ui.Box(bar, 0, 0, 600 * frac, 18), frac >= 1 ? Ui.Hex("#7BD88F") : Ui.Hex("#5FA8E8")).raycastTarget = false;
-            Ui.Text(Ui.Box(_detail, 884, 288, 270, 30), $"{owned} of {wanted} cards ({Mathf.RoundToInt(frac * 100)}%)", 16, Color.white, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(_detail, 884, 288, 270, 30), $"{owned} of {wanted} cards ({Mathf.RoundToInt(frac * 100)}%)", TextRole.Small, Color.white, TextAnchor.MiddleLeft);
             // Recipe packs: 9 of its cards (the missing ones first), or every missing card bought outright.
             if (_state.Printings != null && frac < 1)
             {
@@ -378,17 +378,17 @@ namespace YgoCampaign.Game
                 int packPrice = PackPrice(r);
                 int complete = RecipeShop.CompletePrice(deck, Profile, list, year, printings, _cards, packPrice);
                 var packRecipe = r;
-                Ui.BoxButton(_detail, 270, 318, 280, 30, $"Recipe pack · {packPrice:N0} DP", () => BuyRecipePack(packRecipe, deck), 15);
+                Ui.BoxButton(_detail, 270, 318, 280, 30, $"Recipe pack · {packPrice:N0} DP", () => BuyRecipePack(packRecipe, deck), TextRole.Label);
                 if (complete > 0)
-                    Ui.BoxButton(_detail, 560, 318, 310, 30, $"Buy what's missing · {complete:N0} DP", () => CompleteRecipe(packRecipe, deck), 15);
+                    Ui.BoxButton(_detail, 560, 318, 310, 30, $"Buy what's missing · {complete:N0} DP", () => CompleteRecipe(packRecipe, deck), TextRole.Label);
             }
             // A Replay Lesson: the deck played by its owner, opened at its key turn.
             var lessonRecipe = r;
-            Ui.BoxButton(_detail, 884, 186, 270, 36, "Customize as loaner", () => CustomizeLoaner(lessonRecipe, deck), 15);
-            Ui.BoxButton(_detail, 884, 228, 270, 36, $"▶ Watch {r.Owner.Name.Split(' ')[0]} play it", () => WatchLesson?.Invoke(lessonRecipe), 15);
+            Ui.BoxButton(_detail, 884, 186, 270, 36, "Customize as loaner", () => CustomizeLoaner(lessonRecipe, deck), TextRole.Label);
+            Ui.BoxButton(_detail, 884, 228, 270, 36, $"▶ Watch {r.Owner.Name.Split(' ')[0]} play it", () => WatchLesson?.Invoke(lessonRecipe), TextRole.Label);
 
             // The list: each card once with its count; ones you're short of are dimmed with what you have.
-            Ui.Text(Ui.Box(_detail, 16, 354, 600, 24), $"MAIN DECK {deck.Main.Count}   ·   EXTRA DECK {deck.Extra.Count}", 13, new Color(1, 1, 1, 0.5f), TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(_detail, 16, 354, 600, 24), $"MAIN DECK {deck.Main.Count}   ·   EXTRA DECK {deck.Extra.Count}", TextRole.Caption, new Color(1, 1, 1, 0.5f), TextAnchor.MiddleLeft);
             var wants = AutoDeck.Wants(deck, list, _cards);
             var groups = deck.Main.Select(c => (c, extra: false)).Concat(deck.Extra.Select(c => (c, extra: true)))
                 .GroupBy(x => Banlist.BaseCode(x.c, _cards)).Select(g => (code: g.First().c, key: g.Key, count: g.Count(), extra: g.First().extra)).ToList();
@@ -406,8 +406,8 @@ namespace YgoCampaign.Game
                 var view = CardView.Create(_detail, new Vector2(x - 590, 445 - y), size, card, info, 0, true, null, offField: true);
                 int have = Math.Min(count, Profile.Collection.Count(key));
                 if (have < count) view.gameObject.AddComponent<CanvasGroup>().alpha = 0.4f;
-                var label = Ui.Text(Ui.Placed("Count", _detail, new Vector2(x - 590, 445 - y - size.y / 2 - 9), new Vector2(60, 16)),
-                    have < count ? $"<color=#FF8A8A>{have}/{count}</color>" : $"x{count}", 12, Color.white);
+                var label = Ui.Text(Ui.Placed("Count", _detail, new Vector2(x - 590, 445 - y - size.y / 2 - 10), new Vector2(60, 18)),
+                    have < count ? $"<color=#FF8A8A>{have}/{count}</color>" : $"x{count}", TextRole.Caption, Color.white);
                 label.supportRichText = true;
             }
 
@@ -416,19 +416,33 @@ namespace YgoCampaign.Game
             // Five lines fit: four and "…and N more" when there are more than five.
             int listed = missing.Count > 5 ? 4 : missing.Count;
             var where = missing.Take(listed).Select(w =>
-                $"<b>{_cards.Get(w.Key)?.Name ?? w.Key.ToString()}</b> x{w.Value - Profile.Collection.Count(w.Key)}: {WhereToGet(w.Key)}");
-            var missingText = Ui.Text(Ui.Box(_detail, 16, 790, 820, 92),
-                missing.Count == 0 ? "<color=#7BD88F>You own every card in this recipe.</color>"
-                    : $"<color=#FF8A8A>Missing {missing.Count} card{(missing.Count == 1 ? "" : "s")}:</color>\n" + string.Join("\n", where) + (missing.Count > listed ? $"\n…and {missing.Count - listed} more" : ""),
-                13, new Color(0.84f, 0.87f, 0.93f), TextAnchor.UpperLeft);
+                $"<color=#FFFFFF>{_cards.Get(w.Key)?.Name ?? w.Key.ToString()}</color> x{w.Value - Profile.Collection.Count(w.Key)}: {WhereToGet(w.Key)}");
+            var missingText = Ui.Text(Ui.Box(_detail, 16, 790, 820, 92), "", TextRole.Caption, new Color(0.84f, 0.87f, 0.93f), TextAnchor.UpperLeft);
             missingText.supportRichText = true;
+            FitMissing(missingText, missing.Count, where.ToList());
 
             var recipe = r;
-            Ui.BoxButton(_detail, 850, 792, 310, 42, "Build this deck", () => BuildDeck(recipe, deck), 18).targetGraphic.color = Ui.Hex("#B8432F");
-            if (missing.Count > 0) Ui.BoxButton(_detail, 850, 840, 310, 42, "Add missing to wishlist", () => Wish(recipe, deck), 16);
+            Ui.BoxButton(_detail, 850, 792, 310, 42, "Build this deck", () => BuildDeck(recipe, deck), TextRole.Label).targetGraphic.color = Ui.Hex("#B8432F");
+            if (missing.Count > 0) Ui.BoxButton(_detail, 850, 840, 310, 42, "Add missing to wishlist", () => Wish(recipe, deck), TextRole.Label);
         }
 
         private string WhereToGet(uint baseCode) => _state.WhereToGet(baseCode);
+
+        /// <summary>
+        /// The missing cards under a recipe: the header, then as many of <paramref name="lines"/> as fit the box (wrapped
+        /// lines counted) and "…and N more" for the rest; or the all-owned line.
+        /// </summary>
+        private static void FitMissing(Text t, int total, List<string> lines)
+        {
+            if (total == 0) { t.text = "<color=#7BD88F>You own every card in this recipe.</color>"; return; }
+            string head = $"<color=#FF8A8A>Missing {total} card{(total == 1 ? "" : "s")}:</color>";
+            float room = t.rectTransform.rect.height;
+            for (int k = lines.Count; k >= 0; k--)
+            {
+                t.text = head + (k > 0 ? "\n" + string.Join("\n", lines.Take(k)) : "") + (total > k ? $"\n…and {total - k} more" : "");
+                if (k == 0 || t.preferredHeight <= room + 0.5f) return;
+            }
+        }
 
         /// <summary>
         /// A custom loaner: the recipe (adjusted for the current ban list) saved as a deck you can edit with its own cards

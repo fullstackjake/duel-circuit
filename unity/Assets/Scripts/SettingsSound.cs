@@ -57,15 +57,15 @@ namespace YgoCampaign.Game
         {
             var rt = Ui.Box(rows, 0, y, 1700, 94);
             Ui.Image(rt, Ui.Hex("#1A2030"));
-            Typography.Strong(Ui.Text(Ui.Box(rt, 30, 8, 500, 42), name, 26, Color.white, TextAnchor.MiddleLeft));
-            Ui.Text(Ui.Box(rt, 30, 50, 1100, 40), help, 15, new Color(0.72f, 0.76f, 0.86f), TextAnchor.UpperLeft);
+            Typography.Strong(Ui.Text(Ui.Box(rt, 30, 8, 500, 42), name, TextRole.Heading, Color.white, TextAnchor.MiddleLeft));
+            Ui.Text(Ui.Box(rt, 30, 50, 1100, 40), help, TextRole.Small, new Color(0.72f, 0.76f, 0.86f), TextAnchor.UpperLeft);
             return rt;
         }
 
         private static float Toggle(RectTransform rows, float y, string name, string value, string help, Action change)
         {
             var rt = Box(rows, y, name, help);
-            Ui.BoxButton(rt, 1260, 19, 400, 56, value, change, 20);
+            Ui.BoxButton(rt, 1260, 19, 400, 56, value, change, TextRole.Label);
             return y + 104;
         }
 
@@ -73,7 +73,7 @@ namespace YgoCampaign.Game
         {
             var rt = Box(rows, y, name, help);
             var v = new Volume { Group = group, Key = key, Preview = preview, Get = get };
-            Ui.BoxButton(rt, 1200, 19, 48, 56, "<", () => Step(v, -1), 20);
+            Ui.BoxButton(rt, 1200, 19, 48, 56, "<", () => Step(v, -1), TextRole.Label);
 
             // The slider: a 284 x 8 track, the gold fill, a 24 x 24 white handle; the whole 284 x 28 takes the pointer.
             var area = Ui.Box(rt, 1260, 33, 284, 28);
@@ -118,8 +118,8 @@ namespace YgoCampaign.Game
             slider.SetValueWithoutNotify(get() * Steps);
             v.Slider = slider;
 
-            Ui.BoxButton(rt, 1556, 19, 48, 56, ">", () => Step(v, +1), 20);
-            v.Label = Ui.Text(Ui.Box(rt, 1612, 19, 80, 56), Percent(get()), 20, Color.white, TextAnchor.MiddleRight);
+            Ui.BoxButton(rt, 1556, 19, 48, 56, ">", () => Step(v, +1), TextRole.Label);
+            v.Label = Ui.Text(Ui.Box(rt, 1612, 19, 80, 56), Percent(get()), TextRole.Label, Color.white, TextAnchor.MiddleRight);
 
             slider.onValueChanged.AddListener(value =>
             {

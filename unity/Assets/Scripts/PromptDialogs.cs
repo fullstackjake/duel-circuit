@@ -167,7 +167,7 @@ namespace YgoCampaign.Game
                 var pill = Ui.Placed("ShowChoices", _root, new Vector2(0, 470), new Vector2(420, 50));
                 _banner = pill;
                 Ui.Image(pill, ChainHeader);
-                Ui.Text(pill, $"{Highlight(Short(_set.Title))}   ▲ Show", 17, Color.white).supportRichText = true;
+                Ui.Text(pill, $"{Highlight(Short(_set.Title))}   ▲ Show", TextRole.Body, Color.white).supportRichText = true;
                 Ui.Clickable(pill, () => SetHidden(false), style: HoverStyle.Button);
                 return;
             }
@@ -212,7 +212,7 @@ namespace YgoCampaign.Game
             {
                 var tab = Ui.Placed("Tab", content, new Vector2(x + 70, 106), new Vector2(160, 26));
                 Ui.Image(tab, ChainHeader);
-                Typography.Strong(Ui.Text(tab, g.Key.name, 14, Color.white));
+                Typography.Strong(Ui.Text(tab, g.Key.name, TextRole.Caption, Color.white));
                 foreach (var i in g)
                 {
                     var center = new Vector2(x + CardSize.x / 2, -12);
@@ -234,7 +234,7 @@ namespace YgoCampaign.Game
                 Ui.Button(box, ">", new Vector2(575, 10), new Vector2(36, 80), () => scroll.horizontalNormalizedPosition = Mathf.Clamp01(scroll.horizontalNormalizedPosition + 0.3f));
             }
 
-            var status = Ui.Text(Ui.Placed("Status", box, new Vector2(0, -150), new Vector2(1000, 34)), Status(set), 18, Color.white);
+            var status = Ui.Text(Ui.Placed("Status", box, new Vector2(0, -150), new Vector2(1000, 34)), Status(set), TextRole.Body, Color.white);
             status.supportRichText = true;
             Buttons(box, Actions(set), -200);
         }
@@ -280,13 +280,13 @@ namespace YgoCampaign.Game
             Ui.Image(banner, Panel);
             var edge = Ui.Placed("Edge", banner, new Vector2(0, -58), new Vector2(800, 4));
             Ui.Image(edge, Gold);
-            var title = Ui.Text(Ui.Placed("Title", banner, new Vector2(-24, 26), new Vector2(700, 44)), Highlight(set.Title), 24, Color.white);
+            var title = Ui.Text(Ui.Placed("Title", banner, new Vector2(-24, 26), new Vector2(700, 44)), Highlight(set.Title), TextRole.Heading, Color.white);
             title.supportRichText = true;
             title.resizeTextForBestFit = true;
             title.resizeTextMinSize = 14;
-            title.resizeTextMaxSize = 24;
+            title.resizeTextMaxSize = UiTheme.Size(TextRole.Heading);
             var status = Ui.Text(Ui.Placed("Status", banner, new Vector2(0, -24), new Vector2(760, 36)),
-                $"{Status(set)}   <color=#9AA4B8>Click a glowing card.</color>", 18, Color.white);
+                $"{Status(set)}   <color=#9AA4B8>Click a glowing card.</color>", TextRole.Body, Color.white);
             status.supportRichText = true;
             if (CheckField != null)
             {
@@ -311,7 +311,7 @@ namespace YgoCampaign.Game
             var banner = Ui.Placed("Banner", _root!, new Vector2(-150, 440), new Vector2(800, 70));
             _banner = banner;
             Ui.Image(banner, Panel);
-            Ui.Text(banner, Highlight(set.Title), 22, Color.white).supportRichText = true;
+            Ui.Text(banner, Highlight(set.Title), TextRole.Subhead, Color.white).supportRichText = true;
             if (set.Prompt is PositionPrompt pp && _cards.Get(pp.Code) is { } info)
             {
                 var card = new FieldCard { Code = info.Code, Position = 0x1, Type = info.Type, Level = info.Level & 0xff, Attack = info.Attack, Defense = info.Defense };
@@ -338,11 +338,11 @@ namespace YgoCampaign.Game
             var box = Frame(boxWidth, boxHeight, title, ChainHeader);
             if (about.Length > 0)
             {
-                var line = Ui.Text(Ui.Placed("Responding", box, new Vector2(0, boxHeight / 2 - 94), new Vector2(boxWidth - 80, 24)), about, 16,
+                var line = Ui.Text(Ui.Placed("Responding", box, new Vector2(0, boxHeight / 2 - 94), new Vector2(boxWidth - 80, 24)), about, TextRole.Small,
                     new Color(0.75f, 0.85f, 1f));
                 line.resizeTextForBestFit = true;
-                line.resizeTextMinSize = 12;
-                line.resizeTextMaxSize = 16;
+                line.resizeTextMinSize = UiTheme.Floor;
+                line.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
             }
             int me = set.Prompt.Player;
             float x0 = -(count - 1) * 150 / 2f;
@@ -354,8 +354,8 @@ namespace YgoCampaign.Game
                 var center = new Vector2(x0 + i * 150, 30);
                 CardTile(box, center, set, i, me);
                 var verb = set.Choices[i].Verb.Length > 0 ? set.Choices[i].Verb : "Activate";
-                Ui.Text(Ui.Placed("Verb", box, center + new Vector2(0, -100), new Vector2(146, 24)), verb, 14, Gold);
-                Ui.Text(Ui.Placed("Link", box, center + new Vector2(0, -122), new Vector2(146, 22)), $"→ Chain Link {next}", 14, new Color(0.7f, 0.82f, 1f));
+                Ui.Text(Ui.Placed("Verb", box, center + new Vector2(0, -100), new Vector2(146, 24)), verb, TextRole.Caption, Gold);
+                Ui.Text(Ui.Placed("Link", box, center + new Vector2(0, -122), new Vector2(146, 22)), $"→ Chain Link {next}", TextRole.Caption, new Color(0.7f, 0.82f, 1f));
             }
             var buttons = new List<(string, Action, bool, bool)>();
             if (set.CanCancel) buttons.Add(("Don't chain", _prompt.CancelSelection, false, true));
@@ -365,11 +365,11 @@ namespace YgoCampaign.Game
                 : next == 1 ? "Several can activate: the one you pick first becomes Chain Link 1 and resolves last; the next one chained resolves before it."
                 : $"Click a card to activate it: as Chain Link {next} it resolves first, before Chain Link {next - 1}.";
             // Between the cards' captions (bottom -103) and the button (top -153): two lines at most, 12 px above the button.
-            var howText = Ui.Text(Ui.Placed("How", box, new Vector2(0, -123), new Vector2(boxWidth - 60, 36)), how, 16, new Color(1, 1, 1, 0.65f));
+            var howText = Ui.Text(Ui.Placed("How", box, new Vector2(0, -123), new Vector2(boxWidth - 60, 36)), how, TextRole.Small, new Color(1, 1, 1, 0.65f));
             howText.horizontalOverflow = HorizontalWrapMode.Wrap;
             howText.resizeTextForBestFit = true;
-            howText.resizeTextMinSize = 12;
-            howText.resizeTextMaxSize = 16;
+            howText.resizeTextMinSize = UiTheme.Floor;
+            howText.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
         }
 
         /// <summary>
@@ -395,16 +395,16 @@ namespace YgoCampaign.Game
                 disc.texture = Icons.Round;
                 disc.color = Gold;
                 disc.raycastTarget = false;
-                var n = Ui.Text(badge, (place + 1).ToString(), 18, Ui.Hex("#1A1408"));
+                var n = Ui.Text(badge, (place + 1).ToString(), TextRole.Body, Ui.Hex("#1A1408"));
                 Typography.Strong(n);
                 n.raycastTarget = false;
                 int link = set.ChainLength + place + 1, resolves = total - link + 1;
                 string caption = chain ? $"Chain Link {link} · resolves {Ordinal(resolves)}" : place == 0 ? "on top" : $"{Ordinal(place + 1)} from the top";
-                Ui.Text(Ui.Placed("Caption", box, center + new Vector2(0, -CardSize.y / 2 - 16), new Vector2(156, 22)), caption, 13, Gold);
+                Ui.Text(Ui.Placed("Caption", box, center + new Vector2(0, -CardSize.y / 2 - 16), new Vector2(156, 22)), caption, TextRole.Caption, Gold);
             }
             int placed = Enumerable.Range(0, count).Count(i => _prompt.OrderOf(i) >= 0);
             var status = Ui.Text(Ui.Placed("Status", box, new Vector2(0, -120), new Vector2(1060, 46)),
-                placed < count ? $"<color=#FFC940>{placed}</color> of {count} placed.  {set.Detail}" : "All placed. Confirm, or click one to take it back out.", 15, Color.white);
+                placed < count ? $"<color=#FFC940>{placed}</color> of {count} placed.  {set.Detail}" : "All placed. Confirm, or click one to take it back out.", TextRole.Small, Color.white);
             status.supportRichText = true;
             var buttons = new List<(string, Action, bool, bool)>
             {
@@ -433,12 +433,9 @@ namespace YgoCampaign.Game
             // The effect's own description when the game gives one, else the card's text.
             var words = set.Detail;
             if (words.Length == 0 && set.Prompt is EffectYesNoPrompt yp) words = _cards.Get(yp.Card.Code)?.Text ?? "";
-            var detail = Ui.Text(Ui.Placed("Detail", box, withCard ? new Vector2(80, 10) : new Vector2(0, 10), withCard ? new Vector2(520, 230) : new Vector2(740, 120)),
-                Highlight(words), 18, new Color(0.85f, 0.88f, 0.94f), withCard ? TextAnchor.MiddleLeft : TextAnchor.MiddleCenter);
-            detail.supportRichText = true;
-            detail.resizeTextForBestFit = true;
-            detail.resizeTextMinSize = 11;
-            detail.resizeTextMaxSize = FxSettings.Scaled(18);
+            // Long card text shrinks to the floor, then scrolls: never cut.
+            DebugText = Ui.FitOrScroll(Ui.Placed("Detail", box, withCard ? new Vector2(80, 10) : new Vector2(0, 10), withCard ? new Vector2(520, 230) : new Vector2(740, 120)),
+                Highlight(words), UiTheme.Size(TextRole.Body, reading: true), UiTheme.Floor, new Color(0.85f, 0.88f, 0.94f), withCard ? TextAnchor.MiddleLeft : TextAnchor.MiddleCenter);
             Buttons(box, new List<(string, Action, bool, bool)>
             {
                 ("Yes", () => _prompt.ClickChoice(0), true, true),
@@ -462,24 +459,27 @@ namespace YgoCampaign.Game
                 Ui.Image(tab, on ? Ui.Hex("#9BD12E") : Ui.Hex("#13304F"));
                 var underline = Ui.Placed("Line", tab, new Vector2(0, -24), new Vector2(tabW - 10, 3));
                 Ui.Image(underline, Ui.Hex("#9BD12E")).raycastTarget = false;
-                var number = Ui.Text(tab, (i + 1).ToString(), 24, on ? Ui.Hex("#0B1A10") : Color.white);
+                var number = Ui.Text(tab, (i + 1).ToString(), TextRole.Heading, on ? Ui.Hex("#0B1A10") : Color.white);
                 Typography.Strong(number);
                 Ui.Clickable(tab, () => SelectTab(index), style: on ? HoverStyle.None : HoverStyle.Button); // the open tab doesn't light up
             }
             var body = Ui.Placed("Body", box, new Vector2(0, -25), new Vector2(840, 190));
             Ui.Image(body, Ui.Hex("#0F2236"));
-            var text = Ui.Text(body, Highlight(set.Choices[_optionTab].Label), 24, Color.white, TextAnchor.UpperLeft);
-            text.supportRichText = true;
-            text.rectTransform.offsetMin = new Vector2(24, 16);
-            text.rectTransform.offsetMax = new Vector2(-24, -20);
-            text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = 12;
-            text.resizeTextMaxSize = FxSettings.Scaled(24);
+            var area = Ui.Stretched("Area", body, Vector2.zero, Vector2.one);
+            area.offsetMin = new Vector2(24, 16);
+            area.offsetMax = new Vector2(-24, -20);
+            // Card text in the body face, at Heading's size grown by Settings > Card text size as before the type scale
+            // (24/29/34 then, 26/31/36 now); shrinks to the floor, then scrolls: never cut.
+            DebugText = Ui.FitOrScroll(area, Highlight(set.Choices[_optionTab].Label), FxSettings.Scaled(UiTheme.Size(TextRole.Heading)), UiTheme.Floor,
+                Color.white, TextAnchor.UpperLeft);
             int chosen = _optionTab;
             Buttons(box, new List<(string, Action, bool, bool)> { ("OK", () => _prompt.ClickChoice(chosen), true, true) }, -170);
         }
 
         private int _optionTab;
+
+        /// <summary>For checks: the yes/no or option dialog's text as last drawn (its size, whether it scrolls).</summary>
+        public Text? DebugText { get; private set; }
 
         /// <summary>Shows an effect's tab in the "Use which effect?" dialog (clicking it, or a check).</summary>
         public void SelectTab(int index)
@@ -500,15 +500,15 @@ namespace YgoCampaign.Game
             outline.effectDistance = new Vector2(2, -2);
             var head = Ui.Placed("Header", box, new Vector2(0, height / 2 - 40), new Vector2(width, 80));
             Ui.Image(head, header);
-            var text = Ui.Text(head, Highlight(title), 22, Color.white);
+            var text = Ui.Text(head, Highlight(title), TextRole.Subhead, Color.white);
             text.supportRichText = true;
             text.resizeTextForBestFit = true;
             text.resizeTextMinSize = 14;
-            text.resizeTextMaxSize = 22;
+            text.resizeTextMaxSize = UiTheme.Size(TextRole.Subhead);
             text.rectTransform.offsetMin = new Vector2(30, 0);
             text.rectTransform.offsetMax = new Vector2(-90, 0);
             var hide = Ui.Button(head, "▼", new Vector2(width / 2 - 40, 0), new Vector2(56, 50), () => { if (CheckField != null) CheckField(); else SetHidden(true); });
-            hide.GetComponentInChildren<Text>().fontSize = 22;
+            hide.GetComponentInChildren<Text>().fontSize = UiTheme.Size(TextRole.Subhead);
             var tip = hide.gameObject.AddComponent<TipOnHover>();
             tip.Title = "Check field";
             tip.Body = "Hides this to look at the board. Hold Space to peek instead.";
@@ -537,7 +537,7 @@ namespace YgoCampaign.Game
                 var check = Ui.Placed("Check", parent, center + new Vector2(CardSize.x / 2 - 14, CardSize.y / 2 - 14), new Vector2(36, 36));
                 check.localRotation = Quaternion.Euler(0, 0, 45);
                 Ui.Image(check, Ui.Hex("#13203A")).raycastTarget = false;
-                var mark = Ui.Text(Ui.Placed("Mark", parent, check.anchoredPosition, new Vector2(36, 36)), "✓", 24, Gold);
+                var mark = Ui.Text(Ui.Placed("Mark", parent, check.anchoredPosition, new Vector2(36, 36)), "✓", TextRole.Heading, Gold);
                 mark.raycastTarget = false;
             }
         }
@@ -552,7 +552,7 @@ namespace YgoCampaign.Game
                 var b = Ui.Button(box, label, new Vector2(x0 + i * (w + gap), y), new Vector2(w, 54), () => { Sounds.Play("click"); act(); });
                 b.targetGraphic.color = primary ? Ui.Hex("#2F6B2A") : Ui.Hex("#2A3140");
                 var text = b.GetComponentInChildren<Text>();
-                text.fontSize = 20;
+                text.fontSize = UiTheme.Size(TextRole.Label);
                 text.color = primary ? Ui.Hex("#E8FF8A") : Color.white;
                 b.interactable = enabled;
             }

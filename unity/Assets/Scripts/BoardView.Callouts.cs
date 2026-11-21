@@ -22,6 +22,10 @@ namespace YgoCampaign.Game
             public Text Context = null!;
             /// <summary>The card text's box, and the callout's least height with it squeezed (its text shrinks to fit).</summary>
             public RectTransform Body = null!;
+            /// <summary>The card text in full (the box shows what fits at the floor, then "…").</summary>
+            public string FullText = "";
+            /// <summary>The box size the text was last fitted to (fitted again only when it changes).</summary>
+            public Vector3 FittedFor = new Vector3(-1, -1, -1);
             public float MinHeight;
             /// <summary>Its height with the card text gone (name, effect line and context): the last resort over the board.</summary>
             public float Collapsed;
@@ -112,6 +116,34 @@ namespace YgoCampaign.Game
         public string OpponentCallout => _callouts.LastOrDefault(c => c.Player != (HumanSeat >= 0 ? HumanSeat : 0)) is { } c
             ? c.Context.text.Length > 0 ? $"{c.Name}: {c.Context.text}" : c.Name : "";
 
+        /// <summary>
+        /// A callout's card text in its box: best fit down to the floor; past that, cut at a word with "…" at the floor.
+        /// </summary>
+        private static void FitCalloutText(Callout c)
+        {
+            if (c.Body == null || !c.Body.TryGetComponent<Text>(out var body)) return;
+            var key = new Vector3(c.Body.rect.width, c.Body.rect.height, body.pixelsPerUnit);
+            if (key == c.FittedFor) return; // fitted already for this box at this scale
+            c.FittedFor = key;
+            body.text = c.FullText;
+            body.resizeTextForBestFit = true;
+            body.fontSize = body.resizeTextMaxSize;
+            float room = c.Body.rect.height;
+            if (room <= 0) return;
+            var settings = body.GetGenerationSettings(new Vector2(c.Body.rect.width, 0));
+            settings.resizeTextForBestFit = false;
+            settings.fontSize = UiTheme.Floor;
+            float Height(string s) => body.cachedTextGeneratorForLayout.GetPreferredHeight(s, settings) / body.pixelsPerUnit;
+            // A pixel of margin: at some window sizes a last line that measures as fitting is still dropped by the box.
+            room -= 1;
+            if (Height(c.FullText) <= room) return;
+            body.resizeTextForBestFit = false;
+            body.fontSize = UiTheme.Floor;
+            var words = c.FullText.Split(' ').ToList();
+            while (words.Count > 1 && Height(string.Join(" ", words) + "…") > room) words.RemoveAt(words.Count - 1);
+            body.text = string.Join(" ", words).TrimEnd(',', '.', ':', ';') + "…";
+        }
+
         /// <summary>A card's effect was activated: its callout joins the bottom of the stack.</summary>
         public void ShowCallout(uint code, int player, int link, ulong description, bool force = false)
         {
@@ -124,13 +156,16 @@ namespace YgoCampaign.Game
 
             var text = CalloutText(info.Text);
             float width = CalloutWidth, textW = width - TextLeft - TextRight;
-            // Room for the text: about 7.4 units per letter at size 15, at most 9 lines (longer text shrinks to fit).
+            // Room for the text: about 7.4 units per letter at 15, at most 9 lines (as before the type scale, so three still fit
+            // beside the board): the text, Small (16), shrinks to the floor (14), then ends in "…" (the card is a hover away).
             int lines = text.Split('\n').Sum(p => Mathf.Max(1, Mathf.CeilToInt(p.Length * 7.4f / textW)));
             float textH = Mathf.Clamp(lines * 18f, 18, 162);
             // The effect's short name ("Negate that effect"); a long one only repeats the text below.
             var summary = DuelText.Describe(description, _cards) ?? "";
             if (summary.Length > 60) summary = "";
-            float textTop = summary.Length > 0 ? 58 : 40;
+            // Which effect was used is said only here: never cut. A line too long for one line takes two (the callout grows).
+            bool summaryTwoLines = summary.Length > 0 && Ui.LineWidth(summary, Typography.Font(Face.Italic), UiTheme.Size(TextRole.Caption)) > textW - 4;
+            float textTop = summary.Length > 0 ? (summaryTwoLines ? 76 : 58) : 40;
             float height = Mathf.Max(textTop + textH + 12, 96);
 
             var rt = Ui.Rect("Callout", _calloutRoot);
@@ -153,33 +188,34 @@ namespace YgoCampaign.Game
             stripe.sizeDelta = new Vector2(6, 0);
             Ui.Image(stripe, owner).raycastTarget = false;
 
-            var num = Ui.Text(TopLeft(rt, "N", 8, 12, 40, 36), link > 0 ? link.ToString() : "•", 30, Ui.Hex("#FFC940"));
+            var num = Ui.Text(TopLeft(rt, "N", 8, 10, 40, 44), link > 0 ? link.ToString() : "•", TextRole.Title, Ui.Hex("#FFC940"));
             Typography.Strong(num);
             // Whose play it is in words too, under its number (the stripe's color isn't the only sign).
-            var who = Ui.Text(TopLeft(rt, "Who", 6, 48, 44, 18), OwnerTag(player), 14, new Color(0.8f, 0.84f, 0.92f));
+            var who = Ui.Text(TopLeft(rt, "Who", 6, 55, 44, 18), OwnerTag(player), TextRole.Caption, new Color(0.8f, 0.84f, 0.92f));
             Typography.Strong(who);
             who.resizeTextForBestFit = true; // a six-letter name (when watching) still fits under the number
-            who.resizeTextMinSize = 10;
-            who.resizeTextMaxSize = 14;
+            who.resizeTextMinSize = UiTheme.Floor;
+            who.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
 
             var thumb = TopLeft(rt, "Art", 50, 12, 48, 70);
             // The picture, else the plain card's thumb.
             CardFace.Draw(thumb.gameObject.AddComponent<RawImage>(), code, info, new Vector2(48, 70));
 
-            var name = Ui.Text(TopLeft(rt, "Name", TextLeft, 8, textW, 30), info.Name, 22, Color.white, TextAnchor.MiddleLeft);
+            var name = Ui.Text(TopLeft(rt, "Name", TextLeft, 8, textW, 30), info.Name, TextRole.Subhead, Color.white, TextAnchor.MiddleLeft);
             Typography.Strong(name);
             name.resizeTextForBestFit = true;
-            name.resizeTextMinSize = 14;
-            name.resizeTextMaxSize = 22;
+            name.resizeTextMinSize = UiTheme.Floor;
+            name.resizeTextMaxSize = UiTheme.Size(TextRole.Subhead);
+            Ui.OneLine(name); // shrinks to the floor, then ends in "…" (a narrow callout beside the open log)
             if (summary.Length > 0)
             {
-                var what = Ui.Text(TopLeft(rt, "Effect", TextLeft, 38, textW, 18), summary, 14, Ui.Hex("#9FD8FF"), TextAnchor.MiddleLeft);
+                var what = Ui.Text(TopLeft(rt, "Effect", TextLeft, 38, textW, summaryTwoLines ? 36 : 18), summary, TextRole.Caption, Ui.Hex("#9FD8FF"), TextAnchor.MiddleLeft);
                 Typography.Italic(what);
             }
-            var body = Ui.Text(TopLeft(rt, "Text", TextLeft, textTop, textW, textH), text, 15, new Color(0.86f, 0.89f, 0.95f), TextAnchor.UpperLeft);
+            var body = Ui.Text(TopLeft(rt, "Text", TextLeft, textTop, textW, textH), text, TextRole.Small, new Color(0.86f, 0.89f, 0.95f), TextAnchor.UpperLeft);
             body.resizeTextForBestFit = true;
-            body.resizeTextMinSize = 10;
-            body.resizeTextMaxSize = 15;
+            body.resizeTextMinSize = UiTheme.Floor;
+            body.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
 
             // What it answers or targets, at the bottom once the duel knows it.
             var contextRt = Ui.Rect("Context", rt);
@@ -188,18 +224,19 @@ namespace YgoCampaign.Game
             contextRt.pivot = new Vector2(0.5f, 0);
             contextRt.sizeDelta = new Vector2(-(TextLeft + TextRight), 18);
             contextRt.anchoredPosition = new Vector2((TextLeft - TextRight) / 2, 8);
-            var context = Ui.Text(contextRt, "", 14, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
+            var context = Ui.Text(contextRt, "", TextRole.Caption, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
             Typography.Italic(context);
             foreach (var g in rt.GetComponentsInChildren<Graphic>()) g.raycastTarget = false;
 
             float now = Time.unscaledTime;
             var callout = new Callout
             {
-                Rt = rt, Group = group, Context = context, Body = body.rectTransform, MinHeight = Mathf.Min(height, textTop + SqueezedText + 12),
+                Rt = rt, Group = group, Context = context, Body = body.rectTransform, FullText = text, MinHeight = Mathf.Min(height, textTop + SqueezedText + 12),
                 Collapsed = Mathf.Min(height, textTop + 8),
                 Code = code, Player = player, Name = info.Name, Born = now, Until = now + CalloutLife,
             };
             _callouts.Add(callout);
+            FitCalloutText(callout);
             _pendingContext.RemoveAll(p => now - p.at > 6);
             int pending = _pendingContext.FindIndex(p => p.code == code && p.player == player);
             if (pending >= 0)
@@ -273,6 +310,8 @@ namespace YgoCampaign.Game
                         last.Body.sizeDelta = new Vector2(last.Body.sizeDelta.x, Mathf.Max(0, last.Body.sizeDelta.y - cut));
                     }
             }
+            // Every callout's text fits its box (again only when the box or the scale changed).
+            foreach (var c in _callouts) if (c.Rt != null) FitCalloutText(c);
             // Oldest first: one never outlasts the one above it.
             for (int i = 1; i < _callouts.Count; i++) _callouts[i].Until = Mathf.Max(_callouts[i].Until, _callouts[i - 1].Until);
             for (int i = _callouts.Count - 1; i >= 0; i--)

@@ -45,7 +45,7 @@ namespace YgoCampaign.Game
                 var edge = _skipButton.gameObject.AddComponent<Outline>();
                 edge.effectColor = new Color(0.5f, 0.75f, 1f, 0.7f);
                 edge.effectDistance = new Vector2(1, -1);
-                Ui.Text(_skipButton, "Skip to my turn  »", 14, Color.white).raycastTarget = false;
+                Ui.Text(_skipButton, "Skip to my turn  »", TextRole.Caption, Color.white).raycastTarget = false;
                 image.raycastTarget = true;
                 Ui.Clickable(_skipButton, () => { Sounds.Play("click"); RequestSkip(); });
                 var tip = _skipButton.gameObject.AddComponent<TipOnHover>();
@@ -76,22 +76,22 @@ namespace YgoCampaign.Game
             var edge = panel.gameObject.AddComponent<Outline>();
             edge.effectColor = new Color(0.5f, 0.75f, 1f, 0.6f);
             edge.effectDistance = new Vector2(1.5f, -1.5f);
-            var head = Ui.Text(Ui.Placed("Title", panel, new Vector2(-20, height / 2 - 22), new Vector2(700, 28)), title, 17, Ui.Hex("#8CC8FF"), TextAnchor.MiddleLeft);
+            var head = Ui.Text(Ui.Placed("Title", panel, new Vector2(-20, height / 2 - 22), new Vector2(700, 28)), title, TextRole.Body, Ui.Hex("#8CC8FF"), TextAnchor.MiddleLeft);
             Typography.Strong(head);
             float y = height / 2 - 50;
             if (lines.Count > MaxLines)
             {
-                Ui.Text(Ui.Placed("More", panel, new Vector2(-20, y), new Vector2(700, 20)), $"({lines.Count - MaxLines} earlier: see History)", 13,
+                Ui.Text(Ui.Placed("More", panel, new Vector2(-20, y), new Vector2(700, 20)), $"({lines.Count - MaxLines} earlier: see History)", TextRole.Caption,
                     new Color(1, 1, 1, 0.5f), TextAnchor.MiddleLeft);
                 y -= 22;
             }
             foreach (var line in shown)
             {
-                Ui.Text(Ui.Placed("Line", panel, new Vector2(-10, y), new Vector2(720, 22)), "•  " + line, 15, new Color(0.9f, 0.92f, 0.96f), TextAnchor.MiddleLeft)
+                Ui.Text(Ui.Placed("Line", panel, new Vector2(-10, y), new Vector2(720, 22)), "•  " + line, TextRole.Small, new Color(0.9f, 0.92f, 0.96f), TextAnchor.MiddleLeft)
                     .raycastTarget = false;
                 y -= 24;
             }
-            Ui.Text(Ui.Placed("Close", panel, new Vector2(350, height / 2 - 22), new Vector2(60, 24)), "✕", 18, new Color(1, 1, 1, 0.7f)).raycastTarget = false;
+            Ui.Text(Ui.Placed("Close", panel, new Vector2(350, height / 2 - 22), new Vector2(60, 24)), "✕", TextRole.Body, new Color(1, 1, 1, 0.7f)).raycastTarget = false;
             Ui.Clickable(panel, CloseSkipRecap);
             panel.SetAsLastSibling();
         }

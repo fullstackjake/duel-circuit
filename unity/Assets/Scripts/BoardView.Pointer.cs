@@ -96,7 +96,7 @@ namespace YgoCampaign.Game
                 _pointerEdges[i].raycastTarget = false;
             }
             _pointerArrow = Ui.Placed("Arrow", _pointer, Vector2.zero, new Vector2(60, 50));
-            _pointerArrowText = Ui.Text(_pointerArrow, "▼", 40, Color.clear);
+            _pointerArrowText = Ui.Text(_pointerArrow, "▼", TextRole.Title, Color.clear);
             _pointerArrowText.raycastTarget = false;
             _pointerArrowText.gameObject.AddComponent<Outline>().effectDistance = new Vector2(2, -2);
         }

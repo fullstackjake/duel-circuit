@@ -104,7 +104,7 @@ namespace YgoCampaign.Game
             _main = Ui.Stretched("Main", _root, Vector2.zero, Vector2.one);
 
             var title = Ui.Box(_main, 110, 60, 1000, 100);
-            Typography.Strong(Ui.Text(title, "ABOUT", 60, T.Sign, TextAnchor.MiddleLeft));
+            Typography.Strong(Ui.Text(title, "ABOUT", TextRole.Display, T.Sign, TextAnchor.MiddleLeft));
             _layout.Add(("title", title));
             Block("name", 110, 180, 900, 50, $"Duel Circuit   {GameInfo.Version}", 34, T.Text, bold: true);
             Block("copyright", 110, 232, 900, 30, Copyright, 20, T.TextBody);
@@ -129,7 +129,7 @@ namespace YgoCampaign.Game
             var actions = new Action[] { Back, ShowLicense, ShowNotices, OpenFolder, OpenSource };
             for (int i = 0; i < ButtonLabels.Length; i++)
             {
-                var button = Ui.BoxButton(_main, x, 960, widths[i], 60, ButtonLabels[i], actions[i], 22);
+                var button = Ui.BoxButton(_main, x, 960, widths[i], 60, ButtonLabels[i], actions[i], TextRole.Subhead);
                 if (i == 1) button.targetGraphic.color = T.Primary; // the one red action: read the license
                 _buttons.Add((ButtonLabels[i], button));
                 _layout.Add(($"{ButtonLabels[i]} button", (RectTransform)button.transform));
@@ -141,7 +141,7 @@ namespace YgoCampaign.Game
         private Text Block(string what, float x, float y, float w, float h, string text, int size, Color color, bool bold = false)
         {
             var rt = Ui.Box(_main, x, y, w, h);
-            var t = Ui.Text(rt, text, size, color, TextAnchor.UpperLeft);
+            var t = Ui.Text(rt, text, UiTheme.Mapped(size), color, TextAnchor.UpperLeft); // on the scale, in the body face (paragraphs)
             t.supportRichText = false;
             if (bold) Typography.Strong(t);
             _layout.Add((what, rt));
@@ -151,7 +151,7 @@ namespace YgoCampaign.Game
         private void Heading(string what, float x, float y, float w, string text)
         {
             var rt = Ui.Box(_main, x, y, w, 30);
-            Typography.Strong(Ui.Text(rt, text, 19, UiTheme.Current.Gold, TextAnchor.MiddleLeft));
+            Typography.Strong(Ui.Text(rt, text, TextRole.Label, UiTheme.Current.Gold, TextAnchor.MiddleLeft));
             _layout.Add((what, rt));
         }
 
@@ -162,13 +162,13 @@ namespace YgoCampaign.Game
             Ui.Image(_reader, T.Deep); // covers the screen and its clicks
             // A reading column 1200 wide in the middle (the texts' lines stay a comfortable length).
             const float x = 360, w = 1200;
-            _readerTitle = Ui.Text(Ui.Box(_reader, x, 40, w, 70), "", 44, T.Sign, TextAnchor.MiddleLeft);
+            _readerTitle = Ui.Text(Ui.Box(_reader, x, 40, w, 70), "", TextRole.Title, T.Sign, TextAnchor.MiddleLeft);
             Typography.Strong(_readerTitle);
-            _readerFrom = Ui.Text(Ui.Box(_reader, x, 112, w, 30), "", 15, T.TextMuted, TextAnchor.MiddleLeft);
+            _readerFrom = Ui.Text(Ui.Box(_reader, x, 111, w, 37), "", TextRole.Small, T.TextMuted, TextAnchor.MiddleLeft);
             _readerFrom.supportRichText = false;
-            _readerFrom.resizeTextForBestFit = true; // a long folder path shrinks to fit
-            _readerFrom.resizeTextMinSize = 10;
-            _readerFrom.resizeTextMaxSize = 15;
+            _readerFrom.resizeTextForBestFit = true; // a long folder path shrinks to fit, on two lines at the floor
+            _readerFrom.resizeTextMinSize = UiTheme.Floor;
+            _readerFrom.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
 
             _readerViewport = Ui.Box(_reader, x, 150, w, 780);
             Ui.Image(_readerViewport, T.Panel);
@@ -204,10 +204,10 @@ namespace YgoCampaign.Game
             _readerScroll.verticalScrollbar = scrollbar;
             _readerScroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.Permanent;
 
-            _readerBack = Ui.BoxButton(_reader, x, 960, 240, 60, "Back", CloseReader, 22);
+            _readerBack = Ui.BoxButton(_reader, x, 960, 240, 60, "Back", CloseReader, TextRole.Subhead);
             Ui.Text(Ui.Box(_reader, x + 270, 960, w - 270, 60),
                 "Scroll with the mouse wheel, the arrow keys or the d-pad (Page Up / Page Down, LB / RB jump a page). Esc or B goes back.",
-                16, T.TextMuted, TextAnchor.MiddleLeft);
+                TextRole.Small, T.TextMuted, TextAnchor.MiddleLeft);
             _reader.gameObject.SetActive(false);
         }
 
@@ -251,7 +251,7 @@ namespace YgoCampaign.Game
             // A Text holds about 16,000 characters at most (65,000 vertices): long texts go in pieces, split at line ends.
             foreach (var piece in Pieces(text, 4000))
             {
-                var t = Ui.Text(Ui.Rect("Piece", _readerContent), piece, 20, T.TextBody, TextAnchor.UpperLeft);
+                var t = Ui.Text(Ui.Rect("Piece", _readerContent), piece, UiTheme.Mapped(20), T.TextBody, TextAnchor.UpperLeft); // reading: the body face
                 t.supportRichText = false;
                 t.verticalOverflow = VerticalWrapMode.Overflow;
                 t.lineSpacing = 1.05f;

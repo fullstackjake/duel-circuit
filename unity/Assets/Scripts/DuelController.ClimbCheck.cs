@@ -102,7 +102,7 @@ namespace YgoCampaign.Game
             void WholeLine(string kind, int maxLines)
             {
                 var shown = Texts(_recipeBook);
-                var by = shown.FirstOrDefault(t => t.fontSize == 15 && t.text.Contains("'s deck  ·  "));
+                var by = shown.FirstOrDefault(t => t.fontSize == UiTheme.Size(TextRole.Small) && t.text.Contains("'s deck  ·  "));
                 if (by == null) { sizedKinds.Add(kind); sizeProblems.Add($"{kind}: not found"); return; }
                 StarsFirst(kind, by);
                 var settings = by.GetGenerationSettings(new Vector2(by.rectTransform.rect.width, 0));
@@ -168,7 +168,7 @@ namespace YgoCampaign.Game
             (List<UiText> titles, List<UiText> quotes, List<UiText> rewards, UiText? header) CircuitTexts()
             {
                 var all = Texts(_campaignScreen);
-                return (all.Where(t => t.fontSize == 21 && (t.text.StartsWith("Match ") || t.text.StartsWith("Final: "))).ToList(),
+                return (all.Where(t => t.fontSize == UiTheme.Size(TextRole.Subhead) && (t.text.StartsWith("Match ") || t.text.StartsWith("Final: "))).ToList(),
                     all.Where(t => t.fontSize == 14 && t.font == Typography.Font(Face.Italic) && t.text.StartsWith("“")).ToList(),
                     all.Where(t => t.fontSize == 16 && (t.text.Contains("First win: +") || t.text.Contains("Won ×"))).ToList(),
                     all.FirstOrDefault(t => Plain(t.text).StartsWith("Cleared.") || Plain(t.text).StartsWith("Clear all ")));
@@ -426,7 +426,9 @@ namespace YgoCampaign.Game
             var openRated = _recipeBook.DebugRecipes.Where(r => RecipeBook.IsUnlocked(r, circuits, profile) && DeckStrength.StarsFor(_campaign.Ratings, r.Deck) > 0).ToList();
             var ownerLines = Texts(_recipeBook).Where(t => t.fontSize == 14 && t.text.Contains(StrengthText.Star)).ToList();
             bool linesRight = openRated.Count > 0 && ownerLines.Count == openRated.Count
-                && ownerLines.Select((t, i) => Gold(t.text, UiTheme.Current) == DeckStrength.StarsFor(_campaign.Ratings, openRated[i].Deck) && Plain(t.text).StartsWith(openRated[i].Owner.Name)).All(x => x);
+                && ownerLines.Select((t, i) => Gold(t.text, UiTheme.Current) == DeckStrength.StarsFor(_campaign.Ratings, openRated[i].Deck) && Plain(t.text).StartsWith(openRated[i].Owner.Name)
+                    // (R2: a line cut with "…" would lose stars or its end: it must be whole.)
+                    && !Plain(t.text).TrimEnd().EndsWith("…") && Plain(t.text).Count(c => c == StrengthText.Star) == DeckStrength.MaxStars).All(x => x);
             report($"7. {ownerLines.Count} open rated recipe rows show stars ({openRated.Count} open and rated); the former recipe ({formerRecipe?.Owner.Name}'s {formerDeck}) isn't listed without its key ({!listedBefore})",
                 linesRight && formerRecipe != null && !listedBefore);
             foreach (var t in ownerLines) Size("recipe owner line", t);
@@ -439,7 +441,7 @@ namespace YgoCampaign.Game
             bool selected = formerRecipe != null && _recipeBook.DebugSelectKey(formerRecipe.Key);
             yield return Settle();
             int wantStars = DeckStrength.StarsFor(_campaign.Ratings, formerDeck);
-            var byLine = Texts(_recipeBook).FirstOrDefault(t => t.fontSize == 15 && t.text.Contains("'s deck  ·  "));
+            var byLine = Texts(_recipeBook).FirstOrDefault(t => t.fontSize == UiTheme.Size(TextRole.Small) && t.text.Contains("'s deck  ·  "));
             report($"7. with formerrecipe:{formerRecipe?.Key} it's listed and selected ({selected}); its detail: \"{Plain(byLine?.text ?? "(none)")}\" ({wantStars} stars)",
                 selected && byLine != null && Plain(byLine.text).Contains(formerRecipe!.Where)
                 && byLine.text.StartsWith("Strength " + StrengthText.Stars(wantStars, UiTheme.Current) + "  ·  ") && wantStars > 0);
@@ -449,7 +451,7 @@ namespace YgoCampaign.Game
             {
                 bool liveSelected = _recipeBook.DebugSelectKey(liveFormer.Key);
                 yield return Settle();
-                var liveBy = Texts(_recipeBook).FirstOrDefault(t => t.fontSize == 15 && t.text.Contains("'s deck  ·  "));
+                var liveBy = Texts(_recipeBook).FirstOrDefault(t => t.fontSize == UiTheme.Size(TextRole.Small) && t.text.Contains("'s deck  ·  "));
                 report($"7. the live data's former recipe ({liveFormer.Owner.Name}'s {liveFormer.Deck}): hidden without its key ({!liveListedBefore}), listed with it ({liveSelected}); \"{Plain(liveBy?.text ?? "(none)")}\"",
                     !liveListedBefore && liveSelected && liveBy != null);
                 WholeLine("recipe strength line (former, live)", 2);
@@ -472,7 +474,7 @@ namespace YgoCampaign.Game
                 yield return Settle(0.4f);
                 _recipeBook.DebugSelectKey(longest.Key);
                 yield return Settle();
-                var longBy = Texts(_recipeBook).FirstOrDefault(t => t.fontSize == 15 && t.text.Contains("'s deck  ·  "));
+                var longBy = Texts(_recipeBook).FirstOrDefault(t => t.fontSize == UiTheme.Size(TextRole.Small) && t.text.Contains("'s deck  ·  "));
                 report($"9. the longest recipe line ({longest.Owner.Name}, {longest.Where}): \"{Plain(longBy?.text ?? "(none)")}\"", longBy != null && Plain(longBy.text).StartsWith("Strength ★"));
                 WholeLine("recipe strength line (longest)", 2);
                 yield return shot("climb-recipes-longest");

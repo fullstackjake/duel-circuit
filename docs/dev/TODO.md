@@ -55,14 +55,19 @@ UI polish ideas live in [UI-ROADMAP.md](UI-ROADMAP.md); the post-game's phases i
   - After New Game+, a "once" guest beaten before pays the full win rate without the prize (as built; flagged for the
     owner: does he expect 150?).
 
-## Type scale and fonts (R1 built 2026-11-21; docs/dev/TYPE-AND-FONTS-SPEC-2026-11-21.md, "As built: R1")
+## Type scale and fonts (R1 and R2 built 2026-11-21; docs/dev/TYPE-AND-FONTS-SPEC-2026-11-21.md, "As built: R1" and "As built: R2")
 
-R1 is built and reviewed (one fix round): the fonts, the helpers, the checks and the licences. No text size changed.
-Open:
+R1 (fonts, helpers, checks, licences) and R2 (the scale on the shell screens, the text rule) are built and reviewed (one
+fix round each). Open:
 
-- [ ] **R2 and R3 wait for the owner's go-ahead.** R2 applies the scale screen by screen; R3 does card and editor text
-  (and the deck editor review's M1). Until then buttons in the condensed face look small at 1280x720, and text inside
-  mid-sized plain cards is still about 5 px there.
+- [x] **R2: the scale on the shell screens** (built 2026-11-21; spec "As built: R2"). The owner has not yet confirmed
+  the R2 choices in the spec's "Owner decisions".
+- [ ] **R3 is next (owner's go-ahead given 2026-11-21).** It does card and editor text (and the deck editor review's M1), slab labels,
+  and removes the three R3 exclusions (card faces, the deck editor, the plain card studio) from the text rule. Until then
+  text inside mid-sized plain cards is still about 5 px at 1280x720.
+- [ ] **One Evidence pass over R2 and R3 on one build,** covering the checks not rerun on the final R2 build (board,
+  pile, controls, sound, editor, focus, search, plain) and the runs with pictures, which were not rerun after R2's fix
+  round.
 - [ ] **Windows is untested.** Run `-typecheck` on the PC: its log shows which font draws each fallback character (Greek
   letters in three card names, the katakana middle dot in seven, two Chinese characters in one card's text, arrows).
 - [ ] **About 100 script lines still use rich-text `<b>` / `<i>`,** which draw as synthesized bold or italic on Barlow.

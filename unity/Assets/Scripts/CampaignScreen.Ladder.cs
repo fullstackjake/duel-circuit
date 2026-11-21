@@ -54,11 +54,11 @@ namespace YgoCampaign.Game
             Ui.Image(frame, open ? Ui.Hex("#9AA6B8") : Ui.Hex("#4A4E56"));
             var plaque = Ui.Box(frame, 2, 2, w - 4, LadderPlaqueHeight - 4);
             Ui.Image(plaque, open ? Ui.Hex("#1E2530") : Ui.Hex("#22242A"));
-            var title = Ui.Text(Ui.Box(plaque, 18, 4, 330, 30), "THE CHAMPION'S LADDER", 22, open ? Ui.Hex("#DCE4F0") : new Color(0.62f, 0.64f, 0.68f), TextAnchor.MiddleLeft);
+            var title = Ui.Text(Ui.Box(plaque, 18, 4, 330, 30), "THE CHAMPION'S LADDER", TextRole.Subhead, open ? Ui.Hex("#DCE4F0") : new Color(0.62f, 0.64f, 0.68f), TextAnchor.MiddleLeft);
             Typography.Strong(title);
             title.raycastTarget = false;
             // theme: kept, the plaque's cool line (Library material, no role)
-            var tag = Ui.Text(Ui.Box(plaque, 18, 32, 330, 22), "Past the binders", 13, new Color(0.7f, 0.74f, 0.8f), TextAnchor.MiddleLeft);
+            var tag = Ui.Text(Ui.Box(plaque, 18, 32, 330, 22), "Past the binders", TextRole.Caption, new Color(0.7f, 0.74f, 0.8f), TextAnchor.MiddleLeft);
             Typography.Italic(tag);
             tag.raycastTarget = false;
             int climbed = ladder.Climbed(state);
@@ -67,11 +67,11 @@ namespace YgoCampaign.Game
                 : ladder.HoldsTop(state) && next == null ? "Top: You"
                 : next != null && next.IsVisitor ? $"Rung {climbed} of {ladder.Rungs.Count} · {next.Character.Name} is visiting"
                 : $"Rung {climbed} of {ladder.Rungs.Count} · next: {(next != null ? SeatName(profile, next, false) : "")}";
-            var line = Ui.Text(Ui.Box(plaque, 350, 4, w - 4 - 350 - 64, LadderPlaqueHeight - 12), LadderPlaqueLine, 15,
+            var line = Ui.Text(Ui.Box(plaque, 350, 4, w - 4 - 350 - 64, LadderPlaqueHeight - 12), LadderPlaqueLine, TextRole.Small,
                 !open ? T.TextDim : ladder.HoldsTop(state) ? T.GoldSoft : new Color(0.88f, 0.9f, 0.94f), TextAnchor.MiddleRight);
             line.resizeTextForBestFit = true;
-            line.resizeTextMinSize = 11;
-            line.resizeTextMaxSize = 15;
+            line.resizeTextMinSize = UiTheme.Floor;
+            line.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
             line.raycastTarget = false;
             // The next holder's face (the top's while locked or once yours); a stranger's is a ? tile until they've been introduced.
             var shownSeat = next ?? (ladder.Rungs.Count > 0 ? ladder.Rungs[^1] : null);
@@ -107,17 +107,17 @@ namespace YgoCampaign.Game
             var rulesName = _state.Circuits.All.Count > rulesAt ? _state.Circuits.All[rulesAt].Name : "";
             var list = _state.LadderRules.List?.Name;
 
-            var title = Ui.Text(Ui.Box(_detail, 30, 12, 700, 46), "THE CHAMPION'S LADDER", 32, T.LibraryGold, TextAnchor.MiddleLeft);
+            var title = Ui.Text(Ui.Box(_detail, 30, 12, 700, 46), "THE CHAMPION'S LADDER", TextRole.Title, T.LibraryGold, TextAnchor.MiddleLeft);
             Typography.Strong(title);
             Ui.Text(Ui.Box(_detail, 30, 56, 940, 24), "Past the binders. One duel a rung: beat the holder above you to take theirs. Every holder plays at full strength.",
-                14, T.TextMuted, TextAnchor.MiddleLeft);
+                TextRole.Caption, T.TextMuted, TextAnchor.MiddleLeft);
             var standing = !open ? $"<color={T.WarnHex}>Locked: {ladder.LockReason(profile, library)}.</color>"
                 : top ? $"<color={T.GoldHex}>Top: You.</color> Challenge any rung again: +{Ladder.RepeatWinDp} DP a win."
                 : $"Your rung: <b>{climbed}</b> of {ladder.Rungs.Count}. First climb of a rung <color={T.GoldHex}>+{Ladder.FirstClimbDp} DP</color> · the top "
                   + $"<color={T.GoldHex}>+{ladder.Prize:N0} DP, +{Ladder.TopTokens} Card Tokens and a poster</color>";
-            Ui.Text(Ui.Box(_detail, 30, 80, 940, 26), standing, 15, T.Text, TextAnchor.MiddleLeft).supportRichText = true;
+            Ui.Text(Ui.Box(_detail, 30, 80, 940, 26), standing, TextRole.Small, T.Text, TextAnchor.MiddleLeft).supportRichText = true;
             Ui.Text(Ui.Box(_detail, 30, 104, 940, 24), $"Rules: {rulesName}'s list{(list != null ? $", {list}," : "")} whatever your campaign's mode. Your own decks only, no loaners. A loss keeps your rung.",
-                13, T.Warn, TextAnchor.MiddleLeft).supportRichText = true;
+                TextRole.Caption, T.Warn, TextAnchor.MiddleLeft).supportRichText = true;
 
             // The rows, top rung first; a visitor's row goes right over your rung (or over the foot of the ladder).
             var rows = new List<LadderSeat>();
@@ -134,7 +134,7 @@ namespace YgoCampaign.Game
             float after = rowsTop + rows.Count * step;
             if (climbed == 0)
             {
-                var foot = Ui.Text(Ui.Box(_detail, 30, after - 4, 940, 20), open ? "▲ You: at the foot of the ladder" : "The foot of the ladder", 13,
+                var foot = Ui.Text(Ui.Box(_detail, 30, after - 4, 940, 20), open ? "▲ You: at the foot of the ladder" : "The foot of the ladder", TextRole.Caption,
                     open ? T.Highlight : T.TextDim, TextAnchor.MiddleLeft);
                 Typography.Strong(foot);
                 LadderRows.Add(foot.text);
@@ -143,7 +143,7 @@ namespace YgoCampaign.Game
             DrawYourDeck(deckTop, _state.LadderProblems(profile.Deck));
             // YOUR DECK is judged under the ladder's list, named beside the caption.
             Ui.Text(Ui.Box(_detail, 130, deckTop, 840, 26), list != null ? $"checked against {list} ({rulesName})" : $"checked against {rulesName}'s rules",
-                13, T.TextFaint, TextAnchor.MiddleLeft);
+                TextRole.Caption, T.TextFaint, TextAnchor.MiddleLeft);
         }
 
         /// <summary>One row of the board: the rung (or VISITOR), the holder, their deck(s), the row's state, Duel and Scout.</summary>
@@ -159,23 +159,23 @@ namespace YgoCampaign.Game
             _ladderLastRow = row;
             Ui.Image(row, isNext ? T.RowPlayable : beaten ? T.RowWon : seat.Rung % 2 == 0 ? T.RowA : T.RowB);
             if (isNext || yours) Ui.Image(Ui.Box(row, 0, 0, 4, h), isNext ? T.Highlight : T.Good).raycastTarget = false;
-            var badge = Ui.Text(Ui.Box(row, 8, 0, 52, h), seat.IsVisitor ? "VISIT" : seat.Rung.ToString(), seat.IsVisitor ? 12 : 22,
+            var badge = Ui.Text(Ui.Box(row, 8, 0, 52, h), seat.IsVisitor ? "VISIT" : seat.Rung.ToString(), seat.IsVisitor ? TextRole.Caption : TextRole.Subhead,
                 seat.IsVisitor ? T.Warn : isNext ? T.Highlight : beaten ? T.Good : T.TextBody);
             Typography.Strong(badge);
             var face = Ui.Box(row, 62, 1, h - 2, h - 2);
             Ui.Image(face, T.Well);
             face.gameObject.AddComponent<RectMask2D>();
             SeatFace(face, profile, seat, 30);
-            var name = Ui.Text(Ui.Box(row, 114, 1, 330, 24), SeatName(profile, seat, true), 16, T.Text, TextAnchor.MiddleLeft);
+            var name = Ui.Text(Ui.Box(row, 114, 1, 330, 24), SeatName(profile, seat, true), TextRole.Small, T.Text, TextAnchor.MiddleLeft);
             Typography.Strong(name);
             name.resizeTextForBestFit = true;
-            name.resizeTextMinSize = 11;
-            name.resizeTextMaxSize = 16;
+            name.resizeTextMinSize = UiTheme.Floor;
+            name.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
             var decks = seat.IsSitting ? string.Join(", ", seat.Decks.Select(_state.DeckTitle)) : _state.DeckTitle(seat.Deck);
-            var deckLine = Ui.Text(Ui.Box(row, 114, 24, 330, 20), seat.IsSitting ? $"One sitting, all four: {decks}" : decks, 12, T.TextFaint, TextAnchor.MiddleLeft);
+            var deckLine = Ui.Text(Ui.Box(row, 114, 24, 330, 20), seat.IsSitting ? $"One sitting, all four: {decks}" : decks, TextRole.Caption, T.TextFaint, TextAnchor.MiddleLeft);
             deckLine.resizeTextForBestFit = true;
-            deckLine.resizeTextMinSize = 9;
-            deckLine.resizeTextMaxSize = 12;
+            deckLine.resizeTextMinSize = UiTheme.Floor;
+            deckLine.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
             // A sitting's pips: one per deck, gold once won in this sitting (all gold once the rung is taken).
             if (seat.IsSitting)
             {
@@ -185,7 +185,7 @@ namespace YgoCampaign.Game
                     var pip = Ui.Box(row, 452 + p * 30, (h - 22) / 2, 26, 22);
                     Ui.Image(pip, p < won ? Ui.Hex("#D9B24C") : isNext && p == won ? Ui.Hex("#FFC940") : Ui.Hex("#3A3428")).raycastTarget = false;
                     if (isNext && p == won) Ui.Image(Ui.Box(pip, 2, 2, 22, 18), Ui.Hex("#2B2716")).raycastTarget = false;
-                    var n = Ui.Text(pip, (p + 1).ToString(), 12, p < won ? Ui.Hex("#20180A") : isNext && p == won ? Ui.Hex("#FFC940") : new Color(1, 1, 1, 0.5f));
+                    var n = Ui.Text(pip, (p + 1).ToString(), TextRole.Caption, p < won ? Ui.Hex("#20180A") : isNext && p == won ? Ui.Hex("#FFC940") : new Color(1, 1, 1, 0.5f));
                     Typography.Strong(n);
                     n.raycastTarget = false;
                 }
@@ -197,20 +197,20 @@ namespace YgoCampaign.Game
                 : beaten ? "Yours"
                 : isNext ? (seat.IsSitting ? $"Next: {_state.DeckTitle(deckNow)} ({ladder.SittingProgress(seat, state).won + 1} of {seat.Decks.Count})" : "Next")
                 : open ? "Above you" : "";
-            var stateText = Ui.Text(Ui.Box(row, 572, 0, 190, h), what, 13, isNext ? T.Gold : yours ? T.Good : beaten ? T.Good : T.TextDim, TextAnchor.MiddleCenter);
+            var stateText = Ui.Text(Ui.Box(row, 572, 0, 190, h), what, TextRole.Caption, isNext ? T.Gold : yours ? T.Good : beaten ? T.Good : T.TextDim, TextAnchor.MiddleCenter);
             stateText.resizeTextForBestFit = true;
-            stateText.resizeTextMinSize = 9;
-            stateText.resizeTextMaxSize = 13;
+            stateText.resizeTextMinSize = UiTheme.Floor;
+            stateText.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
             if (open)
             {
                 var key = seat.Key;
-                var duel = Ui.BoxButton(row, 770, 6, 78, h - 12, beaten ? "Again" : "Duel", () => { Close(); LadderDuel?.Invoke(key); }, 15);
+                var duel = Ui.BoxButton(row, 770, 6, 78, h - 12, beaten ? "Again" : "Duel", () => { Close(); LadderDuel?.Invoke(key); }, TextRole.Label);
                 duel.targetGraphic.color = isNext ? T.Primary : T.Button;
                 duel.interactable = canDuel;
                 if (!canDuel) duel.GetComponentInChildren<Text>().color = T.Text.WithAlpha(0.35f);
             }
             var scouted = new List<(string, string)> { (SeatName(profile, seat, false), deckNow) };
-            Ui.BoxButton(row, 854, 6, 78, h - 12, "Scout", () => ScoutClicked?.Invoke(scouted), 14).targetGraphic.color = T.Button;
+            Ui.BoxButton(row, 854, 6, 78, h - 12, "Scout", () => ScoutClicked?.Invoke(scouted), TextRole.Label).targetGraphic.color = T.Button;
             LadderRows.Add($"{(seat.IsVisitor ? "visitor" : "rung " + seat.Rung)} | {SeatName(profile, seat, false)} | {deckNow} | {what}{(canDuel ? " | duel" : "")}");
         }
 
@@ -222,7 +222,7 @@ namespace YgoCampaign.Game
         private void SeatFace(RectTransform box, Profile profile, LadderSeat seat, int size)
         {
             if (!_state.Ladder.Unmet(profile, seat)) { Portraits.Place(box, seat.Character.Id); return; }
-            var mark = Ui.Text(box, "?", size, UiTheme.Current.Text.WithAlpha(0.35f));
+            var mark = Ui.Text(box, "?", UiTheme.Mapped(size), UiTheme.Current.Text.WithAlpha(0.35f));
             Typography.Strong(mark);
             mark.raycastTarget = false;
         }

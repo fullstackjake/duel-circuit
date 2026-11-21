@@ -68,23 +68,23 @@ namespace YgoCampaign.Game
             _root = Ui.Overlay(transform, "Trader", 15);
             Ui.Image(_root, T.Base);
             Ui.Image(Ui.Box(_root, 0, 0, 1920, 90), T.Deep);
-            _title = Ui.Text(Ui.Box(_root, 40, 0, 400, 90), "CARD TRADER", 34, T.Sign, TextAnchor.MiddleLeft);
+            _title = Ui.Text(Ui.Box(_root, 40, 0, 400, 90), "CARD TRADER", TextRole.Title, T.Sign, TextAnchor.MiddleLeft);
             Typography.Strong(_title);
-            _header = Ui.Text(Ui.Box(_root, 380, 0, 780, 90), "", 22, T.GoldSoft, TextAnchor.MiddleLeft);
+            _header = Ui.Text(Ui.Box(_root, 380, 0, 780, 90), "", TextRole.Subhead, T.GoldSoft, TextAnchor.MiddleLeft);
             _header.supportRichText = true;
             // DP buys tokens too, dearer each time.
-            _buyToken = Ui.BoxButton(_root, 1450, 22, 260, 46, "", BuyToken, 16);
-            Ui.BoxButton(_root, 1720, 22, 160, 46, "Back", Close, 18);
+            _buyToken = Ui.BoxButton(_root, 1450, 22, 260, 46, "", BuyToken, TextRole.Label);
+            Ui.BoxButton(_root, 1720, 22, 160, 46, "Back", Close, TextRole.Label);
 
-            Ui.Input(Ui.Box(_root, 40, 110, 640, 44), "Search any card: name, text, lv8, atk>2000, dragon, \"destroy all\"...", 16, v => { _query = v.Trim(); _page = 0; Find(); });
-            _ocgToggle = Ui.BoxButton(_root, 690, 110, 170, 44, "", () => { _ocgOnly = !_ocgOnly; _page = 0; Find(); }, 16);
+            Ui.Input(Ui.Box(_root, 40, 110, 640, 44), "Search any card: name, text, lv8, atk>2000, dragon, \"destroy all\"...", UiTheme.Size(TextRole.Small), v => { _query = v.Trim(); _page = 0; Find(); });
+            _ocgToggle = Ui.BoxButton(_root, 690, 110, 170, 44, "", () => { _ocgOnly = !_ocgOnly; _page = 0; Find(); }, TextRole.Label);
             _list = Ui.Box(_root, 40, 166, 820, PerPage * 62);
-            Ui.BoxButton(_root, 40, 950, 140, 40, "< Prev", () => { _page--; ShowList(); });
-            _pageLabel = Ui.Text(Ui.Box(_root, 190, 950, 480, 40), "", 16, T.Text);
-            Ui.BoxButton(_root, 720, 950, 140, 40, "Next >", () => { _page++; ShowList(); });
+            Ui.BoxButton(_root, 40, 950, 140, 40, "< Prev", () => { _page--; ShowList(); }, TextRole.Label);
+            _pageLabel = Ui.Text(Ui.Box(_root, 190, 950, 480, 40), "", TextRole.Small, T.Text);
+            Ui.BoxButton(_root, 720, 950, 140, 40, "Next >", () => { _page++; ShowList(); }, TextRole.Label);
             _detail = Ui.Box(_root, 900, 110, 980, 880);
             Ui.Image(_detail, T.Panel);
-            _status = Ui.Text(Ui.Box(_root, 40, 1010, 1840, 50), "", 16, T.TextSoft, TextAnchor.MiddleLeft);
+            _status = Ui.Text(Ui.Box(_root, 40, 1010, 1840, 50), "", TextRole.Small, T.TextSoft, TextAnchor.MiddleLeft);
             _status.supportRichText = true;
         }
 
@@ -194,7 +194,7 @@ namespace YgoCampaign.Game
                     ? $"None of your wishlist's cards were out by {DeckRules.MonthYear(Pool)}. Search for a card from the {_cup}'s era above."
                     : _query.Length == 0
                     ? "Your wishlist is empty. Search for any card above, or use Recipe in the campaign's deck editor to fill the wishlist."
-                    : _rules != null ? $"No cards out by {DeckRules.MonthYear(Pool)} match." : "No cards match.", 17, T.TextMuted, TextAnchor.MiddleLeft);
+                    : _rules != null ? $"No cards out by {DeckRules.MonthYear(Pool)} match." : "No cards match.", TextRole.Body, T.TextMuted, TextAnchor.MiddleLeft);
                 return;
             }
             var profile = _state.Profile!;
@@ -207,7 +207,7 @@ namespace YgoCampaign.Game
                 Ui.Image(rt, info == _selected ? T.RowSelected : row % 2 == 0 ? T.RowA : T.RowB);
                 var thumb = Ui.Box(rt, 4, 4, 36, 50);
                 CardFace.Draw(thumb.gameObject.AddComponent<RawImage>(), info.Code, info, new Vector2(36, 50)); // the picture, else the plain thumb
-                Ui.Text(Ui.Box(rt, 50, 4, 560, 26), info.Name, 16, T.Text, TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(rt, 50, 4, 560, 26), info.Name, TextRole.Small, T.Text, TextAnchor.MiddleLeft);
                 if (_state.Imports.IsOcgOnly(info.Code)) OcgBadge(rt, 750, 6);
                 var blocked = CardTrader.Blocked(info.Code, profile, ShopYear, CardFoil.Printings, _cards, Pool);
                 var owned = profile.Collection.Count(info.Code);
@@ -215,7 +215,7 @@ namespace YgoCampaign.Game
                 var line = $"you own {owned} · <color={T.GoldHex}>{cost} token{(cost == 1 ? "" : "s")}</color>" + (blocked == null ? $" · <color={T.GoodHex}>can trade</color>"
                     : blocked.StartsWith("you have no") || blocked.StartsWith("it costs") ? "" : $" · <color={T.BadHex}>{blocked}</color>")
                     + (AheadOfBand(info) ? $" · {AheadTag}" : "") + ListTag(info, " · ");
-                Ui.Text(Ui.Box(rt, 50, 30, 760, 24), line, 13, T.TextFaint, TextAnchor.MiddleLeft).supportRichText = true;
+                Ui.Text(Ui.Box(rt, 50, 30, 760, 24), line, TextRole.Caption, T.TextFaint, TextAnchor.MiddleLeft).supportRichText = true;
                 var pick = info;
                 int at = i;
                 Ui.Clickable(rt, () => Select(pick), hover: () => _keys.Point(at), style: HoverStyle.Row);
@@ -237,7 +237,7 @@ namespace YgoCampaign.Game
             var T = UiTheme.Current;
             var chip = Ui.Box(parent, x, y, 56, 22);
             Ui.Image(chip, T.ImportChip).raycastTarget = false;
-            var label = Ui.Text(chip, "OCG", 13, T.Text);
+            var label = Ui.Text(chip, "OCG", TextRole.Caption, T.Text);
             Typography.Strong(label);
             label.raycastTarget = false;
         }
@@ -271,21 +271,21 @@ namespace YgoCampaign.Game
             var face = Ui.Box(_detail, 30, 30, 300, 438);
             Ui.Image(face, T.Well);
             CardFace.Draw(Ui.Stretched("Art", face, Vector2.zero, Vector2.one).gameObject.AddComponent<RawImage>(), info.Code, info, new Vector2(300, 438));
-            Typography.Strong(Ui.Text(Ui.Box(_detail, 360, 30, 590, 44), info.Name, 26, T.Text, TextAnchor.MiddleLeft));
+            Typography.Strong(Ui.Text(Ui.Box(_detail, 360, 30, 590, 44), info.Name, TextRole.Heading, T.Text, TextAnchor.MiddleLeft));
             int year = printings?.FirstYear(info.Code, info.Alias) ?? 0;
             var rarity = printings?.Commonest(info.Code, info.Alias) ?? Rarity.Common;
             bool ocg = _state.Imports.IsOcgOnly(info.Code);
             if (ocg) OcgBadge(_detail, 30, 478); // under the card picture
             var facts = Ui.Text(Ui.Box(_detail, 360, 78, 590, 60),
                 $"{(year > 0 ? $"First printed {year}" : ocg ? "OCG-only: printed in Japan and Asia, never in the TCG" : "Not printed in the TCG")}{(AheadOfBand(info) ? $" ({AheadTag}: the shop's at {ShopYear})" : "")}{ListTag(info, " · ")} · you'd get it as {CardFoil.ColoredName(rarity)}\nYou own {profile.Collection.Count(info.Code)} of {Collection.MaxCopies}",
-                16, T.TextSoft, TextAnchor.UpperLeft);
+                TextRole.Small, T.TextSoft, TextAnchor.UpperLeft);
             facts.supportRichText = true;
-            var text = Ui.Text(Ui.Box(_detail, 360, 150, 590, 320), info.Text, 15, T.TextBody, TextAnchor.UpperLeft);
+            var text = Ui.Text(Ui.Box(_detail, 360, 150, 590, 320), info.Text, TextRole.Small, T.TextBody, TextAnchor.UpperLeft);
             text.verticalOverflow = VerticalWrapMode.Truncate;
 
             var blocked = CardTrader.Blocked(info.Code, profile, ShopYear, printings, _cards, Pool);
             int cost = CardTrader.Cost(info.Code, printings, _cards);
-            var button = Ui.BoxButton(_detail, 30, 520, 920, 80, blocked == null ? $"Trade {cost} Card Token{(cost == 1 ? "" : "s")} for it" : $"Can't trade: {blocked}", () => Trade(info), 24);
+            var button = Ui.BoxButton(_detail, 30, 520, 920, 80, blocked == null ? $"Trade {cost} Card Token{(cost == 1 ? "" : "s")} for it" : $"Can't trade: {blocked}", () => Trade(info), TextRole.Heading);
             button.interactable = blocked == null;
             if (blocked == null) button.targetGraphic.color = T.Primary; // the screen's commit action
         }

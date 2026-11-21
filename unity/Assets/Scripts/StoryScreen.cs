@@ -86,12 +86,12 @@ namespace YgoCampaign.Game
             _portrait = Ui.Box(_root, 190, 560, 220, 321);
             // The name plate lines up with the text column under it.
             _plate = Ui.Image(Ui.Box(box, 280, -26, 560, 52), Ui.Hex("#2A3448"));
-            _name = Ui.Text(Ui.Box(box, 300, -26, 540, 52), "", 24, Color.white, TextAnchor.MiddleLeft);
+            _name = Ui.Text(Ui.Box(box, 300, -26, 540, 52), "", TextRole.Heading, Color.white, TextAnchor.MiddleLeft);
             Typography.Strong(_name);
-            _text = Ui.Text(Ui.Box(box, 280, 50, 1270, 230), "", 27, new Color(0.93f, 0.94f, 0.97f), TextAnchor.UpperLeft);
+            _text = Ui.Text(Ui.Box(box, 280, 50, 1270, 230), "", UiTheme.Mapped(27), new Color(0.93f, 0.94f, 0.97f), TextAnchor.UpperLeft); // reading: the body face at Heading's size
             _text.supportRichText = true;
-            _hint = Ui.Text(Ui.Box(box, 280, 290, 900, 34), "", 18, new Color(1, 1, 1, 0.7f), TextAnchor.MiddleLeft);
-            _skip = (Image)Ui.BoxButton(box, 1360, 280, 200, 44, "Skip", Finish, 18).targetGraphic;
+            _hint = Ui.Text(Ui.Box(box, 280, 290, 900, 34), "", TextRole.Body, new Color(1, 1, 1, 0.7f), TextAnchor.MiddleLeft);
+            _skip = (Image)Ui.BoxButton(box, 1360, 280, 200, 44, "Skip", Finish, TextRole.Label).targetGraphic;
             _root.gameObject.SetActive(false);
         }
 

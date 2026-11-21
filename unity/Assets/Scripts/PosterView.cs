@@ -31,11 +31,11 @@ namespace YgoCampaign.Game
 
             // The title band.
             Image(root, "Band", new Vector2(0, 128), new Vector2(222, 46), ink);
-            var title = Ui.Text(Ui.Placed("Title", root, new Vector2(0, 128), new Vector2(210, 42)), poster.Title.ToUpperInvariant(), 26, Ui.Hex("#FBF6EA"));
+            var title = Ui.Text(Ui.Placed("Title", root, new Vector2(0, 128), new Vector2(210, 42)), poster.Title.ToUpperInvariant(), TextRole.Heading, Ui.Hex("#FBF6EA"));
             Typography.Strong(title);
             title.resizeTextForBestFit = true;
-            title.resizeTextMinSize = 14;
-            title.resizeTextMaxSize = 26;
+            title.resizeTextMinSize = UiTheme.Floor;
+            title.resizeTextMaxSize = UiTheme.Size(TextRole.Heading);
             title.raycastTarget = false;
 
             // The artwork: the picture's art square, or the middle of a plain card's window (its glyph), square.
@@ -58,11 +58,11 @@ namespace YgoCampaign.Game
 
             if (tagline)
             {
-                var line = Ui.Text(Ui.Placed("Tagline", root, new Vector2(0, -141), new Vector2(222, 28)), poster.Tagline, 12, Ui.Hex("#4A4034"));
+                var line = Ui.Text(Ui.Placed("Tagline", root, new Vector2(0, -142), new Vector2(222, 36)), poster.Tagline, TextRole.Caption, Ui.Hex("#4A4034"));
                 Typography.Italic(line);
                 line.resizeTextForBestFit = true;
-                line.resizeTextMinSize = 8;
-                line.resizeTextMaxSize = 12;
+                line.resizeTextMinSize = UiTheme.Floor;
+                line.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
                 line.raycastTarget = false;
             }
 

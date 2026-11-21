@@ -309,18 +309,18 @@ namespace YgoCampaign.Game
             Ui.Image(Ui.Box(chip, 0, 0, 4, 64), T.Highlight).raycastTarget = false;
             var text = Ui.Text(Ui.Box(chip, 16, 4, 540, 56),
                 $"YOUR CARD   <b>{_campaign.CopyText(_orvelPick)}</b>  ·  <color={T.GoldHex}>{profile.Collection.Value(_orvelPick):N0} DP</color>\n"
-                + $"<size=13><color={T.TextDimHex}>{at + 1} of {_orvelChoices.Count} spare cards · lost, it goes on Moth's rail</color></size>", 18, T.Text, TextAnchor.MiddleLeft);
+                + $"<size=14><color={T.TextDimHex}>{at + 1} of {_orvelChoices.Count} spare cards · lost, it goes on Moth's rail</color></size>", TextRole.Body, T.Text, TextAnchor.MiddleLeft);
             text.supportRichText = true;
             text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = 11;
-            text.resizeTextMaxSize = 18;
+            text.resizeTextMinSize = UiTheme.Floor;
+            text.resizeTextMaxSize = UiTheme.Size(TextRole.Body);
             void Step(int delta)
             {
                 _orvelPick = _orvelChoices[(at + delta + _orvelChoices.Count) % _orvelChoices.Count];
                 ShowAlleyVersus(table, encore, cycled: true);
             }
-            Ui.BoxButton(chip, 572, 6, 64, 52, "<", () => Step(-1), 26).targetGraphic.color = T.Button;
-            Ui.BoxButton(chip, 644, 6, 64, 52, ">", () => Step(+1), 26).targetGraphic.color = T.Button;
+            Ui.BoxButton(chip, 572, 6, 64, 52, "<", () => Step(-1), TextRole.Heading).targetGraphic.color = T.Button;
+            Ui.BoxButton(chip, 644, 6, 64, 52, ">", () => Step(+1), TextRole.Heading).targetGraphic.color = T.Button;
             _scenes.Buttons["stake<"] = () => Step(-1);
             _scenes.Buttons["stake>"] = () => Step(+1);
         }

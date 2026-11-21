@@ -419,6 +419,12 @@ namespace YgoCampaign.Game
             : literal <= 46 ? TextRole.Title
             : TextRole.Display;
 
+        /// <summary>
+        /// A size worked out in code (a layout's constant, a size picked by room) put on the scale: the size of
+        /// <see cref="RoleFor"/>(<paramref name="literal"/>), reading roles scaled when <paramref name="reading"/>.
+        /// </summary>
+        public static int Mapped(int literal, bool reading = false) => Size(RoleFor(literal), reading);
+
         private static Font? _stencil;
         private static bool _stencilLooked;
 

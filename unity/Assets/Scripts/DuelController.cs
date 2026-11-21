@@ -2566,6 +2566,7 @@ namespace YgoCampaign.Game
             _browser.Open();
             yield return new WaitForSecondsRealtime(0.5f);
             ScreenCapture.CaptureScreenshot(Path.Combine(folder, "replays-list.png"));
+            yield return TextRule("replays-list", Report);
             yield return null;
             _browser.Close();
 
@@ -2736,6 +2737,7 @@ namespace YgoCampaign.Game
             System.Collections.IEnumerator Shot(string name)
             {
                 ScreenCapture.CaptureScreenshot(Path.Combine(folder, $"campaign-{name}.png"));
+                yield return TextRule($"campaign-{name}", Report);
                 yield return null; // taken at the end of this frame
                 yield return null;
             }
@@ -4424,6 +4426,7 @@ namespace YgoCampaign.Game
             {
                 yield return new WaitForEndOfFrame();
                 ScreenCapture.CaptureScreenshot(Path.Combine(folder, $"tag-{name}.png"));
+                yield return TextRule($"tag-{name}", Report);
                 yield return null;
             }
             yield return new WaitForSecondsRealtime(1f);
@@ -4504,6 +4507,7 @@ namespace YgoCampaign.Game
             System.Collections.IEnumerator Shot(string name)
             {
                 ScreenCapture.CaptureScreenshot(Path.Combine(folder, $"menu-{name}.png"));
+                yield return TextRule($"menu-{name}", Report);
                 yield return null;
                 yield return null;
             }
@@ -5052,12 +5056,10 @@ namespace YgoCampaign.Game
         private System.Collections.IEnumerator LayoutCheck(string folder)
         {
             Directory.CreateDirectory(folder);
-            var small = new Dictionary<string, (int size, string shot)>();
             System.Collections.IEnumerator Shot(string name)
             {
                 ScreenCapture.CaptureScreenshot(Path.Combine(folder, $"layout-{name}.png"));
-                foreach (var (label, size) in SmallTexts())
-                    if (!small.ContainsKey(label)) small[label] = (size, name);
+                yield return TextRule($"layout-{name}", Report);
                 yield return null;
                 yield return null;
             }
@@ -5326,6 +5328,67 @@ namespace YgoCampaign.Game
                     lilith != 0 && wholeNames && manyProblems.Count == 0);
                 _view.ShowChain(Array.Empty<Ygo.Engine.Presentation.TrackedLink>());
             }
+            // Prompts never cut text silently (R2 fix round): a yes/no over a long card text, option tabs with long effects and
+            // a decision list whose two long labels differ only at the end, each shot under the text rule; and Settings > Card
+            // text size still grows the option text.
+            {
+                var pendingPrompt = _view.Prompt.Current;
+                var sentence = "When this card is Normal or Special Summoned, you can target 1 face-up monster your opponent controls; negate its effects until the end of this turn, and if you do, ";
+                string longText = string.Concat(Enumerable.Repeat(sentence, 7)) + "then draw 1 card. THE-LAST-WORDS";
+                uint someCard = _board.Players[0].Hand.FirstOrDefault()?.Code ?? 89631139;
+                var yesNo = new ChoiceSet { Title = "Use the effect?", Detail = longText,
+                    Prompt = new Ygo.Engine.Protocol.EffectYesNoPrompt { Card = new Ygo.Engine.Protocol.CardRef(someCard, 0, Location.Hand, 0) } };
+                yesNo.Choices.Add(new Choice { Label = "Yes" });
+                yesNo.Choices.Add(new Choice { Label = "No" });
+                _view.ShowChoices(yesNo, false);
+                yield return new WaitForSecondsRealtime(0.4f);
+                yield return Shot("prompt-yesno-long");
+                var yn = _view.Dialogs.DebugText;
+                bool ynScrolls = yn != null && yn.GetComponentInParent<UnityEngine.UI.ScrollRect>() != null;
+                Report($"a yes/no over {longText.Length} characters of card text keeps all of it (ends \"{(yn != null ? Words(yn.text).Substring(Math.Max(0, Words(yn.text).Length - 20)) : "")}\", "
+                       + $"size {yn?.fontSize}, scrolls {ynScrolls})", yn != null && yn.text.Contains("THE-LAST-WORDS") && yn.fontSize >= UiTheme.Floor && ynScrolls);
+                var longOptions = new ChoiceSet { Title = "Choose an effect", Prompt = new Ygo.Engine.Protocol.OptionPrompt() };
+                longOptions.Choices.Add(new Choice { Label = string.Concat(Enumerable.Repeat(sentence, 4)) + "then OPTION-ONE-END." });
+                longOptions.Choices.Add(new Choice { Label = string.Concat(Enumerable.Repeat(sentence, 2)) + "then OPTION-TWO-END." });
+                _view.ShowChoices(longOptions, false);
+                _view.Dialogs.SelectTab(0);
+                yield return new WaitForSecondsRealtime(0.4f);
+                yield return Shot("prompt-options-long");
+                var opt = _view.Dialogs.DebugText;
+                Report($"a long effect in the option tabs keeps all of it (size {opt?.fontSize}, scrolls {opt?.GetComponentInParent<UnityEngine.UI.ScrollRect>() != null})",
+                    opt != null && opt.text.Contains("OPTION-ONE-END") && opt.fontSize >= UiTheme.Floor);
+                // Card text size: a short option at Normal and at Larger.
+                var shortOptions = new ChoiceSet { Title = "Choose an effect", Prompt = new Ygo.Engine.Protocol.OptionPrompt() };
+                shortOptions.Choices.Add(new Choice { Label = "Draw 1 card." });
+                shortOptions.Choices.Add(new Choice { Label = "Gain 500 LP." });
+                var sizeBefore = FxSettings.TextSizeOverride;
+                FxSettings.TextSizeOverride = 0;
+                _view.ShowChoices(shortOptions, false);
+                _view.Dialogs.SelectTab(0);
+                yield return null;
+                int normal = _view.Dialogs.DebugText?.fontSize ?? 0;
+                FxSettings.TextSizeOverride = 2;
+                _view.Dialogs.SelectTab(0);
+                yield return null;
+                int larger = _view.Dialogs.DebugText?.fontSize ?? 0;
+                yield return Shot("prompt-options-larger");
+                FxSettings.TextSizeOverride = sizeBefore;
+                Report($"Settings > Card text size grows the option text (Normal {normal}, Larger {larger}; {FxSettings.Scaled(UiTheme.Size(TextRole.Heading))} at this run's setting)",
+                    normal == UiTheme.Size(TextRole.Heading) && larger == Mathf.RoundToInt(UiTheme.Size(TextRole.Heading) * 1.4f));
+                var list = new ChoiceSet { Title = "Declare a card", Prompt = new Ygo.Engine.Protocol.AnnounceNumberPrompt() };
+                string stem = "Special Summon this card from your hand in Defense Position, then send 1 card from your Deck to the GY, ending with ";
+                list.Choices.Add(new Choice { Label = stem + "the FIRST-ENDING" });
+                list.Choices.Add(new Choice { Label = stem + "the SECOND-ENDING" });
+                list.Choices.Add(new Choice { Label = "A short one" });
+                _view.ShowChoices(list, false);
+                yield return new WaitForSecondsRealtime(0.4f);
+                yield return Shot("prompt-list-long");
+                var rows = _view.Prompt.DebugRows;
+                Report($"a decision list with two long labels that differ only at the end shows both whole or apart ({string.Join(" | ", rows.Select(r => $"{Words(r.label)} ({r.height:0})"))})",
+                    rows.Count == 3 && rows[0].label != rows[1].label && rows[0].label.Contains("FIRST-ENDING") && rows[1].label.Contains("SECOND-ENDING") && rows[0].height > 30);
+                _view.ShowChoices(pendingPrompt, false);
+                yield return null;
+            }
             _paused = pausedBefore;
             UpdateControls();
             ToggleDevPanel();
@@ -5403,39 +5466,9 @@ namespace YgoCampaign.Game
             }
             // Hover: a test mouse over buttons in both themes, the gold frame and the arrows (DuelController.HoverCheck).
             yield return HoverCheck(folder, Report);
-            // A warning, not a check: text drawn under the 14 px the accessibility review asked for (card faces aside).
-            Debug.Log($"layout check: note {small.Count} label{(small.Count == 1 ? "" : "s")} under {MinTextSize} px");
-            foreach (var (label, (size, shot)) in small.OrderBy(s => s.Value.size).ThenBy(s => s.Value.shot))
-                Debug.Log($"layout check: note   {size} px on {shot}: {label}");
             FaceAuditSummary("layout");
             yield return new WaitForSecondsRealtime(0.3f);
             Application.Quit();
-        }
-
-        /// <summary>The smallest text size the accessibility review asked for (a layout check warning, not a rule).</summary>
-        private const int MinTextSize = 14;
-
-        /// <summary>
-        /// The visible labels drawn smaller than <see cref="MinTextSize"/> (best-fit text at the size it came out), as
-        /// "Parent/Label: text" with the size. Card faces are left out: they're drawn at card scale on purpose.
-        /// </summary>
-        private static List<(string label, int size)> SmallTexts()
-        {
-            var found = new List<(string, int)>();
-            Canvas.ForceUpdateCanvases(); // so best-fit text reports the size it came out at this frame
-            foreach (var text in FindObjectsByType<UnityEngine.UI.Text>(FindObjectsSortMode.None))
-            {
-                if (!text.isActiveAndEnabled || text.color.a < 0.1f || string.IsNullOrWhiteSpace(text.text)) continue;
-                if (text.GetComponentInParent<CardView>() != null) continue;
-                int size = text.resizeTextForBestFit && text.cachedTextGenerator.fontSizeUsedForBestFit > 0
-                    ? text.cachedTextGenerator.fontSizeUsedForBestFit : text.fontSize;
-                if (size >= MinTextSize) continue;
-                var words = System.Text.RegularExpressions.Regex.Replace(text.text, "<[^>]+>", "").Replace('\n', ' ');
-                if (words.Length > 40) words = words.Substring(0, 40) + "…";
-                var parent = text.transform.parent != null ? text.transform.parent.name + "/" : "";
-                found.Add(($"{parent}{text.name}: \"{words}\"", size));
-            }
-            return found;
         }
 
         private System.Collections.IEnumerator AutoClick()

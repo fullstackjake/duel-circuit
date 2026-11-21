@@ -799,7 +799,7 @@ namespace YgoCampaign.Game
         {
             var y = Mathf.Clamp(at.y + (at.y < 0 ? 170 : -170), -380, 380);
             var rt = Ui.Placed("SummonName", _layer, new Vector2(0, y), new Vector2(1200, 90));
-            var label = Ui.Text(rt, text, 58, WithAlpha(color, 0));
+            var label = Ui.Text(rt, text, TextRole.Display, WithAlpha(color, 0));
             Typography.Strong(label);
             label.gameObject.AddComponent<Outline>().effectDistance = new Vector2(3, -3);
             Animate(delay, duration, t =>
@@ -845,11 +845,11 @@ namespace YgoCampaign.Game
                 edge.sizeDelta = new Vector2(5, 0);
                 Ui.Image(edge, e.Player == _board.HumanSeat ? Ui.Hex("#4FA3FF") : Ui.Hex("#FF5A5A"));
                 var text = Ui.Text(Ui.Placed("Text", rt, new Vector2(6, 0), new Vector2(352, 90)),
-                    $"<b>{(e.ChainLink > 0 ? $"Chain Link {e.ChainLink} · " : "")}{info.Name}</b>\n{effect}", 14, new Color(1f, 0.93f, 0.7f), TextAnchor.MiddleLeft);
+                    $"<b>{(e.ChainLink > 0 ? $"Chain Link {e.ChainLink} · " : "")}{info.Name}</b>\n{effect}", TextRole.Caption, new Color(1f, 0.93f, 0.7f), TextAnchor.MiddleLeft);
                 text.supportRichText = true;
                 text.resizeTextForBestFit = true;
-                text.resizeTextMinSize = 10;
-                text.resizeTextMaxSize = 14;
+                text.resizeTextMinSize = UiTheme.Floor;
+                text.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
             });
         }
 
@@ -881,7 +881,7 @@ namespace YgoCampaign.Game
             var badge = Ui.Placed("ChainLink", _layer, at, new Vector2(40, 40));
             var disc = Sprite("Disc", Textures.Glow, Vector2.zero, new Vector2(64, 64), Ui.Hex("#FFC940"));
             disc.rectTransform.SetParent(badge, false);
-            var num = Ui.Text(Ui.Stretched("N", badge, Vector2.zero, Vector2.one), e.ChainLink.ToString(), 26, Color.white);
+            var num = Ui.Text(Ui.Stretched("N", badge, Vector2.zero, Vector2.one), e.ChainLink.ToString(), TextRole.Heading, Color.white);
             Typography.Strong(num);
             num.gameObject.AddComponent<Outline>().effectDistance = new Vector2(2, -2);
             badge.localScale = Vector3.zero;
@@ -1001,7 +1001,7 @@ namespace YgoCampaign.Game
         private void BigText(string text, Color color, float delay, float duration, float y)
         {
             var rt = Ui.Placed("BigText", _layer, new Vector2(0, y), new Vector2(1400, 140));
-            var t = Ui.Text(rt, text, 84, new Color(color.r, color.g, color.b, 0));
+            var t = Ui.Text(rt, text, TextRole.Display, new Color(color.r, color.g, color.b, 0));
             Typography.Strong(t);
             t.gameObject.AddComponent<Outline>().effectDistance = new Vector2(4, -4);
             Animate(delay, duration, k =>
@@ -1055,13 +1055,13 @@ namespace YgoCampaign.Game
                 CardFoil.Apply(picture, info, 1f);
                 CardFoil.Tilting(picture);
             }
-            var name = Ui.Text(Ui.Placed("Name", band, new Vector2(240, 20), new Vector2(760, 90)), info.Name.ToUpperInvariant(), 46, new Color(1, 1, 1, 0));
+            var name = Ui.Text(Ui.Placed("Name", band, new Vector2(240, 20), new Vector2(760, 90)), info.Name.ToUpperInvariant(), TextRole.Title, new Color(1, 1, 1, 0));
             Typography.Strong(name);
             name.resizeTextForBestFit = true;
             name.resizeTextMinSize = 20;
-            name.resizeTextMaxSize = 46;
+            name.resizeTextMaxSize = UiTheme.Size(TextRole.Title);
             name.gameObject.AddComponent<Outline>().effectDistance = new Vector2(3, -3);
-            var stats = Ui.Text(Ui.Placed("Stats", band, new Vector2(240, -46), new Vector2(760, 40)), $"ATK {CardDetail.Stat(info.Attack)}", 26, new Color(1, 0.8f, 0.3f, 0));
+            var stats = Ui.Text(Ui.Placed("Stats", band, new Vector2(240, -46), new Vector2(760, 40)), $"ATK {CardDetail.Stat(info.Attack)}", TextRole.Heading, new Color(1, 0.8f, 0.3f, 0));
             Animate(delay, duration, k =>
             {
                 float a = k < 0.15f ? k / 0.15f : k > 0.85f ? (1 - k) / 0.15f : 1;
@@ -1094,7 +1094,7 @@ namespace YgoCampaign.Game
             {
                 var strip = Ui.Placed("FinalBlow", _layer, new Vector2(side * 640, 0), new Vector2(70, 1100));
                 var bar = Ui.Image(strip, new Color(1f, 0.85f, 0.1f, 0));
-                var label = Ui.Text(Ui.Placed("T", strip, Vector2.zero, new Vector2(1100, 70)), "FINAL BLOW!  FINAL BLOW!  FINAL BLOW!", 40, new Color(0.8f, 0.1f, 0.1f, 0));
+                var label = Ui.Text(Ui.Placed("T", strip, Vector2.zero, new Vector2(1100, 70)), "FINAL BLOW!  FINAL BLOW!  FINAL BLOW!", TextRole.Title, new Color(0.8f, 0.1f, 0.1f, 0));
                 label.rectTransform.localRotation = Quaternion.Euler(0, 0, side * 90);
                 Typography.Strong(label);
                 int s = side;
@@ -1120,7 +1120,7 @@ namespace YgoCampaign.Game
             var duration = 0.9f * Tempo;
             var rt = Ui.Placed("Banner", _layer, new Vector2(0, y), new Vector2(1400, 86));
             var bar = Ui.Image(rt, WithAlpha(color, 0));
-            var label = Ui.Text(Ui.Stretched("T", rt, Vector2.zero, Vector2.one), text, 52, new Color(1, 1, 1, 0));
+            var label = Ui.Text(Ui.Stretched("T", rt, Vector2.zero, Vector2.one), text, TextRole.Display, new Color(1, 1, 1, 0));
             Typography.Strong(label);
             label.gameObject.AddComponent<Outline>().effectDistance = new Vector2(3, -3);
             Animate(delay, duration, t =>
@@ -1182,7 +1182,7 @@ namespace YgoCampaign.Game
             var card = Ghost(e.Code, e.Player, src, faceUp: true, size: new Vector2(232, 338), cover: live?.Cover ?? 0);
             var group = card.gameObject.AddComponent<CanvasGroup>();
             var foil = card.GetComponentInChildren<CardFoil>();
-            var caption = Ui.Text(Ui.Placed("Caption", _layer, center + new Vector2(0, -200), new Vector2(700, 40)), info.Name, 26, Color.white);
+            var caption = Ui.Text(Ui.Placed("Caption", _layer, center + new Vector2(0, -200), new Vector2(700, 40)), info.Name, TextRole.Heading, Color.white);
             Typography.Strong(caption);
             caption.gameObject.AddComponent<Outline>().effectDistance = new Vector2(2, -2);
 
@@ -1215,7 +1215,7 @@ namespace YgoCampaign.Game
             var duration = 0.7f * Tempo;
             Started?.Invoke("negate");
             Sound(delay, effectOnly ? "negate_effect" : "negate");
-            var text = Ui.Text(Ui.Placed("Negated", _layer, new Vector2(0, 0), new Vector2(760, 90)), effectOnly ? "EFFECT NEGATED" : "NEGATED", 64,
+            var text = Ui.Text(Ui.Placed("Negated", _layer, new Vector2(0, 0), new Vector2(760, 90)), effectOnly ? "EFFECT NEGATED" : "NEGATED", TextRole.Display,
                 effectOnly ? Ui.Hex("#C78CFF") : Ui.Hex("#FF4D4D"));
             Typography.Strong(text);
             text.gameObject.AddComponent<Outline>().effectDistance = new Vector2(3, -3);
@@ -1353,7 +1353,7 @@ namespace YgoCampaign.Game
             if (Tempo <= 0) return;
             Started?.Invoke("floater");
             var rt = Ui.Placed("Floater", _layer, at, new Vector2(200, 34));
-            var label = Ui.Text(rt, text, 22, color);
+            var label = Ui.Text(rt, text, TextRole.Subhead, color);
             Typography.Strong(label);
             label.raycastTarget = false;
             label.gameObject.AddComponent<Outline>().effectDistance = new Vector2(2, -2);

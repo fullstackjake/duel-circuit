@@ -94,7 +94,7 @@ namespace YgoCampaign.Game
                 _nameTab[p] = Poly("NameTab", plate, Slanted(0, 36, 10), new Vector2(-176, -60), new Vector2(10, 36), accent, 0);
                 _nameTab[p].rectTransform.pivot = new Vector2(0, 0.5f);
                 _nameTab[p].rectTransform.anchoredPosition = new Vector2(-176, -60);
-                _plateName[p] = Ui.Text(Ui.Placed("Name", plate, Vector2.zero, new Vector2(260, 34)), "", 24, Ui.Hex("#06101F"), TextAnchor.MiddleLeft);
+                _plateName[p] = Ui.Text(Ui.Placed("Name", plate, Vector2.zero, new Vector2(260, 34)), "", TextRole.Heading, Ui.Hex("#06101F"), TextAnchor.MiddleLeft);
                 _plateName[p].rectTransform.pivot = new Vector2(0, 0.5f);
                 _plateName[p].rectTransform.anchoredPosition = new Vector2(-162, -60);
                 Typography.Strong(_plateName[p]);
@@ -103,25 +103,25 @@ namespace YgoCampaign.Game
                 // "Your turn" / "Their turn": a light slanted tag at the right of the name row, on the active panel only.
                 var turn = Ui.Placed("TurnTag", plate, new Vector2(140, -60), new Vector2(96, 26));
                 Poly("Back", turn, Slanted(96, 26, 8), Vector2.zero, new Vector2(96, 26), Ui.Hex("#E9F1FF"), 0);
-                _turnText[p] = Ui.Text(Ui.Stretched("Label", turn, Vector2.zero, Vector2.one), "", 14, Ui.Hex("#06101F"));
+                _turnText[p] = Ui.Text(Ui.Stretched("Label", turn, Vector2.zero, Vector2.one), "", TextRole.Caption, Ui.Hex("#06101F"));
                 Typography.Strong(_turnText[p]);
                 _turnText[p].resizeTextForBestFit = true; // a partner's name ("Ryo's turn") still fits the tag
-                _turnText[p].resizeTextMinSize = 10;
-                _turnText[p].resizeTextMaxSize = 14;
+                _turnText[p].resizeTextMinSize = UiTheme.Floor;
+                _turnText[p].resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
                 _turnTag[p] = turn.gameObject;
                 turn.gameObject.SetActive(false);
 
                 // LP: an outlined slanted tag ("LP", or "! Low" in danger), the number, then the last change.
                 var tag = Ui.Placed("LPTag", plate, new Vector2(-155, -102), new Vector2(44, 26));
                 _lpTagEdge[p] = Poly("Edge", tag, Slanted(44, 26, 6), Vector2.zero, new Vector2(44, 26), accent, 1.6f);
-                _lpTag[p] = Ui.Text(Ui.Stretched("Label", tag, Vector2.zero, Vector2.one), "LP", 15, accent);
+                _lpTag[p] = Ui.Text(Ui.Stretched("Label", tag, Vector2.zero, Vector2.one), "LP", TextRole.Small, accent);
                 Typography.Strong(_lpTag[p]);
                 _lpTag[p].supportRichText = true;
                 // The number starts right after the tag (its pivot at its left edge: the danger pulse grows from there).
                 var lpBox = Ui.Placed("LP", plate, Vector2.zero, new Vector2(200, 60));
                 lpBox.pivot = new Vector2(0, 0.5f);
                 lpBox.anchoredPosition = new Vector2(-122, -102);
-                _lifePoints[p] = Ui.Text(lpBox, "", 50, Color.white, TextAnchor.MiddleLeft);
+                _lifePoints[p] = Ui.Text(lpBox, "", 50, Color.white, TextAnchor.MiddleLeft); // a hero number: its literal size (below)
                 _lifePoints[p].supportRichText = true;
                 Typography.Hero(Typography.Counter(Typography.Strong(_lifePoints[p])));
                 _lifePoints[p].horizontalOverflow = HorizontalWrapMode.Overflow;
@@ -134,7 +134,7 @@ namespace YgoCampaign.Game
                 _chipBack[p] = Poly("Back", chip, Slanted(96, 26, 8), new Vector2(48, 0), new Vector2(96, 26), Color.black, 0);
                 _chipIcon[p] = Ui.Placed("Icon", chip, new Vector2(18, 0), new Vector2(16, 16)).gameObject.AddComponent<RawImage>();
                 _chipIcon[p].raycastTarget = false;
-                _chipText[p] = Ui.Text(Ui.Placed("Amount", chip, new Vector2(58, 0), new Vector2(70, 26)), "", 15, Color.white, TextAnchor.MiddleLeft);
+                _chipText[p] = Ui.Text(Ui.Placed("Amount", chip, new Vector2(58, 0), new Vector2(70, 26)), "", TextRole.Small, Color.white, TextAnchor.MiddleLeft);
                 Typography.Counter(Typography.Strong(_chipText[p]));
 
                 // The bar: eight slanted segments of 1,000 LP, each a mask over its trail (white) and its fill.
@@ -176,7 +176,7 @@ namespace YgoCampaign.Game
                 emblem.texture = Icons.For("shield");
                 emblem.color = accent;
                 emblem.raycastTarget = false;
-                _plateDeck[p] = Ui.Text(Ui.Placed("Deck", plate, new Vector2(7, -167), new Vector2(290, 30)), "", 20, new Color(0.82f, 0.86f, 0.94f), TextAnchor.MiddleLeft);
+                _plateDeck[p] = Ui.Text(Ui.Placed("Deck", plate, new Vector2(7, -167), new Vector2(290, 30)), "", TextRole.Label, new Color(0.82f, 0.86f, 0.94f), TextAnchor.MiddleLeft);
 
                 // A tag duel's partner: a small round portrait at the frame's right edge, with their name under it.
                 var partner = Ui.Placed("Partner", plate, new Vector2(150, 22), new Vector2(66, 66));
@@ -185,7 +185,7 @@ namespace YgoCampaign.Game
                 var faceMask = Ui.Image(face, new Color(0.11f, 0.15f, 0.25f, 1));
                 faceMask.sprite = HudShapes.Circle;
                 face.gameObject.AddComponent<Mask>().showMaskGraphic = true;
-                _partnerName[p] = Ui.Text(Ui.Placed("Name", partner, new Vector2(0, -45), new Vector2(130, 22)), "", 15, new Color(0.9f, 0.93f, 0.98f));
+                _partnerName[p] = Ui.Text(Ui.Placed("Name", partner, new Vector2(0, -45), new Vector2(130, 22)), "", TextRole.Small, new Color(0.9f, 0.93f, 0.98f));
                 Typography.Strong(_partnerName[p]);
                 // A dark edge so the name reads over the mat and the character art.
                 var partnerEdge = _partnerName[p].gameObject.AddComponent<Outline>();
@@ -256,7 +256,7 @@ namespace YgoCampaign.Game
             var face = (RectTransform)chip.Find("Face");
             for (int i = face.childCount - 1; i >= 0; i--) Destroy(face.GetChild(i).gameObject);
             if (!Portraits.PlaceHead(face, characterId!, mirror: player == 1))
-                Typography.Strong(Ui.Text(Ui.Stretched("Initial", face, Vector2.zero, Vector2.one), name.Length > 0 ? name.Substring(0, 1) : "?", 26, Color.white));
+                Typography.Strong(Ui.Text(Ui.Stretched("Initial", face, Vector2.zero, Vector2.one), name.Length > 0 ? name.Substring(0, 1) : "?", TextRole.Heading, Color.white));
             _partnerName[player].text = name;
         }
 
@@ -287,7 +287,7 @@ namespace YgoCampaign.Game
             var name = _names[p];
             var amp = name.IndexOf(" & ", StringComparison.Ordinal);
             var who = amp > 0 ? name.Substring(0, amp) : name;
-            _plateName[p].text = who.Length > 18 ? $"<size=18>{who}</size>" : who.Length > 13 ? $"<size=21>{who}</size>" : who;
+            _plateName[p].text = who.Length > 18 ? $"<size=18>{who}</size>" : who.Length > 13 ? $"<size=22>{who}</size>" : who;
             float tab = Mathf.Min(_plateName[p].preferredWidth + 30, 260);
             _nameTab[p].rectTransform.sizeDelta = new Vector2(tab, 36);
             _nameTab[p].SetPoints(Slanted(tab, 36, 10));

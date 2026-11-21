@@ -34,6 +34,7 @@ namespace YgoCampaign.Game
             System.Collections.IEnumerator Shot(string name)
             {
                 ScreenCapture.CaptureScreenshot(Path.Combine(folder, $"alley-{name}.png"));
+                yield return TextRule($"alley-{name}", Report);
                 yield return null;
                 yield return null;
             }
@@ -468,6 +469,28 @@ namespace YgoCampaign.Game
                 yield return new WaitForSecondsRealtime(0.6f);
                 yield return Shot("10-orvel-panel");
                 var rows = _campaignScreen.OrvelRows;
+                // (R2 fix round) A long line shortens the names, never the values: both DP figures show, each in gold.
+                {
+                    IReadOnlyList<string> lines = _campaignScreen.DebugOrvelLines;
+                    var gold = UiTheme.Current.GoldHex;
+                    var bad = new List<string>();
+                    for (int i = 0; i < lines.Count && i < rows.Count; i++)
+                    {
+                        var (rowCopy, hisStake) = rows[i];
+                        string mineDp = $"<color={gold}>{profile.Collection.Value(rowCopy):N0} DP</color>";
+                        string hisDp = hisStake != null ? $"<color={gold}>{_campaign.StakeValue(hisStake):N0} DP</color>" : "";
+                        if (!lines[i].Contains(mineDp) || hisStake != null && !lines[i].Substring(lines[i].IndexOf(mineDp) + mineDp.Length).Contains(hisDp)) bad.Add(lines[i]);
+                    }
+                    // The line that was cut in the 0.4 R2 run (alley-10-orvel-panel: 171 characters), composed as the panel does.
+                    var (diablosis, diablosisSize) = CampaignScreen.OrvelLine("Number 89: Diablosis the Mind Hacker", " · Ultra Rare · Grade 9 slab", 3150,
+                        "Dharc the Dark Charmer, Gloomy", " · Secret Rare · Raw · Near Mint", 2840, Typography.Font(Face.Body), 940);
+                    if (!diablosis.Contains($"<color={gold}>3,150 DP</color>") || !diablosis.Contains($"<color={gold}>2,840 DP</color>")
+                        || Ui.LineWidth(diablosis, Typography.Font(Face.Body), diablosisSize) > 936) bad.Add(diablosis);
+                    lines = lines.Append(diablosis).ToList();
+                    var longest = lines.OrderByDescending(l => l.Length).FirstOrDefault() ?? "";
+                    Report($"10. Orvel's stake lines keep both DP values in gold ({lines.Count} lines; the longest: \"{System.Text.RegularExpressions.Regex.Replace(longest, "<[^>]+>", "")}\")"
+                           + (bad.Count > 0 ? ": lost in " + string.Join(" / ", bad) : ""), lines.Count > 0 && bad.Count == 0);
+                }
                 Report($"10. Orvel's panel: one seat, both stakes (\"{_campaignScreen.AlleyStakeLine}\"), {rows.Count} spare cards, {rows.Count(r => r.his != null)} he matches",
                     _campaignScreen.AlleyStakeLine.Contains($"{AlleyEconomy.OrvelStake:N0} DP") && spares.All(c => rows.Any(r => r.copy == c && r.his != null)));
                 _campaignScreen.DebugAlleyDuel();

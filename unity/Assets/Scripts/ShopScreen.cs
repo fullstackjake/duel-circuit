@@ -205,33 +205,33 @@ namespace YgoCampaign.Game
             _root = Ui.Overlay(transform, "Shop", 14);
             Ui.Image(_root, T.Base);
             Ui.Image(Ui.Box(_root, 0, 0, 1920, 90), T.Deep);
-            _plate = Ui.Text(Ui.Box(_root, 40, 0, 300, 90), "CARD SHOP", 34, T.Sign, TextAnchor.MiddleLeft);
+            _plate = Ui.Text(Ui.Box(_root, 40, 0, 300, 90), "CARD SHOP", TextRole.Title, T.Sign, TextAnchor.MiddleLeft);
             Typography.Strong(_plate);
-            _dp = Typography.Counter(Ui.Text(Ui.Box(_root, 340, 10, 490, 40), "", 26, T.Gold, TextAnchor.MiddleLeft));
-            _meta = Ui.Text(Ui.Box(_root, 340, 50, 490, 30), "", 16, T.TextDim, TextAnchor.MiddleLeft);
+            _dp = Typography.Counter(Ui.Text(Ui.Box(_root, 340, 10, 490, 40), "", TextRole.Heading, T.Gold, TextAnchor.MiddleLeft));
+            _meta = Ui.Text(Ui.Box(_root, 340, 50, 490, 30), "", TextRole.Small, T.TextDim, TextAnchor.MiddleLeft);
             _meta.resizeTextForBestFit = true;
-            _meta.resizeTextMinSize = 12;
-            _meta.resizeTextMaxSize = 16;
-            Ui.BoxButton(_root, 840, 22, 180, 46, "Recipe Book", () => RecipeClicked?.Invoke(), 17);
-            var desk = Ui.BoxButton(_root, 1032, 22, 200, 46, "Grading Desk", () => GradingClicked?.Invoke(), 17);
+            _meta.resizeTextMinSize = UiTheme.Floor;
+            _meta.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
+            Ui.BoxButton(_root, 840, 22, 180, 46, "Recipe Book", () => RecipeClicked?.Invoke(), TextRole.Label);
+            var desk = Ui.BoxButton(_root, 1032, 22, 200, 46, "Grading Desk", () => GradingClicked?.Invoke(), TextRole.Label);
             _deskLabel = desk.GetComponentInChildren<Text>();
             _deskLabel.supportRichText = true;
-            Ui.BoxButton(_root, 1244, 22, 210, 46, "Structure Decks", () => StructureClicked?.Invoke(), 17);
-            var trader = Ui.BoxButton(_root, 1466, 22, 260, 46, "", () => TraderClicked?.Invoke(), 17);
+            Ui.BoxButton(_root, 1244, 22, 210, 46, "Structure Decks", () => StructureClicked?.Invoke(), TextRole.Label);
+            var trader = Ui.BoxButton(_root, 1466, 22, 260, 46, "", () => TraderClicked?.Invoke(), TextRole.Label);
             _traderLabel = trader.GetComponentInChildren<Text>();
-            Ui.BoxButton(_root, 1740, 22, 140, 46, "Back", Close, 18);
+            Ui.BoxButton(_root, 1740, 22, 140, 46, "Back", Close, TextRole.Label);
 
-            _search = Ui.Input(Ui.Box(_root, 40, 110, 630, 44), "Search sets: name or code (e.g. \"legend\", \"RA01\", \"2005\")", 16, v => Filter(v));
-            var wish = Ui.BoxButton(_root, 680, 110, 180, 44, "", ToggleWishlist, 16);
+            _search = Ui.Input(Ui.Box(_root, 40, 110, 630, 44), "Search sets: name or code (e.g. \"legend\", \"RA01\", \"2005\")", UiTheme.Size(TextRole.Small), v => Filter(v));
+            var wish = Ui.BoxButton(_root, 680, 110, 180, 44, "", ToggleWishlist, TextRole.Label);
             _wishLabel = wish.GetComponentInChildren<Text>();
             _list = Ui.Box(_root, 40, 166, 820, PerPage * 70);
-            Ui.BoxButton(_root, 40, 950, 140, 40, "< Prev", () => { _page--; ShowList(); });
-            _pageLabel = Ui.Text(Ui.Box(_root, 190, 950, 520, 40), "", 16, T.Text);
-            Ui.BoxButton(_root, 720, 950, 140, 40, "Next >", () => { _page++; ShowList(); });
+            Ui.BoxButton(_root, 40, 950, 140, 40, "< Prev", () => { _page--; ShowList(); }, TextRole.Label);
+            _pageLabel = Ui.Text(Ui.Box(_root, 190, 950, 520, 40), "", TextRole.Small, T.Text);
+            Ui.BoxButton(_root, 720, 950, 140, 40, "Next >", () => { _page++; ShowList(); }, TextRole.Label);
 
             _detail = Ui.Box(_root, 900, 110, 980, 880);
             Ui.Image(_detail, T.Panel);
-            _status = Ui.Text(Ui.Box(_root, 40, 1010, 1840, 50), "", 16, T.TextSoft, TextAnchor.MiddleLeft);
+            _status = Ui.Text(Ui.Box(_root, 40, 1010, 1840, 50), "", TextRole.Small, T.TextSoft, TextAnchor.MiddleLeft);
             _status.supportRichText = true;
 
             BuildOpening();
@@ -368,35 +368,35 @@ namespace YgoCampaign.Game
                     var parts = r.Header.Split(new[] { " · " }, 2, StringSplitOptions.None);
                     var text = parts[0] + (parts.Length > 1 ? $"  <color={T.TextDimHex}>{parts[1]}</color>" : "");
                     bool line = r.Section == ShelfSection.Featured && _shelfLine != null && !_byWishlist;
-                    var head = Ui.Text(Ui.Box(rt, 14, line ? 2 : 0, 790, line ? 26 : 64), text, 17, T.Gold, line ? TextAnchor.MiddleLeft : TextAnchor.LowerLeft);
+                    var head = Ui.Text(Ui.Box(rt, 14, line ? 2 : 0, 790, line ? 26 : 64), text, TextRole.Body, T.Gold, line ? TextAnchor.MiddleLeft : TextAnchor.LowerLeft);
                     Typography.Strong(head);
                     if (line)
                     {
                         // The shelf's line, under its header: why Gus put these sets up front.
-                        var said = Ui.Text(Ui.Box(rt, 14, 29, 790, 35), Say(_shelfLine), 13, T.TextSoft, TextAnchor.UpperLeft);
+                        var said = Ui.Text(Ui.Box(rt, 14, 29, 790, 35), Say(_shelfLine), TextRole.Caption, T.TextSoft, TextAnchor.UpperLeft);
                         said.resizeTextForBestFit = true;
-                        said.resizeTextMinSize = 11;
-                        said.resizeTextMaxSize = 13;
+                        said.resizeTextMinSize = UiTheme.Floor;
+                        said.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
                     }
                     Ui.Image(Ui.Box(rt, 0, 66, 820, 1), T.Divider);
                     break;
                 }
                 case ShelfRowKind.YearHeader:
-                    Typography.Strong(Ui.Text(Ui.Box(rt, 14, 0, 790, 62), r.Header, 16, T.Caption, TextAnchor.LowerLeft));
+                    Typography.Strong(Ui.Text(Ui.Box(rt, 14, 0, 790, 62), r.Header, TextRole.Small, T.Caption, TextAnchor.LowerLeft));
                     break;
                 case ShelfRowKind.BackToggle:
                 {
                     Ui.Image(rt, _backSelected ? T.RowSelected : slot % 2 == 0 ? T.RowA : T.RowB);
-                    Typography.Strong(Ui.Text(Ui.Box(rt, 14, 6, 790, 28), r.Header, 18, T.Text, TextAnchor.MiddleLeft));
+                    Typography.Strong(Ui.Text(Ui.Box(rt, 14, 6, 790, 28), r.Header, TextRole.Body, T.Text, TextAnchor.MiddleLeft));
                     // A search keeps them open (it looks through every set), so the row says so instead of offering to close.
                     Ui.Text(Ui.Box(rt, 14, 34, 790, 26), _filter.Length > 0 ? "Every other set on sale, newest year first · open while you search"
                         : _backOpen ? "Every other set on sale, newest year first · click to close"
-                        : "Every other set on sale, by year · click to open", 15, T.TextFaint, TextAnchor.MiddleLeft);
+                        : "Every other set on sale, by year · click to open", TextRole.Small, T.TextFaint, TextAnchor.MiddleLeft);
                     Ui.Clickable(rt, () => ToggleBack(), hover: () => _keys.Point(_page * PerPage + slot), style: HoverStyle.Row);
                     break;
                 }
                 case ShelfRowKind.More:
-                    Typography.Italic(Ui.Text(Ui.Box(rt, 14, 0, 790, 64), r.Header, 15, T.TextFaint, TextAnchor.MiddleLeft));
+                    Typography.Italic(Ui.Text(Ui.Box(rt, 14, 0, 790, 64), r.Header, TextRole.Small, T.TextFaint, TextAnchor.MiddleLeft));
                     Ui.Clickable(rt, () => ToggleBack(true), style: HoverStyle.Row);
                     break;
                 default:
@@ -418,22 +418,22 @@ namespace YgoCampaign.Game
             // A soon row is greyed out, its chips too.
             if (r.Locked) chips = chips.Select(c => (c.text, T.ButtonOff, T.TextDim, c.width)).ToList();
             float room = 640 - chips.Sum(c => c.width + 8);
-            var name = Ui.Text(Ui.Box(rt, 14, 6, room, 28), set.Info.Name, 17, r.Locked ? T.TextDim : T.Text, TextAnchor.MiddleLeft);
+            var name = Ui.Text(Ui.Box(rt, 14, 6, room, 28), set.Info.Name, TextRole.Body, r.Locked ? T.TextDim : T.Text, TextAnchor.MiddleLeft);
             name.resizeTextForBestFit = true;
-            name.resizeTextMinSize = 12;
-            name.resizeTextMaxSize = 17;
+            name.resizeTextMinSize = UiTheme.Floor;
+            name.resizeTextMaxSize = UiTheme.Size(TextRole.Body);
             float x = 14 + Mathf.Min(name.preferredWidth, room) + 10;
             foreach (var chip in chips)
             {
                 var box = Ui.Box(rt, x, 9, chip.width, 22);
                 Ui.Image(box, chip.fill).raycastTarget = false;
-                Typography.Strong(Ui.Text(box, chip.text, 12, chip.ink));
+                Typography.Strong(Ui.Text(box, chip.text, TextRole.Caption, chip.ink));
                 x += chip.width + 8;
             }
             var wishText = _byWishlist && _wishValue.TryGetValue(set, out var perPack) ? $" · <color={T.GoldSoftHex}>≈ {perPack:0.0} wishlist cards per pack</color>" : "";
-            var second = Ui.Text(Ui.Box(rt, 14, 34, 640, 26), RowLine(r) + wishText, 15, T.TextFaint, TextAnchor.MiddleLeft);
+            var second = Ui.Text(Ui.Box(rt, 14, 34, 640, 26), RowLine(r) + wishText, TextRole.Small, T.TextFaint, TextAnchor.MiddleLeft);
             second.supportRichText = true;
-            Typography.Counter(Ui.Text(Ui.Box(rt, 660, 0, 150, 64), $"{set.Price:N0} DP", 17, r.Locked ? T.TextDim : T.Gold, TextAnchor.MiddleRight));
+            Typography.Counter(Ui.Text(Ui.Box(rt, 660, 0, 150, 64), $"{set.Price:N0} DP", TextRole.Body, r.Locked ? T.TextDim : T.Gold, TextAnchor.MiddleRight));
             Ui.Clickable(rt, () => Select(set), hover: () => _keys.Point(_page * PerPage + slot), style: HoverStyle.Row);
         }
 
@@ -489,11 +489,11 @@ namespace YgoCampaign.Game
             _backSelected = true;
             ShowList();
             ClearDetail();
-            Typography.Strong(Ui.Text(Ui.Box(_detail, 30, 24, 920, 44), "Back shelves", 28, T.Text, TextAnchor.MiddleLeft));
+            Typography.Strong(Ui.Text(Ui.Box(_detail, 30, 24, 920, 44), "Back shelves", TextRole.Heading, T.Text, TextAnchor.MiddleLeft));
             int n = _shelves?.Back.Count ?? 0;
             var years = _shelves?.Back.Select(r => r.Set!.Year).Where(y => y.Length > 0).ToList() ?? new List<string>();
             Ui.Text(Ui.Box(_detail, 30, 70, 920, 28), years.Count > 0 ? $"{n} sets from {years.Min()} to {years.Max()}, newest year first · sets with commons first in each year" : $"{n} sets",
-                16, T.TextMuted, TextAnchor.MiddleLeft);
+                TextRole.Small, T.TextMuted, TextAnchor.MiddleLeft);
             if (!_backPicked && _state.Profile != null)
             {
                 _backPicked = true;
@@ -516,7 +516,7 @@ namespace YgoCampaign.Game
         /// <summary>A wrapped line of the detail panel at <paramref name="y"/>; returns the y under it.</summary>
         private float Line(float y, string text, int size, Color color, float x = 30, float width = 920)
         {
-            var t = Ui.Text(Ui.Box(_detail, x, y, width, 400), text, size, color, TextAnchor.UpperLeft);
+            var t = Ui.Text(Ui.Box(_detail, x, y, width, 400), text, UiTheme.Mapped(size), color, TextAnchor.UpperLeft);
             t.supportRichText = true;
             float h = Mathf.Ceil(t.preferredHeight) + 2;
             ((RectTransform)t.transform).sizeDelta = new Vector2(width, h);
@@ -530,7 +530,7 @@ namespace YgoCampaign.Game
             bool house = SelectionPacks.IsHousePack(set), import = ImportShelf.IsImport(set), real = !house && !import;
             bool rarity = real && PackCatalog.IsRaritySet(set), featured = row.Section == ShelfSection.Featured && real;
 
-            Typography.Strong(Ui.Text(Ui.Box(_detail, 30, 20, 920, 42), set.Info.Name, 28, row.Locked ? T.TextMuted : T.Text, TextAnchor.MiddleLeft));
+            Typography.Strong(Ui.Text(Ui.Box(_detail, 30, 20, 920, 42), set.Info.Name, TextRole.Heading, row.Locked ? T.TextMuted : T.Text, TextAnchor.MiddleLeft));
             var about = house ? _state.HouseAbout(set) : "";
             var sub = house ? $"{(about.Length > 0 ? about + " · " : "")}{set.CardCount} cards · {PackCatalog.PackSize} cards per pack"
                 : import ? $"OCG import · cards printed in Japan and Asia that the TCG never released · {set.CardCount} cards · {PackCatalog.PackSize} cards per pack"
@@ -584,7 +584,7 @@ namespace YgoCampaign.Game
                 _oddsLine = _state.Voice.Pick("odds", _state.Profile, _state.Circuits, NoFill);
                 _state.Save();
             }
-            var caption = Ui.Text(Ui.Box(_detail, 30, y, 920, 20), "ODDS PER PACK" + (_oddsLine != null ? "   " + Say(_oddsLine) : ""), 13, T.Caption, TextAnchor.MiddleLeft);
+            var caption = Ui.Text(Ui.Box(_detail, 30, y, 920, 20), "ODDS PER PACK" + (_oddsLine != null ? "   " + Say(_oddsLine) : ""), TextRole.Caption, T.Caption, TextAnchor.MiddleLeft);
             caption.supportRichText = true;
             y += 24;
             var odds = OddsRows(set);
@@ -595,8 +595,8 @@ namespace YgoCampaign.Game
             if (box) y = Line(y, BoxLine(set), 15, T.TextSoft);
             Line(y, Condition(), 14, T.TextFaint);
 
-            var buy = Ui.BoxButton(_detail, 30, 704, 440, 64, $"Buy a pack · {set.Price:N0} DP", () => Buy(set, 1), 22);
-            var five = Ui.BoxButton(_detail, 500, 704, 440, 64, $"Buy 5 packs · {set.Price * 5:N0} DP", () => Buy(set, 5), 22);
+            var buy = Ui.BoxButton(_detail, 30, 704, 440, 64, $"Buy a pack · {set.Price:N0} DP", () => Buy(set, 1), TextRole.Subhead);
+            var five = Ui.BoxButton(_detail, 500, 704, 440, 64, $"Buy 5 packs · {set.Price * 5:N0} DP", () => Buy(set, 5), TextRole.Subhead);
             buy.targetGraphic.color = T.Primary;
             if (row.Locked)
                 foreach (var b in new[] { buy, five })
@@ -609,14 +609,14 @@ namespace YgoCampaign.Game
             if (box)
             {
                 int price = ShopPrices.Box(set);
-                Ui.BoxButton(_detail, 30, 778, 440, 56, $"Buy a box · {ShopPrices.BoxPacks} packs · {price:N0} DP", () => BuyBox(set), 20);
+                Ui.BoxButton(_detail, 30, 778, 440, 56, $"Buy a box · {ShopPrices.BoxPacks} packs · {price:N0} DP", () => BuyBox(set), TextRole.Label);
                 var promise = ShopPrices.BoxTop(set);
                 Ui.Text(Ui.Box(_detail, 500, 778, 440, 56), promise is Rarity t ? $"At least one {CardFoil.ColoredName(t)} in every box ({ShopPrices.BoxDiscount * 100:0}% off {ShopPrices.BoxPacks} packs)"
-                    : $"{ShopPrices.BoxDiscount * 100:0}% off {ShopPrices.BoxPacks} packs", 15, T.TextSoft, TextAnchor.MiddleLeft).supportRichText = true;
+                    : $"{ShopPrices.BoxDiscount * 100:0}% off {ShopPrices.BoxPacks} packs", TextRole.Small, T.TextSoft, TextAnchor.MiddleLeft).supportRichText = true;
             }
             Ui.Text(Ui.Box(_detail, 30, 840, 920, 36),
                 $"The best card is always last. You keep up to {Collection.MaxCopies} of a card: extra copies turn into DP (a rarer one replaces your least rare copy).",
-                14, T.TextFaint, TextAnchor.MiddleLeft);
+                TextRole.Caption, T.TextFaint, TextAnchor.MiddleLeft);
         }
 
         private static string Plural(Rarity r) => Rarities.Name(r) + "s";
@@ -753,9 +753,9 @@ namespace YgoCampaign.Game
             g.texture = BoardFx.Textures.Glow;
             g.color = new Color(0.35f, 0.45f, 0.9f, 0.18f); // theme: kept, the reveal glow is pack-opening art, not a shell surface
             g.raycastTarget = false;
-            _openingTitle = Ui.Text(Ui.Box(_opening, 0, 40, 1660, 50), "", 30, T.Gold);
+            _openingTitle = Ui.Text(Ui.Box(_opening, 0, 40, 1660, 50), "", TextRole.Title, T.Gold);
             Typography.Strong(_openingTitle);
-            _openingUnlocks = Ui.Text(Ui.Box(_opening, 0, 92, 1660, 30), "", 18, T.GoldSoft);
+            _openingUnlocks = Ui.Text(Ui.Box(_opening, 0, 92, 1660, 30), "", TextRole.Body, T.GoldSoft);
             _openingUnlocks.supportRichText = true;
             // The cards are laid out on the same 1920x1080 frame as the title, summary and buttons (top-left anchored), so
             // their captions keep their room above the summary at any aspect ratio.
@@ -772,7 +772,7 @@ namespace YgoCampaign.Game
             infoContent.anchorMax = new Vector2(1, 1);
             infoContent.pivot = new Vector2(0.5f, 1);
             infoContent.sizeDelta = Vector2.zero;
-            _cardInfo = Ui.Text(infoContent, "Hover a revealed card to read it.", 17, T.TextBright, TextAnchor.UpperLeft);
+            _cardInfo = Ui.Text(infoContent, "Hover a revealed card to read it.", TextRole.Body, T.TextBright, TextAnchor.UpperLeft);
             _cardInfo.supportRichText = true;
             _cardInfo.verticalOverflow = VerticalWrapMode.Overflow;
             infoContent.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
@@ -782,23 +782,23 @@ namespace YgoCampaign.Game
             infoScroll.horizontal = false;
             infoScroll.movementType = ScrollRect.MovementType.Clamped;
             infoScroll.scrollSensitivity = 30;
-            _openingSummary = Ui.Text(Ui.Box(_opening, 0, 910, 1660, 34), "", 20, T.Text); // clear of the card captions
+            _openingSummary = Ui.Text(Ui.Box(_opening, 0, 910, 1660, 34), "", TextRole.Label, T.Text); // clear of the card captions
             _openingSummary.supportRichText = true;
-            _openingVoice = Ui.Text(Ui.Box(_opening, 0, 944, 1660, 32), "", 18, T.TextSoft);
+            _openingVoice = Ui.Text(Ui.Box(_opening, 0, 944, 1660, 32), "", TextRole.Body, T.TextSoft);
             _openingVoice.supportRichText = true;
-            _revealAll = Ui.BoxButton(_opening, 430, 984, 240, 56, "Reveal all", () => StartCoroutine(RevealAll()), 20).gameObject;
+            _revealAll = Ui.BoxButton(_opening, 430, 984, 240, 56, "Reveal all", () => StartCoroutine(RevealAll()), TextRole.Label).gameObject;
             _openAnother = Ui.BoxButton(_opening, 710, 984, 240, 56, "Next pack", () =>
             {
                 // Prize Packs: the next one won; the shop's: the next one bought (or another).
                 if (_prizing) { if (_prizeQueue.Count > 0) OpenPrize(_prizeTitle, _prizeQueue.Dequeue()); }
                 else if (_openSet != null) OpenPack(_openSet);
-            }, 20);
+            }, TextRole.Label);
             _openAnother.targetGraphic.color = T.Primary; // the opening screen's one primary
             _openingBack = Ui.BoxButton(_opening, 990, 984, 240, 56, "Back to shop", () =>
             {
                 if (_prizing) { FinishPrizes(); return; }
                 BackToShop();
-            }, 20);
+            }, TextRole.Label);
             _opening.gameObject.SetActive(false);
         }
 
@@ -1114,27 +1114,28 @@ namespace YgoCampaign.Game
         {
             var T = UiTheme.Current;
             var rarity = Ui.Text(Ui.Placed("Rarity", card.Slot, new Vector2(0, -card.Slot.sizeDelta.y / 2 - 16), new Vector2(260, 24)),
-                CardFoil.ColoredName(card.Pull.Rarity), 15, T.Text);
+                CardFoil.ColoredName(card.Pull.Rarity), TextRole.Small, T.Text);
             rarity.supportRichText = true;
             Typography.Strong(rarity);
             // Long names wrap to two lines within the card's width instead of running into the next card. The box is as tall
             // as the name's lines, so the tag line under it sits right below the name, one line or two.
             float bottom = card.Slot.sizeDelta.y / 2, nameTop = bottom + 28, nameWidth = card.Slot.sizeDelta.x + 16;
-            var name = Ui.Text(Ui.Placed("Name", card.Slot, new Vector2(0, -nameTop - 15), new Vector2(nameWidth, 30)),
-                info?.Name ?? card.Pull.Code.ToString(), 12, T.TextBody, TextAnchor.UpperCenter);
-            float nameHeight = Mathf.Clamp(Mathf.Ceil(name.preferredHeight), 14, 30);
+            var name = Ui.Text(Ui.Placed("Name", card.Slot, new Vector2(0, -nameTop - 18), new Vector2(nameWidth, 36)),
+                info?.Name ?? card.Pull.Code.ToString(), TextRole.Caption, T.TextBody, TextAnchor.UpperCenter);
+            float nameHeight = Mathf.Clamp(Mathf.Ceil(name.preferredHeight), 18, 36);
             ((RectTransform)name.transform).sizeDelta = new Vector2(nameWidth, nameHeight);
             ((RectTransform)name.transform).anchoredPosition = new Vector2(0, -nameTop - nameHeight / 2);
             // Why it matters, one line under the name (a kept copy only): your wishlist, who plays it, your deck.
             if (card.Added.Kept && card.Tags is PackCardTags tags && PackTags.Line(tags) is { Length: > 0 } why)
             {
                 var color = tags.Wanted ? T.GoldSoft : tags.PlayedBy.Count > 0 ? T.Info : T.InfoSoft;
-                var line = Ui.Text(Ui.Placed("Why", card.Slot, new Vector2(0, -nameTop - nameHeight - 9), new Vector2(card.Slot.sizeDelta.x + 30, 16)),
-                    why, 12, color);
+                var line = Ui.Text(Ui.Placed("Why", card.Slot, new Vector2(0, -nameTop - nameHeight - 10), new Vector2(card.Slot.sizeDelta.x + 30, 18)),
+                    why, TextRole.Caption, color);
                 Typography.Strong(line);
                 line.resizeTextForBestFit = true;
-                line.resizeTextMinSize = 9;
-                line.resizeTextMaxSize = 12;
+                line.resizeTextMinSize = UiTheme.Floor;
+                line.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
+                Ui.OneLine(line);
             }
             string? tag = null;
             var badge = Ui.Hex("#E8433F");
@@ -1151,11 +1152,11 @@ namespace YgoCampaign.Game
                 Ui.Image(chip, band).raycastTarget = false;
                 var inner = Ui.Placed("Fill", chip, Vector2.zero, new Vector2(94, 22));
                 Ui.Image(inner, T.GlassSoft.WithAlpha(0.92f)).raycastTarget = false;
-                var word = Ui.Text(inner, $"{Grades.Glyph(copy.Shown)} {Grades.Word(copy.Shown)}", 13, band);
+                var word = Ui.Text(inner, $"{Grades.Glyph(copy.Shown)} {Grades.Word(copy.Shown)}", TextRole.Caption, band);
                 Typography.Strong(word);
                 word.resizeTextForBestFit = true;
-                word.resizeTextMinSize = 9;
-                word.resizeTextMaxSize = 13;
+                word.resizeTextMinSize = UiTheme.Floor;
+                word.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
             }
             // A pull printing an original text (docs/dev/CARD-VERSIONS-SPEC-2026-11-03.md 4.2: old sets' printings): a gold band
             // over the card's text box, "ORIGINAL TEXT · 2002", clear of the stats line at its foot (the lines under the card
@@ -1165,11 +1166,11 @@ namespace YgoCampaign.Game
                 var year = printed.Printed.Length >= 4 ? $" · {printed.Printed.Substring(0, 4)}" : "";
                 var band = Ui.Placed("Original", card.Slot, new Vector2(0, -card.Slot.sizeDelta.y / 2 + 52), new Vector2(card.Slot.sizeDelta.x - 6, 22));
                 Ui.Image(band, T.GlassSoft.WithAlpha(0.9f)).raycastTarget = false;
-                var words = Ui.Text(band, $"ORIGINAL TEXT{year}", 12, T.GoldSoft);
+                var words = Ui.Text(band, $"ORIGINAL TEXT{year}", TextRole.Caption, T.GoldSoft);
                 Typography.Strong(words);
                 words.resizeTextForBestFit = true;
-                words.resizeTextMinSize = 8;
-                words.resizeTextMaxSize = 12;
+                words.resizeTextMinSize = UiTheme.Floor;
+                words.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
                 words.raycastTarget = false;
             }
             if (tag != null)
@@ -1177,7 +1178,7 @@ namespace YgoCampaign.Game
                 var width = tag.Length > 4 ? 96 : 54;
                 var box = Ui.Placed("Tag", card.Slot, new Vector2(card.Slot.sizeDelta.x / 2 - width / 2f + 8, card.Slot.sizeDelta.y / 2 + 15), new Vector2(width, 24));
                 Ui.Image(box, badge).raycastTarget = false;
-                Typography.Strong(Ui.Text(box, tag, 14, T.Text));
+                Typography.Strong(Ui.Text(box, tag, TextRole.Caption, T.Text));
             }
         }
 

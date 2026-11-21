@@ -59,7 +59,7 @@ namespace YgoCampaign.Game
             title.anchoredPosition = new Vector2(70, 0);
             title.sizeDelta = new Vector2(520, 40);
             // Opaque gold with a dark edge: there's no bar behind it, and it must read over the brightest mats.
-            _headerTitle = Ui.Text(title, "", 16, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
+            _headerTitle = Ui.Text(title, "", TextRole.Small, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
             _headerTitle.supportRichText = true;
             var titleEdge = _headerTitle.gameObject.AddComponent<Outline>();
             titleEdge.effectColor = new Color(0, 0, 0, 0.8f);
@@ -273,7 +273,7 @@ namespace YgoCampaign.Game
                 ("Speed", row =>
                 {
                     Ui.Button(row, "-", new Vector2(-60, 0), new Vector2(44, 34), () => SpeedChanged?.Invoke(-1));
-                    _gearSpeed = Ui.Text(Ui.Placed("Value", row, new Vector2(0, 0), new Vector2(70, 34)), _speedLabel.text, 16, Color.white);
+                    _gearSpeed = Ui.Text(Ui.Placed("Value", row, new Vector2(0, 0), new Vector2(70, 34)), _speedLabel.text, TextRole.Small, Color.white);
                     Ui.Button(row, "+", new Vector2(60, 0), new Vector2(44, 34), () => SpeedChanged?.Invoke(+1));
                 }),
             };
@@ -298,7 +298,7 @@ namespace YgoCampaign.Game
                 row.pivot = new Vector2(0, 0.5f);
                 row.anchoredPosition = new Vector2(0, -8 - rowH / 2 - i * rowH);
                 row.sizeDelta = new Vector2(width, rowH);
-                Ui.Text(Ui.Placed("Label", row, new Vector2(-95, 0), new Vector2(210, 34)), rows[i].label, 16, new Color(0.85f, 0.88f, 0.95f), TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Placed("Label", row, new Vector2(-95, 0), new Vector2(210, 34)), rows[i].label, TextRole.Small, new Color(0.85f, 0.88f, 0.95f), TextAnchor.MiddleLeft);
                 var right = Ui.Rect("Right", row);
                 right.anchorMin = right.anchorMax = new Vector2(1, 0.5f);
                 right.pivot = new Vector2(1, 0.5f);
@@ -369,14 +369,14 @@ namespace YgoCampaign.Game
             _strip.sizeDelta = new Vector2(66, 6 * 80 + 24);
             _strip.SetSiblingIndex(_detailGroup.GetSiblingIndex());
             _stripFade = _strip.gameObject.AddComponent<CanvasGroup>();
-            Ui.Text(Ui.Placed("Head", _strip, new Vector2(0, (6 * 80 + 24) / 2f - 10), new Vector2(70, 18)), "RECENT", 13, new Color(1, 1, 1, 0.7f));
+            Ui.Text(Ui.Placed("Head", _strip, new Vector2(0, (6 * 80 + 24) / 2f - 10), new Vector2(70, 18)), "RECENT", TextRole.Caption, new Color(1, 1, 1, 0.7f));
 
             _stripTip = Ui.Rect("Tip", _canvas);
             _stripTip.anchorMin = _stripTip.anchorMax = new Vector2(1, 0.5f);
             _stripTip.pivot = new Vector2(1, 0.5f);
             _stripTip.sizeDelta = new Vector2(360, 54);
             Ui.Image(_stripTip, new Color(0.04f, 0.06f, 0.1f, 0.95f)).raycastTarget = false;
-            _stripTipText = Ui.Text(Ui.Stretched("Text", _stripTip, Vector2.zero, Vector2.one), "", 15, Color.white);
+            _stripTipText = Ui.Text(Ui.Stretched("Text", _stripTip, Vector2.zero, Vector2.one), "", TextRole.Small, Color.white);
             _stripTipText.rectTransform.offsetMin = new Vector2(12, 4);
             _stripTipText.rectTransform.offsetMax = new Vector2(-12, -4);
             _stripTip.gameObject.SetActive(false);
@@ -394,7 +394,7 @@ namespace YgoCampaign.Game
             head.anchorMax = new Vector2(1, 1);
             head.pivot = new Vector2(0.5f, 1);
             head.sizeDelta = new Vector2(0, 56);
-            Typography.Strong(Ui.Text(Ui.Placed("Title", head, new Vector2(-120, 0), new Vector2(280, 40)), "DUEL HISTORY", 20, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
+            Typography.Strong(Ui.Text(Ui.Placed("Title", head, new Vector2(-120, 0), new Vector2(280, 40)), "DUEL HISTORY", TextRole.Label, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
             Ui.Button(head, "Close", new Vector2(220, 0), new Vector2(90, 36), ToggleHistory);
             var viewport = Ui.Rect("Viewport", _drawer);
             viewport.anchorMin = Vector2.zero;
@@ -466,16 +466,16 @@ namespace YgoCampaign.Game
             {
                 Ui.Image(face, new Color(0.1f, 0.12f, 0.18f, 1)).raycastTarget = false;
                 var label = e.Kind == HistoryKind.Damage ? $"−{e.Amount}" : e.Kind == HistoryKind.Recover ? $"+{e.Amount}" : e.Kind == HistoryKind.Set ? "SET" : "";
-                if (label.Length > 0) Typography.Strong(Ui.Text(face, label, 14, e.Kind == HistoryKind.Damage ? Ui.Hex("#FF8A8A") : Color.white));
+                if (label.Length > 0) Typography.Strong(Ui.Text(face, label, TextRole.Caption, e.Kind == HistoryKind.Damage ? Ui.Hex("#FF8A8A") : Color.white));
             }
             // Whose it is in words, on a band at the bottom; what happened as an icon in the corner.
             var band = Ui.Placed("Who", tile, new Vector2(0, -38 + 9.5f), new Vector2(56, 19));
             Ui.Image(band, new Color(0, 0, 0, 0.72f)).raycastTarget = false;
-            var whose = Ui.Text(band, OwnerTag(e.Player), 13, Color.white);
+            var whose = Ui.Text(band, OwnerTag(e.Player), TextRole.Caption, Color.white);
             Typography.Strong(whose);
             whose.resizeTextForBestFit = true; // a six-letter name still fits
-            whose.resizeTextMinSize = 10;
-            whose.resizeTextMaxSize = 13;
+            whose.resizeTextMinSize = UiTheme.Floor;
+            whose.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
             var icon = IconFor(e.Kind);
             if (icon.Length > 0)
             {
@@ -528,7 +528,7 @@ namespace YgoCampaign.Game
                 {
                     var turn = Ui.Box(_drawerRows, 0, y + 8, 540, 30);
                     Ui.Image(turn, new Color(1, 1, 1, 0.06f)).raycastTarget = false;
-                    Typography.Strong(Ui.Text(Ui.Box(turn, 12, 0, 500, 30), e.Text, 15, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
+                    Typography.Strong(Ui.Text(Ui.Box(turn, 12, 0, 500, 30), e.Text, TextRole.Small, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
                     y += 44;
                     continue;
                 }
@@ -549,12 +549,12 @@ namespace YgoCampaign.Game
                 var owner = OwnerTag(e.Player);
                 var said = e.Text;
                 if (owner == "YOU" && said.StartsWith("You ", StringComparison.Ordinal)) said = said.Substring(4);
-                var tag = Ui.Text(Ui.Box(row, 58, 0, 52, 52), owner, 13, Ui.Hex("#9AA3B5"), TextAnchor.MiddleLeft);
+                var tag = Ui.Text(Ui.Box(row, 58, 0, 52, 52), owner, TextRole.Caption, Ui.Hex("#9AA3B5"), TextAnchor.MiddleLeft);
                 Typography.Strong(tag);
                 tag.resizeTextForBestFit = true; // a six-letter name (when watching) still fits the column
-                tag.resizeTextMinSize = 10;
-                tag.resizeTextMaxSize = 13;
-                var text = Ui.Text(Ui.Box(row, 112, 0, 372, 52), said, 15, Color.white, TextAnchor.MiddleLeft);
+                tag.resizeTextMinSize = UiTheme.Floor;
+                tag.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
+                var text = Ui.Text(Ui.Box(row, 112, 0, 372, 52), said, TextRole.Small, Color.white, TextAnchor.MiddleLeft);
                 text.supportRichText = true;
                 var icon = IconFor(e.Kind);
                 if (icon.Length > 0)
@@ -636,12 +636,12 @@ namespace YgoCampaign.Game
             icon.texture = Icons.For(IconFor(kind));
             icon.color = bad ? Ui.Hex("#FF8A8A") : Ui.Hex("#FFC940");
             icon.raycastTarget = false;
-            var label = Ui.Text(Ui.Stretched("Text", toast, Vector2.zero, Vector2.one), text, 18, Color.white, TextAnchor.MiddleLeft);
+            var label = Ui.Text(Ui.Stretched("Text", toast, Vector2.zero, Vector2.one), text, TextRole.Body, Color.white, TextAnchor.MiddleLeft);
             label.rectTransform.offsetMin = new Vector2(56, 0);
             label.rectTransform.offsetMax = new Vector2(-14, 0);
             label.resizeTextForBestFit = true;
-            label.resizeTextMinSize = 12;
-            label.resizeTextMaxSize = 18;
+            label.resizeTextMinSize = UiTheme.Floor;
+            label.resizeTextMaxSize = UiTheme.Size(TextRole.Body);
             toast.gameObject.AddComponent<CanvasGroup>().blocksRaycasts = false;
             ToastText = text;
             _toastUntil = Time.unscaledTime + 3.2f;

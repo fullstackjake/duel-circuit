@@ -27,14 +27,14 @@ namespace YgoCampaign.Game
         private float DrawMine(List<string> mine)
         {
             float y = 0;
-            var heading = Ui.Text(Ui.Box(_list, 6, y + 8, 400, 28), "MY RECIPES", 16, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
+            var heading = Ui.Text(Ui.Box(_list, 6, y + 8, 400, 28), "MY RECIPES", TextRole.Small, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
             Typography.Strong(heading);
-            Ui.BoxButton(_list, 470, y + 6, 156, 32, "Import .ydk", PickYdk, 15);
+            Ui.BoxButton(_list, 470, y + 6, 156, 32, "Import .ydk", PickYdk, TextRole.Label);
             y += 44;
             if (mine.Count == 0)
             {
                 Ui.Text(Ui.Box(_list, 6, y, 620, 44), "Import a .ydk deck list (deck sites and EDOPro export them) to keep it here as a plan to build towards.",
-                    14, new Color(0.72f, 0.76f, 0.84f), TextAnchor.UpperLeft);
+                    TextRole.Caption, new Color(0.72f, 0.76f, 0.84f), TextAnchor.UpperLeft);
                 return y + 52;
             }
             foreach (var name in mine)
@@ -44,14 +44,14 @@ namespace YgoCampaign.Game
                 Ui.Image(row, name == _mine ? Ui.Hex("#2E3A55") : Ui.Hex("#1E2535"));
                 var badge = Ui.Box(row, 8, 6, 64, 64);
                 Ui.Image(badge, Ui.Hex("#232A3A")).raycastTarget = false;
-                Typography.Strong(Ui.Text(badge, "YDK", 16, Ui.Hex("#FFC940")));
-                var title = Ui.Text(Ui.Box(row, 84, 8, 390, 30), name, 19, Color.white, TextAnchor.MiddleLeft);
+                Typography.Strong(Ui.Text(badge, "YDK", TextRole.Small, Ui.Hex("#FFC940")));
+                var title = Ui.Text(Ui.Box(row, 84, 8, 390, 30), name, TextRole.Label, Color.white, TextAnchor.MiddleLeft);
                 Typography.Strong(title);
                 title.resizeTextForBestFit = true;
-                title.resizeTextMinSize = 12;
-                title.resizeTextMaxSize = 19;
+                title.resizeTextMinSize = UiTheme.Floor;
+                title.resizeTextMaxSize = UiTheme.Size(TextRole.Label);
                 Ui.Text(Ui.Box(row, 84, 40, 400, 26), deck == null ? "can't be read" : $"Your recipe  ·  {deck.Main.Count} / {deck.Extra.Count} / {deck.Side.Count}",
-                    14, new Color(0.72f, 0.76f, 0.84f), TextAnchor.MiddleLeft);
+                    TextRole.Caption, new Color(0.72f, 0.76f, 0.84f), TextAnchor.MiddleLeft);
                 if (deck != null)
                 {
                     var (owned, wanted) = MineOwnership(deck);
@@ -59,7 +59,7 @@ namespace YgoCampaign.Game
                     var back = Ui.Box(row, 490, 30, 120, 12);
                     Ui.Image(back, new Color(0, 0, 0, 0.5f)).raycastTarget = false;
                     Ui.Image(Ui.Box(back, 0, 0, 120 * frac, 12), frac >= 1 ? Ui.Hex("#7BD88F") : Ui.Hex("#5FA8E8")).raycastTarget = false;
-                    Ui.Text(Ui.Box(row, 490, 44, 120, 22), $"own {Mathf.RoundToInt(frac * 100)}%", 13, new Color(0.8f, 0.84f, 0.92f));
+                    Ui.Text(Ui.Box(row, 490, 44, 120, 22), $"own {Mathf.RoundToInt(frac * 100)}%", TextRole.Caption, new Color(0.8f, 0.84f, 0.92f));
                 }
                 var pick = name;
                 Ui.Clickable(row, () => { _mine = pick; _deleteArmed = null; Refresh(); }, style: HoverStyle.Row);
@@ -85,17 +85,17 @@ namespace YgoCampaign.Game
             var deck = _state.MyRecipes.Load(name);
             if (deck == null)
             {
-                Ui.Text(Ui.Box(_detail, 16, 30, 1100, 50), $"{name} (its file can't be read)", 22, Color.white, TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(_detail, 16, 30, 1100, 50), $"{name} (its file can't be read)", TextRole.Subhead, Color.white, TextAnchor.MiddleLeft);
                 return;
             }
             var list = _state.MyRecipeList;
-            var title = Ui.Text(Ui.Box(_detail, 16, 18, 840, 46), name, 32, Color.white, TextAnchor.MiddleLeft);
+            var title = Ui.Text(Ui.Box(_detail, 16, 18, 840, 46), name, TextRole.Title, Color.white, TextAnchor.MiddleLeft);
             Typography.Strong(title);
             title.resizeTextForBestFit = true;
             title.resizeTextMinSize = 18;
-            title.resizeTextMaxSize = 32;
+            title.resizeTextMaxSize = UiTheme.Size(TextRole.Title);
             Ui.Text(Ui.Box(_detail, 16, 64, 840, 26), "Your recipe, imported from a .ydk file: a plan to build towards. Build fills it from your cards; nothing here sells it.",
-                15, new Color(0.75f, 0.78f, 0.86f), TextAnchor.MiddleLeft);
+                TextRole.Small, new Color(0.75f, 0.78f, 0.86f), TextAnchor.MiddleLeft);
 
             // The ban list it's judged by, and the cards over it (flagged, never removed).
             var over = _state.OverList(deck, list);
@@ -105,38 +105,38 @@ namespace YgoCampaign.Game
             var banLine = Ui.Text(Ui.Box(_detail, 16, 90, 1150, 24),
                 (list != Banlist.None ? $"Ban list: {list.Name} (the current circuit's)" : "No ban list applies in open play")
                 + (over.Count == 0 ? "   ·   nothing over it" : $"   ·   <color=#FF8A8A>Over it: {flagged}</color>"),
-                14, Ui.Hex("#E3A21A"), TextAnchor.MiddleLeft);
+                TextRole.Caption, Ui.Hex("#E3A21A"), TextAnchor.MiddleLeft);
             banLine.supportRichText = true;
             banLine.resizeTextForBestFit = true;
-            banLine.resizeTextMinSize = 10;
-            banLine.resizeTextMaxSize = 14;
+            banLine.resizeTextMinSize = UiTheme.Floor;
+            banLine.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
             // Its sizes, and what the deck rules say (Build and the editor sort it out).
             var sizeProblems = DeckRules.Validate(deck, Banlist.None, _cards).Where(p => p.Code == 0).Select(p => p.Message).ToList();
             var sizes = Ui.Text(Ui.Box(_detail, 16, 116, 1150, 24),
                 $"Main {deck.Main.Count}  ·  Extra {deck.Extra.Count}  ·  Side {deck.Side.Count}"
                 + (sizeProblems.Count > 0 ? $"   ·   <color=#FF8A8A>{string.Join(" ", sizeProblems)}</color>" : ""),
-                14, new Color(0.86f, 0.88f, 0.93f), TextAnchor.MiddleLeft);
+                TextRole.Caption, new Color(0.86f, 0.88f, 0.93f), TextAnchor.MiddleLeft);
             sizes.supportRichText = true;
 
             // How much of it you own.
             var (owned, wanted) = MineOwnership(deck);
             float frac = wanted == 0 ? 0 : (float)owned / wanted;
-            Ui.Text(Ui.Box(_detail, 16, 148, 300, 24), "YOU OWN", 13, new Color(1, 1, 1, 0.5f), TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(_detail, 16, 148, 300, 24), "YOU OWN", TextRole.Caption, new Color(1, 1, 1, 0.5f), TextAnchor.MiddleLeft);
             var bar = Ui.Box(_detail, 16, 174, 600, 18);
             Ui.Image(bar, new Color(0, 0, 0, 0.5f));
             Ui.Image(Ui.Box(bar, 0, 0, 600 * frac, 18), frac >= 1 ? Ui.Hex("#7BD88F") : Ui.Hex("#5FA8E8")).raycastTarget = false;
-            Ui.Text(Ui.Box(_detail, 630, 168, 260, 30), $"{owned} of {wanted} cards ({Mathf.RoundToInt(frac * 100)}%)", 16, Color.white, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(_detail, 630, 168, 260, 30), $"{owned} of {wanted} cards ({Mathf.RoundToInt(frac * 100)}%)", TextRole.Small, Color.white, TextAnchor.MiddleLeft);
 
             // Rename and Delete.
-            _renameField = Ui.Input(Ui.Box(_detail, 16, 214, 420, 36), "new name", 16);
+            _renameField = Ui.Input(Ui.Box(_detail, 16, 214, 420, 36), "new name", UiTheme.Size(TextRole.Small));
             _renameField.SetTextWithoutNotify(name);
-            Ui.BoxButton(_detail, 446, 214, 120, 36, "Rename", () => Rename(name, _renameField!.text), 15);
-            Ui.BoxButton(_detail, 576, 214, 120, 36, _deleteArmed == name ? "Delete?" : "Delete", () => Delete(name), 15)
+            Ui.BoxButton(_detail, 446, 214, 120, 36, "Rename", () => Rename(name, _renameField!.text), TextRole.Label);
+            Ui.BoxButton(_detail, 576, 214, 120, 36, _deleteArmed == name ? "Delete?" : "Delete", () => Delete(name), TextRole.Label)
                 .targetGraphic.color = _deleteArmed == name ? Ui.Hex("#B8432F") : UiTheme.Current.Button;
 
             // The list: each card once with its count; short ones dimmed with what you have; ones over the list tagged.
             Ui.Text(Ui.Box(_detail, 16, 262, 900, 24), $"MAIN DECK {deck.Main.Count}   ·   EXTRA DECK {deck.Extra.Count}"
-                + (deck.Side.Count > 0 ? $"   ·   SIDE DECK {deck.Side.Count} (not built)" : ""), 13, new Color(1, 1, 1, 0.5f), TextAnchor.MiddleLeft);
+                + (deck.Side.Count > 0 ? $"   ·   SIDE DECK {deck.Side.Count} (not built)" : ""), TextRole.Caption, new Color(1, 1, 1, 0.5f), TextAnchor.MiddleLeft);
             var overCodes = over.ToDictionary(o => o.code, o => o.allowed);
             var groups = deck.Main.Select(c => (c, extra: false)).Concat(deck.Extra.Select(c => (c, extra: true)))
                 .GroupBy(x => Banlist.BaseCode(x.c, _cards)).Select(g => (code: g.First().c, key: g.Key, count: g.Count())).ToList();
@@ -154,32 +154,30 @@ namespace YgoCampaign.Game
                 var view = CardView.Create(_detail, new Vector2(x - 590, 445 - y), size, card, info, 0, true, null, offField: true);
                 int have = Math.Min(count, Profile.Collection.Count(key));
                 if (have < count) view.gameObject.AddComponent<CanvasGroup>().alpha = 0.4f;
-                var label = Ui.Text(Ui.Placed("Count", _detail, new Vector2(x - 590, 445 - y - size.y / 2 - 9), new Vector2(60, 16)),
-                    have < count ? $"<color=#FF8A8A>{have}/{count}</color>" : $"x{count}", 12, Color.white);
+                var label = Ui.Text(Ui.Placed("Count", _detail, new Vector2(x - 590, 445 - y - size.y / 2 - 10), new Vector2(60, 18)),
+                    have < count ? $"<color=#FF8A8A>{have}/{count}</color>" : $"x{count}", TextRole.Caption, Color.white);
                 label.supportRichText = true;
                 if (overCodes.TryGetValue(key, out var allowed))
                 {
                     var tag = Ui.Placed("Over", _detail, new Vector2(x - 590, 445 - y + size.y / 2 - 8), new Vector2(54, 16));
                     Ui.Image(tag, Ui.Hex("#B8432F")).raycastTarget = false;
-                    Typography.Strong(Ui.Text(tag, allowed == 0 ? "BANNED" : $"LIMIT {allowed}", 10, Color.white));
+                    Typography.Strong(Ui.Text(tag, allowed == 0 ? "BANNED" : $"LIMIT {allowed}", TextRole.Caption, Color.white));
                 }
             }
             if (groups.Count > perRow * rows)
-                Ui.Text(Ui.Box(_detail, 16, 790 - 22, 600, 20), $"…and {groups.Count - perRow * rows} more cards", 12, new Color(1, 1, 1, 0.6f), TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(_detail, 16, 790 - 22, 600, 20), $"…and {groups.Count - perRow * rows} more cards", TextRole.Caption, new Color(1, 1, 1, 0.6f), TextAnchor.MiddleLeft);
 
             // What you're missing, and where to get it.
             var missing = AutoDeck.Wants(deck, list, _cards).Where(w => Profile.Collection.Count(w.Key) < w.Value).ToList();
             int listed = missing.Count > 5 ? 4 : missing.Count;
             var where = missing.Take(listed).Select(w =>
-                $"<b>{_cards.Get(w.Key)?.Name ?? w.Key.ToString()}</b> x{w.Value - Profile.Collection.Count(w.Key)}: {WhereToGet(w.Key)}");
-            var missingText = Ui.Text(Ui.Box(_detail, 16, 790, 820, 92),
-                missing.Count == 0 ? "<color=#7BD88F>You own every card in this recipe.</color>"
-                    : $"<color=#FF8A8A>Missing {missing.Count} card{(missing.Count == 1 ? "" : "s")}:</color>\n" + string.Join("\n", where) + (missing.Count > listed ? $"\n…and {missing.Count - listed} more" : ""),
-                13, new Color(0.84f, 0.87f, 0.93f), TextAnchor.UpperLeft);
+                $"<color=#FFFFFF>{_cards.Get(w.Key)?.Name ?? w.Key.ToString()}</color> x{w.Value - Profile.Collection.Count(w.Key)}: {WhereToGet(w.Key)}");
+            var missingText = Ui.Text(Ui.Box(_detail, 16, 790, 820, 92), "", TextRole.Caption, new Color(0.84f, 0.87f, 0.93f), TextAnchor.UpperLeft);
             missingText.supportRichText = true;
+            FitMissing(missingText, missing.Count, where.ToList());
 
-            Ui.BoxButton(_detail, 850, 792, 310, 42, "Build this deck", () => BuildMine(name), 18).targetGraphic.color = Ui.Hex("#B8432F");
-            if (missing.Count > 0) Ui.BoxButton(_detail, 850, 840, 310, 42, "Add missing to wishlist", () => WishMine(name), 16);
+            Ui.BoxButton(_detail, 850, 792, 310, 42, "Build this deck", () => BuildMine(name), TextRole.Label).targetGraphic.color = Ui.Hex("#B8432F");
+            if (missing.Count > 0) Ui.BoxButton(_detail, 850, 840, 310, 42, "Add missing to wishlist", () => WishMine(name), TextRole.Label);
         }
 
         /// <summary>Import .ydk: macOS's open panel, then the file kept as one of your recipes.</summary>

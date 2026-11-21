@@ -28,8 +28,8 @@ namespace YgoCampaign.Game
             root.SetAsLastSibling();
             _title.text = title;
             _body.text = body;
-            _body.fontSize = FxSettings.Scaled(15);
-            _title.fontSize = FxSettings.Scaled(17);
+            _body.fontSize = UiTheme.Size(TextRole.Small, reading: true);
+            _title.fontSize = UiTheme.Size(TextRole.Body, reading: true);
             float bodyH = _body.preferredHeight;
             float titleH = _title.preferredHeight;
             root.sizeDelta = new Vector2(Width, 14 + titleH + 6 + bodyH + 14);
@@ -73,10 +73,10 @@ namespace YgoCampaign.Game
             var outline = _root.gameObject.AddComponent<Outline>();
             outline.effectColor = new Color(0.55f, 0.78f, 1f, 0.55f);
             outline.effectDistance = new Vector2(1, -1);
-            _title = Ui.Text(Top("Title", 14), "", 17, Ui.Hex("#8CC8FF"), TextAnchor.UpperLeft);
+            _title = Ui.Text(Top("Title", 14), "", TextRole.Body, Ui.Hex("#8CC8FF"), TextAnchor.UpperLeft);
             Typography.Strong(_title);
             _title.verticalOverflow = VerticalWrapMode.Overflow;
-            _body = Ui.Text(Top("Meaning", 40), "", 15, Ui.Hex("#D8DEE8"), TextAnchor.UpperLeft);
+            _body = Ui.Text(Top("Meaning", 40), "", TextRole.Small, Ui.Hex("#D8DEE8"), TextAnchor.UpperLeft);
             _body.verticalOverflow = VerticalWrapMode.Overflow;
             _root.gameObject.SetActive(false);
         }

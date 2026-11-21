@@ -33,14 +33,14 @@ namespace YgoCampaign.Game
             _root = Ui.Overlay(transform, "Structure", 15);
             Ui.Image(_root, Ui.Hex("#121620"));
             Ui.Image(Ui.Box(_root, 0, 0, 1920, 90), Ui.Hex("#0D1017"));
-            Typography.Strong(Ui.Text(Ui.Box(_root, 40, 0, 600, 90), "STRUCTURE DECKS", 34, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
-            _header = Ui.Text(Ui.Box(_root, 520, 0, 1000, 90), "", 24, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
-            Ui.BoxButton(_root, 1720, 22, 160, 46, "Back", Close, 18);
+            Typography.Strong(Ui.Text(Ui.Box(_root, 40, 0, 600, 90), "STRUCTURE DECKS", TextRole.Title, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft));
+            _header = Ui.Text(Ui.Box(_root, 520, 0, 1000, 90), "", TextRole.Heading, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
+            Ui.BoxButton(_root, 1720, 22, 160, 46, "Back", Close, TextRole.Label);
             Ui.Text(Ui.Box(_root, 40, 100, 1840, 40),
                 "Ready-to-play themed decks. Buying one adds its cards to your collection and saves it as a campaign deck. More go on sale as the shop's era advances.",
-                17, new Color(0.75f, 0.78f, 0.86f), TextAnchor.MiddleLeft);
+                TextRole.Body, new Color(0.75f, 0.78f, 0.86f), TextAnchor.MiddleLeft);
             _list = Ui.Box(_root, 40, 150, 1840, 850);
-            _status = Ui.Text(Ui.Box(_root, 40, 1010, 1840, 50), "", 16, new Color(0.8f, 0.83f, 0.9f), TextAnchor.MiddleLeft);
+            _status = Ui.Text(Ui.Box(_root, 40, 1010, 1840, 50), "", TextRole.Small, new Color(0.8f, 0.83f, 0.9f), TextAnchor.MiddleLeft);
             _status.supportRichText = true;
             _root.gameObject.SetActive(false);
         }
@@ -91,15 +91,15 @@ namespace YgoCampaign.Game
                 }
                 var title = Title(name, deck);
                 float dim = open ? 1 : 0.4f;
-                Typography.Strong(Ui.Text(Ui.Box(tile, 146, 12, 560, 36), title, 24, new Color(1, 1, 1, dim), TextAnchor.MiddleLeft));
+                Typography.Strong(Ui.Text(Ui.Box(tile, 146, 12, 560, 36), title, TextRole.Heading, new Color(1, 1, 1, dim), TextAnchor.MiddleLeft));
                 Ui.Text(Ui.Box(tile, 146, 48, 560, 26), open ? $"{era} · {deck.Main.Count} main · {deck.Extra.Count} extra" : $"On sale when the shop reaches {era}",
-                    15, new Color(0.7f, 0.74f, 0.82f, dim), TextAnchor.MiddleLeft);
-                Ui.Text(Ui.Box(tile, 146, 78, 730, 110), deck.Note("about"), 15, new Color(0.88f, 0.9f, 0.95f, dim), TextAnchor.UpperLeft);
+                    TextRole.Small, new Color(0.7f, 0.74f, 0.82f, dim), TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(tile, 146, 78, 730, 110), deck.Note("about"), TextRole.Small, new Color(0.88f, 0.9f, 0.95f, dim), TextAnchor.UpperLeft);
                 if (open)
                 {
                     var n = name;
                     var d = deck;
-                    Ui.BoxButton(tile, 720, 14, 166, 50, $"Buy · {price:N0} DP", () => Buy(n, d, price), 17).targetGraphic.color = Ui.Hex("#B8432F");
+                    Ui.BoxButton(tile, 720, 14, 166, 50, $"Buy · {price:N0} DP", () => Buy(n, d, price), TextRole.Label).targetGraphic.color = Ui.Hex("#B8432F");
                 }
             }
         }

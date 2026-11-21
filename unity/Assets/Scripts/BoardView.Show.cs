@@ -60,23 +60,23 @@ namespace YgoCampaign.Game
             float h = band.sizeDelta.y;
             Ui.Image(Ui.Placed("Top", band, new Vector2(0, h / 2 - 2), new Vector2(1500, 4)), T.Sign).raycastTarget = false;
             Ui.Image(Ui.Placed("Bottom", band, new Vector2(0, -h / 2 + 2), new Vector2(1500, 4)), T.IsAlley ? UiTheme.NeonCyan : T.Sign).raycastTarget = false;
-            var title = Ui.Text(Ui.Placed("Who", band, new Vector2(0, h / 2 - 50), new Vector2(1400, 64)), $"{who.ToUpperInvariant()} IS GOING FOR IT", 44, T.Text);
+            var title = Ui.Text(Ui.Placed("Who", band, new Vector2(0, h / 2 - 50), new Vector2(1400, 64)), $"{who.ToUpperInvariant()} IS GOING FOR IT", TextRole.Title, T.Text);
             Typography.Strong(title);
             title.raycastTarget = false;
             T.Title(title);
             title.gameObject.AddComponent<Outline>().effectDistance = new Vector2(3, -3);
-            var name = Ui.Text(Ui.Placed("Route", band, new Vector2(0, h / 2 - 108), new Vector2(1400, 54)), route.ToUpperInvariant(), 40, T.Sign);
+            var name = Ui.Text(Ui.Placed("Route", band, new Vector2(0, h / 2 - 108), new Vector2(1400, 54)), route.ToUpperInvariant(), TextRole.Title, T.Sign);
             Typography.Strong(name);
             name.raycastTarget = false;
             T.Title(name);
             if (call.Length > 0)
             {
-                var said = Ui.Text(Ui.Placed("Call", band, new Vector2(0, -h / 2 + 34), new Vector2(1400, 40)), call, 22, T.Quote);
+                var said = Ui.Text(Ui.Placed("Call", band, new Vector2(0, -h / 2 + 34), new Vector2(1400, 40)), call, TextRole.Subhead, T.Quote);
                 Typography.Italic(said);
                 said.raycastTarget = false;
                 said.resizeTextForBestFit = true;
                 said.resizeTextMinSize = 14;
-                said.resizeTextMaxSize = 22;
+                said.resizeTextMaxSize = UiTheme.Size(TextRole.Subhead);
             }
             ComboBannerText = $"{who.ToUpperInvariant()} IS GOING FOR IT: {route.ToUpperInvariant()}";
             ComboBanners++;
@@ -103,23 +103,23 @@ namespace YgoCampaign.Game
             var edge = stamp.gameObject.AddComponent<Outline>();
             edge.effectColor = accent;
             edge.effectDistance = new Vector2(4, -4);
-            var word = Ui.Text(Ui.Placed("Word", stamp, new Vector2(0, h / 2 - 52), new Vector2(1060, 84)), payoff ? "PAYOFF!" : "FIZZLED", 68, accent);
+            var word = Ui.Text(Ui.Placed("Word", stamp, new Vector2(0, h / 2 - 52), new Vector2(1060, 84)), payoff ? "PAYOFF!" : "FIZZLED", TextRole.Display, accent);
             Typography.Strong(word);
             word.raycastTarget = false;
             T.Title(word);
-            var sub = Ui.Text(Ui.Placed("Line", stamp, new Vector2(0, h / 2 - 116), new Vector2(1060, 40)), line, 24, T.Text);
+            var sub = Ui.Text(Ui.Placed("Line", stamp, new Vector2(0, h / 2 - 116), new Vector2(1060, 40)), line, TextRole.Heading, T.Text);
             sub.raycastTarget = false;
             sub.resizeTextForBestFit = true;
             sub.resizeTextMinSize = 14;
-            sub.resizeTextMaxSize = 24;
+            sub.resizeTextMaxSize = UiTheme.Size(TextRole.Heading);
             for (int i = 0; i < calls.Count; i++)
             {
-                var said = Ui.Text(Ui.Placed($"Call{i}", stamp, new Vector2(0, h / 2 - 160 - i * 34), new Vector2(1060, 32)), calls[i], 20, T.Quote);
+                var said = Ui.Text(Ui.Placed($"Call{i}", stamp, new Vector2(0, h / 2 - 160 - i * 34), new Vector2(1060, 32)), calls[i], TextRole.Label, T.Quote);
                 Typography.Italic(said);
                 said.raycastTarget = false;
                 said.resizeTextForBestFit = true;
-                said.resizeTextMinSize = 12;
-                said.resizeTextMaxSize = 20;
+                said.resizeTextMinSize = UiTheme.Floor;
+                said.resizeTextMaxSize = UiTheme.Size(TextRole.Label);
             }
             ComboStampText = $"{(payoff ? "PAYOFF!" : "FIZZLED")} {line}";
             _stampRun = StartCoroutine(Run(stamp, group, seconds, !FxSettings.ReducedMotion, () => { _comboStamp = null; _stampRun = null; }, stampIn: true));
@@ -143,7 +143,7 @@ namespace YgoCampaign.Game
             Ui.Image(meter, T.Deep.WithAlpha(0.94f)).raycastTarget = false;
             Ui.Image(Ui.Placed("Edge", meter, new Vector2(-MeterWidth / 2 + 3, 0), new Vector2(6, MeterHeight)), accent).raycastTarget = false;
             var head = Ui.Text(Ui.Placed("Head", meter, new Vector2(8, MeterHeight / 2 - 14), new Vector2(MeterWidth - 32, 22)),
-                $"{show.Route.ToUpperInvariant()}  <color={T.TextDimHex}>· {show.Handle}</color>", 14, T.Sign, TextAnchor.MiddleLeft);
+                $"{show.Route.ToUpperInvariant()}  <color={T.TextDimHex}>· {show.Handle}</color>", TextRole.Caption, T.Sign, TextAnchor.MiddleLeft);
             head.supportRichText = true;
             Typography.Strong(head);
             head.raycastTarget = false;
@@ -151,12 +151,12 @@ namespace YgoCampaign.Game
                 : show.State == ComboShow.Phase.Finished ? $"FINISHED · STEP {show.Step} OF {show.Steps}"
                 : show.State == ComboShow.Phase.PaidOff ? $"PAYOFF · STEP {show.Step} OF {show.Steps}"
                 : $"STEP {Mathf.Max(1, show.Step)} OF {show.Steps}";
-            var big = Ui.Text(Ui.Placed("State", meter, new Vector2(8, 6), new Vector2(MeterWidth - 32, 34)), state, 24, fizzled ? T.Bad : T.Text, TextAnchor.MiddleLeft);
+            var big = Ui.Text(Ui.Placed("State", meter, new Vector2(8, 6), new Vector2(MeterWidth - 32, 34)), state, TextRole.Heading, fizzled ? T.Bad : T.Text, TextAnchor.MiddleLeft);
             Typography.Strong(big);
             big.raycastTarget = false;
             big.resizeTextForBestFit = true;
             big.resizeTextMinSize = 14;
-            big.resizeTextMaxSize = 24;
+            big.resizeTextMaxSize = UiTheme.Size(TextRole.Heading);
             // The steps as pips: played, the one it stopped at (fizzled), the rest.
             int steps = Mathf.Clamp(show.Steps, 1, 16);
             float pipW = Mathf.Min(26, (MeterWidth - 190) / steps - 4);
@@ -168,7 +168,7 @@ namespace YgoCampaign.Game
                 // A fizzle marks only where it stopped: the steps before it stay plain.
                 Ui.Image(pip, stopped ? T.Bad : done ? (fizzled ? T.TextDim : accent) : T.Inset).raycastTarget = false;
             }
-            var total = Ui.Text(Ui.Placed("Total", meter, new Vector2(MeterWidth / 2 - 92, -MeterHeight / 2 + 18), new Vector2(170, 24)), show.TotalText, 16, T.Gold, TextAnchor.MiddleRight);
+            var total = Ui.Text(Ui.Placed("Total", meter, new Vector2(MeterWidth / 2 - 92, -MeterHeight / 2 + 18), new Vector2(170, 24)), show.TotalText, TextRole.Small, T.Gold, TextAnchor.MiddleRight);
             Typography.Strong(total);
             total.raycastTarget = false;
             ComboMeterText = $"{state.ToLowerInvariant()} · {show.TotalText}";

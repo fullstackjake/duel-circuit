@@ -176,7 +176,7 @@ namespace YgoCampaign.Game
         private void Button(float x, float y, float w, float h, string label, Action onClick, int size = 22, Color? color = null)
         {
             Action act = () => { Close(); onClick(); };
-            var button = Ui.BoxButton(_root, x, y, w, h, label, act, size);
+            var button = Ui.BoxButton(_root, x, y, w, h, label, act, Mathf.Max(UiTheme.Mapped(size), UiTheme.Size(TextRole.Label)));
             button.targetGraphic.color = color ?? UiTheme.Current.Button;
             Buttons[label] = act;
         }
@@ -197,12 +197,12 @@ namespace YgoCampaign.Game
             LastVersus = (you, them);
             _arrowsDeckLine = null;
             Ui.Image(Ui.Box(root, 0, 0, 1920, 120), T.Base);
-            Typography.Strong(Ui.Text(Ui.Box(root, 0, 18, 1920, 50), circuit.ToUpperInvariant(), 34, T.Sign));
-            Ui.Text(Ui.Box(root, 0, 68, 1920, 34), match, 20, T.TextMuted);
+            Typography.Strong(Ui.Text(Ui.Box(root, 0, 18, 1920, 50), circuit.ToUpperInvariant(), TextRole.Title, T.Sign));
+            Ui.Text(Ui.Box(root, 0, 68, 1920, 34), match, TextRole.Label, T.TextMuted);
 
             DrawSide(you, 80, Ui.Hex("#4C8DFF"), arrows: cycleDeck != null);
             DrawSide(them, 1060, Ui.Hex("#FF5A5A"));
-            var vs = Ui.Text(Ui.Box(root, 860, 360, 200, 160), "VS", 96, T.Text);
+            var vs = Ui.Text(Ui.Box(root, 860, 360, 200, 160), "VS", TextRole.Display, T.Text);
             Typography.Strong(vs);
             vs.gameObject.AddComponent<Outline>().effectColor = T.Scrim.WithAlpha(0.8f);
 
@@ -211,10 +211,10 @@ namespace YgoCampaign.Game
             TextsLine = texts;
             if (texts.Length > 0)
             {
-                var line = Ui.Text(Ui.Box(root, 80, 904, 780, 30), texts, 17, T.Warn, TextAnchor.MiddleLeft);
+                var line = Ui.Text(Ui.Box(root, 80, 904, 780, 30), texts, TextRole.Body, T.Warn, TextAnchor.MiddleLeft);
                 line.resizeTextForBestFit = true;
-                line.resizeTextMinSize = 12;
-                line.resizeTextMaxSize = 17;
+                line.resizeTextMinSize = UiTheme.Floor;
+                line.resizeTextMaxSize = UiTheme.Size(TextRole.Body);
             }
 
             Button(760, 940, 400, 80, "Duel!", start, 32, T.Primary);
@@ -227,17 +227,17 @@ namespace YgoCampaign.Game
                 Arrow(80 + DeckArrowAt, 650, "<", () => cycleDeck(-1));
                 Arrow(80 + DeckArrowAt + 80, 650, ">", () => cycleDeck(+1));
                 // (After a purchase on the Stuck? panel, what it did, in its place.)
-                var hint = Ui.Text(Ui.Box(root, 110, 840, 700, 30), note.Length > 0 ? note : arrowsHint.Length > 0 ? arrowsHint : "Arrows: switch decks, or borrow a recipe you've unlocked (a loaner win pays half DP).", 15,
+                var hint = Ui.Text(Ui.Box(root, 110, 836, 700, 40), note.Length > 0 ? note : arrowsHint.Length > 0 ? arrowsHint : "Arrows: switch decks, or borrow a recipe you've unlocked (a loaner win pays half DP).", TextRole.Small,
                     note.Length > 0 ? T.Good : T.TextFaint, TextAnchor.MiddleLeft);
                 hint.supportRichText = true;
                 hint.resizeTextForBestFit = true;
-                hint.resizeTextMinSize = 14;
-                hint.resizeTextMaxSize = 15;
+                hint.resizeTextMinSize = UiTheme.Floor; // two lines at the floor fit
+                hint.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
             }
             if (scouts != null && scouts.Count > 0)
             {
                 void Open() => ShowScouting(scouts, stuck ?? new List<string>(), null, offer);
-                Ui.BoxButton(root, 1660, 960, 180, 56, stuck != null && stuck.Count > 0 ? "Stuck? Scout" : "Scout", Open, 20).targetGraphic.color = T.Button;
+                Ui.BoxButton(root, 1660, 960, 180, 56, stuck != null && stuck.Count > 0 ? "Stuck? Scout" : "Scout", Open, TextRole.Label).targetGraphic.color = T.Button;
                 Buttons["Scout"] = Open;
                 if (stuck != null && stuck.Count > 0 && !quiet) Open();
             }
@@ -271,10 +271,10 @@ namespace YgoCampaign.Game
             float top = 24;
             if (stuck.Count > 0)
             {
-                Typography.Strong(Ui.Text(Ui.Box(panel, 40, top, 1440, 40), "STUCK? HERE'S WHAT HELPS", 26, T.Gold, TextAnchor.MiddleLeft));
+                Typography.Strong(Ui.Text(Ui.Box(panel, 40, top, 1440, 40), "STUCK? HERE'S WHAT HELPS", TextRole.Heading, T.Gold, TextAnchor.MiddleLeft));
                 // The first line says why it opened; the rest are the tips.
                 var text = string.Join("\n", stuck.Select((s, i) => i == 0 ? s : "•  " + s));
-                var tips = Ui.Text(Ui.Box(panel, 40, top + 44, 1440, 25 * stuck.Count + 10), text, 18, T.TextBright, TextAnchor.UpperLeft);
+                var tips = Ui.Text(Ui.Box(panel, 40, top + 44, 1440, 25 * stuck.Count + 10), text, TextRole.Body, T.TextBright, TextAnchor.UpperLeft);
                 tips.supportRichText = true;
                 top += 74 + 25 * stuck.Count;
                 if (offer != null)
@@ -283,7 +283,7 @@ namespace YgoCampaign.Game
                     top += 84;
                 }
             }
-            Typography.Strong(Ui.Text(Ui.Box(panel, 40, top, 1440, 40), "SCOUTING REPORT", 24, T.Info, TextAnchor.MiddleLeft));
+            Typography.Strong(Ui.Text(Ui.Box(panel, 40, top, 1440, 40), "SCOUTING REPORT", TextRole.Heading, T.Info, TextAnchor.MiddleLeft));
             top += 50;
             float width = (1440 - 40 * (scouts.Count - 1)) / (float)scouts.Count, bodyTop = top + 40, tallest = 0;
             var bodies = new List<Text>();
@@ -291,14 +291,14 @@ namespace YgoCampaign.Game
             {
                 var s = scouts[i];
                 float x = 40 + i * (width + 40);
-                Typography.Strong(Ui.Text(Ui.Box(panel, x, top, width, 34), $"{s.Who}: {s.Deck}", 21, T.Text, TextAnchor.MiddleLeft));
+                Typography.Strong(Ui.Text(Ui.Box(panel, x, top, width, 34), $"{s.Who}: {s.Deck}", TextRole.Subhead, T.Text, TextAnchor.MiddleLeft));
                 var lines = new List<string>();
                 if (s.Plan.Length > 0) lines.Add(s.Plan);
                 if (s.Keys.Count > 0) lines.Add($"<color={T.GoldHex}>Watch for:</color> {string.Join(" · ", s.Keys)}");
                 if (s.Counters.Length > 0) lines.Add($"<color={T.GoodHex}>What beats it:</color> {s.Counters}");
                 if (s.Build.Count > 0) lines.Add($"<color={T.VioletSoftHex}>Build against it:</color> {string.Join(" · ", s.Build)}");
                 if (s.Turn.Length > 0) lines.Add($"<color={T.InfoHex}>If you win the toss:</color> {s.Turn}");
-                var body = Ui.Text(Ui.Box(panel, x, bodyTop, width, MaxHeight - bodyTop - 100), string.Join("\n\n", lines), 17,
+                var body = Ui.Text(Ui.Box(panel, x, bodyTop, width, MaxHeight - bodyTop - 100), string.Join("\n\n", lines), TextRole.Body,
                     T.TextSoft, TextAnchor.UpperLeft);
                 body.supportRichText = true;
                 bodies.Add(body);
@@ -314,7 +314,7 @@ namespace YgoCampaign.Game
                 _scouting = null;
                 closed?.Invoke();
             }
-            Ui.BoxButton(panel, 1520 / 2 - 110, height - 76, 220, 56, "Close", CloseScouting, 20);
+            Ui.BoxButton(panel, 1520 / 2 - 110, height - 76, 220, 56, "Close", CloseScouting, TextRole.Label);
             Buttons["Close scouting"] = CloseScouting;
         }
 
@@ -329,11 +329,11 @@ namespace YgoCampaign.Game
             var row = Ui.Box(panel, 40, top - 6, 1440, 72);
             Ui.Image(row, T.RowB);
             Ui.Image(Ui.Box(row, 0, 0, 4, 72), T.Highlight).raycastTarget = false;
-            var status = Ui.Text(Ui.Box(row, 416, 6, 1008, 60), offer.Note, 16, T.TextSoft, TextAnchor.MiddleLeft);
+            var status = Ui.Text(Ui.Box(row, 416, 6, 1008, 60), offer.Note, TextRole.Small, T.TextSoft, TextAnchor.MiddleLeft);
             status.supportRichText = true;
             status.resizeTextForBestFit = true;
             status.resizeTextMinSize = 14;
-            status.resizeTextMaxSize = 16;
+            status.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
             Button? button = null;
             Text? label = null;
             float armedAt = -1;
@@ -363,7 +363,7 @@ namespace YgoCampaign.Game
                 yield return new WaitForSecondsRealtime(ConfirmSeconds);
                 if (button != null && armedAt == armed) Show(false);
             }
-            button = Ui.BoxButton(row, 16, 8, 380, 56, offer.Label, Click, 20);
+            button = Ui.BoxButton(row, 16, 8, 380, 56, offer.Label, Click, TextRole.Label);
             label = button.GetComponentInChildren<Text>();
             var edge = button.targetGraphic.gameObject.AddComponent<Outline>();
             edge.effectColor = T.Highlight;
@@ -390,8 +390,8 @@ namespace YgoCampaign.Game
             var root = Fresh();
             var T = UiTheme.Current;
             Ui.Image(Ui.Box(root, 0, 0, 1920, 120), T.Base);
-            Typography.Strong(Ui.Text(Ui.Box(root, 0, 18, 1920, 50), title, 34, T.Sign));
-            Ui.Text(Ui.Box(root, 0, 68, 1920, 34), subtitle, 20, T.TextMuted);
+            Typography.Strong(Ui.Text(Ui.Box(root, 0, 18, 1920, 50), title, TextRole.Title, T.Sign));
+            Ui.Text(Ui.Box(root, 0, 68, 1920, 34), subtitle, TextRole.Label, T.TextMuted);
             // The coin: art/coin's two faces (blue for the left side, red for the right, like the board), or a plain
             // gold coin marked Y and T without them. It flies up and flips end over end inside its box.
             var coin = Ui.Box(root, 830, 190, 260, 260);
@@ -411,7 +411,7 @@ namespace YgoCampaign.Game
                 var edge = flier.gameObject.AddComponent<Outline>();
                 edge.effectColor = Ui.Hex("#7A5A12");
                 edge.effectDistance = new Vector2(4, -4);
-                face = Ui.Text(flier, "?", 84, Ui.Hex("#5A3F0A"));
+                face = Ui.Text(flier, "?", TextRole.Display, Ui.Hex("#5A3F0A"));
                 Typography.Strong(face);
             }
             void ShowFace(bool left)
@@ -419,9 +419,9 @@ namespace YgoCampaign.Game
                 if (art != null) art.texture = left ? blueFace : redFace;
                 if (face != null) face.text = left ? "Y" : "T";
             }
-            var result = Ui.Text(Ui.Box(root, 260, 500, 1400, 60), "", 34, T.Text);
+            var result = Ui.Text(Ui.Box(root, 260, 500, 1400, 60), "", TextRole.Title, T.Text);
             Typography.Strong(result);
-            var detail = Ui.Text(Ui.Box(root, 260, 566, 1400, 90), "", 19, T.TextSoft);
+            var detail = Ui.Text(Ui.Box(root, 260, 566, 1400, 90), "", TextRole.Label, T.TextSoft);
             detail.supportRichText = true;
             const string First = "Going first: set up before they can act (no draw and no attack on turn 1).";
             const string Second = "Going second: a sixth card, and the first chance to attack and break their setup.";
@@ -526,12 +526,12 @@ namespace YgoCampaign.Game
             var root = Fresh();
             var T = UiTheme.Current;
             Ui.Image(Ui.Box(root, 0, 0, 1920, 120), T.Base);
-            Typography.Strong(Ui.Text(Ui.Box(root, 0, 18, 1920, 50), "FREE DUEL", 34, T.Sign));
-            Ui.Text(Ui.Box(root, 0, 68, 1920, 34), "Pick who plays and with which deck. The left side can be you, or a character to watch.", 20,
+            Typography.Strong(Ui.Text(Ui.Box(root, 0, 18, 1920, 50), "FREE DUEL", TextRole.Title, T.Sign));
+            Ui.Text(Ui.Box(root, 0, 68, 1920, 34), "Pick who plays and with which deck. The left side can be you, or a character to watch.", TextRole.Label,
                 T.TextMuted);
             DrawSide(left, 80, Ui.Hex("#4C8DFF"), arrows: true); // (both sides have deck arrows here)
             DrawSide(right, 1060, Ui.Hex("#FF5A5A"), arrows: true);
-            var vs = Ui.Text(Ui.Box(root, 860, 360, 200, 160), "VS", 96, T.Text);
+            var vs = Ui.Text(Ui.Box(root, 860, 360, 200, 160), "VS", TextRole.Display, T.Text);
             Typography.Strong(vs);
             vs.gameObject.AddComponent<Outline>().effectColor = T.Scrim.WithAlpha(0.8f);
             // Arrows for the duelist (beside the name) and the deck (beside the deck line); these redraw, not close.
@@ -554,7 +554,7 @@ namespace YgoCampaign.Game
             var T = UiTheme.Current;
             // Level with the line it steps (the deck line at 650 is 36 tall), and ending above the detail under it (at 690):
             // a 52-tall arrow ran down over the detail's first line ("last picked on a" under the "<").
-            var b = Ui.BoxButton(_root, x, y - ArrowRise, 64, ArrowHeight, label, click, 26);
+            var b = Ui.BoxButton(_root, x, y - ArrowRise, 64, ArrowHeight, label, click, TextRole.Heading);
             b.targetGraphic.color = T.Button;
             Buttons[$"{label}@{x}:{y}"] = click;
             _arrowRects.Add((RectTransform)b.transform);
@@ -567,10 +567,10 @@ namespace YgoCampaign.Game
             var panel = Ui.Box(_root, x, 160, 780, 740);
             Ui.Image(panel, T.PanelDeep);
             Ui.Image(Ui.Box(panel, 0, 0, 780, 6), accent);
-            var name = Ui.Text(Ui.Box(panel, 30, 26, 720, 54), side.Name, 40, T.Text, TextAnchor.MiddleLeft);
+            var name = Ui.Text(Ui.Box(panel, 30, 26, 720, 54), side.Name, TextRole.Title, T.Text, TextAnchor.MiddleLeft);
             Typography.Strong(name);
             if (side.Title.Length > 0)
-                Typography.Italic(Ui.Text(Ui.Box(panel, 30, 80, 720, 32), side.Title, 20, T.TextSoft, TextAnchor.MiddleLeft));
+                Typography.Italic(Ui.Text(Ui.Box(panel, 30, 80, 720, 32), side.Title, TextRole.Label, T.TextSoft, TextAnchor.MiddleLeft));
 
             // The duelists' portraits with two of their cards beside them; without portraits, three cards.
             var portraits = side.Portraits.Where(YgoCampaign.Game.Portraits.Has).ToList();
@@ -587,7 +587,7 @@ namespace YgoCampaign.Game
             if (side.ShowcaseLabels.Count == 0 && side.ShowcaseLabel.Length > 0 && side.Showcase.Count > 0)
             {
                 // A sign over the cards (neon is for signs): what they're showing off.
-                var label = Ui.Text(Ui.Box(panel, cardX, cardY - 26, 3 * gap, 24), side.ShowcaseLabel, 16, T.Sign, TextAnchor.LowerLeft);
+                var label = Ui.Text(Ui.Box(panel, cardX, cardY - 26, 3 * gap, 24), side.ShowcaseLabel, TextRole.Small, T.Sign, TextAnchor.LowerLeft);
                 Typography.Strong(label);
             }
             for (int i = 0; i < side.Showcase.Count && i < cardCount; i++)
@@ -595,11 +595,11 @@ namespace YgoCampaign.Game
                 // A sign over this card (No Limits: UNBANNED over a restored card, CONTRABAND over a pick).
                 if (i < side.ShowcaseLabels.Count && side.ShowcaseLabels[i].Length > 0)
                 {
-                    var over = Ui.Text(Ui.Box(panel, cardX + i * gap, cardY - 26, cardW, 24), side.ShowcaseLabels[i], 15, T.Sign, TextAnchor.LowerLeft);
+                    var over = Ui.Text(Ui.Box(panel, cardX + i * gap, cardY - 26, cardW, 24), side.ShowcaseLabels[i], TextRole.Small, T.Sign, TextAnchor.LowerLeft);
                     Typography.Strong(over);
                     over.resizeTextForBestFit = true;
-                    over.resizeTextMinSize = 10;
-                    over.resizeTextMaxSize = 15;
+                    over.resizeTextMinSize = UiTheme.Floor;
+                    over.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
                 }
                 var slot = Ui.Box(panel, cardX + i * gap, cardY, cardW, cardH);
                 Ui.Image(slot, T.Well);
@@ -615,24 +615,28 @@ namespace YgoCampaign.Game
             // the arrows read as running into the "<".)
             float deckWidth = arrows ? DeckLineWithArrows : 720;
             var deck = Ui.Text(Ui.Box(panel, 30, 490, deckWidth, 36), $"Deck: <b>{side.Deck}</b>{(side.DeckNote.Length > 0 ? $"  <color={T.TextDimHex}>{side.DeckNote}</color>" : "")}",
-                22, T.Text, TextAnchor.MiddleLeft);
+                TextRole.Subhead, T.Text, TextAnchor.MiddleLeft);
             deck.supportRichText = true;
             deck.resizeTextForBestFit = true;
-            deck.resizeTextMinSize = 15;
-            deck.resizeTextMaxSize = 22;
+            deck.resizeTextMinSize = UiTheme.Floor;
+            deck.resizeTextMaxSize = UiTheme.Size(TextRole.Subhead);
             // (For the checks: the first side drawn with arrows, yours.)
             if (arrows && _arrowsDeckLine == null) { _arrowsDeckLine = deck; _arrowsDeckRight = x + 30 + deckWidth; _arrowsDeckGap = x + DeckArrowAt - _arrowsDeckRight; }
-            var detail = Ui.Text(Ui.Box(panel, 30, 530, 720, 60), side.Detail, 18, T.TextMuted, TextAnchor.UpperLeft);
+            var detail = Ui.Text(Ui.Box(panel, 30, 528, 720, 72), side.Detail, TextRole.Body, T.TextMuted, TextAnchor.UpperLeft);
             if (arrows && _youDetail == null) _youDetail = detail;
             detail.supportRichText = true;
+            // Three lines of Body don't fit the 60 under the deck line: a long detail (seed, wallet, ban list) shrinks to the floor.
+            detail.resizeTextForBestFit = true;
+            detail.resizeTextMinSize = UiTheme.Floor;
+            detail.resizeTextMaxSize = detail.fontSize;
             if (side.Quote.Length > 0)
             {
                 // (Clear of the arrows' hint line under it: a long quote shrinks instead.)
-                var quote = Ui.Text(Ui.Box(panel, 30, 596, 720, 80), $"“{side.Quote}”", 26, T.Quote, TextAnchor.MiddleLeft);
+                var quote = Ui.Text(Ui.Box(panel, 30, 602, 720, 74), $"“{side.Quote}”", TextRole.Heading, T.Quote, TextAnchor.MiddleLeft);
                 Typography.Italic(quote);
                 quote.resizeTextForBestFit = true;
                 quote.resizeTextMinSize = 18;
-                quote.resizeTextMaxSize = 26;
+                quote.resizeTextMaxSize = UiTheme.Size(TextRole.Heading);
             }
             if (side.Chip.Length > 0)
             {
@@ -640,11 +644,11 @@ namespace YgoCampaign.Game
                 var chip = Ui.Box(panel, 30, 684, 720, 42);
                 Ui.Image(chip, T.Well);
                 Ui.Image(Ui.Box(chip, 0, 0, 4, 42), T.Highlight).raycastTarget = false;
-                var text = Ui.Text(Ui.Box(chip, 16, 8, 696, 26), side.Chip, 18, T.Text, TextAnchor.MiddleLeft); // one line: it shrinks rather than wraps
+                var text = Ui.Text(Ui.Box(chip, 16, 8, 696, 26), side.Chip, TextRole.Body, T.Text, TextAnchor.MiddleLeft); // one line: it shrinks rather than wraps
                 text.supportRichText = true;
                 text.resizeTextForBestFit = true;
-                text.resizeTextMinSize = 12;
-                text.resizeTextMaxSize = 18;
+                text.resizeTextMinSize = UiTheme.Floor;
+                text.resizeTextMaxSize = UiTheme.Size(TextRole.Body);
             }
         }
 
@@ -677,9 +681,9 @@ namespace YgoCampaign.Game
             var root = Fresh();
             var T = UiTheme.Current;
             Ui.Image(Ui.Box(root, 0, 0, 1920, 120), T.Base);
-            Typography.Strong(Ui.Text(Ui.Box(root, 0, 18, 1920, 50), "SPECIAL GUESTS", 34, T.Sign));
+            Typography.Strong(Ui.Text(Ui.Box(root, 0, 18, 1920, 50), "SPECIAL GUESTS", TextRole.Title, T.Sign));
             Ui.Text(Ui.Box(root, 0, 68, 1920, 34), "Duelists outside the circuits. Take them on alone or in a tag duel; beat one and they can partner you in the Tag Cups.",
-                20, T.TextMuted);
+                TextRole.Label, T.TextMuted);
             // Four rows at full height; five at a shorter step (rows 150, 310 ... 790-940), six or more denser (128, 264 ...
             // 808-936 for six), each clear of Back at 960.
             bool compact = guests.Count > 4, dense = guests.Count > 5;
@@ -697,7 +701,7 @@ namespace YgoCampaign.Game
                 Ui.Image(Ui.Box(panel, 0, 0, 8, height), g.Unlocked ? T.Brass : T.Locked);
                 var face = Ui.Box(panel, 24, dense ? 8 : 10, faceW, height - (dense ? 16 : 20));
                 Ui.Image(face, T.Well);
-                if (!g.Unlocked) Ui.Text(face, "?", 64, T.Text.WithAlpha(0.35f));
+                if (!g.Unlocked) Ui.Text(face, "?", TextRole.Display, T.Text.WithAlpha(0.35f));
                 else if (!YgoCampaign.Game.Portraits.Place(face, g.Id))
                 {
                     // Unlocked but no portrait: a gold initial on a framed tile, so it doesn't read as a locked slot.
@@ -705,27 +709,27 @@ namespace YgoCampaign.Game
                     Ui.Image(Ui.Box(face, 0, 0, faceW, faceH), T.Brass);
                     var tile = Ui.Box(face, 2, 2, faceW - 4, faceH - 4);
                     Ui.Image(tile, T.Placeholder);
-                    Typography.Strong(Ui.Text(tile, g.Name.Substring(0, 1), 64, T.Gold));
+                    Typography.Strong(Ui.Text(tile, g.Name.Substring(0, 1), TextRole.Display, T.Gold));
                 }
                 // The name, the blurb, then the decks and status lines (moved up in a compact row; in a dense one the blurb is one line).
                 var name = Ui.Text(Ui.Box(panel, textX, dense ? 4 : compact ? 8 : 14, 1100, dense ? 36 : compact ? 40 : 46), g.Unlocked ? g.Name : "???",
-                    dense ? 26 : compact ? 28 : 30, g.Unlocked ? T.Text : T.Text.WithAlpha(0.5f), TextAnchor.MiddleLeft);
+                    UiTheme.Mapped(dense ? 26 : compact ? 28 : 30), g.Unlocked ? T.Text : T.Text.WithAlpha(0.5f), TextAnchor.MiddleLeft);
                 Typography.Strong(name);
-                Ui.Text(Ui.Box(panel, textX, dense ? 40 : compact ? 50 : 60, 1140, dense ? 26 : compact ? 42 : 50), g.Blurb, 17 + (compact ? 0 : 1), T.TextSoft,
+                Ui.Text(Ui.Box(panel, textX, dense ? 40 : compact ? 50 : 60, 1140, dense ? 26 : compact ? 42 : 50), g.Blurb, TextRole.Body, T.TextSoft,
                     dense ? TextAnchor.MiddleLeft : TextAnchor.UpperLeft);
-                if (g.Unlocked) Ui.Text(Ui.Box(panel, textX, dense ? 66 : compact ? 90 : 108, 1140, dense ? 24 : compact ? 26 : 28), g.Decks, 16, T.TextQuiet, TextAnchor.MiddleLeft).supportRichText = true;
-                Ui.Text(Ui.Box(panel, textX, dense ? 92 : compact ? 116 : 138, 1140, dense ? 28 : compact ? 28 : 30), g.Status, 17, g.Unlocked ? T.Good : T.TextQuiet, TextAnchor.MiddleLeft)
+                if (g.Unlocked) Ui.Text(Ui.Box(panel, textX, dense ? 66 : compact ? 90 : 108, 1140, dense ? 24 : compact ? 26 : 28), g.Decks, TextRole.Small, T.TextQuiet, TextAnchor.MiddleLeft).supportRichText = true;
+                Ui.Text(Ui.Box(panel, textX, dense ? 92 : compact ? 116 : 138, 1140, dense ? 28 : compact ? 28 : 30), g.Status, TextRole.Body, g.Unlocked ? T.Good : T.TextQuiet, TextAnchor.MiddleLeft)
                     .supportRichText = true;
                 if (!g.Unlocked) continue;
                 int index = i;
                 Action fight = () => { Close(); duel(index); }, team = () => { Close(); tag(index); };
                 float buttonY = dense ? 12 : compact ? 18 : 36, buttonH = dense ? 50 : compact ? 54 : 60;
-                Ui.BoxButton(panel, 1330, buttonY, 150, buttonH, "Duel", fight, 22).targetGraphic.color = T.Primary;
+                Ui.BoxButton(panel, 1330, buttonY, 150, buttonH, "Duel", fight, TextRole.Subhead).targetGraphic.color = T.Primary;
                 Buttons[$"Duel:{g.Id}"] = fight;
                 if (g.HasTag)
                 {
                     // A locked tag duel stays clickable (it says what opens it) but reads as locked.
-                    var tagButton = Ui.BoxButton(panel, 1500, buttonY, 160, buttonH, g.TagLocked ? "Tag locked" : "Tag duel", team, 22);
+                    var tagButton = Ui.BoxButton(panel, 1500, buttonY, 160, buttonH, g.TagLocked ? "Tag locked" : "Tag duel", team, TextRole.Subhead);
                     tagButton.targetGraphic.color = g.TagLocked ? T.ButtonOff : T.Button;
                     if (g.TagLocked) tagButton.GetComponentInChildren<Text>().color = T.Text.WithAlpha(0.45f);
                     Buttons[$"Tag:{g.Id}"] = team;
@@ -733,7 +737,7 @@ namespace YgoCampaign.Game
                 if (scout != null)
                 {
                     Action look = () => scout(index);
-                    Ui.BoxButton(panel, 1330, dense ? 72 : compact ? 88 : 112, 330, dense ? 40 : compact ? 42 : 44, g.HasTag ? "Scout their decks" : "Scout the next deck", look, 18).targetGraphic.color = T.Button;
+                    Ui.BoxButton(panel, 1330, dense ? 72 : compact ? 88 : 112, 330, dense ? 40 : compact ? 42 : 44, g.HasTag ? "Scout their decks" : "Scout the next deck", look, TextRole.Label).targetGraphic.color = T.Button;
                     Buttons[$"Scout:{g.Id}"] = look;
                 }
             }
@@ -748,8 +752,8 @@ namespace YgoCampaign.Game
             var root = Fresh();
             var T = UiTheme.Current;
             Ui.Image(Ui.Box(root, 0, 0, 1920, 120), T.Base);
-            Typography.Strong(Ui.Text(Ui.Box(root, 0, 18, 1920, 50), "GUS'S LESSONS", 34, T.Sign));
-            Ui.Text(Ui.Box(root, 0, 68, 1920, 34), "Short duels from a set position. Gus plays only what each lesson needs.", 20, T.TextMuted);
+            Typography.Strong(Ui.Text(Ui.Box(root, 0, 18, 1920, 50), "GUS'S LESSONS", TextRole.Title, T.Sign));
+            Ui.Text(Ui.Box(root, 0, 68, 1920, 34), "Short duels from a set position. Gus plays only what each lesson needs.", TextRole.Label, T.TextMuted);
             if (YgoCampaign.Game.Portraits.Has("old-gus")) YgoCampaign.Game.Portraits.Place(Ui.Box(root, 60, 200, 520, 700), "old-gus");
             // The guided first duel (if listed) comes first and isn't numbered; the chain lessons are 1, 2, 3.
             int numbered = 0;
@@ -775,11 +779,11 @@ namespace YgoCampaign.Game
                     image.raycastTarget = false;
                     CardFace.Draw(image, lesson.Showcase, _cards.Get(lesson.Showcase), new Vector2(106, 154));
                 }
-                var title = Ui.Text(Ui.Box(panel, 166, 16, 780, 46), first ? lesson.Title : $"{numbered}.  {lesson.Title}", 30, T.Text, TextAnchor.MiddleLeft);
+                var title = Ui.Text(Ui.Box(panel, 166, 16, 780, 46), first ? lesson.Title : $"{numbered}.  {lesson.Title}", TextRole.Title, T.Text, TextAnchor.MiddleLeft);
                 Typography.Strong(title);
-                Ui.Text(Ui.Box(panel, 166, 66, 780, 60), lesson.Teaches, 21, T.TextSoft, TextAnchor.UpperLeft);
+                Ui.Text(Ui.Box(panel, 166, 66, 780, 60), lesson.Teaches, TextRole.Subhead, T.TextSoft, TextAnchor.UpperLeft);
                 // The mark says it in words too, not only in green.
-                Ui.Text(Ui.Box(panel, 166, 130, 500, 36), done ? "✓  Passed" : "Not passed yet", 20, done ? T.Good : T.TextQuiet, TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(panel, 166, 130, 500, 36), done ? "✓  Passed" : "Not passed yet", TextRole.Label, done ? T.Good : T.TextQuiet, TextAnchor.MiddleLeft);
                 int index = i;
                 Button(640 + 960, top + i * step + 55, 200, 72, first ? "First duel" : $"Lesson {numbered}", () => start(index), 22, i == nextUp ? T.Primary : T.Button);
             }
@@ -794,13 +798,13 @@ namespace YgoCampaign.Game
             var root = Fresh();
             var T = UiTheme.Current;
             if (YgoCampaign.Game.Portraits.Has("old-gus")) YgoCampaign.Game.Portraits.Place(Ui.Box(root, 120, 180, 560, 760), "old-gus");
-            var head = Ui.Text(Ui.Box(root, 740, 200, 1100, 70), "Before your first circuit", 48, T.Gold, TextAnchor.MiddleLeft);
+            var head = Ui.Text(Ui.Box(root, 740, 196, 1100, 78), "Before your first circuit", TextRole.Display, T.Gold, TextAnchor.MiddleLeft);
             Typography.Strong(head);
             var quote = Ui.Text(Ui.Box(root, 740, 300, 1060, 120),
                 "Gus: “New to dueling, or just new to the shop? I can walk you through a practice duel first: the board, the phases, and how to answer a card. Three minutes, tops.”",
-                28, T.Quote, TextAnchor.UpperLeft);
+                TextRole.Heading, T.Quote, TextAnchor.UpperLeft);
             Typography.Italic(quote);
-            Ui.Text(Ui.Box(root, 740, 430, 1060, 40), "You can play it any time from Lessons, at the top of the campaign screen.", 21, T.TextMuted, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(root, 740, 430, 1060, 40), "You can play it any time from Lessons, at the top of the campaign screen.", TextRole.Subhead, T.TextMuted, TextAnchor.MiddleLeft);
             Button(740, 510, 320, 76, "Practice duel", practice, 26, T.Primary);
             Button(1090, 510, 380, 76, "Skip: I know how to play", skip, 22);
         }
@@ -811,13 +815,13 @@ namespace YgoCampaign.Game
             var root = Fresh();
             var T = UiTheme.Current;
             if (YgoCampaign.Game.Portraits.Has("old-gus")) YgoCampaign.Game.Portraits.Place(Ui.Box(root, 120, 180, 560, 760), "old-gus");
-            var head = Ui.Text(Ui.Box(root, 740, 220, 1100, 90), passed ? "Lesson passed!" : "Not quite", 64, passed ? T.Good : T.BadWarm, TextAnchor.MiddleLeft);
+            var head = Ui.Text(Ui.Box(root, 740, 220, 1100, 90), passed ? "Lesson passed!" : "Not quite", TextRole.Display, passed ? T.Good : T.BadWarm, TextAnchor.MiddleLeft);
             Typography.Strong(head);
-            Ui.Text(Ui.Box(root, 740, 316, 1100, 44), lesson.Title, 28, T.Gold, TextAnchor.MiddleLeft);
-            Ui.Text(Ui.Box(root, 740, 380, 1060, 120), detail, 24, T.TextBody, TextAnchor.UpperLeft);
+            Ui.Text(Ui.Box(root, 740, 316, 1100, 44), lesson.Title, TextRole.Heading, T.Gold, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(root, 740, 380, 1060, 120), detail, UiTheme.Size(TextRole.Heading), T.TextBody, TextAnchor.UpperLeft); // a paragraph: the body face
             if (passed)
             {
-                var quote = Ui.Text(Ui.Box(root, 740, 520, 1060, 160), $"Gus: “{lesson.PassLine}”", 28, T.Quote, TextAnchor.UpperLeft);
+                var quote = Ui.Text(Ui.Box(root, 740, 520, 1060, 160), $"Gus: “{lesson.PassLine}”", TextRole.Heading, T.Quote, TextAnchor.UpperLeft);
                 Typography.Italic(quote);
             }
             if (next != null && passed)
@@ -900,35 +904,35 @@ namespace YgoCampaign.Game
         {
             var root = Fresh();
             var T = UiTheme.Current;
-            var headline = Ui.Text(Ui.Box(root, 0, 60, 1920, 110), r.Headline, 76, r.Won ? T.Gold : T.Text);
+            var headline = Ui.Text(Ui.Box(root, 0, 60, 1920, 110), r.Headline, TextRole.Display, r.Won ? T.Gold : T.Text);
             Typography.Strong(headline);
             headline.gameObject.AddComponent<Outline>().effectColor = T.Scrim.WithAlpha(0.8f);
-            Ui.Text(Ui.Box(root, 0, 170, 1920, 34), r.Circuit, 20, T.TextMuted);
+            Ui.Text(Ui.Box(root, 0, 170, 1920, 34), r.Circuit, TextRole.Label, T.TextMuted);
             if (r.Quote.Length > 0)
             {
-                var quote = Ui.Text(Ui.Box(root, 260, 220, 1400, 70), $"{r.Speaker}: “{r.Quote}”", 26, T.Quote);
+                var quote = Ui.Text(Ui.Box(root, 260, 220, 1400, 70), $"{r.Speaker}: “{r.Quote}”", TextRole.Heading, T.Quote);
                 Typography.Italic(quote);
             }
 
             // Left: what you earned.
             var earned = Ui.Box(root, 260, 320, 680, 420);
             Ui.Image(earned, T.PanelDeep);
-            Ui.Text(Ui.Box(earned, 30, 20, 620, 30), r.Stakes.Count > 0 ? "STAKES" : "DUEL POINTS", 16, T.Caption, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(earned, 30, 20, 620, 30), r.Stakes.Count > 0 ? "STAKES" : "DUEL POINTS", TextRole.Small, T.Caption, TextAnchor.MiddleLeft);
             for (int i = 0; i < r.Stakes.Count; i++)
             {
-                Ui.Text(Ui.Box(earned, 30, 64 + i * 64, 620, 26), r.Stakes[i].what, 17, T.TextMuted, TextAnchor.MiddleLeft);
-                var value = Ui.Text(Ui.Box(earned, 30, 88 + i * 64, 620, 34), r.Stakes[i].value, 22, r.Stakes[i].color, TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(earned, 30, 64 + i * 64, 620, 26), r.Stakes[i].what, TextRole.Body, T.TextMuted, TextAnchor.MiddleLeft);
+                var value = Ui.Text(Ui.Box(earned, 30, 88 + i * 64, 620, 34), r.Stakes[i].value, TextRole.Subhead, r.Stakes[i].color, TextAnchor.MiddleLeft);
                 value.resizeTextForBestFit = true;
                 value.resizeTextMinSize = 14;
-                value.resizeTextMaxSize = 22;
+                value.resizeTextMaxSize = UiTheme.Size(TextRole.Subhead);
             }
             for (int i = 0; i < r.Earnings.Count; i++)
             {
-                Ui.Text(Ui.Box(earned, 30, 64 + i * 44, 460, 40), r.Earnings[i].what, 22, T.Text, TextAnchor.MiddleLeft);
-                Ui.Text(Ui.Box(earned, 470, 64 + i * 44, 180, 40), $"+{r.Earnings[i].dp:N0}", 24, T.Gold, TextAnchor.MiddleRight);
+                Ui.Text(Ui.Box(earned, 30, 64 + i * 44, 460, 40), r.Earnings[i].what, TextRole.Subhead, T.Text, TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(earned, 470, 64 + i * 44, 180, 40), $"+{r.Earnings[i].dp:N0}", TextRole.Heading, T.Gold, TextAnchor.MiddleRight);
             }
             Ui.Image(Ui.Box(earned, 30, 330, 620, 2), T.Divider);
-            Ui.Text(Ui.Box(earned, 30, 344, 400, 50), "You have", 22, T.TextMuted, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(earned, 30, 344, 400, 50), "You have", TextRole.Subhead, T.TextMuted, TextAnchor.MiddleLeft);
             Typography.Hero(Typography.Counter(Typography.Strong(Ui.Text(Ui.Box(earned, 330, 344, 320, 50), $"{r.TotalDp:N0} DP", 30, T.Gold, TextAnchor.MiddleRight))));
 
             // Right: circuit progress and your record against them.
@@ -936,19 +940,19 @@ namespace YgoCampaign.Game
             Ui.Image(progress, T.PanelDeep);
             // No match chips outside a circuit (guest duels): just the record, under its own header.
             bool chips = r.Progress.Count > 0;
-            Ui.Text(Ui.Box(progress, 30, 20, 620, 30), chips ? r.ProgressTitle : "RECORD", 16, T.Caption, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(progress, 30, 20, 620, 30), chips ? r.ProgressTitle : "RECORD", TextRole.Small, T.Caption, TextAnchor.MiddleLeft);
             // Four chips fill the panel; more (the final's six) share its width.
             float chipStep = Math.Min(150, 640f / Math.Max(1, r.Progress.Count));
             for (int i = 0; i < r.Progress.Count; i++)
             {
                 var pip = Ui.Box(progress, 30 + i * chipStep, 70, chipStep - 16, 90);
                 Ui.Image(pip, r.Progress[i] ? T.PipOn : T.Inset);
-                Ui.Text(pip, r.Progress[i] ? $"{r.ProgressItem} {i + 1}\n<b>WON</b>" : $"{r.ProgressItem} {i + 1}\n-", chipStep < 150 ? 17 : 20,
+                Ui.Text(pip, r.Progress[i] ? $"{r.ProgressItem} {i + 1}\n<b>WON</b>" : $"{r.ProgressItem} {i + 1}\n-", chipStep < 150 ? TextRole.Body : TextRole.Label,
                     r.Progress[i] ? T.Good : T.TextFaint).supportRichText = true;
             }
-            Ui.Text(Ui.Box(progress, 30, chips ? 190 : 64, 620, 80), r.Record, 22, T.Text, TextAnchor.UpperLeft).supportRichText = true;
+            Ui.Text(Ui.Box(progress, 30, chips ? 190 : 64, 620, 80), r.Record, TextRole.Subhead, T.Text, TextAnchor.UpperLeft).supportRichText = true;
             // EXP bar.
-            Typography.Counter(Ui.Text(Ui.Box(progress, 30, 290, 620, 30), $"LEVEL {r.Exp.level}   <color={T.GoodHex}>+{r.Exp.earned} EXP</color>", 18, T.Text, TextAnchor.MiddleLeft))
+            Typography.Counter(Ui.Text(Ui.Box(progress, 30, 290, 620, 30), $"LEVEL {r.Exp.level}   <color={T.GoodHex}>+{r.Exp.earned} EXP</color>", TextRole.Body, T.Text, TextAnchor.MiddleLeft))
                 .supportRichText = true;
             var bar = Ui.Box(progress, 30, 326, 620, 22);
             Ui.Image(bar, T.Well);
@@ -957,7 +961,7 @@ namespace YgoCampaign.Game
             float fill = maxed ? 1 : r.Exp.needed > 0 ? Mathf.Clamp01((float)r.Exp.into / r.Exp.needed) : 0;
             Ui.Image(Ui.Box(bar, 0, 0, 620 * fill, 22), T.Meter);
             ExpLine = ExpToNext(r.Exp.level, r.Exp.into, r.Exp.needed);
-            Ui.Text(Ui.Box(progress, 30, 354, 620, 26), ExpLine, 15, T.TextMuted, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(progress, 30, 354, 620, 26), ExpLine, TextRole.Small, T.TextMuted, TextAnchor.MiddleLeft);
 
             // Unlocks: the big news, in gold. Level-ups share one row; the rows get compact when many, so the buttons stay
             // at least 60 px above the bottom edge.
@@ -969,7 +973,7 @@ namespace YgoCampaign.Game
             {
                 var row = Ui.Box(root, 260, rowsTop + i * step, 1400, step - 4);
                 Ui.Image(row, T.Unlock);
-                var text = Ui.Text(row, unlocks[i], step >= 46 ? 22 : step >= 34 ? 18 : 15, T.GoldSoft);
+                var text = Ui.Text(row, unlocks[i], step >= 46 ? TextRole.Subhead : step >= 34 ? TextRole.Body : TextRole.Small, T.GoldSoft);
                 Typography.Strong(text);
             }
 

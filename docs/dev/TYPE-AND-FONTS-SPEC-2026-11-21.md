@@ -258,7 +258,7 @@ text only)), plus the floor and clip steps in the screen checks (`DuelController
 **R3: the plain card and the editor (about 2.5 agent-days).** Section 2's pixel rules in `PlainCards.cs` and
 `CardFace.cs` (the variants and their cache key), `CardView.cs` (the stat strip rule), and the editor's text
 (`DeckEditor*.cs`: help lines, chips, status, badges, the result names under tiles go); `DuelController.PlainCheck.cs`,
-`SearchCheck.cs`, `FocusCheck.cs`, `EditorCheck.cs` steps. The editor review's M1 is done by this part.
+`SearchCheck.cs`, `FocusCheck.cs`, `EditorCheck.cs` steps. The editor review's M1 is done by this part. Slab labels (`SlabView.cs`'s label text, drawn at the case's scale like a card face) move here too: R2 leaves them and their exclusion in the layout rule.
 
 After R3: Code Reviewer (Opus) on the three diffs against this spec, one fix round, Evidence Collector (Opus), Technical
 Writer (Sonnet) for PLAYING.md (Settings > Card text size), DEVELOPING.md (`-typecheck`, the layout rule), TODO.md.
@@ -390,6 +390,18 @@ Decided (owner, 2026-11-21): the font pair is Barlow Condensed for display and B
 - **N5. Card text size Larger** scales reading text only (as today). *Recommended:* yes. *Or:* scale the whole scale,
   which needs a 720 layout first.
 
+Chosen by the session for R2 (2026-11-21), with a sensible default each. **Not yet confirmed by the owner**:
+
+- **Slab labels** (`SlabView`) move from R2 to R3, with the card faces: the case scales them like a card face.
+- **Main menu:** the first item is Title 34, the others Heading 26 (before the scale: 46 and 30).
+- **Banners** ("Victory!", turn and phase banners) are Display 60, as section 1 says (they were 64 to 96).
+- **Prompt option text** follows Settings > Card text size again: 26 / 31 / 36 (before R2: 24 / 29 / 34).
+- **Very long yes/no and option text** scrolls at 14 instead of shrinking under the floor. Decision-list rows grow to fit;
+  a label past three lines is cut in the middle, so two labels that differ at the end still read differently.
+- **Text that used to shrink is now cut with "…"** in: market and van tile names, some alley lines, 16-player bracket
+  deck names and the card detail's copies line. The duel log keeps the newest lines that fit. The 16-slot bracket drops
+  the word "Elo" only where the line doesn't fit.
+
 ## Not verified
 
 - **No Barlow on screen yet:** widths, line heights and the 9.3 px floor's legibility in Barlow are judged from the face's
@@ -467,3 +479,66 @@ the wallet step would fail without its fix; audio is never heard. The writer ran
 
 R2 and R3 (owner's go-ahead). About 100 script lines still use rich-text `<b>` / `<i>`. Both are in `docs/dev/TODO.md`,
 "Type scale and fonts".
+
+## As built: R2 (2026-11-21)
+
+R2 is built from the code in the working tree, from the code and the final build's check logs. R3 (card faces, the deck
+editor, slab labels) is **not built**. Models: R2 by a Unity Architect (Opus); a Code Reviewer found a regression in Card
+text size for prompt options and a fix round fixed it. Final build: `build/qa-type2`, 17:55, no pictures.
+
+### What exists
+
+- **The scale on the shell screens.** Text there uses a `TextRole` through `Ui.Text`; sizes worked out in code use
+  `UiTheme.Mapped`. Best fit never goes under `UiTheme.Floor` (14). Buttons use the Label role (`Ui.BoxButton` has a
+  `TextRole` overload).
+- **`Ui.OneLine(text, min?)`:** the largest size down to `min` at which one line fits, else a cut with "…" that keeps
+  rich-text tags, a literal `<` and whole surrogate pairs (`Ui.Cut`).
+- **`Ui.FitOrScroll(area, text, max, min, ...)`:** shrinks to `min`, then scrolls with a scrollbar. Never cut.
+- **The text rule** (`DuelController.TextRule.cs`, `TextRule(shot, report)`) runs at every shot of `-layoutcheck`,
+  `-campaigncheck`, `-menucheck`, `-shopcheck`, `-themecheck`, `-alleycheck`, `-tagcheck`, `-aboutcheck` and
+  `-replaycheck`'s list. It fails on text under the floor at 1080, clipped text, a word wider than its box, lines
+  spilling out of their box and one-line text running sideways into a neighbour. It skips hero numbers, faded text and
+  text under a full-window opaque screen. Its self-test makes it able to fail. The exclusions: card faces, the deck
+  editor, the plain card studio and slab labels (all R3), the rarity mark (sized by the card), the board's developer
+  layout.
+- **Check steps added:** `-layoutcheck` shoots long prompts (yes/no, option tabs, a decision list) and runs a Card text
+  size step (Normal 26, Larger 36); `-alleycheck` asserts Orvel's stake lines keep both DP values; `-climbcheck` asserts
+  deck-star lines are whole; `-typecheck` checks that a cut keeps its tags (58 lines, was 57).
+- **Layout changes** are the Owner decisions above (menu sizes, banners, option text, scrolling prompts, cut names).
+
+### Where the build differs from this spec
+
+- **Slab labels** stay in R3 (section 6 said R2).
+- **Prompt option text** is Heading 26 with Card text size scaling (26 / 31 / 36), not a fixed size.
+
+### Checks (final build, no pictures, 0 failures each)
+
+| Check | At | Result |
+|---|---|---|
+| `-layoutcheck` | 1280x720, 1920x1080, 3024x1964 | 88 ok |
+| `-campaigncheck` | the same three | 356 ok |
+| `-typecheck` | the same three | 58 ok |
+| `-menucheck` | 1280x720 | 15 ok |
+| `-shopcheck` | 1280x720 | 117 ok |
+| `-themecheck` | 1280x720 | 107 ok |
+| `-alleycheck` | 1280x720 | 233 ok |
+| `-climbcheck` | 1280x720 | 22 ok |
+| `-tagcheck` | 1280x720 | 11 ok |
+| `-aboutcheck` | 1280x720 | 39 ok |
+| `-replaycheck` | 1280x720 | 18 ok |
+
+Harness: `--texts-check`, `--campaign-test` and `--deckbuilding-test` pass.
+
+### Not verified
+
+- **The regression the review found** (Card text size for prompt options) was fixed in the fix round; `-layoutcheck`'s
+  Card text size step covers it.
+- **Not rerun on the final build:** board, pile, controls, sound, editor, focus, search and plain checks ran on the
+  16:12 build only.
+- **Runs with pictures** were not rerun after the fix round.
+- **No still shows a two-line callout effect line.**
+- **Windows is untested.** Audio is never heard.
+
+### Still open
+
+R3, and one Evidence pass over R2 and R3 on one build. Both are in `docs/dev/TODO.md`, "Type scale and fonts".

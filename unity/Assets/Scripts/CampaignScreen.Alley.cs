@@ -132,8 +132,8 @@ namespace YgoCampaign.Game
             // The map's title ends where the switch begins.
             _mapTitle.rectTransform.sizeDelta = new Vector2(three ? 400 : 800, _mapTitle.rectTransform.sizeDelta.y);
             _mapTitle.resizeTextForBestFit = three;
-            _mapTitle.resizeTextMinSize = 10;
-            _mapTitle.resizeTextMaxSize = 15;
+            _mapTitle.resizeTextMinSize = UiTheme.Floor;
+            _mapTitle.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
             var T = UiTheme.Current;
             _alleyTab.GetComponentInChildren<Text>().text = profile.Seen.Contains(AlleySeen) ? "Back Alley" : $"Back Alley <color={T.GoodHex}>(new)</color>";
         }
@@ -331,20 +331,20 @@ namespace YgoCampaign.Game
                     var frame = Ui.Stretched("Frame", row, Vector2.zero, Vector2.one).gameObject.AddComponent<Outline>();
                     frame.effectColor = T.Highlight;
                 }
-                var title = Ui.Text(Ui.Box(row, 28, 12, 470, 40), name.ToUpperInvariant(), 26, open ? T.Text : T.Text.WithAlpha(0.5f), TextAnchor.MiddleLeft);
+                var title = Ui.Text(Ui.Box(row, 28, 12, 470, 40), name.ToUpperInvariant(), TextRole.Heading, open ? T.Text : T.Text.WithAlpha(0.5f), TextAnchor.MiddleLeft);
                 Typography.Strong(title);
                 T.Title(title);
                 title.raycastTarget = false;
-                var subText = Ui.Text(Ui.Box(row, 28, 54, 470, 34), sub, 16, open ? T.Gold : T.TextDim, TextAnchor.MiddleLeft);
+                var subText = Ui.Text(Ui.Box(row, 28, 54, 470, 34), sub, TextRole.Small, open ? T.Gold : T.TextDim, TextAnchor.MiddleLeft);
                 subText.raycastTarget = false;
                 if (!open) Badge(row, "lock", new Vector2((MapWidth - 80) / 2 - 44, 0), 40, T.TextDim);
                 if (cleared)
                 {
-                    var tick = Ui.Text(Ui.Box(row, 510, 10, 190, 40), "✓ Cleared", 20, T.Good, TextAnchor.MiddleRight);
+                    var tick = Ui.Text(Ui.Box(row, 510, 10, 190, 40), "✓ Cleared", TextRole.Label, T.Good, TextAnchor.MiddleRight);
                     Typography.Strong(tick);
                     tick.raycastTarget = false;
                 }
-                if (progress.Length > 0) Ui.Text(Ui.Box(row, 510, 54, 190, 34), progress, 16, T.TextSoft, TextAnchor.MiddleRight).raycastTarget = false;
+                if (progress.Length > 0) Ui.Text(Ui.Box(row, 510, 54, 190, 34), progress, TextRole.Small, T.TextSoft, TextAnchor.MiddleRight).raycastTarget = false;
                 if (click != null) Ui.Clickable(row, () => { Sounds.Play("click"); click(); }, style: HoverStyle.Row);
                 _rowTops.Add(y);
             }
@@ -400,8 +400,8 @@ namespace YgoCampaign.Game
             if (index == Chalkboard && ChalkboardOpen(profile)) { ShowChalkboard(); return; }
             if (index < 0 || index >= data.Tables.Count || !BackAlley.IsUnlocked(profile, data, index))
             {
-                Typography.Strong(Ui.Text(Ui.Box(_detail, 30, 20, 940, 46), "THE BACK ALLEY", 30, T.Text, TextAnchor.MiddleLeft));
-                Ui.Text(Ui.Box(_detail, 30, 70, 940, 60), "Pick a table on the left.", 18, T.TextMuted, TextAnchor.UpperLeft);
+                Typography.Strong(Ui.Text(Ui.Box(_detail, 30, 20, 940, 46), "THE BACK ALLEY", TextRole.Title, T.Text, TextAnchor.MiddleLeft));
+                Ui.Text(Ui.Box(_detail, 30, 70, 940, 60), "Pick a table on the left.", TextRole.Body, T.TextMuted, TextAnchor.UpperLeft);
                 return;
             }
             var table = data.Tables[index];
@@ -416,13 +416,13 @@ namespace YgoCampaign.Game
             PanelHeader(table.Name);
             AlleyStakeLine = $"{TierName(table.Tier)} · stake {stake:N0} DP, held · back if you win";
             Ui.Text(Ui.Box(_detail, 30, 66, 940, 28), AlleyStakeLine + (cleared ? $"  <color={T.GoodHex}>✓ Cleared</color>" : $"  ·  <color={T.GoldSoftHex}>first clear: +{AlleyEconomy.ClearTokens} Card Token</color>"),
-                18, T.Gold, TextAnchor.MiddleLeft).supportRichText = true;
+                TextRole.Body, T.Gold, TextAnchor.MiddleLeft).supportRichText = true;
             // The rules, under a neon rule line (neon is for signs and rules). No Limits: no list, three of anything (section 4.2).
             AlleyRulesLine = noLimits ? NoLimitsRulesChip : "Alley list · no Ban Passes · turn 40 · higher LP wins";
-            var rulesText = Ui.Text(Ui.Box(_detail, 30, 98, 940, 26), AlleyRulesLine + "  ·  Leaving a duel counts as a loss.", 15, T.TextSoft, TextAnchor.MiddleLeft);
+            var rulesText = Ui.Text(Ui.Box(_detail, 30, 98, 940, 26), AlleyRulesLine + "  ·  Leaving a duel counts as a loss.", TextRole.Small, T.TextSoft, TextAnchor.MiddleLeft);
             rulesText.resizeTextForBestFit = true;
-            rulesText.resizeTextMinSize = 11;
-            rulesText.resizeTextMaxSize = 15;
+            rulesText.resizeTextMinSize = UiTheme.Floor;
+            rulesText.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
             Ui.Image(Ui.Box(_detail, 30, 128, 940, 2), T.Divider).raycastTarget = false;
 
             const float top = 144, step = 132, rowH = 122;
@@ -456,41 +456,41 @@ namespace YgoCampaign.Game
                 var head = Ui.Text(Ui.Box(row, 128, 8, 620, 34),
                     $"Seat {o.Seat}: {o.Handle}" + (tag.Length > 0 ? $"  <color={T.VioletHex}>{tag}</color>" : "")
                     + (won ? $"  <color={T.GoodHex}>✓</color>" : ""),
-                    21, T.Text, TextAnchor.MiddleLeft);
+                    TextRole.Subhead, T.Text, TextAnchor.MiddleLeft);
                 Typography.Strong(head);
                 head.supportRichText = true;
                 head.resizeTextForBestFit = true;
                 head.resizeTextMinSize = 15;
-                head.resizeTextMaxSize = 21;
+                head.resizeTextMaxSize = UiTheme.Size(TextRole.Subhead);
                 // With an UNBANNED row the lines sit closer: deck 38, UNBANNED 58, the stake 78, the binder 100.
                 bool row5 = seat.Unbanned.Length > 0;
-                Ui.Text(Ui.Box(row, 128, row5 ? 38 : 42, 620, row5 ? 22 : 24), $"Deck: {seat.Deck}" + (o.Elo > 0 ? $" · Elo {o.Elo:N0}" : ""), 14, T.TextFaint, TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(row, 128, row5 ? 38 : 42, 620, row5 ? 22 : 24), $"Deck: {seat.Deck}" + (o.Elo > 0 ? $" · Elo {o.Elo:N0}" : ""), TextRole.Caption, T.TextFaint, TextAnchor.MiddleLeft);
                 if (row5)
                 {
-                    var unbannedText = Ui.Text(Ui.Box(row, 128, 58, 620, 22), seat.Unbanned, 13, T.Sign, TextAnchor.MiddleLeft);
+                    var unbannedText = Ui.Text(Ui.Box(row, 128, 58, 620, 22), seat.Unbanned, TextRole.Caption, T.Sign, TextAnchor.MiddleLeft);
                     Typography.Strong(unbannedText);
                     unbannedText.resizeTextForBestFit = true;
-                    unbannedText.resizeTextMinSize = 10;
-                    unbannedText.resizeTextMaxSize = 13;
+                    unbannedText.resizeTextMinSize = UiTheme.Floor;
+                    unbannedText.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
                 }
                 var stakeLine = won ? $"<color={T.GoodHex}>Beaten tonight.</color>"
                     : stakeCard?.Flag == Ante.PennyFlag ? $"Puts up: <b>{seat.Stake}</b> · <color={T.TextDimHex}>Penny plays for the Common: nothing of yours is held.</color>"
                     : stakeCard != null
                     ? $"Puts up: <b>{seat.Stake}</b> · <color={T.GoldHex}>{seat.StakeValue:N0} DP</color>"
                     : $"<color={T.TextDimHex}>Binder's empty: no stakes tonight.</color>";
-                var stakeText = Ui.Text(Ui.Box(row, 128, row5 ? 78 : 66, 620, row5 ? 24 : 26), stakeLine, 15, T.TextBody, TextAnchor.MiddleLeft);
+                var stakeText = Ui.Text(Ui.Box(row, 128, row5 ? 78 : 66, 620, row5 ? 24 : 26), stakeLine, TextRole.Small, T.TextBody, TextAnchor.MiddleLeft);
                 stakeText.supportRichText = true;
                 stakeText.resizeTextForBestFit = true;
-                stakeText.resizeTextMinSize = 12;
-                stakeText.resizeTextMaxSize = 15;
-                Ui.Text(Ui.Box(row, 128, row5 ? 100 : 92, 620, row5 ? 20 : 24), $"Binder: {binder} / {AlleyEconomy.BinderSize}", 13, T.TextQuiet, TextAnchor.MiddleLeft);
-                if (won) Ui.Text(Ui.Box(row, 770, 0, 150, rowH), "Won\ntonight", 18, T.Good);
+                stakeText.resizeTextMinSize = UiTheme.Floor;
+                stakeText.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
+                Ui.Text(Ui.Box(row, 128, row5 ? 100 : 92, 620, row5 ? 20 : 24), $"Binder: {binder} / {AlleyEconomy.BinderSize}", TextRole.Caption, T.TextQuiet, TextAnchor.MiddleLeft);
+                if (won) Ui.Text(Ui.Box(row, 770, 0, 150, rowH), "Won\ntonight", TextRole.Body, T.Good);
                 else if (o.Seat == next)
                 {
                     int tableIndex = index;
-                    Ui.BoxButton(row, 770, (rowH - 60) / 2, 150, 60, "Duel", () => TryAlleyDuel(tableIndex), 22).targetGraphic.color = T.Primary;
+                    Ui.BoxButton(row, 770, (rowH - 60) / 2, 150, 60, "Duel", () => TryAlleyDuel(tableIndex), TextRole.Subhead).targetGraphic.color = T.Primary;
                 }
-                else Ui.Text(Ui.Box(row, 770, 0, 150, rowH), $"After seat {o.Seat - 1}", 15, T.TextDim);
+                else Ui.Text(Ui.Box(row, 770, 0, 150, rowH), $"After seat {o.Seat - 1}", TextRole.Small, T.TextDim);
             }
             float y = top + Math.Max(1, lineup.Count) * step;
             // The Encore: once every ready headliner of the table is beaten, rematch one at the table's stake.
@@ -501,7 +501,7 @@ namespace YgoCampaign.Game
                 {
                     var id = h.Id;
                     int tableIndex = index;
-                    Ui.BoxButton(_detail, x, y, 260, 40, $"Encore: {h.Handle}", () => TryAlleyEncore(tableIndex, id), 16).targetGraphic.color = T.Button;
+                    Ui.BoxButton(_detail, x, y, 260, 40, $"Encore: {h.Handle}", () => TryAlleyEncore(tableIndex, id), TextRole.Label).targetGraphic.color = T.Button;
                     x += 274;
                 }
                 y += 52;
@@ -540,7 +540,7 @@ namespace YgoCampaign.Game
         {
             var T = UiTheme.Current;
             if (T.IsAlley) AlleyMaterials.Header(_detail, 0, 0, 1000, 62, T.Sign);
-            var title = Ui.Text(Ui.Box(_detail, 30, 10, 700, 48), name.ToUpperInvariant(), 32, T.Text, TextAnchor.MiddleLeft);
+            var title = Ui.Text(Ui.Box(_detail, 30, 10, 700, 48), name.ToUpperInvariant(), TextRole.Title, T.Text, TextAnchor.MiddleLeft);
             Typography.Strong(title);
             T.Title(title);
         }
@@ -584,15 +584,15 @@ namespace YgoCampaign.Game
             bool invitational = shown.Any(x => x.Kind == Brackets.InvitationalKind);
             AlleyStakeLine = invitational ? "Alley brackets · an entry fee, placement pay and Contraband or No Limits Packs · no stakes"
                 : "Alley brackets · an entry fee, placement pay and Contraband Packs · no stakes";
-            Ui.Text(Ui.Box(_detail, 30, 66, 940, 28), AlleyStakeLine, 18, T.Gold, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(_detail, 30, 66, 940, 28), AlleyStakeLine, TextRole.Body, T.Gold, TextAnchor.MiddleLeft);
             var rulesHeader = Ui.Text(Ui.Box(_detail, 30, 98, 940, 26), invitational
                     ? "The Alley list, or no list at the Invitational · your own decks, every round · turn 40 · higher LP wins  ·  Baz calls it, Mika streams it."
-                    : "Alley list · your own decks, every round · turn 40 · higher LP wins  ·  Baz calls it, Mika streams it.", 15, T.TextSoft, TextAnchor.MiddleLeft);
+                    : "Alley list · your own decks, every round · turn 40 · higher LP wins  ·  Baz calls it, Mika streams it.", TextRole.Small, T.TextSoft, TextAnchor.MiddleLeft);
             if (invitational)
             {
                 rulesHeader.resizeTextForBestFit = true;
-                rulesHeader.resizeTextMinSize = 11;
-                rulesHeader.resizeTextMaxSize = 15;
+                rulesHeader.resizeTextMinSize = UiTheme.Floor;
+                rulesHeader.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
             }
             Ui.Image(Ui.Box(_detail, 30, 128, 940, 2), T.Divider).raycastTarget = false;
 
@@ -612,28 +612,28 @@ namespace YgoCampaign.Game
                 var block = Ui.Box(_detail, 30, top + i * step, 940, blockH);
                 Ui.Image(block, running ? T.RowSelected : i % 2 == 0 ? T.RowA : T.RowB);
                 if (running) Ui.Image(Ui.Box(block, 0, 0, 4, blockH), T.Highlight).raycastTarget = false;
-                var name = Ui.Text(Ui.Box(block, 20, compact ? 4 : 10, 600, compact ? 34 : 40), spec.Name.ToUpperInvariant(), compact ? 22 : 26, unlocked ? T.Text : T.Text.WithAlpha(0.5f), TextAnchor.MiddleLeft);
+                var name = Ui.Text(Ui.Box(block, 20, compact ? 4 : 10, 600, compact ? 34 : 40), spec.Name.ToUpperInvariant(), compact ? TextRole.Subhead : TextRole.Heading, unlocked ? T.Text : T.Text.WithAlpha(0.5f), TextAnchor.MiddleLeft);
                 Typography.Strong(name);
                 T.Title(name);
                 if (record.Titles > 0)
-                    Typography.Strong(Ui.Text(Ui.Box(block, 620, compact ? 4 : 10, 300, compact ? 34 : 40), $"♛ {record.Titles} title{(record.Titles == 1 ? "" : "s")}", 18, T.Gold, TextAnchor.MiddleRight));
+                    Typography.Strong(Ui.Text(Ui.Box(block, 620, compact ? 4 : 10, 300, compact ? 34 : 40), $"♛ {record.Titles} title{(record.Titles == 1 ? "" : "s")}", TextRole.Body, T.Gold, TextAnchor.MiddleRight));
                 var pay = Brackets.PayFor(kind);
                 var packs = Brackets.PacksFor(kind);
                 string packName = Brackets.PackNameFor(kind);
                 var size = spec.FinalBestOf > 1 ? $"{spec.Size} players · single elimination · the final best of {spec.FinalBestOf}" : $"{spec.Size} players · single elimination";
                 if (kind == Brackets.InvitationalKind) size += " · no list, three of anything";
-                Ui.Text(Ui.Box(block, 20, compact ? 38 : 50, 900, compact ? 20 : 24), size, compact ? 14 : 15, T.TextSoft, TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(block, 20, compact ? 38 : 50, 900, compact ? 20 : 24), size, compact ? TextRole.Caption : TextRole.Small, T.TextSoft, TextAnchor.MiddleLeft);
                 // The kind's first title pays its Card Tokens once (the Midnight Open's, the Invitational's).
                 int tokens = Brackets.TokensFor(kind);
                 bool firstToken = tokens > 0 && Brackets.TokenKeyFor(kind) is { Length: > 0 } tokenKey && !profile.Seen.Contains(tokenKey);
                 var prizes = Ui.Text(Ui.Box(block, 20, compact ? 58 : 76, 900, compact ? 22 : 26),
                     $"Entry <color={T.GoldHex}>{Brackets.EntryFor(kind):N0} DP</color> · the title +{pay[0]:N0} DP and {packs[0]} {packName}{(packs[0] == 1 ? "" : "s")}"
                     + (firstToken ? $" (+{tokens} Card Token{(tokens == 1 ? "" : "s")}, the first time)" : "")
-                    + (packs.Length > 1 && packs[1] > 0 ? $" · the final +{pay[1]:N0} DP and {packs[1]} pack{(packs[1] == 1 ? "" : "s")}" : ""), 15, T.TextBody, TextAnchor.MiddleLeft);
+                    + (packs.Length > 1 && packs[1] > 0 ? $" · the final +{pay[1]:N0} DP and {packs[1]} pack{(packs[1] == 1 ? "" : "s")}" : ""), TextRole.Small, T.TextBody, TextAnchor.MiddleLeft);
                 prizes.supportRichText = true;
                 prizes.resizeTextForBestFit = true;
-                prizes.resizeTextMinSize = 11;
-                prizes.resizeTextMaxSize = 15;
+                prizes.resizeTextMinSize = UiTheme.Floor;
+                prizes.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
                 // Who's on the slate: the Brawl's regulars come from a cleared table (never The Black Market's); the Open's names are written.
                 int brawlTable = BackAlley.BrawlTable(profile, data);
                 // The Brawl's out-of-towners sit once their `after:` table is cleared (docs/dev/NO-LIMITS-SPEC-2026-11-02.md section 8).
@@ -646,20 +646,21 @@ namespace YgoCampaign.Game
                     : kind == Brackets.InvitationalKind
                         ? $"The field: the out-of-towners on their peak builds and the alley's best{(TopSeat(spec) is { Length: > 0 } top1 ? $" ({top1} seed 1)" : "")}. You're seed 2."
                         : "The field: Ilara Gale (the reigning champion, seed 1), circuit champions, Library bosses and Black Market regulars. You're seed 2.";
-                var fieldText = Ui.Text(Ui.Box(block, 20, compact ? 80 : 104, compact ? 620 : 900, compact ? 22 : 24), field, 14, T.TextFaint, TextAnchor.MiddleLeft);
+                var fieldText = Ui.Text(Ui.Box(block, 20, compact ? 80 : 104, compact ? 620 : 900, compact ? 22 : 24), field, TextRole.Caption, T.TextFaint, TextAnchor.MiddleLeft);
                 fieldText.resizeTextForBestFit = true;
-                fieldText.resizeTextMinSize = 11;
-                fieldText.resizeTextMaxSize = 14;
+                fieldText.resizeTextMinSize = UiTheme.Floor;
+                fieldText.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
+                Ui.OneLine(fieldText); // a compact block's line ends in "…" (the entry dialog lists the field)
                 // A finished Invitational held back (its No Limits Packs can't be opened here): why, in place of the record.
                 var held = running && profile.Bracket!.Done && kind == Brackets.InvitationalKind ? Brackets.FinishBlocked(profile.Bracket, _state.NoLimitsPacks()) : null;
                 var recordLine = Ui.Text(Ui.Box(block, 20, compact ? 104 : 130, 620, compact ? 22 : 24),
                     held != null ? $"<color={T.WarnHex}>Finished, not paid yet: {held}</color>"
                     : record.Entries > 0 ? $"Your record: {record.Entries} entr{(record.Entries == 1 ? "y" : "ies")} · {record.Titles} title{(record.Titles == 1 ? "" : "s")} · best: {Brackets.PlacementText(Math.Max(0, record.Best)).ToLowerInvariant()}"
-                        : "Your record: not entered yet", 14, T.TextQuiet, TextAnchor.MiddleLeft);
+                        : "Your record: not entered yet", TextRole.Caption, T.TextQuiet, TextAnchor.MiddleLeft);
                 recordLine.supportRichText = true;
                 recordLine.resizeTextForBestFit = true;
-                recordLine.resizeTextMinSize = 10;
-                recordLine.resizeTextMaxSize = 14;
+                recordLine.resizeTextMinSize = UiTheme.Floor;
+                recordLine.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
                 // The button: the running bracket, Enter (pressed short of DP it says why), or why not.
                 string label;
                 bool open;
@@ -684,15 +685,15 @@ namespace YgoCampaign.Game
                 float buttonY = compact ? 86 : 150;
                 if (open)
                 {
-                    var button = Ui.BoxButton(block, 660, buttonY, 260, 52, label, () => ChalkboardButton(k), 20);
+                    var button = Ui.BoxButton(block, 660, buttonY, 260, 52, label, () => ChalkboardButton(k), TextRole.Label);
                     button.targetGraphic.color = running || blocked == null ? T.Primary : T.Button;
                 }
                 else
                 {
-                    var why = Ui.Text(Ui.Box(block, 560, buttonY, 360, 52), label, 16, T.TextDim, TextAnchor.MiddleRight);
+                    var why = Ui.Text(Ui.Box(block, 560, buttonY, 360, 52), label, TextRole.Small, T.TextDim, TextAnchor.MiddleRight);
                     why.resizeTextForBestFit = true;
-                    why.resizeTextMinSize = 11;
-                    why.resizeTextMaxSize = 16;
+                    why.resizeTextMinSize = UiTheme.Floor;
+                    why.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
                     if (!unlocked) Badge(block, "lock", new Vector2(940 / 2f - 34, blockH / 2f - 30), 30, T.TextDim);
                 }
             }
@@ -757,30 +758,30 @@ namespace YgoCampaign.Game
             const float h = 132;
             var block = Ui.Box(_detail, 30, y, 940, h);
             Ui.Image(block, T.RowB);
-            var name = Ui.Text(Ui.Box(block, 20, 6, 400, 34), "EXHIBITION", 22, T.Text, TextAnchor.MiddleLeft);
+            var name = Ui.Text(Ui.Box(block, 20, 6, 400, 34), "EXHIBITION", TextRole.Subhead, T.Text, TextAnchor.MiddleLeft);
             Typography.Strong(name);
             T.Title(name);
-            Ui.Text(Ui.Box(block, 420, 6, 500, 34), "watch only · no stakes, no DP, no posters", 14, T.TextDim, TextAnchor.MiddleRight);
-            Ui.Text(Ui.Box(block, 20, 40, 900, 24), "Two headliners you've met, or a headliner against a splasher, CPU against CPU. Baz calls it, Mika streams it.", 14, T.TextSoft, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(block, 420, 6, 500, 34), "watch only · no stakes, no DP, no posters", TextRole.Caption, T.TextDim, TextAnchor.MiddleRight);
+            Ui.Text(Ui.Box(block, 20, 40, 900, 24), "Two headliners you've met, or a headliner against a splasher, CPU against CPU. Baz calls it, Mika streams it.", TextRole.Caption, T.TextSoft, TextAnchor.MiddleLeft);
             ExhibitionSides(profile);
             if (ExhibitionLeft.Count == 0 || ExhibitionRight.Count == 0)
             {
                 Ui.Text(Ui.Box(block, 20, 72, 900, 48), ExhibitionLeft.Count == 0 ? "Opens with the first headliner you meet." : "Meet another headliner, or open a table, for its other side.",
-                    16, T.TextDim, TextAnchor.MiddleLeft);
+                    TextRole.Small, T.TextDim, TextAnchor.MiddleLeft);
                 return;
             }
             void Side(float x, string label, Action<int> step)
             {
-                Ui.BoxButton(block, x, 74, 40, 46, "<", () => step(-1), 18);
-                var text = Ui.Text(Ui.Box(block, x + 44, 74, 246, 46), label, 16, T.Text);
+                Ui.BoxButton(block, x, 74, 40, 46, "<", () => step(-1), TextRole.Label);
+                var text = Ui.Text(Ui.Box(block, x + 44, 74, 246, 46), label, TextRole.Small, T.Text);
                 Typography.Strong(text);
                 text.resizeTextForBestFit = true;
-                text.resizeTextMinSize = 10;
-                text.resizeTextMaxSize = 16;
-                Ui.BoxButton(block, x + 294, 74, 40, 46, ">", () => step(+1), 18);
+                text.resizeTextMinSize = UiTheme.Floor;
+                text.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
+                Ui.BoxButton(block, x + 294, 74, 40, 46, ">", () => step(+1), TextRole.Label);
             }
             Side(16, ExhibitionLeft[_exLeft].label, d => { _exLeft += d; _exRight = 0; Refresh(); });
-            Ui.Text(Ui.Box(block, 352, 74, 40, 46), "vs", 16, T.TextDim);
+            Ui.Text(Ui.Box(block, 352, 74, 40, 46), "vs", TextRole.Small, T.TextDim);
             Side(394, ExhibitionRight[_exRight].label, d => { _exRight += d; Refresh(); });
             Ui.BoxButton(block, 740, 74, 84, 46, "Random", () =>
             {
@@ -788,8 +789,8 @@ namespace YgoCampaign.Game
                 ExhibitionSides(profile);
                 _exRight = UnityEngine.Random.Range(0, ExhibitionRight.Count);
                 Refresh();
-            }, 15);
-            Ui.BoxButton(block, 830, 74, 96, 46, "Watch", () => DebugWatchExhibition(), 18).targetGraphic.color = T.Primary;
+            }, TextRole.Label);
+            Ui.BoxButton(block, 830, 74, 96, 46, "Watch", () => DebugWatchExhibition(), TextRole.Label).targetGraphic.color = T.Primary;
         }
 
         /// <summary>The exhibition's Watch, as clicked: the two sides shown.</summary>
@@ -850,6 +851,35 @@ namespace YgoCampaign.Game
 
         /// <summary>Orvel's panel as last drawn, for the checks: your spare cards and whether his binder matches each.</summary>
         public List<(CardCopy copy, Stake? his)> OrvelRows { get; } = new List<(CardCopy, Stake?)>();
+        /// <summary>
+        /// One of Orvel's stake lines and its size: your copy and its value, then his stake and its value (or that he has
+        /// none), on one line of <paramref name="width"/>. Small when it fits, else the floor; still too long, the card names
+        /// lose letters (the longer first, ending in "…"): the two DP values and their gold always show.
+        /// </summary>
+        internal static (string text, int size) OrvelLine(string myName, string myRest, int myValue, string? hisName, string hisRest, int hisValue, Font font, float width)
+        {
+            var T = UiTheme.Current;
+            string Compose(string a, string b) =>
+                $"{a}{myRest} · <color={T.GoldHex}>{myValue:N0} DP</color>   →   "
+                + (hisName != null ? $"he'd put up <b>{b}{hisRest}</b> · <color={T.GoldHex}>{hisValue:N0} DP</color>"
+                    : $"<color={T.TextDimHex}>“Nothing in my binder matches that.”</color>");
+            float room = width - 4;
+            string theirName = hisName ?? "";
+            string mine = myName, theirs = theirName;
+            int size = UiTheme.Size(TextRole.Small);
+            if (Ui.LineWidth(Compose(mine, theirs), font, size) > room) size = UiTheme.Floor;
+            int keepMine = mine.Length, keepTheirs = theirs.Length;
+            while (Ui.LineWidth(Compose(mine, theirs), font, size) > room && (keepMine > 6 || keepTheirs > 6))
+            {
+                if (keepMine >= keepTheirs) keepMine--; else keepTheirs--;
+                mine = keepMine < myName.Length ? myName.Substring(0, keepMine).TrimEnd() + "…" : myName;
+                theirs = keepTheirs < theirName.Length ? theirName.Substring(0, keepTheirs).TrimEnd() + "…" : theirName;
+            }
+            return (Compose(mine, theirs), size);
+        }
+
+        /// <summary>For checks: Orvel's stake lines as drawn (rich text), in row order.</summary>
+        public List<string> DebugOrvelLines { get; } = new List<string>();
 
         /// <summary>
         /// Orvel's Table: one seat (Patron Orvel's house deck), both stakes (your DP, held, and a spare card of yours you pick
@@ -870,8 +900,8 @@ namespace YgoCampaign.Game
             PanelHeader(table.Name);
             AlleyStakeLine = $"Orvel's · stake {stake:N0} DP, held, and a spare card of yours · both back if you win";
             Ui.Text(Ui.Box(_detail, 30, 66, 940, 28), AlleyStakeLine + (cleared ? $"  <color={T.GoodHex}>✓ Cleared</color>" : $"  ·  <color={T.GoldSoftHex}>first win: +{AlleyEconomy.ClearTokens} Card Token</color>"),
-                18, T.Gold, TextAnchor.MiddleLeft).supportRichText = true;
-            Ui.Text(Ui.Box(_detail, 30, 98, 940, 26), "Alley list · no Ban Passes · turn 40 · higher LP wins  ·  A card you lose goes on Moth's rail.  ·  Leaving counts as a loss.", 15, T.TextSoft, TextAnchor.MiddleLeft);
+                TextRole.Body, T.Gold, TextAnchor.MiddleLeft).supportRichText = true;
+            Ui.Text(Ui.Box(_detail, 30, 98, 940, 26), "Alley list · no Ban Passes · turn 40 · higher LP wins  ·  A card you lose goes on Moth's rail.  ·  Leaving counts as a loss.", TextRole.Small, T.TextSoft, TextAnchor.MiddleLeft);
             Ui.Image(Ui.Box(_detail, 30, 128, 940, 2), T.Divider).raycastTarget = false;
             if (o == null) { DrawYourDeck(150, AlleyDeckProblems()); return; }
 
@@ -881,47 +911,47 @@ namespace YgoCampaign.Game
             var row = Ui.Box(_detail, 30, 144, 940, 168);
             Ui.Image(row, T.RowA);
             Silhouette(row, 12, 12, 144, o);
-            var head = Ui.Text(Ui.Box(row, 172, 10, 600, 36), $"{o.Handle}  <color={T.VioletHex}>HOUSE</color>", 24, T.Text, TextAnchor.MiddleLeft);
+            var head = Ui.Text(Ui.Box(row, 172, 10, 600, 36), $"{o.Handle}  <color={T.VioletHex}>HOUSE</color>", TextRole.Heading, T.Text, TextAnchor.MiddleLeft);
             Typography.Strong(head);
             head.supportRichText = true;
-            Ui.Text(Ui.Box(row, 172, 46, 600, 24), $"Deck: {_state.DeckTitle(o.Base)} · Elo {o.Elo:N0}", 15, T.TextFaint, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(row, 172, 46, 600, 24), $"Deck: {_state.DeckTitle(o.Base)} · Elo {o.Elo:N0}", TextRole.Small, T.TextFaint, TextAnchor.MiddleLeft);
             var puts = Ui.Text(Ui.Box(row, 172, 72, 590, 90),
                 $"Puts up: a Grade 9-10 slab, Super Rare and up, worth {AlleyEconomy.OrvelMatchMin:0.#}-{AlleyEconomy.OrvelMatchMax:0.#}× your card, authenticated by the Loupe.\n"
                 + (values.Count > 0 ? $"<color={T.TextDimHex}>His binder: {values.Count} / {AlleyEconomy.BinderSize} slabs, {values[0]:N0} to {values[values.Count - 1]:N0} DP</color>"
-                    : $"<color={T.TextDimHex}>Binder's empty: no stakes tonight.</color>"), 15, T.TextBody, TextAnchor.UpperLeft);
+                    : $"<color={T.TextDimHex}>Binder's empty: no stakes tonight.</color>"), TextRole.Small, T.TextBody, TextAnchor.UpperLeft);
             puts.supportRichText = true;
             var spares = _state.OrvelSpares();
             foreach (var c in spares) OrvelRows.Add((c, _state.OrvelStake(o, c)));
             bool any = OrvelRows.Any(r => r.his != null);
             int tableIndex = index;
             if (spares.Count == 0)
-                Typography.Italic(Ui.Text(Ui.Box(row, 772, 0, 160, 168), "Orvel looks through your binder.\n“Nothing I'd take.”", 15, T.TextDim));
-            else Ui.BoxButton(row, 780, 54, 150, 60, "Duel", () => TryAlleyDuel(tableIndex), 22).targetGraphic.color = any ? T.Primary : T.Button;
+                Typography.Italic(Ui.Text(Ui.Box(row, 772, 0, 160, 168), "Orvel looks through your binder.\n“Nothing I'd take.”", TextRole.Small, T.TextDim));
+            else Ui.BoxButton(row, 780, 54, 150, 60, "Duel", () => TryAlleyDuel(tableIndex), TextRole.Subhead).targetGraphic.color = any ? T.Primary : T.Button;
 
             // Your side: the spare cards Orvel would take, cheapest first, and his slab against each.
             float y = 326;
             Ui.Text(Ui.Box(_detail, 30, y, 940, 24), $"YOUR SPARE CARDS ({spares.Count}) · worth {AlleyEconomy.OrvelMinCard:N0} DP or more, none a saved deck needs · you pick one at the versus",
-                13, T.Caption, TextAnchor.MiddleLeft);
+                TextRole.Caption, T.Caption, TextAnchor.MiddleLeft);
             y += 28;
             const int shown = 6;
+            DebugOrvelLines.Clear();
             for (int i = 0; i < OrvelRows.Count && i < shown; i++)
             {
                 var (copy, his) = OrvelRows[i];
-                var line = Ui.Text(Ui.Box(_detail, 30, y, 940, 30),
-                    $"{_state.CopyText(copy)} · <color={T.GoldHex}>{profile.Collection.Value(copy):N0} DP</color>   →   "
-                    + (his != null ? $"he'd put up <b>{_state.StakeText(his)}</b> · <color={T.GoldHex}>{_state.StakeValue(his):N0} DP</color>"
-                        : $"<color={T.TextDimHex}>“Nothing in my binder matches that.”</color>"),
-                    15, T.TextBody, TextAnchor.MiddleLeft);
+                var line = Ui.Text(Ui.Box(_detail, 30, y, 940, 30), "", TextRole.Small, T.TextBody, TextAnchor.MiddleLeft);
                 line.supportRichText = true;
-                line.resizeTextForBestFit = true;
-                line.resizeTextMinSize = 11;
-                line.resizeTextMaxSize = 15;
+                // Both DP values always show, in gold: a long line shortens the card names (with "…"), never the values.
+                string myName = _cards.Get(copy.Code)?.Name ?? copy.Code.ToString(), myText = _state.CopyText(copy);
+                string? hisName = his != null ? _cards.Get(his.Code)?.Name ?? his.Code.ToString() : null, hisText = his != null ? _state.StakeText(his) : "";
+                (line.text, line.fontSize) = OrvelLine(myName, myText.Substring(Math.Min(myName.Length, myText.Length)), profile.Collection.Value(copy),
+                    hisName, hisName == null ? "" : hisText.Substring(Math.Min(hisName.Length, hisText.Length)), his != null ? _state.StakeValue(his) : 0, line.font, 940);
+                DebugOrvelLines.Add(line.text);
                 y += 32;
             }
-            if (OrvelRows.Count > shown) { Ui.Text(Ui.Box(_detail, 30, y, 940, 24), $"…and {OrvelRows.Count - shown} more", 13, T.TextQuiet, TextAnchor.MiddleLeft); y += 26; }
+            if (OrvelRows.Count > shown) { Ui.Text(Ui.Box(_detail, 30, y, 940, 24), $"…and {OrvelRows.Count - shown} more", TextRole.Caption, T.TextQuiet, TextAnchor.MiddleLeft); y += 26; }
             if (spares.Count == 0)
             {
-                Ui.Text(Ui.Box(_detail, 30, y, 940, 30), "No spare card worth his time: a card a saved deck needs never rides.", 15, T.TextMuted, TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(_detail, 30, y, 940, 30), "No spare card worth his time: a card a saved deck needs never rides.", TextRole.Small, T.TextMuted, TextAnchor.MiddleLeft);
                 y += 32;
             }
             _state.Save(); // his binder made or refilled to show it
@@ -961,13 +991,13 @@ namespace YgoCampaign.Game
             Ui.Image(rim, Ui.Hex("#2C2522")).raycastTarget = false;
             var plate = Ui.Box(rim, 2, 2, 178, 40);
             Ui.Image(plate, Ui.Hex("#4A403A")).raycastTarget = false;
-            var word = Ui.Text(plate, "UNLISTED", 20, Ui.Hex("#D9CFC2"));
+            var word = Ui.Text(plate, "UNLISTED", TextRole.Label, Ui.Hex("#D9CFC2"));
             Typography.Strong(word);
             word.raycastTarget = false;
             int pages = profile.UnlistedPages.Count;
-            var count = Ui.Text(Ui.Box(binder, 26, 78, 182, 30), $"{pages} page{(pages == 1 ? "" : "s")}", 16, T.TextBody, TextAnchor.MiddleLeft);
+            var count = Ui.Text(Ui.Box(binder, 26, 78, 182, 30), $"{pages} page{(pages == 1 ? "" : "s")}", TextRole.Small, T.TextBody, TextAnchor.MiddleLeft);
             count.raycastTarget = false;
-            var note = Ui.Text(Ui.Box(binder, 26, 108, 182, 44), "Decks beaten in the alley", 13, T.TextQuiet, TextAnchor.UpperLeft);
+            var note = Ui.Text(Ui.Box(binder, 26, 108, 182, 44), "Decks beaten in the alley", TextRole.Caption, T.TextQuiet, TextAnchor.UpperLeft);
             Typography.Italic(note);
             note.raycastTarget = false;
             Ui.Clickable(binder, () =>
@@ -994,9 +1024,9 @@ namespace YgoCampaign.Game
             for (int i = _detail.childCount - 1; i >= 0; i--) Destroy(_detail.GetChild(i).gameObject);
             var profile = _state.Profile!;
             var pages = Unlisted.Pages(profile);
-            var title = Ui.Text(Ui.Box(_detail, 30, 18, 940, 46), "UNLISTED", 30, T.Text, TextAnchor.MiddleLeft);
+            var title = Ui.Text(Ui.Box(_detail, 30, 18, 940, 46), "UNLISTED", TextRole.Title, T.Text, TextAnchor.MiddleLeft);
             Typography.Strong(title);
-            Ui.Text(Ui.Box(_detail, 30, 64, 940, 26), "The contraband decks you've beaten in the alley, a page each, as you met them. They never count toward a cup.", 15, T.TextMuted, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(_detail, 30, 64, 940, 26), "The contraband decks you've beaten in the alley, a page each, as you met them. They never count toward a cup.", TextRole.Small, T.TextMuted, TextAnchor.MiddleLeft);
             if (pages.Count == 0 || _state.AlleyContext is not AlleyContext ctx) { UnlistedPageShown = null; return; }
             _unlistedPage = Mathf.Clamp(_unlistedPage, 0, pages.Count - 1);
             var data = _state.AlleyData;
@@ -1018,12 +1048,12 @@ namespace YgoCampaign.Game
                 var row = Ui.Box(content, 0, i * rowH, 280, rowH - 6);
                 Ui.Image(row, on ? T.RowSelected : i % 2 == 0 ? T.RowA : T.RowB);
                 if (on) Ui.Image(Ui.Box(row, 0, 0, 4, rowH - 6), T.Highlight).raycastTarget = false;
-                var name = Ui.Text(Ui.Box(row, 12, 2, 262, 24), page.Handle, 15, T.Text, TextAnchor.MiddleLeft);
+                var name = Ui.Text(Ui.Box(row, 12, 2, 262, 24), page.Handle, TextRole.Small, T.Text, TextAnchor.MiddleLeft);
                 Typography.Strong(name);
                 name.resizeTextForBestFit = true;
-                name.resizeTextMinSize = 10;
-                name.resizeTextMaxSize = 15;
-                Ui.Text(Ui.Box(row, 12, 24, 262, 22), TableName(page), 12, T.TextFaint, TextAnchor.MiddleLeft);
+                name.resizeTextMinSize = UiTheme.Floor;
+                name.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
+                Ui.Text(Ui.Box(row, 12, 24, 262, 22), TableName(page), TextRole.Caption, T.TextFaint, TextAnchor.MiddleLeft);
                 Ui.Clickable(row, () => { _unlistedPage = at; Refresh(); }, style: HoverStyle.Row);
                 UnlistedRows++;
             }
@@ -1038,16 +1068,16 @@ namespace YgoCampaign.Game
                 : shown.Kind == "authored" ? data.Tables.SelectMany(t => t.Seats).FirstOrDefault(seat => seat.Deck == shown.Base)?.Character ?? "" : "";
             face.gameObject.AddComponent<RectMask2D>();
             if (!Portraits.Place(face, who)) AlleyMaterials.Silhouette(face, T.TextDim);
-            var handle = Ui.Text(Ui.Box(_detail, 462, 100, 510, 40), shown.Handle, 26, T.Text, TextAnchor.MiddleLeft);
+            var handle = Ui.Text(Ui.Box(_detail, 462, 100, 510, 40), shown.Handle, TextRole.Heading, T.Text, TextAnchor.MiddleLeft);
             Typography.Strong(handle);
             handle.resizeTextForBestFit = true;
             handle.resizeTextMinSize = 14;
-            handle.resizeTextMaxSize = 26;
+            handle.resizeTextMaxSize = UiTheme.Size(TextRole.Heading);
             var kind = shown.Kind == "regular" ? $"{_state.DeckTitle(shown.Base)}, splashed" : _state.DeckTitle(shown.Base);
-            Ui.Text(Ui.Box(_detail, 462, 140, 510, 26), $"{TableName(shown)} · {kind}", 16, T.TextSoft, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(_detail, 462, 140, 510, 26), $"{TableName(shown)} · {kind}", TextRole.Small, T.TextSoft, TextAnchor.MiddleLeft);
             var deck = Unlisted.DeckOf(shown, ctx);
             var contraband = new HashSet<uint>(Unlisted.Contraband(shown, ctx));
-            Ui.Text(Ui.Box(_detail, 462, 168, 510, 26), $"<color={T.BadHex}>◆</color> contraband ({contraband.Count}) · {deck.Main.Count} main, {deck.Extra.Count} extra", 14, T.TextFaint, TextAnchor.MiddleLeft)
+            Ui.Text(Ui.Box(_detail, 462, 168, 510, 26), $"<color={T.BadHex}>◆</color> contraband ({contraband.Count}) · {deck.Main.Count} main, {deck.Extra.Count} extra", TextRole.Caption, T.TextFaint, TextAnchor.MiddleLeft)
                 .supportRichText = true;
             // The list: main then extra, name and count, the contraband marked.
             var lines = new List<string>();
@@ -1060,23 +1090,23 @@ namespace YgoCampaign.Game
             const int perList = 26;
             for (int c = 0; c * perList < lines.Count && c < 2; c++)
             {
-                var text = Ui.Text(Ui.Box(_detail, 336 + c * 318, 222, 312, perList * 20), string.Join("\n", lines.Skip(c * perList).Take(perList)), 13, T.TextBody, TextAnchor.UpperLeft);
+                var text = Ui.Text(Ui.Box(_detail, 336 + c * 318, 222, 312, perList * 20), string.Join("\n", lines.Skip(c * perList).Take(perList)), TextRole.Caption, T.TextBody, TextAnchor.UpperLeft);
                 text.supportRichText = true;
                 text.verticalOverflow = VerticalWrapMode.Truncate;
             }
-            if (lines.Count > perList * 2) Ui.Text(Ui.Box(_detail, 336, 222 + perList * 20, 600, 20), $"…and {lines.Count - perList * 2} more", 12, T.TextQuiet, TextAnchor.MiddleLeft);
+            if (lines.Count > perList * 2) Ui.Text(Ui.Box(_detail, 336, 222 + perList * 20, 600, 20), $"…and {lines.Count - perList * 2} more", TextRole.Caption, T.TextQuiet, TextAnchor.MiddleLeft);
             var page2 = shown;
-            Ui.BoxButton(_detail, 336, 790, 300, 52, "Open as a new deck", () => OpenUnlisted(page2), 18).targetGraphic.color = T.Primary;
+            Ui.BoxButton(_detail, 336, 790, 300, 52, "Open as a new deck", () => OpenUnlisted(page2), TextRole.Label).targetGraphic.color = T.Primary;
             // A headliner's page plays its combo: the goldfish clip, the show and all, against an empty board.
             if (shown.Key.StartsWith("hl:") && data.FindHeadliner(shown.Key.Substring(3)) != null)
             {
                 var id = shown.Key.Substring(3);
-                Ui.BoxButton(_detail, 652, 790, 318, 52, "▶ Watch the combo", () => { Close(); WatchComboClicked?.Invoke(id); }, 18);
+                Ui.BoxButton(_detail, 652, 790, 318, 52, "▶ Watch the combo", () => { Close(); WatchComboClicked?.Invoke(id); }, TextRole.Label);
                 WatchComboShown = id;
             }
             else
             {
-                Ui.Text(Ui.Box(_detail, 650, 784, 320, 64), "Built from the cards you own under the Alley's list; the cards you're missing are left out.", 13, T.TextQuiet, TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(_detail, 650, 784, 320, 64), "Built from the cards you own under the Alley's list; the cards you're missing are left out.", TextRole.Caption, T.TextQuiet, TextAnchor.MiddleLeft);
                 WatchComboShown = "";
             }
         }

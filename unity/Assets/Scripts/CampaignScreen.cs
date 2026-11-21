@@ -184,9 +184,9 @@ namespace YgoCampaign.Game
             dp.sizeDelta = new Vector2(1720 - 14 - _nav.Sum(n => n.sizeDelta.x + 14) - dp.anchoredPosition.x, dp.sizeDelta.y);
             _wallet = new List<(string, int, string?)[]>
             {
-                new (string, int, string?)[] { ("9,999,999 DP", 24, null), (" (12,500 held)", 18, T.TextDimHex), ("   9,999 tokens", 20, T.GoldSoftHex) },
-                new (string, int, string?)[] { ("Level 99 · NG+12", 20, T.GoodHex), ("   44/44 circuits cleared", 15, T.TextDimHex) },
-                new (string, int, string?)[] { ("99,999 cards (12,345 different) · 9,999 packs opened", 15, T.TextDimHex) },
+                new (string, int, string?)[] { ("9,999,999 DP", 26, null), (" (12,500 held)", 18, T.TextDimHex), ("   9,999 tokens", 20, T.GoldSoftHex) },
+                new (string, int, string?)[] { ("Level 99 · NG+12", 20, T.GoodHex), ("   44/44 circuits cleared", 16, T.TextDimHex) },
+                new (string, int, string?)[] { ("99,999 cards (12,345 different) · 9,999 packs opened", 16, T.TextDimHex) },
             };
             FitWallet();
             _dp.GetComponent<TabularDigits>()?.PrepareNow();
@@ -222,8 +222,9 @@ namespace YgoCampaign.Game
             float tall = _wallet.Sum(line => line.Max(r => r.size)) * 1.2f;
             float room = _dp.rectTransform.sizeDelta.x * 0.97f;
             float scale = Mathf.Min(1f, room / Mathf.Max(1f, widest), (_dp.rectTransform.sizeDelta.y - 4) / tall);
-            int Size(int size) => Mathf.Max(8, Mathf.FloorToInt(size * scale));
-            int baseSize = Size(24);
+            // Never under the type scale's floor: a line that can't fit there runs past the box (the check would say so).
+            int Size(int size) => Mathf.Max(UiTheme.Floor, Mathf.FloorToInt(size * scale));
+            int baseSize = Size(UiTheme.Size(TextRole.Heading));
             _dp.fontSize = baseSize;
             _dp.text = string.Join("\n", _wallet.Select(line => string.Concat(line.Where(r => r.text.Length > 0).Select(r =>
                 r.color == null && Size(r.size) == baseSize ? r.text
@@ -240,42 +241,42 @@ namespace YgoCampaign.Game
             _root = Ui.Overlay(transform, "Campaign", 12);
             Ui.Image(_root, T.Base);
             Ui.Image(Ui.Box(_root, 0, 0, 1920, 90), T.Deep);
-            Typography.Strong(Ui.Text(Ui.Box(_root, 40, 0, 400, 90), "CAMPAIGN", 34, T.Sign, TextAnchor.MiddleLeft));
-            _dp = Ui.Text(Ui.Box(_root, 280, 0, 484, 90), "", 24, T.Gold, TextAnchor.MiddleLeft);
+            Typography.Strong(Ui.Text(Ui.Box(_root, 40, 0, 400, 90), "CAMPAIGN", TextRole.Title, T.Sign, TextAnchor.MiddleLeft));
+            _dp = Ui.Text(Ui.Box(_root, 280, 0, 484, 90), "", TextRole.Heading, T.Gold, TextAnchor.MiddleLeft);
             _dp.supportRichText = true;
             Typography.Counter(_dp);
             // FitWallet sizes it: it never wraps (a wrapped line broke as "Level 43 · NG+1  4 / tokens").
             _dp.horizontalOverflow = HorizontalWrapMode.Overflow;
             _dp.verticalOverflow = VerticalWrapMode.Overflow;
-            var guests = Ui.BoxButton(_root, 772, 22, 112, 46, "Guests", () => { if (_state.Profile != null) GuestsClicked?.Invoke(); }, 18);
-            var lessons = Ui.BoxButton(_root, 916, 22, 142, 46, "Lessons", () => { if (_state.Profile != null) LessonsClicked?.Invoke(); }, 18);
+            var guests = Ui.BoxButton(_root, 772, 22, 112, 46, "Guests", () => { if (_state.Profile != null) GuestsClicked?.Invoke(); }, TextRole.Label);
+            var lessons = Ui.BoxButton(_root, 916, 22, 142, 46, "Lessons", () => { if (_state.Profile != null) LessonsClicked?.Invoke(); }, TextRole.Label);
             _lessonsLabel = lessons.GetComponentInChildren<Text>();
             _lessonsLabel.supportRichText = true;
             // Gus's bounty board (the header packs the buttons, so its place is only its order).
-            var bounties = Ui.BoxButton(_root, 916, 22, 176, 46, "Bounties", ShowBounties, 18);
+            var bounties = Ui.BoxButton(_root, 916, 22, 176, 46, "Bounties", ShowBounties, TextRole.Label);
             _bountiesLabel = bounties.GetComponentInChildren<Text>();
             _bountiesLabel.supportRichText = true;
             _bountiesButton = bounties.gameObject;
-            var recipes = Ui.BoxButton(_root, 1090, 22, 178, 46, "Recipe Book", () => { if (_state.Profile != null) RecipesClicked?.Invoke(); }, 18);
+            var recipes = Ui.BoxButton(_root, 1090, 22, 178, 46, "Recipe Book", () => { if (_state.Profile != null) RecipesClicked?.Invoke(); }, TextRole.Label);
             _recipesLabel = recipes.GetComponentInChildren<Text>();
             _recipesLabel.supportRichText = true;
             _recipesButton = recipes.gameObject;
-            var locker = Ui.BoxButton(_root, 1150, 22, 120, 46, "Locker", ShowLocker, 18);
+            var locker = Ui.BoxButton(_root, 1150, 22, 120, 46, "Locker", ShowLocker, TextRole.Label);
             _lockerLabel = locker.GetComponentInChildren<Text>();
             _lockerLabel.supportRichText = true;
             _lockerButton = locker.gameObject;
-            var shop = Ui.BoxButton(_root, 1290, 22, 150, 46, "Card Shop", () => { if (_state.Profile != null) ShopClicked?.Invoke(); }, 18);
+            var shop = Ui.BoxButton(_root, 1290, 22, 150, 46, "Card Shop", () => { if (_state.Profile != null) ShopClicked?.Invoke(); }, TextRole.Label);
             // New game resets the campaign: after the navigation, and tinted so it doesn't read as one more screen.
-            var newGame = Ui.BoxButton(_root, 1506, 22, 146, 46, "New game", ShowNewGame, 18);
+            var newGame = Ui.BoxButton(_root, 1506, 22, 146, 46, "New game", ShowNewGame, TextRole.Label);
             newGame.GetComponentInChildren<Text>().color = T.Bad;
             _newGameButton = newGame.gameObject;
             _nav = new[] { guests, lessons, bounties, recipes, locker, shop, newGame }.Select(b => (RectTransform)b.transform).ToArray();
-            Ui.BoxButton(_root, 1720, 22, 160, 46, "Menu", () => { Close(); MenuClicked?.Invoke(); }, 18);
-            _status = Ui.Text(Ui.Box(_root, 40, 1018, 1840, 50), "", 16, T.TextSoft, TextAnchor.MiddleLeft);
+            Ui.BoxButton(_root, 1720, 22, 160, 46, "Menu", () => { Close(); MenuClicked?.Invoke(); }, TextRole.Label);
+            _status = Ui.Text(Ui.Box(_root, 40, 1018, 1840, 50), "", TextRole.Small, T.TextSoft, TextAnchor.MiddleLeft);
             _status.supportRichText = true;
 
             _main = Ui.Stretched("Main", _root, Vector2.zero, Vector2.one);
-            _mapTitle = Ui.Text(Ui.Box(_main, 40, 104, 800, 30), CircuitsTitle, 15, T.Caption, TextAnchor.MiddleLeft);
+            _mapTitle = Ui.Text(Ui.Box(_main, 40, 104, 800, 30), CircuitsTitle, TextRole.Small, T.Caption, TextAnchor.MiddleLeft);
             _mapTitle.supportRichText = true;
             BuildDistricts();
 
@@ -306,8 +307,8 @@ namespace YgoCampaign.Game
         {
             var T = UiTheme.Current;
             _starters = Ui.Stretched("Starters", _root, Vector2.zero, Vector2.one);
-            Typography.Strong(Ui.Text(Ui.Box(_starters, 0, 130, 1920, 60), "Choose your starter deck", 38, T.Text));
-            Ui.Text(Ui.Box(_starters, 0, 192, 1920, 34), "You can build new decks from your collection at any time.", 18, T.TextMuted);
+            Typography.Strong(Ui.Text(Ui.Box(_starters, 0, 130, 1920, 60), "Choose your starter deck", TextRole.Title, T.Text));
+            Ui.Text(Ui.Box(_starters, 0, 192, 1920, 34), "You can build new decks from your collection at any time.", TextRole.Body, T.TextMuted);
             BuildOptions();
             var starters = CampaignState.Starters;
             // The tiles share the width: three at 540 wide, four at 420.
@@ -336,14 +337,14 @@ namespace YgoCampaign.Game
                 {
                     var ribbon = Ui.Box(tile, 0, 0, width, 40);
                     Ui.Image(ribbon, T.Highlight);
-                    Typography.Strong(Ui.Text(ribbon, starter.Badge.ToUpperInvariant(), 18, T.OnAccent));
+                    Typography.Strong(Ui.Text(ribbon, starter.Badge.ToUpperInvariant(), TextRole.Body, T.OnAccent));
                 }
                 if (starter.Tag.Length > 0)
-                    Typography.Italic(Ui.Text(Ui.Box(tile, 20, 356, width - 40, 34), starter.Tag, 16, T.TextQuiet));
-                Typography.Strong(Ui.Text(Ui.Box(tile, 20, 400, width - 40, 50), starter.Title, 30, T.Text));
-                Ui.Text(Ui.Box(tile, 30, 460, width - 60, 130), starter.Blurb, 18, T.TextSoft, TextAnchor.UpperCenter);
+                    Typography.Italic(Ui.Text(Ui.Box(tile, 20, 356, width - 40, 34), starter.Tag, TextRole.Small, T.TextQuiet));
+                Typography.Strong(Ui.Text(Ui.Box(tile, 20, 400, width - 40, 50), starter.Title, TextRole.Title, T.Text));
+                Ui.Text(Ui.Box(tile, 30, 460, width - 60, 130), starter.Blurb, TextRole.Body, T.TextSoft, TextAnchor.UpperCenter);
                 var pick = starter;
-                Ui.BoxButton(tile, (width - 360) / 2, 600, 360, 64, "Start with this deck", () => StartWith(pick), 20);
+                Ui.BoxButton(tile, (width - 360) / 2, 600, 360, 64, "Start with this deck", () => StartWith(pick), TextRole.Label);
             }
         }
 
@@ -394,15 +395,15 @@ namespace YgoCampaign.Game
             Ui.Image(_newGame, T.Scrim.WithAlpha(0.75f));
             var panel = Ui.Box(_newGame, 560, 300, 800, 480);
             Ui.Image(panel, T.Panel);
-            Typography.Strong(Ui.Text(Ui.Box(panel, 0, 20, 800, 50), "New game", 32, T.Text));
-            var help = Ui.Text(Ui.Box(panel, 40, 300, 720, 110), "Highlight an option to see what it does.", 16, T.TextSoft, TextAnchor.UpperLeft);
+            Typography.Strong(Ui.Text(Ui.Box(panel, 0, 20, 800, 50), "New game", TextRole.Title, T.Text));
+            var help = Ui.Text(Ui.Box(panel, 40, 300, 720, 110), "Highlight an option to see what it does.", TextRole.Small, T.TextSoft, TextAnchor.UpperLeft);
             help.supportRichText = true;
             GameObject? first = null;
             void Choice(float y, string label, string text, Action act)
             {
                 var rt = Ui.Box(panel, 100, y, 600, 70);
                 Ui.Image(rt, T.Button);
-                var t = Ui.Text(rt, label, 24, T.Text);
+                var t = Ui.Text(rt, label, TextRole.Heading, T.Text);
                 // Its help shows on hover and on the keyboard's focus too (Ui.Focusable: arrows reach it, Enter clicks it).
                 Ui.Clickable(rt, () =>
                 {
@@ -426,7 +427,7 @@ namespace YgoCampaign.Game
                 _state.StartOver();
                 Open();
             });
-            Ui.BoxButton(panel, 300, 420, 200, 44, "Cancel", () => { Destroy(_newGame!.gameObject); _newGame = null; }, 18);
+            Ui.BoxButton(panel, 300, 420, 200, 44, "Cancel", () => { Destroy(_newGame!.gameObject); _newGame = null; }, TextRole.Label);
             if (!InputMode.Pointer && first != null) UnityEngine.EventSystems.EventSystem.current?.SetSelectedGameObject(first);
         }
 
@@ -446,19 +447,19 @@ namespace YgoCampaign.Game
             Ui.Image(_locker, T.Scrim.WithAlpha(0.88f));
             var panel = Ui.Box(_locker, 300, 130, 1320, 820);
             Ui.Image(panel, T.Panel);
-            Typography.Strong(Ui.Text(Ui.Box(panel, 40, 18, 600, 50), "Locker", 32, T.Text, TextAnchor.MiddleLeft));
+            Typography.Strong(Ui.Text(Ui.Box(panel, 40, 18, 600, 50), "Locker", TextRole.Title, T.Text, TextAnchor.MiddleLeft));
             bool mats = _lockerMats && profile.LibraryOpen;
             _lockerNote = Ui.Text(Ui.Box(panel, 40, 66, 1240, 30), mats
                     ? $"The mat on your half of the duel board; your opponent brings their own. A cleared Library cup sells its era's mat: {Cosmetics.MatPrice:N0} DP."
-                    : "Your plate shows this in a duel, where your opponent has a portrait. Clearing a band pins a new poster.", 16,
+                    : "Your plate shows this in a duel, where your opponent has a portrait. Clearing a band pins a new poster.", TextRole.Small,
                 T.TextSoft, TextAnchor.MiddleLeft);
             _lockerNote.supportRichText = true;
-            Ui.BoxButton(panel, 1140, 24, 140, 44, "Close", CloseLocker, 18);
+            Ui.BoxButton(panel, 1140, 24, 140, 44, "Close", CloseLocker, TextRole.Label);
             if (profile.LibraryOpen)
             {
                 // Two tabs once the Library is open: the poster on your plate, the mat on your side.
-                Ui.BoxButton(panel, 760, 24, 170, 44, "Posters", () => { _lockerMats = false; ShowLocker(); }, 18).targetGraphic.color = mats ? T.Button : T.TabOn;
-                Ui.BoxButton(panel, 940, 24, 170, 44, "Mats", () => { _lockerMats = true; ShowLocker(); }, 18).targetGraphic.color = mats ? T.TabOn : T.Button;
+                Ui.BoxButton(panel, 760, 24, 170, 44, "Posters", () => { _lockerMats = false; ShowLocker(); }, TextRole.Label).targetGraphic.color = mats ? T.Button : T.TabOn;
+                Ui.BoxButton(panel, 940, 24, 170, 44, "Mats", () => { _lockerMats = true; ShowLocker(); }, TextRole.Label).targetGraphic.color = mats ? T.TabOn : T.Button;
             }
             if (mats)
             {
@@ -515,9 +516,9 @@ namespace YgoCampaign.Game
                     : !unlocked ? $"<color={T.TextDimHex}>{poster!.Unlock}</color>"
                     : fresh ? $"<color={T.GoodHex}>New · click to hang it</color>"
                     : $"<color={T.TextDimHex}>Click to hang it</color>";
-                var label = Ui.Text(Ui.Box(tile, 8, 262, 220, 30), unlocked ? name : $"{name} (locked)", 18, T.Text);
+                var label = Ui.Text(Ui.Box(tile, 8, 262, 220, 30), unlocked ? name : $"{name} (locked)", TextRole.Body, T.Text);
                 Typography.Strong(label);
-                Ui.Text(Ui.Box(tile, 8, 292, 220, 36), line, 14, T.Text).supportRichText = true;
+                Ui.Text(Ui.Box(tile, 8, 292, 220, 36), line, TextRole.Caption, T.Text).supportRichText = true;
                 if (unlocked)
                 {
                     var id = poster?.Id ?? Posters.Emblem;
@@ -584,19 +585,19 @@ namespace YgoCampaign.Game
                 {
                     var chip = Ui.Box(preview, 6, 6, 64, 20);
                     Ui.Image(chip, T.Scrim.WithAlpha(0.6f)).raycastTarget = false;
-                    var locked = Ui.Text(chip, "LOCKED", 11, Ui.Hex("#C9CED6")); // theme: kept, no role matches #C9CED6 (LOCKED on a mat preview)
+                    var locked = Ui.Text(chip, "LOCKED", TextRole.Caption, Ui.Hex("#C9CED6")); // theme: kept, no role matches #C9CED6 (LOCKED on a mat preview)
                     Typography.Strong(locked);
                     locked.raycastTarget = false;
                 }
                 var c = cup < 0 ? null : library.Cups[cup];
-                var label = Ui.Text(Ui.Box(tile, 8, 118, 220, 50), c == null ? "Space\n<size=13>Default · free</size>" : $"{c.Era}\n<size=13>{c.Name}</size>", 18, T.Text);
+                var label = Ui.Text(Ui.Box(tile, 8, 118, 220, 50), c == null ? "Space\n<size=14>Default · free</size>" : $"{c.Era}\n<size=14>{c.Name}</size>", TextRole.Body, T.Text);
                 Typography.Strong(label);
                 label.supportRichText = true;
                 string line = chosen ? $"<color={T.GoldHex}>On your side</color>"
                     : owned ? $"<color={T.GoodHex}>Owned</color> · click to use"
                     : forSale ? $"<color={(profile.Dp >= Cosmetics.MatPrice ? T.GoldHex : T.BadHex)}>{Cosmetics.MatPrice:N0} DP</color> · click to buy"
                     : $"<color={T.TextDimHex}>Clear the {c!.Name}</color>";
-                Ui.Text(Ui.Box(tile, 8, 168, 220, 46), line, 14, T.Text).supportRichText = true;
+                Ui.Text(Ui.Box(tile, 8, 168, 220, 46), line, TextRole.Caption, T.Text).supportRichText = true;
                 int pick = cup;
                 if (owned || forSale) Ui.Clickable(tile, () => { var note = MatClicked(pick); ShowLocker(); if (_lockerNote != null) _lockerNote.text = note; }, style: HoverStyle.Tile);
             }
@@ -711,14 +712,14 @@ namespace YgoCampaign.Game
             Ui.Image(_bounties, T.Scrim.WithAlpha(0.88f));
             var panel = Ui.Box(_bounties, 360, 210, 1200, 640);
             Ui.Image(panel, T.Panel);
-            Typography.Strong(Ui.Text(Ui.Box(panel, 40, 18, 900, 50), "Gus's bounty board", 32, T.Text, TextAnchor.MiddleLeft));
-            Ui.BoxButton(panel, 1040, 24, 120, 44, "Close", CloseBounties, 18);
+            Typography.Strong(Ui.Text(Ui.Box(panel, 40, 18, 900, 50), "Gus's bounty board", TextRole.Title, T.Text, TextAnchor.MiddleLeft));
+            Ui.BoxButton(panel, 1040, 24, 120, 44, "Close", CloseBounties, TextRole.Label);
             var band = _state.Unlocks.BoardBand(profile);
             var rows = _state.Unlocks.Board(profile);
             Ui.Text(Ui.Box(panel, 40, 66, 1120, 30), rows.Count == 0
                     ? "No bounties are posted for this band."
                     : $"The {band} band's bounties. Win a circuit duel in this band the way one asks, and it's yours: each pays once.",
-                16, T.TextSoft, TextAnchor.MiddleLeft);
+                TextRole.Small, T.TextSoft, TextAnchor.MiddleLeft);
             var pays = _state.Unlocks.BountyPays(profile);
             for (int i = 0; i < rows.Count; i++)
             {
@@ -726,15 +727,15 @@ namespace YgoCampaign.Game
                 var row = Ui.Box(panel, 40, 116 + i * 130, 1120, 116);
                 Ui.Image(row, r.Claimed ? T.RowWon : i % 2 == 0 ? T.RowA : T.RowB);
                 Ui.Image(Ui.Box(row, 0, 0, 6, 116), r.Claimed ? T.GoodStripe : T.Brass);
-                Typography.Strong(Ui.Text(Ui.Box(row, 28, 12, 880, 44), r.Bounty.Text, 22, T.Text, TextAnchor.MiddleLeft));
-                Ui.Text(Ui.Box(row, 28, 60, 880, 40), r.Claimed ? "Claimed: Gus paid this one." : pays, 16, r.Claimed ? T.TextFaint : T.GoldSoft, TextAnchor.MiddleLeft);
-                var state = Ui.Text(Ui.Box(row, 920, 0, 180, 116), r.Claimed ? "CLAIMED" : "OPEN", 22, r.Claimed ? T.Good : T.Gold);
+                Typography.Strong(Ui.Text(Ui.Box(row, 28, 12, 880, 44), r.Bounty.Text, TextRole.Subhead, T.Text, TextAnchor.MiddleLeft));
+                Ui.Text(Ui.Box(row, 28, 60, 880, 40), r.Claimed ? "Claimed: Gus paid this one." : pays, TextRole.Small, r.Claimed ? T.TextFaint : T.GoldSoft, TextAnchor.MiddleLeft);
+                var state = Ui.Text(Ui.Box(row, 920, 0, 180, 116), r.Claimed ? "CLAIMED" : "OPEN", TextRole.Subhead, r.Claimed ? T.Good : T.Gold);
                 Typography.Strong(state);
             }
             Ui.Text(Ui.Box(panel, 40, 520, 1120, 90),
                 "Bounties count in one-on-one circuit duels you win, not in Tag Cups, guests or the Library. A bounty pays a card your Recipe still needs "
                 + "(Recipe in the deck editor, or Wishlist in the Recipe Book); with none set, the first pays a Card Token and the rest wait for one.",
-                15, T.TextQuiet, TextAnchor.UpperLeft);
+                TextRole.Small, T.TextQuiet, TextAnchor.UpperLeft);
         }
 
         private void CloseBounties()
@@ -802,21 +803,21 @@ namespace YgoCampaign.Game
             Ui.Image(_trade, T.Scrim.WithAlpha(0.88f));
             var panel = Ui.Box(_trade, 300, 130, 1320, 820);
             Ui.Image(panel, T.Panel);
-            Typography.Strong(Ui.Text(Ui.Box(panel, 40, 18, 1000, 50), $"A trade with {partner.Name}", 32, T.Text, TextAnchor.MiddleLeft));
-            Ui.BoxButton(panel, 1160, 24, 120, 44, "Close", CloseTrade, 18);
+            Typography.Strong(Ui.Text(Ui.Box(panel, 40, 18, 1000, 50), $"A trade with {partner.Name}", TextRole.Title, T.Text, TextAnchor.MiddleLeft));
+            Ui.BoxButton(panel, 1160, 24, 120, 44, "Close", CloseTrade, TextRole.Label);
             Ui.Text(Ui.Box(panel, 40, 66, 1240, 30),
                 $"Bond {TagPartners.DeckBond}: one trade. Pick a card from {partner.Name}'s decks, then give a spare copy worth at least as many Card Tokens.",
-                16, T.TextSoft, TextAnchor.MiddleLeft);
+                TextRole.Small, T.TextSoft, TextAnchor.MiddleLeft);
             var offers = _state.Unlocks.TradeOffers(profile, partner.Id);
             if (!offers.Contains(take)) take = offers.FirstOrDefault();
             _tradeTake = take;
 
-            Ui.Text(Ui.Box(panel, 40, 106, 600, 30), $"{partner.Name.ToUpperInvariant()} GIVES", 15, T.Caption, TextAnchor.MiddleLeft);
-            Ui.Text(Ui.Box(panel, 680, 106, 600, 30), "YOU GIVE", 15, T.Caption, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(panel, 40, 106, 600, 30), $"{partner.Name.ToUpperInvariant()} GIVES", TextRole.Small, T.Caption, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(panel, 680, 106, 600, 30), "YOU GIVE", TextRole.Small, T.Caption, TextAnchor.MiddleLeft);
             const float rowH = 44;
             var left = ScrollList(panel, 40, 140, 600, 560, Math.Max(1, offers.Count) * rowH);
             if (offers.Count == 0)
-                Ui.Text(Ui.Box(left, 16, 0, 570, rowH), "Nothing to trade: you have three of every card they'd give.", 16, T.TextFaint, TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(left, 16, 0, 570, rowH), "Nothing to trade: you have three of every card they'd give.", TextRole.Small, T.TextFaint, TextAnchor.MiddleLeft);
             for (int i = 0; i < offers.Count; i++)
             {
                 uint code = offers[i];
@@ -824,8 +825,8 @@ namespace YgoCampaign.Game
                 var row = Ui.Box(left, 0, i * rowH, 600, rowH - 4);
                 Ui.Image(row, picked ? T.RowSelected : i % 2 == 0 ? T.RowA : T.RowB);
                 int cost = TokenCost(code);
-                Ui.Text(Ui.Box(row, 16, 0, 420, rowH - 4), _cards.Get(code)?.Name ?? code.ToString(), 16, T.Text, TextAnchor.MiddleLeft);
-                Ui.Text(Ui.Box(row, 440, 0, 144, rowH - 4), $"{cost} token{(cost == 1 ? "" : "s")} · own {profile.Collection.Count(code)}", 14, T.TextQuiet, TextAnchor.MiddleRight);
+                Ui.Text(Ui.Box(row, 16, 0, 420, rowH - 4), _cards.Get(code)?.Name ?? code.ToString(), TextRole.Small, T.Text, TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(row, 440, 0, 144, rowH - 4), $"{cost} token{(cost == 1 ? "" : "s")} · own {profile.Collection.Count(code)}", TextRole.Caption, T.TextQuiet, TextAnchor.MiddleRight);
                 Ui.Clickable(row, () => { _tradeArmed = null; ShowTrade(partner, code); }, style: HoverStyle.Row);
             }
 
@@ -833,22 +834,22 @@ namespace YgoCampaign.Game
             var right = ScrollList(panel, 680, 140, 600, 560, Math.Max(1, gives.Count) * rowH);
             if (take != 0 && gives.Count == 0)
                 Ui.Text(Ui.Box(right, 16, 0, 570, rowH * 2), $"No spare copy worth {TokenCost(take)} Card Token{(TokenCost(take) == 1 ? "" : "s")} or more: your saved decks need the ones you have.",
-                    16, T.TextFaint, TextAnchor.MiddleLeft);
+                    TextRole.Small, T.TextFaint, TextAnchor.MiddleLeft);
             for (int i = 0; i < gives.Count; i++)
             {
                 var copy = gives[i];
                 var row = Ui.Box(right, 0, i * rowH, 600, rowH - 4);
                 Ui.Image(row, i % 2 == 0 ? T.RowA : T.RowB);
                 var look = $"{Ygo.Engine.Data.Rarities.Name(copy.Rarity)} · {Grades.Describe(copy)}";
-                var label = Ui.Text(Ui.Box(row, 16, 0, 440, rowH - 4), $"{_cards.Get(copy.Code)?.Name ?? copy.Code.ToString()}  <color={T.TextDimHex}>{look}</color>", 15, T.Text, TextAnchor.MiddleLeft);
+                var label = Ui.Text(Ui.Box(row, 16, 0, 440, rowH - 4), $"{_cards.Get(copy.Code)?.Name ?? copy.Code.ToString()}  <color={T.TextDimHex}>{look}</color>", TextRole.Small, T.Text, TextAnchor.MiddleLeft);
                 label.supportRichText = true;
                 var key = $"{take}:{copy.Id}";
                 bool armed = _tradeArmed == key && Time.unscaledTime - _tradeArmedAt < 5;
-                var b = Ui.BoxButton(row, 470, 4, 120, rowH - 12, armed ? "Confirm" : "Trade", () => TradeClicked(partner, take, copy, key), 15);
+                var b = Ui.BoxButton(row, 470, 4, 120, rowH - 12, armed ? "Confirm" : "Trade", () => TradeClicked(partner, take, copy, key), TextRole.Label);
                 if (armed) b.targetGraphic.color = T.Primary;
             }
             _tradeNote = Ui.Text(Ui.Box(panel, 40, 712, 1240, 90), note ?? (take == 0 ? "" : $"You'd get {_cards.Get(take)?.Name} as a Raw Near Mint copy at its commonest printing."),
-                16, T.TextSoft, TextAnchor.UpperLeft);
+                TextRole.Small, T.TextSoft, TextAnchor.UpperLeft);
             _tradeNote.supportRichText = true;
         }
 
@@ -959,7 +960,7 @@ namespace YgoCampaign.Game
                 bool history = i == 1;
                 var box = Ui.Box(_starters, 560 + i * 404, 972, 396, 42);
                 _ruleFills[i] = Ui.Image(box, T.Button);
-                _ruleLabels[i] = Ui.Text(box, labels[i], 18, T.Text);
+                _ruleLabels[i] = Ui.Text(box, labels[i], TextRole.Body, T.Text);
                 _ruleLabels[i].supportRichText = true;
                 // Its help shows on hover and on the keyboard's focus too (Ui.Focusable); the picked one (TabOn) doesn't light up.
                 Ui.Clickable(box, () => { _eraLimited = history; ShowOptions(); _status.text = history ? EraLimitedHelp : ShopWayHelp; },
@@ -999,10 +1000,10 @@ namespace YgoCampaign.Game
             var held = profile.AnteLive is { Held: > 0 } live ? $" ({live.Held:N0} held)" : "";
             _wallet = new List<(string, int, string?)[]>
             {
-                new (string, int, string?)[] { ($"{profile.Dp:N0} DP", 24, null), (held, 18, T.TextDimHex), ($"   {profile.Tokens:N0} token{(profile.Tokens == 1 ? "" : "s")}", 20, T.GoldSoftHex) },
+                new (string, int, string?)[] { ($"{profile.Dp:N0} DP", 26, null), (held, 18, T.TextDimHex), ($"   {profile.Tokens:N0} token{(profile.Tokens == 1 ? "" : "s")}", 20, T.GoldSoftHex) },
                 new (string, int, string?)[] { ($"Level {profile.Level}{(profile.Cycle > 0 ? $" · NG+{profile.Cycle}" : "")}", 20, T.GoodHex),
-                    ($"   {circuits.ClearedCount(profile)}/{circuits.All.Count} circuits cleared", 15, T.TextDimHex) },
-                new (string, int, string?)[] { ($"{profile.Collection.Total:N0} cards ({profile.Collection.Distinct:N0} different) · {profile.PacksOpened:N0} pack{(profile.PacksOpened == 1 ? "" : "s")} opened", 15, T.TextDimHex) },
+                    ($"   {circuits.ClearedCount(profile)}/{circuits.All.Count} circuits cleared", 16, T.TextDimHex) },
+                new (string, int, string?)[] { ($"{profile.Collection.Total:N0} cards ({profile.Collection.Distinct:N0} different) · {profile.PacksOpened:N0} pack{(profile.PacksOpened == 1 ? "" : "s")} opened", 16, T.TextDimHex) },
             };
             FitWallet();
 
@@ -1088,7 +1089,7 @@ namespace YgoCampaign.Game
                 labels.Add(() =>
                 {
                     Ui.Image(Ui.Box(_circuitList, 0, stripY, MapWidth, 42), T.Glass.WithAlpha(0.92f)).raycastTarget = false;
-                    var title = Ui.Text(Ui.Box(_circuitList, 20, stripY + 4, 760, 34), bandText, 22, bandColor, TextAnchor.MiddleLeft);
+                    var title = Ui.Text(Ui.Box(_circuitList, 20, stripY + 4, 760, 34), bandText, TextRole.Subhead, bandColor, TextAnchor.MiddleLeft);
                     Typography.Strong(title);
                     title.supportRichText = true;
                     title.raycastTarget = false;
@@ -1218,20 +1219,20 @@ namespace YgoCampaign.Game
             // The circuit's number on a small tab.
             var tab = Ui.Placed("Number", node, new Vector2(-size / 2 + 6, size / 2 - 6), new Vector2(number.Length > 2 ? 44 : 30, 26));
             Ui.Image(tab, open ? accent : new Color(0.3f, 0.32f, 0.38f)).raycastTarget = false;
-            var num = Ui.Text(tab, number, 15, Ui.Hex("#121620"));
+            var num = Ui.Text(tab, number, TextRole.Small, Ui.Hex("#121620"));
             Typography.Strong(num);
             // A dark tag behind the name and progress, so they read on any map picture.
             float tagWidth = Mathf.Min(330, name.Length * (size > 80 ? 9.5f : 8f) + 24);
             var backing = Ui.Placed("NameTag", node, new Vector2(0, -size / 2 - (progress.Length > 0 ? 25 : 16)), new Vector2(tagWidth, progress.Length > 0 ? 44 : 26));
             Ui.Image(backing, T.Glass.WithAlpha(0.72f)).raycastTarget = false;
-            var label = Ui.Text(Ui.Placed("Name", node, new Vector2(0, -size / 2 - 16), new Vector2(320, 24)), name, size > 80 ? 17 : 14,
+            var label = Ui.Text(Ui.Placed("Name", node, new Vector2(0, -size / 2 - 16), new Vector2(320, 24)), name, size > 80 ? TextRole.Body : TextRole.Caption,
                 open ? T.Text : T.Text.WithAlpha(0.6f));
             Typography.Strong(label);
             label.raycastTarget = false;
             label.gameObject.AddComponent<Outline>().effectColor = T.Scrim.WithAlpha(0.8f);
             if (progress.Length > 0)
             {
-                var p = Ui.Text(Ui.Placed("Progress", node, new Vector2(0, -size / 2 - 36), new Vector2(200, 20)), progress, 15,
+                var p = Ui.Text(Ui.Placed("Progress", node, new Vector2(0, -size / 2 - 36), new Vector2(200, 20)), progress, TextRole.Small,
                     cleared ? accent : T.TextSoft.WithAlpha(open ? 1 : 0.75f));
                 p.raycastTarget = false;
             }
@@ -1277,14 +1278,14 @@ namespace YgoCampaign.Game
             var circuit = circuits.All[index];
             bool cleared = circuits.IsCleared(index, profile);
 
-            Typography.Strong(Ui.Text(Ui.Box(_detail, 30, 20, 940, 46), circuit.Name, 30, T.Text, TextAnchor.MiddleLeft));
-            Ui.Text(Ui.Box(_detail, 30, 66, 940, 28), circuit.Blurb, 16, T.TextMuted, TextAnchor.MiddleLeft);
+            Typography.Strong(Ui.Text(Ui.Box(_detail, 30, 20, 940, 46), circuit.Name, TextRole.Title, T.Text, TextAnchor.MiddleLeft));
+            Ui.Text(Ui.Box(_detail, 30, 66, 940, 28), circuit.Blurb, TextRole.Small, T.TextMuted, TextAnchor.MiddleLeft);
             var prize = Ui.Text(Ui.Box(_detail, 30, 96, 940, 28),
                 cleared ? $"<color={T.GoldHex}>Cleared.</color> A rematch pays {Circuits.RepeatWinDp} DP." : $"Clear all {circuit.Matches.Count} matches: <color={T.GoldHex}>+{circuit.Prize:N0} DP prize</color>"
-                + (index + 1 < circuits.All.Count ? $" and {circuits.All[index + 1].Name} opens." : "."), 16, T.Text, TextAnchor.MiddleLeft);
+                + (index + 1 < circuits.All.Count ? $" and {circuits.All[index + 1].Name} opens." : "."), TextRole.Small, T.Text, TextAnchor.MiddleLeft);
             prize.supportRichText = true;
             if (_state.ListFor(index) is Banlist list)
-                Ui.Text(Ui.Box(_detail, 30, 118, 940, 24), $"Ban list: {list.Name}. Your deck must be legal under it.", 14,
+                Ui.Text(Ui.Box(_detail, 30, 118, 940, 24), $"Ban list: {list.Name}. Your deck must be legal under it.", TextRole.Caption,
                     T.Warn, TextAnchor.MiddleLeft);
 
             // One primary: the first match not won yet gets the red Duel.
@@ -1301,23 +1302,23 @@ namespace YgoCampaign.Game
                 float tx = Portraits.Place(Ui.Box(row, 6, 4, 110, 108), c.Id) ? 124 : 20;
                 // The last match is the circuit's final: billed by name, with its own line before the deciding duel.
                 bool final = Circuits.IsFinal(circuit, m);
-                Typography.Strong(Ui.Text(Ui.Box(row, tx, 10, 600 - tx + 20, 34), final ? $"Final: {c.DisplayName}" : $"Match {m + 1}: {c.DisplayName}", 21, T.Text, TextAnchor.MiddleLeft));
-                Ui.Text(Ui.Box(row, tx, 44, 600 - tx + 20, 26), $"Deck: {_state.DeckTitle(match.Deck)} · {c.StyleSummary}", 14, T.TextFaint, TextAnchor.MiddleLeft);
+                Typography.Strong(Ui.Text(Ui.Box(row, tx, 10, 600 - tx + 20, 34), final ? $"Final: {c.DisplayName}" : $"Match {m + 1}: {c.DisplayName}", TextRole.Subhead, T.Text, TextAnchor.MiddleLeft));
+                Ui.Text(Ui.Box(row, tx, 44, 600 - tx + 20, 26), $"Deck: {_state.DeckTitle(match.Deck)} · {c.StyleSummary}", TextRole.Caption, T.TextFaint, TextAnchor.MiddleLeft);
                 var intro = final && circuit.FinalLine.Length > 0 ? circuit.FinalLine : c.IntroFor(circuit.Matches.Take(m).Any(earlier => earlier.Character.Id == c.Id));
                 if (intro.Length > 0)
-                    Typography.Italic(Ui.Text(Ui.Box(row, tx, 72, 600 - tx + 20, 36), $"“{intro}”", 14, T.Intro, TextAnchor.UpperLeft));
+                    Typography.Italic(Ui.Text(Ui.Box(row, tx, 72, 600 - tx + 20, 36), $"“{intro}”", TextRole.Caption, T.Intro, TextAnchor.UpperLeft));
                 // Same numbers as the results screen: the first win carries the bonus, a rematch pays RepeatWinDp. Above them,
                 // the deck's strength.
                 var stars = StrengthText.Stars(DeckStrength.StarsFor(_state.Ratings, match.Deck), T);
                 var reward = (stars.Length > 0 ? stars + "\n" : "")
                              + (won ? $"Won ×{profile.MatchWins[Profile.MatchKey(index, m)]}\nRematch: +{circuits.DuelDp(index, repeat: true)} DP"
                                     : $"First win: +{circuits.DuelDp(index, repeat: false) + Circuits.FirstWinBonus} DP");
-                var r = Ui.Text(Ui.Box(row, 610, 0, 160, 116), reward, 16, won ? T.Good : T.Gold);
+                var r = Ui.Text(Ui.Box(row, 610, 0, 160, 116), reward, TextRole.Small, won ? T.Good : T.Gold);
                 r.supportRichText = true;
                 int circuitIndex = index, matchIndex = m;
-                Ui.BoxButton(row, 780, 10, 140, 54, "Duel", () => TryDuel(circuitIndex, matchIndex), 20).targetGraphic.color = m == nextUp ? T.Primary : T.Button;
+                Ui.BoxButton(row, 780, 10, 140, 54, "Duel", () => TryDuel(circuitIndex, matchIndex), TextRole.Label).targetGraphic.color = m == nextUp ? T.Primary : T.Button;
                 var scouted = new List<(string, string)> { (c.Name, match.Deck) };
-                Ui.BoxButton(row, 780, 70, 140, 38, "Scout", () => ScoutClicked?.Invoke(scouted), 16).targetGraphic.color = T.Button;
+                Ui.BoxButton(row, 780, 70, 140, 38, "Scout", () => ScoutClicked?.Invoke(scouted), TextRole.Label).targetGraphic.color = T.Button;
             }
 
             DrawYourDeck(142 + circuit.Matches.Count * 128 + 20, index);
@@ -1335,20 +1336,20 @@ namespace YgoCampaign.Game
         {
             var T = UiTheme.Current;
             var profile = _state.Profile!;
-            Ui.Text(Ui.Box(_detail, 30, top, 400, 26), "YOUR DECK", 15, T.Caption, TextAnchor.MiddleLeft);
-            Ui.BoxButton(_detail, 30, top + 32, 44, 44, "<", () => CycleDeck(-1), 20);
-            var label = Ui.Text(Ui.Box(_detail, 80, top + 32, 380, 44), profile.Deck.Length > 0 ? CampaignState.SlugTitle(profile.Deck) : "(no deck)", 22, T.Text);
+            Ui.Text(Ui.Box(_detail, 30, top, 400, 26), "YOUR DECK", TextRole.Small, T.Caption, TextAnchor.MiddleLeft);
+            Ui.BoxButton(_detail, 30, top + 32, 44, 44, "<", () => CycleDeck(-1), TextRole.Label);
+            var label = Ui.Text(Ui.Box(_detail, 80, top + 32, 380, 44), profile.Deck.Length > 0 ? CampaignState.SlugTitle(profile.Deck) : "(no deck)", TextRole.Subhead, T.Text);
             Typography.Strong(label);
-            Ui.BoxButton(_detail, 466, top + 32, 44, 44, ">", () => CycleDeck(+1), 20);
-            Ui.BoxButton(_detail, 540, top + 32, 200, 44, "Edit deck", () => EditDeck?.Invoke(profile.Deck), 18);
-            Ui.BoxButton(_detail, 760, top + 32, 200, 44, "New deck", () => EditDeck?.Invoke(null), 18);
+            Ui.BoxButton(_detail, 466, top + 32, 44, 44, ">", () => CycleDeck(+1), TextRole.Label);
+            Ui.BoxButton(_detail, 540, top + 32, 200, 44, "Edit deck", () => EditDeck?.Invoke(profile.Deck), TextRole.Label);
+            Ui.BoxButton(_detail, 760, top + 32, 200, 44, "New deck", () => EditDeck?.Invoke(null), TextRole.Label);
             YourDeckLine = problems.Count == 0 ? "Ready to duel." : string.Join("  ·  ", problems.Take(3).Select(p => p.Message));
             var status = Ui.Text(Ui.Box(_detail, 30, top + 86, 940, 90),
                 problems.Count == 0
                     ? $"<color={T.GoodHex}>Ready to duel.</color> Every card in it is one you own."
                     : $"<color={T.BadHex}>Not ready ({problems.Count} problem{(problems.Count == 1 ? "" : "s")}):</color> "
                       + string.Join("  ·  ", problems.Take(3).Select(p => p.Message)) + (problems.Count > 3 ? "  ..." : ""),
-                15, T.Text, TextAnchor.UpperLeft);
+                TextRole.Small, T.Text, TextAnchor.UpperLeft);
             status.supportRichText = true;
         }
 
@@ -1397,19 +1398,19 @@ namespace YgoCampaign.Game
             var circuits = _state.Circuits;
             var cup = circuits.TagCups[index];
             bool cleared = circuits.IsTagCupCleared(index, profile);
-            Typography.Strong(Ui.Text(Ui.Box(_detail, 30, 20, 940, 46), cup.Name, 30, T.GoldSoft, TextAnchor.MiddleLeft));
-            Ui.Text(Ui.Box(_detail, 30, 66, 940, 28), cup.Blurb, 16, T.TextMuted, TextAnchor.MiddleLeft);
+            Typography.Strong(Ui.Text(Ui.Box(_detail, 30, 20, 940, 46), cup.Name, TextRole.Title, T.GoldSoft, TextAnchor.MiddleLeft));
+            Ui.Text(Ui.Box(_detail, 30, 66, 940, 28), cup.Blurb, TextRole.Small, T.TextMuted, TextAnchor.MiddleLeft);
             var prize = Ui.Text(Ui.Box(_detail, 30, 94, 940, 28),
                 cleared ? $"<color={T.GoldHex}>Cleared.</color> A rematch pays {Circuits.RepeatWinDp} DP." : $"You and a partner against two. Clear all {cup.Matches.Count}: <color={T.GoldHex}>+{cup.Prize:N0} DP prize</color>",
-                16, T.Text, TextAnchor.MiddleLeft);
+                TextRole.Small, T.Text, TextAnchor.MiddleLeft);
             prize.supportRichText = true;
 
             // Your partner (‹ › to pick; remembered): anyone you've beaten, or Kit with one of your decks. The deck they
             // bring is a choice too once the bond allows it.
             var partners = _state.TagPartnerChoices();
-            Ui.Text(Ui.Box(_detail, 30, 128, 200, 44), "YOUR PARTNER", 15, T.Caption, TextAnchor.MiddleLeft);
+            Ui.Text(Ui.Box(_detail, 30, 128, 200, 44), "YOUR PARTNER", TextRole.Small, T.Caption, TextAnchor.MiddleLeft);
             if (partners.Count == 0)
-                Ui.Text(Ui.Box(_detail, 230, 128, 740, 44), "Beat a duelist in the circuits first: they can partner you here.", 16, T.Text, TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(_detail, 230, 128, 740, 44), "Beat a duelist in the circuits first: they can partner you here.", TextRole.Small, T.Text, TextAnchor.MiddleLeft);
             else
             {
                 int remembered = partners.FindIndex(p => p.Id == profile.TagPartner);
@@ -1422,15 +1423,15 @@ namespace YgoCampaign.Game
                     _state.Save();
                     ShowTagCup(index);
                 }
-                Ui.BoxButton(_detail, 230, 128, 44, 44, "<", () => PickPartner(-1), 20);
+                Ui.BoxButton(_detail, 230, 128, 44, 44, "<", () => PickPartner(-1), TextRole.Label);
                 Portraits.Place(Ui.Box(_detail, 900, 100, 70, 80), partner.Id);
-                Ui.Text(Ui.Box(_detail, 280, 128, 560, 44), $"<b>{partner.DisplayName}</b>  <color={T.TextDimHex}>({_partnerIndex + 1} of {partners.Count})</color>", 18, T.Text)
+                Ui.Text(Ui.Box(_detail, 280, 128, 560, 44), $"<b>{partner.DisplayName}</b>  <color={T.TextDimHex}>({_partnerIndex + 1} of {partners.Count})</color>", TextRole.Body, T.Text)
                     .supportRichText = true;
-                Ui.BoxButton(_detail, 846, 128, 44, 44, ">", () => PickPartner(1), 20);
+                Ui.BoxButton(_detail, 846, 128, 44, 44, ">", () => PickPartner(1), TextRole.Label);
 
                 var decks = _state.PartnerDeckChoices(partner);
                 var deck = _state.PartnerDeck(partner);
-                Ui.Text(Ui.Box(_detail, 30, 176, 200, 40), "THEIR DECK", 15, T.Caption, TextAnchor.MiddleLeft);
+                Ui.Text(Ui.Box(_detail, 30, 176, 200, 40), "THEIR DECK", TextRole.Small, T.Caption, TextAnchor.MiddleLeft);
                 if (decks.Count > 1)
                 {
                     void PickDeck(int delta)
@@ -1440,15 +1441,15 @@ namespace YgoCampaign.Game
                         _state.Save();
                         ShowTagCup(index);
                     }
-                    Ui.BoxButton(_detail, 230, 176, 40, 40, "<", () => PickDeck(-1), 18);
-                    Ui.Text(Ui.Box(_detail, 274, 176, 300, 40), _state.DeckTitle(deck), 17, T.Text);
-                    Ui.BoxButton(_detail, 578, 176, 40, 40, ">", () => PickDeck(1), 18);
+                    Ui.BoxButton(_detail, 230, 176, 40, 40, "<", () => PickDeck(-1), TextRole.Label);
+                    Ui.Text(Ui.Box(_detail, 274, 176, 300, 40), _state.DeckTitle(deck), TextRole.Body, T.Text);
+                    Ui.BoxButton(_detail, 578, 176, 40, 40, ">", () => PickDeck(1), TextRole.Label);
                 }
-                else Ui.Text(Ui.Box(_detail, 230, 176, 388, 40), deck.Length > 0 ? _state.DeckTitle(deck) : "(no deck)", 17, T.Text, TextAnchor.MiddleLeft);
+                else Ui.Text(Ui.Box(_detail, 230, 176, 388, 40), deck.Length > 0 ? _state.DeckTitle(deck) : "(no deck)", TextRole.Body, T.Text, TextAnchor.MiddleLeft);
                 // Bond 3's one trade, while it's on offer: a Trade button beside the bond.
                 bool trade = !TagPartners.IsShopRegular(partner) && _state.Unlocks.CanTrade(profile, partner.Id);
-                Ui.Text(Ui.Box(_detail, 630, 176, trade ? 230 : 340, 40), BondText(TagPartners.Bond(partner, profile)), 13, T.TextQuiet, TextAnchor.MiddleLeft);
-                if (trade) Ui.BoxButton(_detail, 866, 178, 104, 36, "Trade", () => ShowTrade(partner), 15);
+                Ui.Text(Ui.Box(_detail, 630, 170, trade ? 230 : 340, 52), BondText(TagPartners.Bond(partner, profile)), TextRole.Caption, T.TextQuiet, TextAnchor.MiddleLeft);
+                if (trade) Ui.BoxButton(_detail, 866, 178, 104, 36, "Trade", () => ShowTrade(partner), TextRole.Label);
                 // Their own deck is their exhibition deck: it plays as built under any list. Your edit of it answers to the
                 // list like your decks do, using your cards plus theirs.
                 if (!TagPartners.IsShopRegular(partner) && deck.Length > 0)
@@ -1456,16 +1457,16 @@ namespace YgoCampaign.Game
                     bool edited = _state.PartnerEditOf(deck) == partner.Id;
                     Ui.Text(Ui.Box(_detail, 30, 222, 560, 36), edited
                         ? $"<color={T.WarnHex}>Your edit:</color> follows the ban list, like your decks."
-                        : $"<color={T.GoodHex}>Their own deck:</color> plays as built, whatever the list.", 15, T.Text, TextAnchor.MiddleLeft).supportRichText = true;
+                        : $"<color={T.GoodHex}>Their own deck:</color> plays as built, whatever the list.", TextRole.Small, T.Text, TextAnchor.MiddleLeft).supportRichText = true;
                     int after = cup.After;
                     Ui.BoxButton(_detail, 600, 222, 170, 36, "Edit deck", () =>
                     {
                         var name = _state.EditPartnerDeck(partner);
                         if (name == null) { _status.text = $"<color={T.BadHex}>{partner.Name}'s deck can't be edited.</color>"; return; }
                         EditPartnerDeck?.Invoke(name, after);
-                    }, 15);
+                    }, TextRole.Label);
                     if (edited)
-                        Ui.BoxButton(_detail, 780, 222, 190, 36, "Their own deck", () => { _state.UsePartnersOwnDeck(partner); ShowTagCup(index); }, 15);
+                        Ui.BoxButton(_detail, 780, 222, 190, 36, "Their own deck", () => { _state.UsePartnersOwnDeck(partner); ShowTagCup(index); }, TextRole.Label);
                 }
             }
 
@@ -1480,20 +1481,20 @@ namespace YgoCampaign.Game
                 Ui.Image(row, won ? T.RowWon : T.RowA);
                 bool faces = Portraits.Place(Ui.Box(row, 4, 4, 92, 100), lead.Character.Id) | Portraits.Place(Ui.Box(row, 70, 4, 92, 100), second.Character.Id);
                 float tx = faces ? 170 : 20;
-                Typography.Strong(Ui.Text(Ui.Box(row, tx, 10, 620 - tx, 34), $"Match {m + 1}: {lead.Character.Name} & {second.Character.Name}", 21, T.Text, TextAnchor.MiddleLeft));
-                Ui.Text(Ui.Box(row, tx, 44, 620 - tx, 26), $"Decks: {_state.DeckTitle(lead.Deck)} + {_state.DeckTitle(second.Deck)}", 14, T.TextFaint, TextAnchor.MiddleLeft);
+                Typography.Strong(Ui.Text(Ui.Box(row, tx, 10, 620 - tx, 34), $"Match {m + 1}: {lead.Character.Name} & {second.Character.Name}", TextRole.Subhead, T.Text, TextAnchor.MiddleLeft));
+                Ui.Text(Ui.Box(row, tx, 44, 620 - tx, 26), $"Decks: {_state.DeckTitle(lead.Deck)} + {_state.DeckTitle(second.Deck)}", TextRole.Caption, T.TextFaint, TextAnchor.MiddleLeft);
                 if (lead.Character.Intro.Length > 0)
-                    Typography.Italic(Ui.Text(Ui.Box(row, tx, 70, 620 - tx, 30), $"“{lead.Character.Intro}”", 14, T.Intro, TextAnchor.UpperLeft));
+                    Typography.Italic(Ui.Text(Ui.Box(row, tx, 70, 620 - tx, 30), $"“{lead.Character.Intro}”", TextRole.Caption, T.Intro, TextAnchor.UpperLeft));
                 // The pair's strength (their decks' mean), then the pay: a rematch pays RepeatWinDp.
                 var stars = StrengthText.Stars(DeckStrength.StarsFor(_state.Ratings, new[] { lead.Deck, second.Deck }), T);
                 var reward = (stars.Length > 0 ? stars + "\n" : "")
                              + (won ? $"Won ×{profile.MatchWins[Circuits.TagKey(index, m)]}\nRematch: +{circuits.DuelDp(cup.After, repeat: true)} DP"
                                     : $"First win: +{circuits.DuelDp(cup.After, repeat: false) + Circuits.FirstWinBonus} DP");
-                Ui.Text(Ui.Box(row, 610, 0, 160, 108), reward, 16, won ? T.Good : T.Gold).supportRichText = true;
+                Ui.Text(Ui.Box(row, 610, 0, 160, 108), reward, TextRole.Small, won ? T.Good : T.Gold).supportRichText = true;
                 int cupIndex = index, matchIndex = m;
-                Ui.BoxButton(row, 780, 8, 140, 52, "Duel", () => TryTagDuel(cupIndex, matchIndex), 20).targetGraphic.color = m == nextUp ? T.Primary : T.Button;
+                Ui.BoxButton(row, 780, 8, 140, 52, "Duel", () => TryTagDuel(cupIndex, matchIndex), TextRole.Label).targetGraphic.color = m == nextUp ? T.Primary : T.Button;
                 var scoutedPair = new List<(string, string)> { (lead.Character.Name, lead.Deck), (second.Character.Name, second.Deck) };
-                Ui.BoxButton(row, 780, 64, 140, 38, "Scout", () => ScoutClicked?.Invoke(scoutedPair), 16).targetGraphic.color = T.Button;
+                Ui.BoxButton(row, 780, 64, 140, 38, "Scout", () => ScoutClicked?.Invoke(scoutedPair), TextRole.Label).targetGraphic.color = T.Button;
             }
             DrawYourDeck(270 + cup.Matches.Count * 120 + 14, cup.After);
         }
@@ -1562,10 +1563,10 @@ namespace YgoCampaign.Game
         {
             var box = Ui.Box(_main, 600, 100, 240, 36);
             _districts = box.gameObject;
-            _circuitsTab = Ui.BoxButton(box, 0, 0, 104, 36, "Circuits", () => ShowDistrict(false), 16);
-            _libraryTab = Ui.BoxButton(box, 110, 0, 130, 36, "Library", () => ShowDistrict(true), 16);
+            _circuitsTab = Ui.BoxButton(box, 0, 0, 104, 36, "Circuits", () => ShowDistrict(false), TextRole.Label);
+            _libraryTab = Ui.BoxButton(box, 110, 0, 130, 36, "Library", () => ShowDistrict(true), TextRole.Label);
             _libraryTab.GetComponentInChildren<Text>().supportRichText = true;
-            _alleyTab = Ui.BoxButton(box, 250, 0, 140, 36, "Back Alley", () => ShowDistrictView(District.Alley), 16);
+            _alleyTab = Ui.BoxButton(box, 250, 0, 140, 36, "Back Alley", () => ShowDistrictView(District.Alley), TextRole.Label);
             _alleyTab.GetComponentInChildren<Text>().supportRichText = true;
             _alleyTab.gameObject.SetActive(false);
             _districts.SetActive(false);
@@ -1671,15 +1672,15 @@ namespace YgoCampaign.Game
                 var binder = Ui.Box(_circuitList, x, y, BinderWidth, BinderHeight);
                 Ui.Image(binder, cover);
                 Ui.Image(Ui.Box(binder, 0, 0, 14, BinderHeight), accent).raycastTarget = false;
-                var year = Ui.Text(Ui.Box(binder, 24, 8, 120, 40), cup.Era.ToString(), 32, accent, TextAnchor.MiddleLeft);
+                var year = Ui.Text(Ui.Box(binder, 24, 6, 120, 44), cup.Era.ToString(), TextRole.Title, accent, TextAnchor.MiddleLeft);
                 Typography.Strong(year);
                 year.raycastTarget = false;
                 // The marks to earn, dim until earned.
-                var tick = Ui.Text(Ui.Box(binder, 148, 8, 32, 36), "✓", 26, cleared ? T.Good : T.Text.WithAlpha(0.18f));
+                var tick = Ui.Text(Ui.Box(binder, 148, 8, 32, 36), "✓", TextRole.Heading, cleared ? T.Good : T.Text.WithAlpha(0.18f));
                 tick.raycastTarget = false;
-                var star = Ui.Text(Ui.Box(binder, 182, 8, 32, 36), "★", 26, stamped ? T.Gold : T.Text.WithAlpha(0.18f));
+                var star = Ui.Text(Ui.Box(binder, 182, 8, 32, 36), "★", TextRole.Heading, stamped ? T.Gold : T.Text.WithAlpha(0.18f));
                 star.raycastTarget = false;
-                var name = Ui.Text(Ui.Box(binder, 24, 50, 190, 46), cup.Name, 16, T.Text, TextAnchor.UpperLeft);
+                var name = Ui.Text(Ui.Box(binder, 24, 50, 190, 46), cup.Name, TextRole.Small, T.Text, TextAnchor.UpperLeft);
                 Typography.Strong(name);
                 name.raycastTarget = false;
                 if (Boss(cup) is CircuitMatch boss) Portraits.Place(Ui.Box(binder, 142, 84, 72, 72), boss.Character.Id);
@@ -1694,17 +1695,17 @@ namespace YgoCampaign.Game
                     var plateBox = Ui.Box(rim, 2, 2, 120, 36);
                     Ui.Image(plateBox, stamped ? Ui.Hex("#D9B24C") : Ui.Hex("#B9C0CB")).raycastTarget = false;
                     Ui.Image(Ui.Box(plateBox, 0, 0, 120, 2), stamped ? Ui.Hex("#F3DC8C") : Ui.Hex("#E6EAF0")).raycastTarget = false;
-                    var engraved = Ui.Text(Ui.Box(plateBox, 4, 2, 112, 32), plate, 13, stamped ? Ui.Hex("#20180A") : Ui.Hex("#1E232B"));
+                    var engraved = Ui.Text(Ui.Box(plateBox, 4, 2, 112, 32), plate, TextRole.Caption, stamped ? Ui.Hex("#20180A") : Ui.Hex("#1E232B"));
                     Typography.Strong(engraved);
                     engraved.horizontalOverflow = HorizontalWrapMode.Wrap;
                     engraved.resizeTextForBestFit = true;
-                    engraved.resizeTextMinSize = 11;
-                    engraved.resizeTextMaxSize = 13;
+                    engraved.resizeTextMinSize = UiTheme.Floor;
+                    engraved.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
                     engraved.raycastTarget = false;
                 }
                 else
                 {
-                    var progress = Ui.Text(Ui.Box(binder, 24, 124, 120, 28), cleared ? "CLEARED" : $"{won} / {needed} won", 15,
+                    var progress = Ui.Text(Ui.Box(binder, 24, 124, 120, 28), cleared ? "CLEARED" : $"{won} / {needed} won", TextRole.Small,
                         cleared ? T.Good : T.TextBody, TextAnchor.MiddleLeft);
                     progress.raycastTarget = false;
                 }
@@ -1744,20 +1745,20 @@ namespace YgoCampaign.Game
             bool cleared = library.IsCleared(index, profile), stamped = library.HasStamp(index, profile);
             bool champion = cup.Matches.Any(m => m.Champion);
 
-            var cupTitle = Ui.Text(Ui.Box(_detail, 30, 20, 300, 46), cup.Name, 30, T.LibraryGold, TextAnchor.MiddleLeft);
+            var cupTitle = Ui.Text(Ui.Box(_detail, 30, 20, 300, 46), cup.Name, TextRole.Title, T.LibraryGold, TextAnchor.MiddleLeft);
             Typography.Strong(cupTitle);
             cupTitle.resizeTextForBestFit = true;
             cupTitle.resizeTextMinSize = 16;
-            cupTitle.resizeTextMaxSize = 30;
+            cupTitle.resizeTextMaxSize = UiTheme.Size(TextRole.Title);
             // The cup's Locals (BRACKETS-SPEC): its 8-player bracket once cleared, gold while yours runs here.
             int traderCup = index;
             var (localsLabel, localsOpen, localsRunning) = LocalsButtonState(index);
-            var localsButton = Ui.BoxButton(_detail, 336, 20, 144, 44, localsLabel, () => LocalsButtonClicked(traderCup), 14);
+            var localsButton = Ui.BoxButton(_detail, 336, 20, 144, 44, localsLabel, () => LocalsButtonClicked(traderCup), TextRole.Label);
             localsButton.interactable = localsOpen;
             var localsText = localsButton.GetComponentInChildren<Text>();
             localsText.resizeTextForBestFit = true;
-            localsText.resizeTextMinSize = 10;
-            localsText.resizeTextMaxSize = 14;
+            localsText.resizeTextMinSize = UiTheme.Floor;
+            localsText.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
             if (localsRunning)
             {
                 localsText.color = T.Gold;
@@ -1768,7 +1769,7 @@ namespace YgoCampaign.Game
             var matId = Cosmetics.MatId(cup);
             bool matOn = profile.Mat == matId && profile.Mats.Contains(matId);
             string matLabel = !cleared ? "Clear to unlock" : matOn ? "Era mat ✓" : profile.Mats.Contains(matId) ? "Use era mat" : $"Era mat · {Cosmetics.MatPrice:N0} DP";
-            var matButton = Ui.BoxButton(_detail, 486, 20, 150, 44, matLabel, () => { _status.text = MatClicked(traderCup); Refresh(); }, 14);
+            var matButton = Ui.BoxButton(_detail, 486, 20, 150, 44, matLabel, () => { _status.text = MatClicked(traderCup); Refresh(); }, TextRole.Label);
             matButton.interactable = cleared && !matOn;
             DoneOrAction(matButton, matOn);
             var deckTitle = profile.Deck.Length > 0 ? _state.DeckTitle(profile.Deck) : "";
@@ -1779,21 +1780,21 @@ namespace YgoCampaign.Game
             string engraveLabel = !cleared ? "Clear to unlock" : engravedHere ? "Engraved ✓"
                 : !canEngraveThis ? "Win here to engrave"
                 : engraving != null ? $"Re-engrave · {Cosmetics.EngravePrice:N0} DP" : $"Engrave · {Cosmetics.EngravePrice:N0} DP";
-            var engraveButton = Ui.BoxButton(_detail, 642, 20, 170, 44, engraveLabel, () => { _status.text = EngraveClicked(traderCup); Refresh(); }, 14);
+            var engraveButton = Ui.BoxButton(_detail, 642, 20, 170, 44, engraveLabel, () => { _status.text = EngraveClicked(traderCup); Refresh(); }, TextRole.Label);
             engraveButton.interactable = cleared && !engravedHere;
             DoneOrAction(engraveButton, engravedHere);
-            Ui.BoxButton(_detail, 818, 20, 142, 44, $"Card Trader ({profile.Tokens})", () => CupTrader?.Invoke(traderCup), 14).targetGraphic.color = T.Button;
+            Ui.BoxButton(_detail, 818, 20, 142, 44, $"Card Trader ({profile.Tokens})", () => CupTrader?.Invoke(traderCup), TextRole.Label).targetGraphic.color = T.Button;
             Ui.Text(Ui.Box(_detail, 30, 66, 940, 28), $"{cup.Banlist} list · cards out by {PoolMonth(cup.Pool)}"
-                + (rules.List == null ? $"  <color={T.BadHex}>(that list isn't installed: no list applies)</color>" : ""), 16, T.TextMuted, TextAnchor.MiddleLeft)
+                + (rules.List == null ? $"  <color={T.BadHex}>(that list isn't installed: no list applies)</color>" : ""), TextRole.Small, T.TextMuted, TextAnchor.MiddleLeft)
                 .supportRichText = true;
             Ui.Text(Ui.Box(_detail, 30, 94, 940, 26),
                 cleared ? $"<color={T.GoodHex}>✓ Cleared.</color> Replay any match: +{Library.RepeatWinDp} DP a win."
                     : $"Win every match{(champion ? " (the Champion's table is optional)" : "")}: <color={T.GoldHex}>+{cup.Prize:N0} DP prize and +{Library.ClearTokens} Card Tokens</color>",
-                16, T.Text, TextAnchor.MiddleLeft).supportRichText = true;
+                TextRole.Small, T.Text, TextAnchor.MiddleLeft).supportRichText = true;
             Ui.Text(Ui.Box(_detail, 30, 120, 940, 24),
                 stamped ? $"<color={T.GoldHex}>★ Format Master stamp earned.</color>"
                     : $"★ Format Master stamp: win every match{(champion ? ", the Champion's table too," : "")} with a deck you built, no loaner, no Ban Passes: +{Library.StampTokens} Card Token.",
-                14, T.Warn, TextAnchor.MiddleLeft).supportRichText = true;
+                TextRole.Caption, T.Warn, TextAnchor.MiddleLeft).supportRichText = true;
 
             // One primary: the first match not won yet gets the red Duel (the Champion's table once the rest are won).
             int nextUp = -1;
@@ -1812,24 +1813,24 @@ namespace YgoCampaign.Game
                 float tx = Portraits.Place(Ui.Box(row, 6, 4, 110, rowHeight - 8), c.Id) ? 124 : 20;
                 // The panel's header says the table is optional; a long name and title shrink to fit rather than cut off.
                 var title = match.Champion ? $"<color={T.VioletHex}>Champion's table:</color> {c.DisplayName}" : $"Match {m + 1}: {c.DisplayName}";
-                var head = Ui.Text(Ui.Box(row, tx, 8, 600 - tx + 20, 34), title, 21, T.Text, TextAnchor.MiddleLeft);
+                var head = Ui.Text(Ui.Box(row, tx, 8, 600 - tx + 20, 34), title, TextRole.Subhead, T.Text, TextAnchor.MiddleLeft);
                 Typography.Strong(head);
                 head.supportRichText = true;
                 head.resizeTextForBestFit = true;
                 head.resizeTextMinSize = 15;
-                head.resizeTextMaxSize = 21;
-                Ui.Text(Ui.Box(row, tx, 42, 600 - tx + 20, 26), $"Deck: {_state.DeckTitle(match.Deck)} · {c.StyleSummary}", 14, T.TextFaint, TextAnchor.MiddleLeft);
+                head.resizeTextMaxSize = UiTheme.Size(TextRole.Subhead);
+                Ui.Text(Ui.Box(row, tx, 42, 600 - tx + 20, 26), $"Deck: {_state.DeckTitle(match.Deck)} · {c.StyleSummary}", TextRole.Caption, T.TextFaint, TextAnchor.MiddleLeft);
                 var intro = c.IntroFor(cup.Matches.Take(m).Any(earlier => earlier.Character.Id == c.Id));
                 if (intro.Length > 0 && rowHeight >= 104)
-                    Typography.Italic(Ui.Text(Ui.Box(row, tx, 70, 600 - tx + 20, rowHeight - 74), $"“{intro}”", 14, T.Intro, TextAnchor.UpperLeft));
+                    Typography.Italic(Ui.Text(Ui.Box(row, tx, 70, 600 - tx + 20, rowHeight - 74), $"“{intro}”", TextRole.Caption, T.Intro, TextAnchor.UpperLeft));
                 // Same numbers as the results screen; ★ marks a win that counts toward the stamp.
                 var reward = won ? $"Won ×{profile.LibraryWins[key]}{(profile.LibraryBuilt.Contains(key) ? $" <color={T.GoldHex}>★</color>" : "")}\nRematch: +{Library.RepeatWinDp} DP"
                                  : $"First win: +{Library.WinDp + Circuits.FirstWinBonus} DP";
-                Ui.Text(Ui.Box(row, 610, 0, 160, rowHeight), reward, 16, won ? T.Good : T.Gold).supportRichText = true;
+                Ui.Text(Ui.Box(row, 610, 0, 160, rowHeight), reward, TextRole.Small, won ? T.Good : T.Gold).supportRichText = true;
                 int cupIndex = index, matchIndex = m;
-                Ui.BoxButton(row, 780, 8, 140, rowHeight / 2 - 4, "Duel", () => TryCupDuel(cupIndex, matchIndex), 20).targetGraphic.color = m == nextUp ? T.Primary : T.Button;
+                Ui.BoxButton(row, 780, 8, 140, rowHeight / 2 - 4, "Duel", () => TryCupDuel(cupIndex, matchIndex), TextRole.Label).targetGraphic.color = m == nextUp ? T.Primary : T.Button;
                 var scouted = new List<(string, string)> { (c.Name, match.Deck) };
-                Ui.BoxButton(row, 780, rowHeight / 2 + 8, 140, rowHeight / 2 - 14, "Scout", () => ScoutClicked?.Invoke(scouted), 16).targetGraphic.color = T.Button;
+                Ui.BoxButton(row, 780, rowHeight / 2 + 8, 140, rowHeight / 2 - 14, "Scout", () => ScoutClicked?.Invoke(scouted), TextRole.Label).targetGraphic.color = T.Button;
             }
 
             DrawYourDeck(150 + cup.Matches.Count * step + 14, DeckProblems(rules));
@@ -1987,12 +1988,12 @@ namespace YgoCampaign.Game
             Ui.Image(frame, open ? Ui.Hex("#D9B24C") : Ui.Hex("#5A5040"));
             var plaque = Ui.Box(frame, 2, 2, w - 4, h - 4);
             Ui.Image(plaque, open ? Ui.Hex("#3A2E14") : Ui.Hex("#2A2620"));
-            var title = Ui.Text(Ui.Box(plaque, 20, 6, 320, 50), library.Final.Name.ToUpperInvariant(), 36, open ? T.GoldSoft : new Color(0.7f, 0.66f, 0.58f), TextAnchor.MiddleLeft);
+            var title = Ui.Text(Ui.Box(plaque, 20, 6, 320, 50), library.Final.Name.ToUpperInvariant(), TextRole.Title, open ? T.GoldSoft : new Color(0.7f, 0.66f, 0.58f), TextAnchor.MiddleLeft);
             Typography.Strong(title);
             title.raycastTarget = false;
             if (!open)
             {
-                var locked = Ui.Text(Ui.Box(plaque, 250, 18, 90, 24), "LOCKED", 14, T.TextDim, TextAnchor.MiddleLeft);
+                var locked = Ui.Text(Ui.Box(plaque, 250, 18, 90, 24), "LOCKED", TextRole.Caption, T.TextDim, TextAnchor.MiddleLeft);
                 Typography.Strong(locked);
                 locked.raycastTarget = false;
             }
@@ -2001,7 +2002,7 @@ namespace YgoCampaign.Game
                 : won ? $"<color={T.GoodHex}>✓ Won.</color> Every era, on its own terms"
                 : $"The final · six eras, decks you built · {roundsWon} of {library.Rounds.Count} rounds won";
             // theme: kept, the plaque's warm line (Library material, no role)
-            var sub = Ui.Text(Ui.Box(plaque, 20, 60, 580, 30), line, 15, new Color(0.88f, 0.86f, 0.8f), TextAnchor.MiddleLeft);
+            var sub = Ui.Text(Ui.Box(plaque, 20, 60, 580, 30), line, TextRole.Small, new Color(0.88f, 0.86f, 0.8f), TextAnchor.MiddleLeft);
             sub.supportRichText = true;
             sub.raycastTarget = false;
             // One pip per round, labelled with its year: won (gold), next (gold outline), to come (dim).
@@ -2013,7 +2014,7 @@ namespace YgoCampaign.Game
                 Ui.Image(pip, roundWon || isNext ? Ui.Hex(roundWon ? "#D9B24C" : "#FFC940") : Ui.Hex("#3A3428")).raycastTarget = false;
                 if (isNext) Ui.Image(Ui.Box(pip, 2, 2, 30, 28), Ui.Hex("#3A2E14")).raycastTarget = false;
                 var era = library.Cups[library.Rounds[r].Cup].Era;
-                var year = Ui.Text(pip, era >= 1000 ? "'" + (era % 100).ToString("00") : "?", 13,
+                var year = Ui.Text(pip, era >= 1000 ? "'" + (era % 100).ToString("00") : "?", TextRole.Caption,
                     roundWon ? Ui.Hex("#20180A") : isNext ? Ui.Hex("#FFC940") : new Color(1, 1, 1, open ? 0.6f : 0.35f));
                 Typography.Strong(year);
                 year.raycastTarget = false;
@@ -2039,17 +2040,17 @@ namespace YgoCampaign.Game
             var library = _state.Library;
             bool open = library.FinalOpen(profile), won = library.FinalCleared(profile);
             int next = library.FinalNext(profile);
-            Typography.Strong(Ui.Text(Ui.Box(_detail, 30, 14, 700, 54), library.Final.Name, 40, T.GoldSoft, TextAnchor.MiddleLeft));
+            Typography.Strong(Ui.Text(Ui.Box(_detail, 30, 14, 700, 54), library.Final.Name, TextRole.Title, T.GoldSoft, TextAnchor.MiddleLeft));
             Portraits.Place(Ui.Box(_detail, 820, 4, 140, 140), "ilse");
-            Ui.Text(Ui.Box(_detail, 30, 66, 940, 28), "Duchess Ilse's final: six eras in order, each under its own list and card pool.", 16,
+            Ui.Text(Ui.Box(_detail, 30, 66, 940, 28), "Duchess Ilse's final: six eras in order, each under its own list and card pool.", TextRole.Small,
                 T.TextMuted, TextAnchor.MiddleLeft);
             Ui.Text(Ui.Box(_detail, 30, 94, 940, 26),
                 won ? $"<color={T.GoodHex}>✓ Won.</color> Replay any round: +{Library.RepeatWinDp} DP a win."
                     : !open ? $"<color={T.TextDimHex}>Opens when every cup is cleared ({library.ClearedCount(profile)} of {library.Cups.Count}).</color>"
                     : $"Win all six: <color={T.GoldHex}>+{library.Final.Prize:N0} DP prize and +{Library.FinalTokens} Card Tokens</color>",
-                16, T.Text, TextAnchor.MiddleLeft).supportRichText = true;
+                TextRole.Small, T.Text, TextAnchor.MiddleLeft).supportRichText = true;
             Ui.Text(Ui.Box(_detail, 30, 120, 940, 24), "Your own decks only: no loaners, no Ban Passes. A lost round is played again; won rounds stay won.",
-                14, T.Warn, TextAnchor.MiddleLeft).supportRichText = true;
+                TextRole.Caption, T.Warn, TextAnchor.MiddleLeft).supportRichText = true;
             const float step = 96, rowHeight = 86;
             for (int r = 0; r < library.Rounds.Count; r++)
             {
@@ -2060,30 +2061,30 @@ namespace YgoCampaign.Game
                 var row = Ui.Box(_detail, 30, 150 + r * step, 940, rowHeight);
                 Ui.Image(row, roundWon ? T.RowWon : playable ? T.RowPlayable : T.RowB);
                 float tx = Portraits.Place(Ui.Box(row, 6, 4, 78, rowHeight - 8), c.Id) ? 96 : 20;
-                var head = Ui.Text(Ui.Box(row, tx, 6, 600 - tx + 20, 32), $"Round {r + 1} · {cup.Era}: {c.DisplayName}", 20, T.Text, TextAnchor.MiddleLeft);
+                var head = Ui.Text(Ui.Box(row, tx, 6, 600 - tx + 20, 32), $"Round {r + 1} · {cup.Era}: {c.DisplayName}", TextRole.Label, T.Text, TextAnchor.MiddleLeft);
                 Typography.Strong(head);
                 head.resizeTextForBestFit = true;
                 head.resizeTextMinSize = 14;
-                head.resizeTextMaxSize = 20;
-                var about = Ui.Text(Ui.Box(row, tx, 40, 600 - tx + 20, 24), $"{_state.DeckTitle(round.Match.Deck)} · {cup.Banlist} list · cards out by {PoolMonth(cup.Pool)}", 14,
+                head.resizeTextMaxSize = UiTheme.Size(TextRole.Label);
+                var about = Ui.Text(Ui.Box(row, tx, 40, 600 - tx + 20, 24), $"{_state.DeckTitle(round.Match.Deck)} · {cup.Banlist} list · cards out by {PoolMonth(cup.Pool)}", TextRole.Caption,
                     T.TextFaint, TextAnchor.MiddleLeft);
                 about.resizeTextForBestFit = true;
-                about.resizeTextMinSize = 11;
-                about.resizeTextMaxSize = 14;
+                about.resizeTextMinSize = UiTheme.Floor;
+                about.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
                 var key = library.FinalKey(r);
                 // While the final is locked, the rows are its lineup only: no states, no Duel buttons.
                 int roundIndex = r;
                 if (open)
                 {
                     var state = roundWon ? $"Won ×{profile.LibraryWins[key]}" : playable ? "Next" : $"Win round {r} first";
-                    Ui.Text(Ui.Box(row, 610, 0, 160, rowHeight), state, 16, roundWon ? T.Good : playable ? T.Gold : T.TextDim).supportRichText = true;
-                    var duel = Ui.BoxButton(row, 780, 6, 140, rowHeight / 2 - 4, "Duel", () => { Close(); RoundDuel?.Invoke(roundIndex); }, 18);
+                    Ui.Text(Ui.Box(row, 610, 0, 160, rowHeight), state, TextRole.Small, roundWon ? T.Good : playable ? T.Gold : T.TextDim).supportRichText = true;
+                    var duel = Ui.BoxButton(row, 780, 6, 140, rowHeight / 2 - 4, "Duel", () => { Close(); RoundDuel?.Invoke(roundIndex); }, TextRole.Label);
                     duel.targetGraphic.color = r == next && playable ? T.Primary : T.Button;
                     duel.interactable = playable;
                     if (!playable) duel.GetComponentInChildren<Text>().color = T.Text.WithAlpha(0.35f);
                 }
                 var scouted = new List<(string, string)> { (c.Name, round.Match.Deck) };
-                Ui.BoxButton(row, 780, rowHeight / 2 + 6, 140, rowHeight / 2 - 10, "Scout", () => ScoutClicked?.Invoke(scouted), 15).targetGraphic.color = T.Button;
+                Ui.BoxButton(row, 780, rowHeight / 2 + 6, 140, rowHeight / 2 - 10, "Scout", () => ScoutClicked?.Invoke(scouted), TextRole.Label).targetGraphic.color = T.Button;
             }
             // Your deck against the next round (the first, once it's won), by the round's versus check: a deck you built
             // (no loaner, custom or not), legal there with no Ban Passes.

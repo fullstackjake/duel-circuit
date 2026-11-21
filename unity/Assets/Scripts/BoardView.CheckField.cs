@@ -99,7 +99,7 @@ namespace YgoCampaign.Game
             var edge = _checkPill.gameObject.AddComponent<Outline>();
             edge.effectColor = new Color(0.5f, 0.78f, 1f, 0.8f);
             edge.effectDistance = new Vector2(1.5f, -1.5f);
-            var text = Ui.Text(_checkPill, _checkSticky ? "Checking the field   <b>▲ Back</b>" : "Checking the field  ·  let go of Space to come back", 18, Color.white);
+            var text = Ui.Text(_checkPill, _checkSticky ? "Checking the field   <b>▲ Back</b>" : "Checking the field  ·  let go of Space to come back", TextRole.Body, Color.white);
             text.supportRichText = true;
             if (_checkSticky) Ui.Clickable(_checkPill, ToggleCheckField);
             _checkPill.SetAsLastSibling();

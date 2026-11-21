@@ -151,7 +151,7 @@ namespace YgoCampaign.Game
             _main = Ui.Stretched("Main", _root, Vector2.zero, Vector2.one);
 
             var title = Ui.Box(_main, 110, 60, 1000, 100);
-            Typography.Strong(Ui.Text(title, "IMPORT CARDS", 60, T.Sign, TextAnchor.MiddleLeft));
+            Typography.Strong(Ui.Text(title, "IMPORT CARDS", TextRole.Display, T.Sign, TextAnchor.MiddleLeft));
             _layout.Add(("title", "page", title));
             Label(_main, "page", "privacy", 110, 168, 1700, 30, Privacy, 18, T.TextSoft);
 
@@ -171,7 +171,7 @@ namespace YgoCampaign.Game
             _barFill = Ui.Stretched("Fill", _barTrack, Vector2.zero, new Vector2(0, 1));
             Ui.Image(_barFill, T.Meter).raycastTarget = false;
             _activityCount = Label(_activity, "activity", "count", 30, 88, 1380, 26, "", 18, T.TextSoft);
-            _activityCancel = Ui.BoxButton(_activity, 1450, 37, 220, 56, "Cancel", CancelWork, 22);
+            _activityCancel = Ui.BoxButton(_activity, 1450, 37, 220, 56, "Cancel", CancelWork, TextRole.Subhead);
             _layout.Add(("Cancel", "activity", (RectTransform)_activityCancel.transform));
             Hover(_activityCancel);
             _activity.gameObject.SetActive(false);
@@ -179,8 +179,8 @@ namespace YgoCampaign.Game
             _status = Label(_main, "page", "status", 110, 880, 1700, 40, "", 20, T.TextSoft);
             _status.resizeTextForBestFit = true; // a long result line (a failure's reason) shrinks to fit
             _status.resizeTextMinSize = 14;
-            _status.resizeTextMaxSize = 20;
-            _back = Ui.BoxButton(_main, 110, 960, 240, 60, "Back", Back, 22);
+            _status.resizeTextMaxSize = UiTheme.Size(TextRole.Label);
+            _back = Ui.BoxButton(_main, 110, 960, 240, 60, "Back", Back, TextRole.Subhead);
             _layout.Add(("Back button", "page", (RectTransform)_back.transform));
             Hover(_back);
             Label(_main, "page", "hint", 380, 960, 1430, 60, Hint, 16, T.TextMuted);
@@ -206,8 +206,8 @@ namespace YgoCampaign.Game
                 _layout.Add(("preview", group, s.Preview));
             }
             int index = _sections.Count;
-            s.Import = Ui.BoxButton(row, 1240, 46, 200, 56, "Import...", () => Pick(index), 22);
-            s.Open = Ui.BoxButton(row, 1460, 46, 200, 56, "Open folder", () => OpenFolder(index), 22);
+            s.Import = Ui.BoxButton(row, 1240, 46, 200, 56, "Import...", () => Pick(index), TextRole.Subhead);
+            s.Open = Ui.BoxButton(row, 1460, 46, 200, 56, "Open folder", () => OpenFolder(index), TextRole.Subhead);
             _layout.Add(("Import...", group, (RectTransform)s.Import.transform));
             _layout.Add(("Open folder", group, (RectTransform)s.Open.transform));
             Hover(s.Import);
@@ -219,7 +219,7 @@ namespace YgoCampaign.Game
             bool bold = false, TextAnchor anchor = TextAnchor.MiddleLeft)
         {
             var rt = Ui.Box(parent, x, y, w, h);
-            var t = Ui.Text(rt, text, size, color, anchor);
+            var t = Ui.Text(rt, text, UiTheme.Mapped(size), color, anchor);
             t.supportRichText = false;
             if (bold) Typography.Strong(t);
             _layout.Add((what, group, rt));
@@ -638,7 +638,7 @@ namespace YgoCampaign.Game
 
         private Button ModalButton(float x, float y, float w, string label, Action action, bool primary = false)
         {
-            var button = Ui.BoxButton(_modal!, x, y, w, 56, label, action, 22);
+            var button = Ui.BoxButton(_modal!, x, y, w, 56, label, action, TextRole.Subhead);
             if (primary)
             {
                 button.targetGraphic.color = UiTheme.Current.Primary;
@@ -710,7 +710,7 @@ namespace YgoCampaign.Game
                 _newBack = null;
             }
             if (_newBack != null) ShowPicture(fresh, _newBack);
-            else Ui.Text(fresh, "(no preview)", 16, T.TextMuted);
+            else Ui.Text(fresh, "(no preview)", TextRole.Small, T.TextMuted);
             ModalText("caption now", 683, 610, 267, 28, "Now", 18, T.TextMuted, anchor: TextAnchor.MiddleCenter);
             ModalText("caption new", 970, 610, 267, 28, "New", 18, T.TextMuted, anchor: TextAnchor.MiddleCenter);
             ModalText("note", 600, 650, 720, 60, OwnBack() != null ? "Your own card back will be replaced."

@@ -115,10 +115,10 @@ namespace YgoCampaign.Game
             legend.anchoredPosition = new Vector2(0, 4);
             legend.sizeDelta = new Vector2(1100, 26);
             Ui.Image(legend, new Color(0, 0, 0, 0.7f)).raycastTarget = false;
-            _legendText = Ui.Text(legend, ControllerBindings.Legend(), 15, new Color(1, 1, 1, 0.85f));
+            _legendText = Ui.Text(legend, ControllerBindings.Legend(), TextRole.Small, new Color(1, 1, 1, 0.85f));
             _legendText.resizeTextForBestFit = true; // shrinks when a narrower strip has to hold it
-            _legendText.resizeTextMinSize = 11;
-            _legendText.resizeTextMaxSize = 15;
+            _legendText.resizeTextMinSize = UiTheme.Floor;
+            _legendText.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
             _legend = legend.gameObject;
         }
 

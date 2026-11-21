@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -81,7 +83,7 @@ namespace YgoCampaign.Game
             var button = rt.gameObject.AddComponent<Button>();
             button.targetGraphic = image;
             button.onClick.AddListener(() => { Sounds.Play("click"); onClick(); });
-            Text(Stretched("Label", rt, Vector2.zero, Vector2.one), label, 18, Color.white).font = Typography.Font(Face.Condensed); // buttons: the Label face
+            Text(Stretched("Label", rt, Vector2.zero, Vector2.one), label, UiTheme.Size(TextRole.Label), Color.white).font = Typography.Font(Face.Condensed); // buttons: the Label role
             UiHover.Attach(button);
             return button;
         }
@@ -127,6 +129,168 @@ namespace YgoCampaign.Game
             UiHover.Attach(button);
             return button;
         }
+
+        private static readonly TextGenerator FitGen = new TextGenerator();
+
+        /// <summary>A one-line string's width in layout units in <paramref name="font"/> at <paramref name="size"/> (no Text needed).</summary>
+        public static float LineWidth(string s, Font font, int size)
+        {
+            var settings = new TextGenerationSettings
+            {
+                font = font, fontSize = size, scaleFactor = 1, richText = true, lineSpacing = 1, color = Color.white,
+                horizontalOverflow = HorizontalWrapMode.Overflow, verticalOverflow = VerticalWrapMode.Overflow,
+                textAnchor = TextAnchor.UpperLeft, pivot = Vector2.zero, generationExtents = new Vector2(10000, 1000),
+            };
+            return FitGen.GetPreferredWidth(s, settings);
+        }
+
+        /// <summary>
+        /// One line in the text's box: the largest size from its own down to <paramref name="min"/> (default: its own) at
+        /// which it fits the box's width, else cut with "…" at <paramref name="min"/> (best fit turned off). For a name or a
+        /// line whose whole text is a hover or click away. A cut keeps rich-text tags (closing the open ones after the "…"),
+        /// a literal "&lt;" and whole surrogate pairs.
+        /// </summary>
+        public static Text OneLine(Text t, int? min = null)
+        {
+            float room = t.rectTransform.rect.width;
+            if (room <= 0 || string.IsNullOrEmpty(t.text)) return t;
+            var settings = t.GetGenerationSettings(Vector2.zero);
+            settings.resizeTextForBestFit = false;
+            settings.horizontalOverflow = HorizontalWrapMode.Overflow;
+            settings.verticalOverflow = VerticalWrapMode.Overflow;
+            float Width(string s, int size) { settings.fontSize = size; return FitGen.GetPreferredWidth(s, settings) / t.pixelsPerUnit; }
+            int max = t.resizeTextForBestFit ? t.resizeTextMaxSize : t.fontSize, least = Mathf.Min(max, min ?? (t.resizeTextForBestFit ? t.resizeTextMinSize : max));
+            t.resizeTextForBestFit = false;
+            for (int size = max; size >= least; size--)
+                if (Width(t.text, size) <= room) { t.fontSize = size; return t; }
+            t.fontSize = least;
+            var full = t.text;
+            int n = VisibleCount(full, t.supportRichText);
+            while (n > 1 && Width(Cut(full, n, t.supportRichText), least) > room) n--;
+            t.text = Cut(full, n, t.supportRichText);
+            return t;
+        }
+
+        private static readonly System.Text.RegularExpressions.Regex RichTag =
+            new System.Text.RegularExpressions.Regex(@"^<(/?)(b|i|color|size|material)(=[^<>]*)?>");
+
+        /// <summary>The text split into rich-text tags (Unity's own: b, i, color, size, material) and visible characters (a surrogate pair is one); a "&lt;" that starts no tag is a character.</summary>
+        private static List<(bool tag, string s)> Tokens(string text, bool rich)
+        {
+            var tokens = new List<(bool, string)>();
+            for (int i = 0; i < text.Length;)
+            {
+                if (rich && text[i] == '<' && RichTag.Match(text.Substring(i)) is { Success: true } m) { tokens.Add((true, m.Value)); i += m.Length; continue; }
+                int len = char.IsHighSurrogate(text[i]) && i + 1 < text.Length && char.IsLowSurrogate(text[i + 1]) ? 2 : 1;
+                tokens.Add((false, text.Substring(i, len)));
+                i += len;
+            }
+            return tokens;
+        }
+
+        private static int VisibleCount(string text, bool rich) => Tokens(text, rich).Count(k => !k.tag);
+
+        /// <summary>
+        /// The first <paramref name="visible"/> characters with "…", rich-text tags kept and the ones still open closed after
+        /// the "…" (a colour or bold runs on to the cut); trailing spaces and separators go.
+        /// </summary>
+        internal static string Cut(string text, int visible, bool rich)
+        {
+            var tokens = Tokens(text, rich);
+            var kept = new List<(bool tag, string s)>();
+            int seen = 0;
+            foreach (var k in tokens)
+            {
+                if (!k.tag && seen >= visible) break;
+                kept.Add(k);
+                if (!k.tag) seen++;
+            }
+            // Trailing spaces and separators go (tags after them stay, so the closing logic sees them).
+            for (int j = kept.Count - 1; j >= 0; j--)
+            {
+                if (kept[j].tag) continue;
+                if (kept[j].s.Length == 1 && " ,·:".IndexOf(kept[j].s[0]) >= 0 && kept.Count(k => !k.tag) > 1) kept.RemoveAt(j);
+                else break;
+            }
+            var open = new List<string>();
+            var sb = new System.Text.StringBuilder();
+            foreach (var k in kept)
+            {
+                sb.Append(k.s);
+                if (!k.tag) continue;
+                var m = RichTag.Match(k.s);
+                if (m.Groups[1].Value == "/") { int at = open.LastIndexOf(m.Groups[2].Value); if (at >= 0) open.RemoveAt(at); }
+                else open.Add(m.Groups[2].Value);
+            }
+            sb.Append('…');
+            for (int i = open.Count - 1; i >= 0; i--) sb.Append("</").Append(open[i]).Append('>');
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// A reading text filling <paramref name="area"/> (an empty rect): the largest size from <paramref name="max"/> down
+        /// to <paramref name="min"/> at which it fits; when it doesn't fit even at <paramref name="min"/>, it stays at
+        /// <paramref name="min"/> and the area scrolls (wheel, drag, and a scrollbar at its right). Never cut.
+        /// </summary>
+        public static Text FitOrScroll(RectTransform area, string text, int max, int min, Color color, TextAnchor anchor)
+        {
+            var t = Text(Stretched("Text", area, Vector2.zero, Vector2.one), text, max, color, anchor);
+            t.supportRichText = true;
+            var size = area.rect.size;
+            float Height(int fontSize, float width)
+            {
+                var settings = t.GetGenerationSettings(new Vector2(width, 0));
+                settings.resizeTextForBestFit = false;
+                settings.fontSize = fontSize;
+                return FitGen.GetPreferredHeight(text, settings) / t.pixelsPerUnit;
+            }
+            if (size.x <= 0 || size.y <= 0) return t;
+            for (int s = max; s >= min; s--)
+                if (Height(s, size.x) <= size.y) { t.fontSize = s; return t; }
+            // Scrolls: the text at the floor in a column as tall as it needs, a scrollbar beside it.
+            const float bar = 10, gap = 6;
+            t.fontSize = min;
+            t.verticalOverflow = VerticalWrapMode.Overflow;
+            t.alignment = anchor switch { TextAnchor.MiddleCenter or TextAnchor.LowerCenter => TextAnchor.UpperCenter, _ => TextAnchor.UpperLeft };
+            area.gameObject.AddComponent<RectMask2D>();
+            if (area.GetComponent<Graphic>() == null) Image(area, new Color(0, 0, 0, 0.001f)); // something to catch the wheel
+            var content = t.rectTransform;
+            content.anchorMin = new Vector2(0, 1);
+            content.anchorMax = new Vector2(1, 1);
+            content.pivot = new Vector2(0.5f, 1);
+            float h = Mathf.Ceil(Height(min, size.x - bar - gap)) + 4;
+            content.offsetMin = new Vector2(0, -h);
+            content.offsetMax = new Vector2(-(bar + gap), 0);
+            var scroll = area.gameObject.AddComponent<ScrollRect>();
+            scroll.content = content;
+            scroll.viewport = area;
+            scroll.horizontal = false;
+            scroll.movementType = ScrollRect.MovementType.Clamped;
+            scroll.scrollSensitivity = 30;
+            var track = Rect("Scrollbar", area);
+            track.anchorMin = new Vector2(1, 0);
+            track.anchorMax = Vector2.one;
+            track.pivot = new Vector2(1, 0.5f);
+            track.sizeDelta = new Vector2(bar, 0);
+            Image(track, new Color(1, 1, 1, 0.12f));
+            var handle = Stretched("Handle", track, Vector2.zero, Vector2.one);
+            var handleImage = Image(handle, new Color(1, 1, 1, 0.5f));
+            var scrollbar = track.gameObject.AddComponent<Scrollbar>();
+            scrollbar.handleRect = handle;
+            scrollbar.targetGraphic = handleImage;
+            scrollbar.direction = Scrollbar.Direction.BottomToTop;
+            scroll.verticalScrollbar = scrollbar;
+            scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.Permanent;
+            scroll.verticalNormalizedPosition = 1;
+            return t;
+        }
+
+        /// <summary>
+        /// A button at a role of the type scale (Label for buttons, tabs and chips; a bigger role for a big button), always in
+        /// the condensed face buttons use.
+        /// </summary>
+        public static Button BoxButton(Transform parent, float x, float y, float w, float h, string label, Action onClick, TextRole role) =>
+            BoxButton(parent, x, y, w, h, label, onClick, UiTheme.Size(role));
 
         /// <summary>
         /// Lets the keyboard's focus (the UI's arrow navigation, Enter) reach a clicked rect as it reaches buttons, its hover

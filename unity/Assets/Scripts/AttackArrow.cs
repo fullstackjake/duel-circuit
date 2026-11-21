@@ -77,7 +77,7 @@ namespace YgoCampaign.Game
                 var edge = plate.gameObject.AddComponent<Outline>();
                 edge.effectColor = new Color(_color.r, _color.g, _color.b, 0.8f);
                 edge.effectDistance = new Vector2(1.5f, -1.5f);
-                var text = Ui.Text(plate, readout, 18, readoutColor);
+                var text = Ui.Text(plate, readout, TextRole.Body, readoutColor);
                 Typography.Strong(text);
                 text.supportRichText = true;
                 plate.SetParent(_root, true); // goes away with the arrow

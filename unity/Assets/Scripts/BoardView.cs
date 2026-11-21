@@ -70,7 +70,7 @@ namespace YgoCampaign.Game
                 else Emblem(plate);
             }
             else if (string.IsNullOrEmpty(characterId) || !Portraits.Place(plate, characterId, mirror: player == 1))
-                Typography.Strong(Ui.Text(Ui.Placed("You", plate, new Vector2(0, -10), new Vector2(300, 120)), "?", 64, new Color(1, 1, 1, 0.16f)));
+                Typography.Strong(Ui.Text(Ui.Placed("You", plate, new Vector2(0, -10), new Vector2(300, 120)), "?", TextRole.Display, new Color(1, 1, 1, 0.16f)));
             // The portrait just placed is the last child (the old one is only destroyed at the end of the frame).
             else _portraitBase[player] = plate.GetChild(plate.childCount - 1).GetComponent<RawImage>();
             _moodUntil[player] = 0;
@@ -144,7 +144,7 @@ namespace YgoCampaign.Game
             _chainPanel = null;
             if (links.Count == 0) return;
             if (links.Count >= 2) ChainShown?.Invoke(links.Count);
-            const float rowH = 46, tallRowH = 60, width = 360, textW = 186, gap = 4;
+            const float rowH = 50, tallRowH = 72, width = 360, textW = 176, gap = 4;
             var ordered = links.OrderByDescending(l => l.Number).ToList();
             // Each row's second line first (its targets, else for the newest link what the effect does): a row grows to two
             // lines when the line needs them, so a second target is never cut off after its comma.
@@ -159,7 +159,7 @@ namespace YgoCampaign.Game
             // Opaque, the panel and its rows: nothing under them (a callout sliding by, the board) shows through.
             Ui.Image(panel, new Color(0.04f, 0.06f, 0.1f, 1f)).raycastTarget = false;
             var head = Ui.Text(Ui.Placed("Head", panel, Vector2.zero, new Vector2(width - 16, 24)),
-                $"CHAIN  <color=#8A93A6><size=11>resolves top to bottom</size></color>", 13, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
+                $"CHAIN  <color=#8A93A6><size=14>resolves top to bottom</size></color>", TextRole.Caption, Ui.Hex("#FFC940"), TextAnchor.MiddleLeft);
             head.supportRichText = true;
             head.raycastTarget = false;
             var rows = new List<(RectTransform row, float h)>();
@@ -171,26 +171,30 @@ namespace YgoCampaign.Game
                 Ui.Image(row, resolving ? new Color(0.25f, 0.2f, 0.06f, 1f) : new Color(0.1f, 0.13f, 0.2f, 1f)).raycastTarget = false;
                 var info = _cards.Get(l.Code);
                 bool negated = l.State == LinkState.Negated || l.State == LinkState.EffectNegated;
-                // The line under the name: one line at 11 down to 9, else two lines (the row grows) at 10, trimmed to fit.
-                var sub = Ui.Text(Ui.Placed("Line", row, Vector2.zero, new Vector2(textW, 18)), "", 11, new Color(0.78f, 0.82f, 0.9f), TextAnchor.MiddleLeft);
+                // The line under the name at Small (16): one line, else two or three (the row grows), trimmed to fit.
+                var sub = Ui.Text(Ui.Placed("Line", row, Vector2.zero, new Vector2(textW, 18)), "", TextRole.Caption, new Color(0.78f, 0.82f, 0.9f), TextAnchor.MiddleLeft);
                 sub.raycastTarget = false;
-                var (lineText, lineSize, twoLines) = FitChainLine(sub, lines[i].text, lines[i].targets, textW);
+                var (lineText, lineSize, lineCount) = FitChainLine(sub, lines[i].text, lines[i].targets, textW);
                 sub.text = lineText;
                 sub.fontSize = lineSize;
-                float h = twoLines ? tallRowH : rowH;
+                bool twoLines = lineCount > 1;
+                float h = lineCount > 2 ? tallRowH + 19 : twoLines ? tallRowH : rowH;
                 float inner = h - gap;
                 row.sizeDelta = new Vector2(width - 8, inner);
                 var subRt = sub.rectTransform;
-                subRt.sizeDelta = new Vector2(textW, twoLines ? 28 : 18);
-                subRt.anchoredPosition = new Vector2(12, twoLines ? -inner / 2 + 17 : -10 - (inner - (rowH - gap)) / 2);
+                float subH = lineCount > 2 ? 59 : twoLines ? 40 : 20;
+                subRt.sizeDelta = new Vector2(textW, subH);
+                subRt.anchoredPosition = new Vector2(7, twoLines ? -inner / 2 + subH / 2 + 3 : -11 - (inner - (rowH - gap)) / 2);
                 var edge = Ui.Placed("Owner", row, new Vector2(-(width - 8) / 2 + 2, 0), new Vector2(4, inner));
                 Ui.Image(edge, l.Controller == HumanSeat || (HumanSeat < 0 && l.Controller == 0) ? Ui.Hex("#4FA3FF") : Ui.Hex("#FF5A5A")).raycastTarget = false;
-                var num = Ui.Text(Ui.Placed("N", row, new Vector2(-(width - 8) / 2 + 20, 5), new Vector2(28, 24)), l.Number.ToString(), 18, Ui.Hex("#FFC940"));
+                var num = Ui.Text(Ui.Placed("N", row, new Vector2(-(width - 8) / 2 + 20, 5), new Vector2(28, 24)), l.Number.ToString(), TextRole.Body, Ui.Hex("#FFC940"));
                 Typography.Strong(num);
                 num.raycastTarget = false;
                 // Whose link it is in words too, under its number (the stripe's color isn't the only sign).
-                var who = Ui.Text(Ui.Placed("Who", row, new Vector2(-(width - 8) / 2 + 20, -13), new Vector2(34, 12)), OwnerTag(l.Controller), 8, new Color(0.8f, 0.84f, 0.92f));
+                var who = Ui.Text(Ui.Placed("Who", row, new Vector2(-(width - 8) / 2 + 21, -14), new Vector2(42, 17)), OwnerTag(l.Controller), TextRole.Caption, new Color(0.8f, 0.84f, 0.92f));
+                who.font = Typography.Font(Face.Condensed); // a name when watching ("SUMIRE"): condensed, then cut with "…"
                 Typography.Strong(who);
+                Ui.OneLine(who);
                 who.raycastTarget = false;
                 var thumb = Ui.Placed("Art", row, new Vector2(-(width - 8) / 2 + 52, 0), new Vector2(27, 39));
                 if (l.Code != 0)
@@ -201,12 +205,12 @@ namespace YgoCampaign.Game
                     CardFace.Draw(raw, l.Code, info, new Vector2(27, 39));
                 }
                 else Ui.Image(thumb, CardView.BackFill).raycastTarget = false;
-                // The name on one line: a size down to 9, then shortened with "…" (never a second, cut-off line).
-                var name = Ui.Text(Ui.Placed("Name", row, new Vector2(12, inner / 2 - 12), new Vector2(textW, 20)), info?.Name ?? "a card", 13,
+                // The name on one line: Small, a size down to the floor, then shortened with "…" (never a second, cut-off line).
+                var name = Ui.Text(Ui.Placed("Name", row, new Vector2(7, inner / 2 - 13), new Vector2(textW, 20)), info?.Name ?? "a card", TextRole.Caption,
                     negated ? new Color(1, 1, 1, 0.45f) : Color.white, TextAnchor.MiddleLeft);
                 Typography.Strong(name);
                 name.raycastTarget = false;
-                (name.text, name.fontSize) = FitOneLine(name, name.text, textW, 13, 9);
+                (name.text, name.fontSize) = FitOneLine(name, name.text, textW, UiTheme.Size(TextRole.Small), UiTheme.Floor);
                 var (mark, color) = l.State switch
                 {
                     LinkState.Resolving => ("▶ resolving", "#FFC940"),
@@ -216,7 +220,7 @@ namespace YgoCampaign.Game
                     LinkState.Activating => ("activating", "#9FD8FF"),
                     _ => ("waiting", "#8A93A6"),
                 };
-                var state = Ui.Text(Ui.Placed("State", row, new Vector2((width - 8) / 2 - 36, 0), new Vector2(68, 36)), mark, 11, Ui.Hex(color));
+                var state = Ui.Text(Ui.Placed("State", row, new Vector2((width - 8) / 2 - 41, 0), new Vector2(80, 40)), mark, TextRole.Caption, Ui.Hex(color));
                 Typography.Strong(state);
                 state.raycastTarget = false;
                 rows.Add((row, h));
@@ -269,29 +273,31 @@ namespace YgoCampaign.Game
         }
 
         /// <summary>
-        /// The chain row's second line fitted to <paramref name="width"/>: one line at 11 down to 9; else two lines at 10,
-        /// a list of targets cut to whole names and "+N more", other text cut with "…". Never a line the box truncates.
+        /// The chain row's second line fitted to <paramref name="width"/> and its line count, at Small (16): one line; else
+        /// two; a list of targets may take three (whole names, then "+N more"); other text is cut with "…" after two. Never a
+        /// line the box truncates.
         /// </summary>
-        private static (string text, int size, bool twoLines) FitChainLine(Text t, string line, List<string> targets, float width)
+        private static (string text, int size, int lines) FitChainLine(Text t, string line, List<string> targets, float width)
         {
-            if (line.Length == 0) return ("", 11, false);
-            for (int size = 11; size >= 9; size--)
-                if (CardView.TextWidth(t, line, size) <= width) return (line, size, false);
-            const int two = 10;
-            float room = 2 * (CardView.TextHeight(t, "Ag", two, width) + 1);
-            bool Fits(string s) => CardView.TextHeight(t, s, two, width) <= room;
-            if (Fits(line)) return (line, two, true);
-            if (targets.Count > 1)
+            int two = UiTheme.Size(TextRole.Small);
+            if (line.Length == 0) return ("", two, 1);
+            if (CardView.TextWidth(t, line, two) <= width) return (line, two, 1);
+            float lineH = CardView.TextHeight(t, "Ag", two, width) + 1;
+            bool Fits(string s, int n) => CardView.TextHeight(t, s, two, width) <= n * lineH;
+            if (Fits(line, 2)) return (line, two, 2);
+            if (targets.Count > 0)
             {
+                if (Fits(line, 3)) return (line, two, 3);
                 for (int keep = targets.Count - 1; keep >= 1; keep--)
                 {
                     var cut = "→ " + string.Join(", ", targets.Take(keep)) + $" +{targets.Count - keep} more";
-                    if (Fits(cut)) return (cut, two, true);
+                    if (Fits(cut, 2)) return (cut, two, 2);
+                    if (Fits(cut, 3)) return (cut, two, 3);
                 }
             }
             var shorter = line;
-            while (shorter.Length > 4 && !Fits(shorter + "…")) shorter = shorter.Substring(0, shorter.Length - 1);
-            return (shorter.TrimEnd(' ', ',') + "…", two, true);
+            while (shorter.Length > 4 && !Fits(shorter + "…", 2)) shorter = shorter.Substring(0, shorter.Length - 1);
+            return (shorter.TrimEnd(' ', ',') + "…", two, 2);
         }
 
         /// <summary>One line of <paramref name="text"/> in <paramref name="width"/>: the size from max down to min that fits, else min with "…".</summary>
@@ -410,13 +416,13 @@ namespace YgoCampaign.Game
             var edge = bubble.gameObject.AddComponent<Outline>();
             edge.effectColor = _plateAccent[player];
             edge.effectDistance = new Vector2(2, -2);
-            var text = Ui.Text(bubble, line, 17, Ui.Hex("#1A1D26"));
+            var text = Ui.Text(bubble, line, TextRole.Body, Ui.Hex("#1A1D26"));
             Typography.Strong(text);
             text.rectTransform.offsetMin = new Vector2(12, 6);
             text.rectTransform.offsetMax = new Vector2(-12, -6);
             text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = 11;
-            text.resizeTextMaxSize = 17;
+            text.resizeTextMinSize = UiTheme.Floor;
+            text.resizeTextMaxSize = UiTheme.Size(TextRole.Body);
             bubble.SetAsLastSibling();
             StartCoroutine(BubbleLife(bubble, group));
         }
@@ -586,10 +592,10 @@ namespace YgoCampaign.Game
             Ui.Clickable((RectTransform)Ui.Image(root, new Color(0, 0, 0, 0.7f)).transform, CloseMoments);
             var panel = Ui.Placed("Panel", root, Vector2.zero, new Vector2(900, 900));
             Ui.Image(panel, Ui.Hex("#161B27"));
-            Typography.Strong(Ui.Text(Ui.Placed("Title", panel, new Vector2(-150, 420), new Vector2(560, 40)), "KEY MOMENTS", 24, Color.white, TextAnchor.MiddleLeft));
+            Typography.Strong(Ui.Text(Ui.Placed("Title", panel, new Vector2(-150, 420), new Vector2(560, 40)), "KEY MOMENTS", TextRole.Heading, Color.white, TextAnchor.MiddleLeft));
             Ui.Button(panel, "Close", new Vector2(370, 420), new Vector2(110, 38), CloseMoments);
             Ui.Text(Ui.Placed("Hint", panel, new Vector2(0, 388), new Vector2(840, 24)),
-                "Click a moment to jump to just before it; press Pause / Step or wait to see it happen.", 13, new Color(0.75f, 0.78f, 0.86f), TextAnchor.MiddleLeft);
+                "Click a moment to jump to just before it; press Pause / Step or wait to see it happen.", TextRole.Caption, new Color(0.75f, 0.78f, 0.86f), TextAnchor.MiddleLeft);
             var viewport = Ui.Placed("View", panel, new Vector2(0, -40), new Vector2(860, 780));
             Ui.Image(viewport, new Color(0, 0, 0, 0.001f));
             viewport.gameObject.AddComponent<RectMask2D>();
@@ -608,7 +614,7 @@ namespace YgoCampaign.Game
             {
                 var row = Ui.Box(list, heading ? 0 : 24, y, heading ? 860 : 836, heading ? 38 : 32);
                 Ui.Image(row, here ? Ui.Hex("#2E3A55") : heading ? Ui.Hex("#1E2535") : new Color(0, 0, 0, 0.001f));
-                var t = Ui.Text(row, text, heading ? 16 : 14, color, TextAnchor.MiddleLeft);
+                var t = Ui.Text(row, text, heading ? TextRole.Small : TextRole.Caption, color, TextAnchor.MiddleLeft);
                 t.supportRichText = true;
                 t.rectTransform.offsetMin = new Vector2(12, 0);
                 if (heading) Typography.Strong(t);
@@ -653,12 +659,12 @@ namespace YgoCampaign.Game
             var banner = Ui.Placed("Lesson", _field, LessonSpot(new Vector2(width, height)), new Vector2(width, height));
             _lessonBanner = banner;
             Ui.Image(banner, new Color(0.08f, 0.2f, 0.12f, 0.94f));
-            var t = Ui.Text(Ui.Placed("T", banner, new Vector2(-72, 32), new Vector2(452, 26)), $"<b>LESSON</b>  {title}", 17, Color.white, TextAnchor.MiddleLeft);
+            var t = Ui.Text(Ui.Placed("T", banner, new Vector2(-72, 32), new Vector2(452, 26)), $"<b>LESSON</b>  {title}", TextRole.Body, Color.white, TextAnchor.MiddleLeft);
             t.supportRichText = true;
-            var s = Ui.Text(Ui.Placed("S", banner, new Vector2(-72, -14), new Vector2(452, 62)), summary ?? "", 20, new Color(0.86f, 0.94f, 0.88f), TextAnchor.MiddleLeft);
+            var s = Ui.Text(Ui.Placed("S", banner, new Vector2(-72, -14), new Vector2(452, 62)), summary ?? "", TextRole.Label, new Color(0.86f, 0.94f, 0.88f), TextAnchor.MiddleLeft);
             s.resizeTextForBestFit = true;
             s.resizeTextMinSize = 14;
-            s.resizeTextMaxSize = 20;
+            s.resizeTextMaxSize = UiTheme.Size(TextRole.Label);
             // Leaves the lesson (it isn't a step back within it).
             if (back != null) Ui.Button(banner, "Leave lesson", new Vector2(width / 2 - 78, 0), new Vector2(136, 44), back);
         }
@@ -743,7 +749,7 @@ namespace YgoCampaign.Game
             var headerRt = Ui.Stretched("Header", canvas, new Vector2(0, 0.955f), new Vector2(0.72f, 1));
             _headerRt = headerRt;
             Ui.Image(headerRt, Ui.Hex("#0F1117"));
-            _header = Ui.Text(headerRt, "", 22, Color.white);
+            _header = Ui.Text(headerRt, "", TextRole.Subhead, Color.white);
             var menuButton = Ui.Button(headerRt, "", new Vector2(-620, 0), new Vector2(46, 38), () => MenuClicked?.Invoke());
             menuButton.name = "Menu";
             var menuIcon = Ui.Placed("Icon", (RectTransform)menuButton.transform, Vector2.zero, new Vector2(24, 24)).gameObject.AddComponent<RawImage>();
@@ -795,12 +801,12 @@ namespace YgoCampaign.Game
             var edge = responses.gameObject.AddComponent<Outline>();
             edge.effectColor = new Color(1f, 0.79f, 0.25f, 0.6f);
             edge.effectDistance = new Vector2(1, -1);
-            _responsesLabel = Ui.Text(Ui.Placed("Mode", responses, new Vector2(0, 14), new Vector2(146, 26)), "", 16, Color.white);
+            _responsesLabel = Ui.Text(Ui.Placed("Mode", responses, new Vector2(0, 14), new Vector2(146, 26)), "", TextRole.Small, Color.white);
             _responsesLabel.supportRichText = true;
-            _responsesHelp = Ui.Text(Ui.Placed("Help", responses, new Vector2(0, -14), new Vector2(146, 26)), "", 14, new Color(0.78f, 0.82f, 0.9f));
+            _responsesHelp = Ui.Text(Ui.Placed("Help", responses, new Vector2(0, -14), new Vector2(146, 26)), "", TextRole.Caption, new Color(0.78f, 0.82f, 0.9f));
             _responsesHelp.resizeTextForBestFit = true;
-            _responsesHelp.resizeTextMinSize = 12;
-            _responsesHelp.resizeTextMaxSize = 14;
+            _responsesHelp.resizeTextMinSize = UiTheme.Floor;
+            _responsesHelp.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
             Ui.Clickable(responses, () => { Sounds.Play("click"); ResponsesClicked?.Invoke(); });
             _responsesRoot = responses.gameObject;
             // Watching (replays, bot duels): whose hands show, in the same place.
@@ -809,14 +815,14 @@ namespace YgoCampaign.Game
             var handsEdge = hands.gameObject.AddComponent<Outline>();
             handsEdge.effectColor = new Color(0.37f, 0.88f, 1f, 0.6f);
             handsEdge.effectDistance = new Vector2(1, -1);
-            _handsLabel = Ui.Text(Ui.Placed("Mode", hands, new Vector2(0, 11), new Vector2(146, 26)), "", 15, Color.white);
+            _handsLabel = Ui.Text(Ui.Placed("Mode", hands, new Vector2(0, 11), new Vector2(146, 26)), "", TextRole.Small, Color.white);
             _handsLabel.supportRichText = true;
-            Ui.Text(Ui.Placed("Help", hands, new Vector2(0, -13), new Vector2(146, 24)), "click to change", 11, new Color(0.78f, 0.82f, 0.9f));
+            Ui.Text(Ui.Placed("Help", hands, new Vector2(0, -13), new Vector2(146, 24)), "click to change", TextRole.Caption, new Color(0.78f, 0.82f, 0.9f));
             Ui.Clickable(hands, () => { Sounds.Play("click"); CycleHands(); });
             _handsRoot = hands.gameObject;
             DrawHands();
             // While you wait: who the game is waiting on (the opponent, or effects resolving), never blank.
-            _waiting = Ui.Text(Ui.Placed("Waiting", _field, new Vector2(Column * 4 + 18, -2 * Row - 50), new Vector2(220, 24)), "", 15, new Color(0.85f, 0.88f, 0.95f));
+            _waiting = Ui.Text(Ui.Placed("Waiting", _field, new Vector2(Column * 4 + 18, -2 * Row - 50), new Vector2(220, 24)), "", TextRole.Small, new Color(0.85f, 0.88f, 0.95f));
             Typography.Italic(_waiting);
             _waiting.raycastTarget = true;
             _waiting.supportRichText = true;
@@ -833,7 +839,7 @@ namespace YgoCampaign.Game
             // Campaign: where this duel sits (circuit, match) in place of the picker.
             var titleRt = Ui.Stretched("CampaignTitle", side, new Vector2(0, 0.93f), new Vector2(1, 1));
             Ui.Image(titleRt, Ui.Hex("#161A23"));
-            _campaignTitle = Ui.Text(titleRt, "", 18, Ui.Hex("#FFC940"));
+            _campaignTitle = Ui.Text(titleRt, "", TextRole.Body, Ui.Hex("#FFC940"));
             _campaignTitle.supportRichText = true;
             _campaignTitleRoot = titleRt.gameObject;
             _campaignTitleRoot.SetActive(false);
@@ -857,7 +863,7 @@ namespace YgoCampaign.Game
             pin.anchoredPosition = new Vector2(0, -2);
             pin.sizeDelta = new Vector2(84, 26);
             _pinImage = Ui.Image(pin, new Color(0.16f, 0.22f, 0.34f, 0.95f));
-            _pinLabel = Ui.Text(pin, "Pin (P)", 13, Color.white);
+            _pinLabel = Ui.Text(pin, "Pin (P)", TextRole.Caption, Color.white);
             Ui.Clickable(pin, () => { Sounds.Play("click"); TogglePin(); });
             // Details: the shown card in the full-screen reader (as a click on its picture or text does).
             var details = Ui.Rect("Details", infoRt);
@@ -866,7 +872,7 @@ namespace YgoCampaign.Game
             details.anchoredPosition = new Vector2(-92, -2);
             details.sizeDelta = new Vector2(104, 26);
             Ui.Image(details, new Color(0.16f, 0.22f, 0.34f, 0.95f));
-            Ui.Text(details, "Details (D)", 13, Color.white);
+            Ui.Text(details, "Details (D)", TextRole.Caption, Color.white);
             Ui.Clickable(details, () => { Sounds.Play("click"); OpenReader(_detail.Shown); });
             _detail.Clicked += OpenReader;
             var second = Ui.Stretched("Hovered", side, new Vector2(0, 0.1f), new Vector2(1, 0.5f));
@@ -912,7 +918,7 @@ namespace YgoCampaign.Game
             var logRt = Ui.Stretched("Log", logBg, Vector2.zero, Vector2.one);
             logRt.offsetMin = new Vector2(10, 8);
             logRt.offsetMax = new Vector2(-10, -8);
-            _log = Ui.Text(logRt, "", 14, new Color(0.78f, 0.8f, 0.84f), TextAnchor.LowerLeft);
+            _log = Ui.Text(logRt, "", TextRole.Caption, new Color(0.78f, 0.8f, 0.84f), TextAnchor.LowerLeft);
             _log.verticalOverflow = VerticalWrapMode.Truncate;
 
             _controlsRt = Ui.Stretched("Controls", side, new Vector2(0, 0), new Vector2(1, 0.1f));
@@ -923,9 +929,12 @@ namespace YgoCampaign.Game
             var bannerRt = Ui.Placed("Banner", _field, Vector2.zero, new Vector2(900, 170));
             Ui.Image(bannerRt, new Color(0, 0, 0, 0.8f)).raycastTarget = false; // an announcement: clicks go through to the cards
             // The headline sits on the middle line and the quote just under it (one block, not two far apart).
-            _banner = Ui.Text(Ui.Stretched("Text", bannerRt, new Vector2(0, 0.48f), new Vector2(1, 0.96f)), "", 44, Color.white, TextAnchor.LowerCenter);
-            _bannerQuote = Ui.Text(Ui.Stretched("Quote", bannerRt, new Vector2(0, 0.04f), new Vector2(1, 0.46f)), "", 20, new Color(0.85f, 0.87f, 0.9f), TextAnchor.UpperCenter);
+            _banner = Ui.Text(Ui.Stretched("Text", bannerRt, new Vector2(0, 0.48f), new Vector2(1, 0.96f)), "", TextRole.Title, Color.white, TextAnchor.LowerCenter);
+            _bannerQuote = Ui.Text(Ui.Stretched("Quote", bannerRt, new Vector2(0, 0.04f), new Vector2(1, 0.46f)), "", TextRole.Label, new Color(0.85f, 0.87f, 0.9f), TextAnchor.UpperCenter);
             Typography.Italic(_bannerQuote);
+            _bannerQuote.resizeTextForBestFit = true; // a long last word shrinks to the floor
+            _bannerQuote.resizeTextMinSize = UiTheme.Floor;
+            _bannerQuote.resizeTextMaxSize = _bannerQuote.fontSize;
             bannerRt.gameObject.SetActive(false);
             _bannerRoot = bannerRt;
             BuildPlayChrome(canvas, side, infoBg, infoRt, second);
@@ -1024,7 +1033,7 @@ namespace YgoCampaign.Game
             var speed = Ui.Stretched("Speed", bar, Vector2.zero, Vector2.one);
             _speedGroup = speed;
             Ui.Button(speed, "-", new Vector2(-25, y), new Vector2(44, 40), () => SpeedChanged?.Invoke(-1));
-            _speedLabel = Ui.Text(Ui.Placed("Speed", speed, new Vector2(35, y), new Vector2(70, 40)), "", 16, Color.white);
+            _speedLabel = Ui.Text(Ui.Placed("Speed", speed, new Vector2(35, y), new Vector2(70, 40)), "", TextRole.Small, Color.white);
             Ui.Button(speed, "+", new Vector2(95, y), new Vector2(44, 40), () => SpeedChanged?.Invoke(+1));
         }
 
@@ -1033,7 +1042,7 @@ namespace YgoCampaign.Game
         {
             Ui.Image(panel, Ui.Hex("#161A23"));
             var title = Ui.Placed("Title", panel, new Vector2(0, 95), new Vector2(500, 24));
-            Ui.Text(title, "MATCHUP", 14, new Color(1, 1, 1, 0.45f));
+            Ui.Text(title, "MATCHUP", TextRole.Caption, new Color(1, 1, 1, 0.45f));
             Text? foilsLabel = null;
             var foils = Ui.Button(panel, "", new Vector2(180, 95), new Vector2(130, 24), () =>
             {
@@ -1043,7 +1052,7 @@ namespace YgoCampaign.Game
             });
             foilsLabel = foils.GetComponentInChildren<Text>();
             foilsLabel.text = CardFoil.ModeLabel;
-            foilsLabel.fontSize = 13;
+            foilsLabel.fontSize = UiTheme.Size(TextRole.Caption);
 
             int[] seatsTopFirst = { 1, 0 };
             for (int row = 0; row < 2; row++)
@@ -1052,24 +1061,24 @@ namespace YgoCampaign.Game
                 float y = 58 - row * 64;
                 var color = seat == 0 ? Ui.Hex("#4FA3FF") : Ui.Hex("#FF5A5A");
                 _duelTools.Add(Ui.Button(panel, "<", new Vector2(-238, y), new Vector2(32, 34), () => CharacterCycled?.Invoke(seat, -1)));
-                _pickName[seat] = Ui.Text(Ui.Placed($"Name{seat}", panel, new Vector2(-128, y), new Vector2(180, 34)), "", 18, color);
+                _pickName[seat] = Ui.Text(Ui.Placed($"Name{seat}", panel, new Vector2(-128, y), new Vector2(180, 34)), "", TextRole.Body, color);
                 Typography.Strong(_pickName[seat]);
                 _duelTools.Add(Ui.Button(panel, ">", new Vector2(-18, y), new Vector2(32, 34), () => CharacterCycled?.Invoke(seat, +1)));
                 _duelTools.Add(Ui.Button(panel, "<", new Vector2(28, y), new Vector2(32, 34), () => DeckCycled?.Invoke(seat, -1)));
-                _pickDeck[seat] = Ui.Text(Ui.Placed($"Deck{seat}", panel, new Vector2(122, y), new Vector2(150, 34)), "", 16, Color.white);
+                _pickDeck[seat] = Ui.Text(Ui.Placed($"Deck{seat}", panel, new Vector2(122, y), new Vector2(150, 34)), "", TextRole.Small, Color.white);
                 // Deck titles ("Chaos / Yata-Lock") run longer than the file names did.
                 _pickDeck[seat].resizeTextForBestFit = true;
-                _pickDeck[seat].resizeTextMinSize = 11;
-                _pickDeck[seat].resizeTextMaxSize = 16;
+                _pickDeck[seat].resizeTextMinSize = UiTheme.Floor;
+                _pickDeck[seat].resizeTextMaxSize = UiTheme.Size(TextRole.Small);
                 _duelTools.Add(Ui.Button(panel, ">", new Vector2(218, y), new Vector2(32, 34), () => DeckCycled?.Invoke(seat, +1)));
-                _pickStyle[seat] = Ui.Text(Ui.Placed($"Style{seat}", panel, new Vector2(0, y - 26), new Vector2(500, 18)), "", 12,
+                _pickStyle[seat] = Ui.Text(Ui.Placed($"Style{seat}", panel, new Vector2(0, y - 26), new Vector2(500, 18)), "", TextRole.Caption,
                     new Color(0.75f, 0.78f, 0.84f));
             }
             _duelTools.Add(Ui.Button(panel, "Start Duel", new Vector2(-165, -88), new Vector2(160, 36), () => StartClicked?.Invoke()));
             _duelTools.Add(Ui.Button(panel, "Random", new Vector2(-10, -88), new Vector2(130, 36), () => RandomClicked?.Invoke()));
             _duelTools.Add(Ui.Button(panel, "Deck Editor", new Vector2(155, -88), new Vector2(180, 36), () => DecksClicked?.Invoke()));
             // Why they're off, when they are (a campaign duel, a story scene: BoardView.DevTools).
-            _duelToolsNote = Ui.Text(Ui.Placed("ToolsNote", panel, new Vector2(0, -114), new Vector2(520, 18)), "", 12, Ui.Hex("#FFC940"));
+            _duelToolsNote = Ui.Text(Ui.Placed("ToolsNote", panel, new Vector2(0, -114), new Vector2(520, 18)), "", TextRole.Caption, Ui.Hex("#FFC940"));
         }
 
         /// <summary>Shows the picker's current choice for one seat (not necessarily the duel in progress).</summary>
@@ -1221,6 +1230,7 @@ namespace YgoCampaign.Game
             if (_lessonBanner != null) _lessonBanner.anchoredPosition = LessonSpot(_lessonBanner.sizeDelta);
             PlaceComboMeter();
             Canvas.ForceUpdateCanvases();
+            FitLog();
             _detail?.Layout();
         }
 
@@ -1385,7 +1395,7 @@ namespace YgoCampaign.Game
             var phase = board.Phase == 0 ? "" : Phase.Name(board.Phase).Replace("Main Phase ", "Main ").Replace(" Phase", "");
             var set = Prompt.Current;
             bool canAdvance = set != null && set.Choices.Any(c => c.Card == null && (c.Label == "Go to the Battle Phase" || c.Label == "Go to Main Phase 2" || c.Label == "End your turn"));
-            _phaseLabel.text = $"<size=17>{TurnText(board.Turn, compact: true)}</size>\n<b>{phase}</b>";
+            _phaseLabel.text = $"<size=18>{TurnText(board.Turn, compact: true)}</size>\n<b>{phase}</b>";
             // The bottom seat's turn is blue (yours, or the near duelist's when watching), the far seat's red.
             bool mine = board.TurnPlayer == (HumanSeat >= 0 ? HumanSeat : 0);
             // Brightest when a click on it changes phase; dimmer blue while you wait on your turn; red on theirs.
@@ -1569,8 +1579,8 @@ namespace YgoCampaign.Game
             _pileOpenedAt = Time.unscaledTime;
             var dim = Ui.Image(root, new Color(0, 0, 0, 0.78f));
             Ui.Clickable((RectTransform)dim.transform, () => { if (!JustOpened) ClosePileViewer(); });
-            Typography.Strong(Ui.Text(Ui.Placed("Title", root, new Vector2(0, 420), new Vector2(1200, 50)), title, 28, Color.white));
-            Ui.Text(Ui.Placed("Hint", root, new Vector2(0, 382), new Vector2(1200, 30)), "Click a card to use it · hover to read it · Cancel to go back", 15, new Color(1, 1, 1, 0.55f));
+            Typography.Strong(Ui.Text(Ui.Placed("Title", root, new Vector2(0, 420), new Vector2(1200, 50)), title, TextRole.Heading, Color.white));
+            Ui.Text(Ui.Placed("Hint", root, new Vector2(0, 382), new Vector2(1200, 30)), "Click a card to use it · hover to read it · Cancel to go back", TextRole.Small, new Color(1, 1, 1, 0.55f));
             var view = Ui.Placed("View", root, new Vector2(0, -10), new Vector2(1240, 680));
             Ui.Image(view, new Color(0, 0, 0, 0.001f));
             view.gameObject.AddComponent<RectMask2D>();
@@ -1602,7 +1612,7 @@ namespace YgoCampaign.Game
                 CardView.Create(content, center, size, shown, info, HumanSeat, true, ShowInfo, offField: true,
                     onClick: () => { ClosePileViewer(); Prompt.ClickChoice(index); }, highlight: true, onRightClick: () => PinCard(info));
                 var label = choice.Verb.Length > 0 ? choice.Verb : choice.Label;
-                var text = Ui.Text(Ui.Placed("Action", content, center + new Vector2(0, -size.y / 2 - 18), new Vector2(size.x + 24, 34)), label, 14, Ui.Hex("#FFC940"));
+                var text = Ui.Text(Ui.Placed("Action", content, center + new Vector2(0, -size.y / 2 - 18), new Vector2(size.x + 24, 34)), label, TextRole.Caption, Ui.Hex("#FFC940"));
                 Typography.Strong(text);
             }
             var scroll = view.gameObject.AddComponent<ScrollRect>();
@@ -1674,8 +1684,8 @@ namespace YgoCampaign.Game
             var dim = Ui.Image(root, new Color(0, 0, 0, 0.78f));
             // The second click of a double-click lands here: it doesn't close what the first one opened.
             Ui.Clickable((RectTransform)dim.transform, () => { if (!JustOpened) ClosePileViewer(); });
-            Typography.Strong(Ui.Text(Ui.Placed("Title", root, new Vector2(0, 420), new Vector2(1200, 50)), $"{title}  ({cards.Count})", 28, Color.white));
-            Ui.Text(Ui.Placed("Hint", root, new Vector2(0, 382), new Vector2(1200, 30)), "Hover a card to read it · scroll for more · click outside or press Esc to close", 15, new Color(1, 1, 1, 0.55f));
+            Typography.Strong(Ui.Text(Ui.Placed("Title", root, new Vector2(0, 420), new Vector2(1200, 50)), $"{title}  ({cards.Count})", TextRole.Heading, Color.white));
+            Ui.Text(Ui.Placed("Hint", root, new Vector2(0, 382), new Vector2(1200, 30)), "Hover a card to read it · scroll for more · click outside or press Esc to close", TextRole.Small, new Color(1, 1, 1, 0.55f));
             var view = Ui.Placed("View", root, new Vector2(0, -30), new Vector2(1240, 760));
             Ui.Image(view, new Color(0, 0, 0, 0.001f));
             view.gameObject.AddComponent<RectMask2D>();
@@ -1711,12 +1721,12 @@ namespace YgoCampaign.Game
                     // A card banished face-down: its back, for everyone.
                     var back = CardView.Create(content, center, size, card, null, owner, false, null, offField: true);
                     CardView.DrawBack(Ui.Stretched("Back", back.transform, Vector2.zero, Vector2.one));
-                    Typography.Italic(Ui.Text(Ui.Placed("FaceDown", back.transform, new Vector2(0, -size.y / 2 + 14), new Vector2(size.x, 22)), "face-down", 12,
+                    Typography.Italic(Ui.Text(Ui.Placed("FaceDown", back.transform, new Vector2(0, -size.y / 2 + 14), new Vector2(size.x, 22)), "face-down", TextRole.Caption,
                         new Color(1, 1, 1, 0.75f)));
                 }
             }
             if (list.Count == 0)
-                Ui.Text(Ui.Placed("Empty", root, new Vector2(0, 100), new Vector2(600, 60)), "Empty.", 22, new Color(1, 1, 1, 0.6f));
+                Ui.Text(Ui.Placed("Empty", root, new Vector2(0, 100), new Vector2(600, 60)), "Empty.", TextRole.Subhead, new Color(1, 1, 1, 0.6f));
             var scroll = view.gameObject.AddComponent<ScrollRect>();
             scroll.viewport = view;
             scroll.content = content;
@@ -1954,8 +1964,28 @@ namespace YgoCampaign.Game
                 _logLines.Enqueue(LogStyled(part));
                 while (_logLines.Count > MaxLogLines) _logLines.Dequeue();
             }
-            _log.text = string.Join("\n", _logLines);
-            _log.fontSize = FxSettings.Scaled(14);
+            _log.fontSize = UiTheme.Size(TextRole.Small, reading: true);
+            FitLog();
+        }
+
+        private readonly TextGenerator _logGen = new TextGenerator();
+
+        /// <summary>
+        /// The log's newest lines that fit its box (it truncates at the bottom, where the newest are): the oldest go first.
+        /// Run after a line is added and when the layout moves the log.
+        /// </summary>
+        private void FitLog()
+        {
+            if (_log == null) return;
+            var lines = _logLines.ToList();
+            var size = _log.rectTransform.rect.size;
+            if (size.x <= 0 || size.y <= 0) { _log.text = string.Join("\n", lines); return; }
+            var settings = _log.GetGenerationSettings(size);
+            settings.verticalOverflow = VerticalWrapMode.Overflow;
+            settings.resizeTextForBestFit = false;
+            int from = 0;
+            while (from < lines.Count - 1 && _logGen.GetPreferredHeight(string.Join("\n", lines.Skip(from)), settings) / _log.pixelsPerUnit > size.y) from++;
+            _log.text = string.Join("\n", lines.Skip(from));
         }
 
         private static readonly System.Text.RegularExpressions.Regex LogTurn =
@@ -2037,7 +2067,7 @@ namespace YgoCampaign.Game
             disc.texture = Icons.Round;
             disc.color = Ui.Hex("#B8862B");
             disc.raycastTarget = false;
-            Ui.Text(Ui.Stretched("P", badge, Vector2.zero, Vector2.one), "●", 13, Color.white).raycastTarget = false;
+            Ui.Text(Ui.Stretched("P", badge, Vector2.zero, Vector2.one), "●", TextRole.Caption, Color.white).raycastTarget = false;
         }
 
         /// <summary>Whether a text field has the keyboard (so shortcut keys stay out of its way).</summary>
@@ -2163,7 +2193,7 @@ namespace YgoCampaign.Game
             var outline = glow.gameObject.AddComponent<Outline>();
             outline.effectColor = new Color(1f, 0.79f, 0.25f, 0.95f);
             outline.effectDistance = new Vector2(3, -3);
-            Typography.Strong(Ui.Text(Ui.Stretched("Label", rt, Vector2.zero, Vector2.one), "Place\nhere", 15, Ui.Hex("#161A23")));
+            Typography.Strong(Ui.Text(Ui.Stretched("Label", rt, Vector2.zero, Vector2.one), "Place\nhere", TextRole.Small, Ui.Hex("#161A23")));
             Ui.Clickable(rt, () => CardClicked(owner, location, sequence));
             Register(owner, location, sequence, rt);
         }
@@ -2218,7 +2248,7 @@ namespace YgoCampaign.Game
                 var badge = Ui.Placed("Picked", _cardLayer, at, new Vector2(34, 34));
                 badge.localRotation = Quaternion.Euler(0, 0, 45);
                 Ui.Image(badge, Ui.Hex("#13203A")).raycastTarget = false;
-                var mark = Ui.Text(Ui.Placed("Check", _cardLayer, at, new Vector2(34, 34)), "✓", 24, CardView.Actionable);
+                var mark = Ui.Text(Ui.Placed("Check", _cardLayer, at, new Vector2(34, 34)), "✓", TextRole.Heading, CardView.Actionable);
                 mark.raycastTarget = false;
             }
         }
@@ -2435,7 +2465,7 @@ namespace YgoCampaign.Game
             var edge = tag.gameObject.AddComponent<Outline>();
             edge.effectColor = ChangeColor;
             edge.effectDistance = new Vector2(1, -1);
-            var t = Ui.Text(tag, text, 14, ChangeColor);
+            var t = Ui.Text(tag, text, TextRole.Caption, ChangeColor);
             Typography.Strong(t);
             t.raycastTarget = false;
             ChangeMarks++;
@@ -2506,8 +2536,18 @@ namespace YgoCampaign.Game
             var rising = shown < _lpTarget[p];
             var lp = falling ? $"<color=#FF6B6B>{shown}</color>" : rising ? $"<color=#7CE38B>{shown}</color>" : shown.ToString();
             DrawPanel(p, lp);
-            _plateDeck[p].text = _deckNames[p];
+            // A long deck name shrinks to the floor, then ends in "…": fitted once per name and width, not every frame of a roll.
+            var deckKey = (_deckNames[p], _plateDeck[p].rectTransform.rect.width);
+            if (_plateDeckFitted[p] != deckKey)
+            {
+                _plateDeckFitted[p] = deckKey;
+                _plateDeck[p].text = _deckNames[p];
+                _plateDeck[p].fontSize = UiTheme.Size(TextRole.Label);
+                Ui.OneLine(_plateDeck[p], UiTheme.Floor);
+            }
         }
+
+        private readonly (string name, float width)[] _plateDeckFitted = { ("", -1), ("", -1) };
 
         /// <summary>When each plate's LP counter may tick next.</summary>
         private readonly float[] _lpTickNext = { 0, 0 };
