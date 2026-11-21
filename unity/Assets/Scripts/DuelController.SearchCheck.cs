@@ -129,6 +129,56 @@ namespace YgoCampaign.Game
             yield return Shot("name-fusion-gate");
             _editor.DebugSearch("");
 
+            // ---- Part C (docs/dev/EDITOR-QUICK-FIXES-SPEC-2026-11-20.md): exact words first, the chip as typed, the real count, no match ----
+            var destroyAll = _editor.DebugSearch("destroy all");
+            var firstPage = destroyAll.Take(25).Select(c => c.Name).ToList();
+            var cChips = _editor.DebugActiveChips();
+            Report($"C: the chip shows the box as typed ({string.Join(", ", cChips)})", cChips.SequenceEqual(new[] { "destroy all" }));
+            Report($"C: \"destroy all\" ranks the exact words first: Dark Hole and Raigeki on the first page ({Names(destroyAll, 8)}; phrase \"{_editor.DebugCardSearch.LastPhrase}\")",
+                firstPage.Contains("Dark Hole") && firstPage.Contains("Raigeki"));
+            yield return Shot("destroy-all");
+            _editor.DebugSearch("\"destroy all\"");
+            cChips = _editor.DebugActiveChips();
+            Report($"C: quotes the player typed stay on the chip ({string.Join(", ", cChips)})", cChips.SequenceEqual(new[] { "\"destroy all\"" }));
+            // A typed ban term between the words parts them; after them it doesn't (review fix 5).
+            _editor.DebugSearch("destroy limit:1 all");
+            var between = _editor.DebugCardSearch.LastPhrase;
+            _editor.DebugSearch("destroy all limit:1");
+            var after = _editor.DebugCardSearch.LastPhrase;
+            Report($"C: \"destroy limit:1 all\" ranks no phrase ({between ?? "none"}); \"destroy all limit:1\" ranks \"{after}\"", between == null && after == "destroy all");
+            _editor.DebugSearch("");
+            var counted = _editor.DebugResultCount;
+            Report($"C: the empty box shows the real count (\"{counted.count}\" for {counted.found} found, {every.Count} in the catalog; {counted.shown} on the pages) and the page label says only the first 2,000 show (\"{counted.page}\")",
+                counted.found == every.Count && counted.found > 2000 && counted.shown == 2000
+                && counted.count == $"{counted.found.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)} cards" && counted.page.EndsWith(" · first 2,000"));
+            _editor.DebugSearch("pot of greed", CardSearch.SearchMode.NameOnly);
+            counted = _editor.DebugResultCount;
+            Report($"C: a short search's count and page (\"{counted.count}\", \"{counted.page}\")", counted.found == counted.shown && counted.count == (counted.found == 1 ? "1 card" : $"{counted.found} cards") && !counted.page.Contains("first"));
+            _editor.DebugSearch("lv4");
+            _editor.DebugFilters(4, 0, 0, -1); // Kind: Spell
+            var empty = _editor.DebugEmptyResults;
+            yield return Shot("no-match");
+            Report($"C: a search with 0 results says what's on (\"{empty.note.Replace("\n", " / ")}\") and offers Clear all ({empty.clearAll})",
+                _editor.DebugResults.Count == 0 && empty.note == "No cards match.\nOn: lv4, Spell" && empty.clearAll);
+            var sanganCard = Named("Sangan")!;
+            _editor.DebugShow(sanganCard);
+            _editor.DebugFavorite(); // Sangan a favorite, the scope Favorites (still lv4, Spell: nothing)
+            empty = _editor.DebugEmptyResults;
+            Report($"C: outside All cards it says where it looks (\"{empty.note.Replace("\n", " / ")}\")", _editor.DebugResults.Count == 0 && empty.note.EndsWith("\nLooking in: Favorites.") && empty.clearAll);
+            _editor.DebugClearAll();
+            yield return null;
+            cChips = _editor.DebugActiveChips();
+            Report($"C: Clear all brings the results back ({Names(_editor.DebugResults, 3)}), clears the box and the filters ({cChips.Count} chips), keeps the scope ({_editor.DebugScopeLabel}) and focuses the first result, not armed ({_editor.DebugFocus.ring}, {_editor.DebugArmed})",
+                _editor.DebugResults.Any(c => c.Name == "Sangan") && cChips.Count == 0 && _editor.DebugScopeIndex == 2 && _editor.DebugEmptyResults.note == ""
+                && _editor.DebugFocus.ring == "result 0" && _editor.DebugArmed == "not armed");
+            _editor.DebugUnfavoriteAll();
+            _editor.DebugScope(2);
+            _editor.DebugSearch("dark");
+            empty = _editor.DebugEmptyResults;
+            Report($"C: an empty Favorites scope still shows its own note (\"{empty.note}\", Clear all {empty.clearAll})", _editor.DebugResults.Count == 0 && empty.note == "Cards you mark ☆ Favorite show here." && !empty.clearAll);
+            _editor.DebugSearch("");
+            _editor.DebugScope(0);
+
             // ---- The More panel ----
             _editor.DebugToggleMore();
             Report("More opens the panel over the grid", _editor.DebugMoreOpen);
@@ -220,7 +270,7 @@ namespace YgoCampaign.Game
             _editor.DebugClearMore();
             chips = _editor.DebugActiveChips();
             Report($"Clear these clears the panel's filters and keeps the box ({string.Join(", ", chips)}; {_editor.DebugMoreButton})",
-                _editor.MoreFilterCount == 0 && chips.Count == 1 && chips[0] == "\"dark magician\"" && _editor.DebugMoreButton == "More");
+                _editor.MoreFilterCount == 0 && chips.Count == 1 && chips[0] == "dark magician" && _editor.DebugMoreButton == "More");
 
             // A long active row scrolls rather than dropping chips.
             _editor.DebugSearch("dragon");

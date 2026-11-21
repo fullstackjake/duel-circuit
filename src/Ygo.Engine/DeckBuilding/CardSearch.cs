@@ -184,6 +184,9 @@ namespace Ygo.Engine.DeckBuilding
         /// <summary>The last search's <c>does:</c> tokens that aren't genres, as typed.</summary>
         public IReadOnlyList<string> LastUnknownGenres => _unknownGenres;
 
+        /// <summary>The phrase the last Find ranked exact matches of first ("destroy all"), or null when it ranked none.</summary>
+        public string? LastPhrase { get; private set; }
+
         /// <summary>
         /// The archetype names for <c>@name</c> terms, suggestions and <see cref="ArchetypesOf"/> (the editor's
         /// <c>SetAnalysisData</c> list). Until it's called, every <c>@term</c> names nothing.
@@ -273,14 +276,15 @@ namespace Ygo.Engine.DeckBuilding
         /// in Name only is Fusion Gate); prefixed terms (does:, @, name:, text:, pend:, attr:, type:) and comparisons
         /// (lv4, atk&gt;2000) keep their meaning. <paramref name="filters"/> always reads keywords as filters. An OR never
         /// joins the two: one at either end of either part is dropped. <paramref name="closeNames"/> false: never add close
-        /// names (the Card Trader's search).
+        /// names (the Card Trader's search). <paramref name="exactWords"/> (the deck editor): when the box holds two or more
+        /// plain words next to each other, the cards whose text has them as typed lead the text matches (<see cref="LastPhrase"/>).
         /// </summary>
-        public List<CardInfo> Find(string box, SearchMode mode, string filters, int limit = 500, bool closeNames = true)
+        public List<CardInfo> Find(string box, SearchMode mode, string filters, int limit = 500, bool closeNames = true, bool exactWords = false)
         {
             ClearLast();
             var groups = ParseQuery(box, mode, plainKeywords: mode != SearchMode.NameAndText);
             groups.AddRange(ParseQuery(filters, SearchMode.NameAndText));
-            return Run(groups, mode, limit, closeNames);
+            return Run(groups, mode, limit, closeNames, exactWords ? PhraseOf(box, mode) : null);
         }
 
         private void ClearLast()
@@ -289,9 +293,53 @@ namespace Ygo.Engine.DeckBuilding
             _unknownGenres.Clear();
             LastUsedCloseNames = false;
             LastCloseNameStart = -1;
+            LastPhrase = null;
         }
 
-        private List<CardInfo> Run(List<List<Term>> groups, SearchMode mode, int limit, bool closeNames)
+        /// <summary>
+        /// The exact words of a box to rank first in the text ("destroy all"), best try first, or null. The box's bare words
+        /// (no quotes, no leading -, no : @ $ &lt; &gt; = |, not a comparison like lv4, not next to an OR) must sit next to
+        /// each other as typed, two or more of them, with no other term between them; other terms may come before or after
+        /// ("destroy all lv4"). The first try is the whole run, keywords included ("draw 2 cards": draw is a role filter in
+        /// Name + text). In Name + text a second try leaves out the keywords (kinds, Attributes, Types, roles, text tags) at
+        /// the ends of the run, when two or more words are left ("spell destroy all" -> "destroy all"); a keyword inside the
+        /// run gives no second try ("destroy spell all"). Name only has none.
+        /// </summary>
+        private static string[]? PhraseOf(string box, SearchMode mode)
+        {
+            if (mode == SearchMode.NameOnly || string.IsNullOrEmpty(box)) return null;
+            var tokens = Tokenize(box).ToList();
+            int first = -1, last = -1, count = 0;
+            for (int i = 0; i < tokens.Count; i++)
+            {
+                if (!IsPhraseWord(tokens[i]) || i > 0 && IsOr(tokens[i - 1]) || i + 1 < tokens.Count && IsOr(tokens[i + 1])) continue;
+                if (first < 0) first = i;
+                else if (i != last + 1) return null; // a term between two words: no phrase
+                last = i;
+                count++;
+            }
+            if (count < 2) return null;
+            var run = tokens.Skip(first).Take(count).Select(t => t.ToLowerInvariant()).ToList();
+            var full = string.Join(" ", run);
+            if (mode != SearchMode.NameAndText) return new[] { full };
+            int from = 0, to = run.Count;
+            while (from < to && IsKeyword(run[from])) from++;
+            while (to > from && IsKeyword(run[to - 1])) to--;
+            bool inner = false;
+            for (int i = from; i < to; i++) inner |= IsKeyword(run[i]);
+            if (inner || to - from < 2 || to - from == run.Count) return new[] { full };
+            return new[] { full, string.Join(" ", run.Skip(from).Take(to - from)) };
+        }
+
+        private static bool IsPhraseWord(string raw)
+        {
+            if (raw.Length == 0 || raw[0] == '-' || IsOr(raw)) return false;
+            foreach (var ch in raw)
+                if (ch == '"' || ch == ':' || ch == '@' || ch == '$' || ch == '<' || ch == '>' || ch == '=' || ch == '|') return false;
+            return !Comparison.IsMatch(raw.ToLowerInvariant());
+        }
+
+        private List<CardInfo> Run(List<List<Term>> groups, SearchMode mode, int limit, bool closeNames, string[]? phrases = null)
         {
             // Ranking and close names read single terms only: the words inside an OR say nothing about the name.
             var single = groups.Where(g => g.Count == 1).Select(g => g[0]).ToList();
@@ -314,9 +362,49 @@ namespace Ygo.Engine.DeckBuilding
             var squashedName = SquashName(name);
             var squashedWords = words.Select(SquashName).ToList();
             // With words, best name matches first; with only filters (e.g. "handtrap"), plain A-Z is easiest to browse.
-            var ordered = matches.OrderBy(e => Rank(e, name, squashedName, words, squashedWords)).ThenBy(e => KindOrder(e.Card.Type));
-            ordered = words.Count > 0 ? ordered.ThenByDescending(e => e.Card.Level).ThenBy(e => e.Card.Name) : ordered.ThenBy(e => e.Card.Name);
-            var result = ordered.Take(limit).Select(e => e.Card).ToList();
+            List<CardInfo> result;
+            if (phrases == null)
+            {
+                var ordered = matches.OrderBy(e => Rank(e, name, squashedName, words, squashedWords)).ThenBy(e => KindOrder(e.Card.Type));
+                ordered = words.Count > 0 ? ordered.ThenByDescending(e => e.Card.Level).ThenBy(e => e.Card.Name) : ordered.ThenBy(e => e.Card.Name);
+                result = ordered.Take(limit).Select(e => e.Card).ToList();
+            }
+            else
+            {
+                // Exact words first: the cards that match only by text (all of them when no word ranks names, as in Text
+                // only) split in two, those whose text has the phrase first (where it starts, then name), then the rest in
+                // the usual order. Name matches (ranks 0-2) stay ahead of both. The first try some of them have is ranked.
+                var keyed = new List<(Entry e, int group, int at)>(matches.Count);
+                var textOnly = new List<int>();
+                foreach (var e in matches)
+                {
+                    int rank = Rank(e, name, squashedName, words, squashedWords);
+                    if (words.Count > 0 && rank < 3) keyed.Add((e, rank, 0));
+                    else
+                    {
+                        textOnly.Add(keyed.Count);
+                        keyed.Add((e, 4, 0));
+                    }
+                }
+                foreach (var phrase in phrases)
+                {
+                    bool anyPhrase = false;
+                    foreach (var i in textOnly)
+                    {
+                        var e = keyed[i].e;
+                        int at = e.Text.IndexOf(phrase, StringComparison.Ordinal);
+                        if (at >= 0) anyPhrase = true;
+                        keyed[i] = at >= 0 ? (e, 3, at) : (e, 4, 0);
+                    }
+                    if (!anyPhrase) continue;
+                    LastPhrase = phrase;
+                    break;
+                }
+                var ordered = keyed.OrderBy(x => x.group).ThenBy(x => x.at)
+                    .ThenBy(x => x.group == 3 ? 0 : KindOrder(x.e.Card.Type));
+                ordered = words.Count > 0 ? ordered.ThenByDescending(x => x.group == 3 ? 0 : x.e.Card.Level) : ordered;
+                result = ordered.ThenBy(x => x.e.Card.Name).Take(limit).Select(x => x.e.Card).ToList();
+            }
 
             // Close names, only when no card in the whole set has all the plain words in its name (whatever the other terms
             // say: "raigeki monster" finds no monster named Raigeki, but Raigeki is a name, so no lookalikes). The close
@@ -790,19 +878,29 @@ namespace Ygo.Engine.DeckBuilding
         /// </summary>
         public static string TakeBanFilters(string query, out BanTerms terms) => TakeBanFilters(query, out terms, negations: true);
 
+        /// <summary>What <see cref="TakeBanFilters(string, out BanTerms)"/> leaves where it took a ban term from between two
+        /// words: a term that tests nothing (<c>limit:</c> with no number) and isn't a word.</summary>
+        private const string Breaker = "limit:";
+
         private static string TakeBanFilters(string query, out BanTerms terms, bool negations)
         {
             terms = new BanTerms();
             var rest = new List<string>();
+            bool taken = false;
             foreach (var token in Tokenize(query))
             {
                 var m = BanToken.Match(token);
                 bool negated = m.Success && m.Groups[1].Length > 0;
                 if (!m.Success || negated && !negations)
                 {
+                    // A ban term taken from between two words still parts them for exact words ("destroy limit:1 all"
+                    // has no phrase): a bare "limit:" stays in their place, which Find ignores.
+                    if (taken && rest.Count > 0 && IsPhraseWord(rest[rest.Count - 1]) && IsPhraseWord(token)) rest.Add(Breaker);
+                    taken = false;
                     rest.Add(token);
                     continue;
                 }
+                taken = true;
                 bool isLimit = m.Groups[2].Success;
                 int n = 0;
                 if (isLimit && !int.TryParse(m.Groups[2].Value, out n)) continue; // (too many digits: no limit)

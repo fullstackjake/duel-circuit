@@ -252,8 +252,8 @@ namespace YgoCampaign.Game
             _pillAt = now;
         }
 
-        /// <summary>An overlay is open over the deck (the test hand, More, the reading view, the deck list, Save's bar): no message shows or takes the pointer.</summary>
-        private bool Covered => _handOverlay.gameObject.activeSelf || MoreOpen || _reading != null || _browser != null || _savePrompt != null;
+        /// <summary>An overlay is open over the deck (the test hand, More, the reading view, the deck list, Save's bar, the leave question): no message shows or takes the pointer.</summary>
+        private bool Covered => _handOverlay.gameObject.activeSelf || MoreOpen || _reading != null || _browser != null || _savePrompt != null || _leaveDialog != null;
 
         private readonly List<UnityEngine.EventSystems.RaycastResult> _pillHits = new List<UnityEngine.EventSystems.RaycastResult>();
 
@@ -479,5 +479,166 @@ namespace YgoCampaign.Game
         public (Rect box, bool shown, bool takesPointer)? DebugPillBox =>
             _pill == null || _pillGroup == null ? null
                 : (new Rect(((RectTransform)_pill).anchoredPosition.x, -((RectTransform)_pill).anchoredPosition.y, 296, 24), _pillGroup.alpha > 0.01f, _pillGroup.blocksRaycasts);
+            // ---- Finding what's illegal (docs/dev/EDITOR-QUICK-FIXES-SPEC-2026-11-20.md part E) ------------------------------
+
+        /// <summary>The red of a card a problem names (the Forbidden X's).</summary>
+        private static readonly Color ProblemRed = new Color32(0xD9, 0x43, 0x3F, 0xFF);
+
+        /// <summary>The base cards the deck's problems name (set by RefreshDeck before the grids are drawn).</summary>
+        private readonly HashSet<uint> _problemKeys = new HashSet<uint>();
+
+        /// <summary>A problem card's badge: its limit when it's over a limit of 1 or 2, X when Forbidden, ! for anything else.</summary>
+        private string ProblemBadge(uint key)
+        {
+            int allowed = EffectiveList.Allowed(key, _cards);
+            if (allowed == 0) return "X";
+            int copies = _deck.Main.Concat(_deck.Extra).Concat(_deck.Side).Count(c => Key(c) == key);
+            return allowed is 1 or 2 && copies > allowed ? allowed.ToString() : "!";
+        }
+
+        /// <summary>Over the problems box: one target per shown problem line that names a card (its base card, the target, its underline).</summary>
+        private RectTransform _problemLinks = null!;
+        private readonly List<(uint key, RectTransform target, GameObject underline, int line)> _links = new List<(uint, RectTransform, GameObject, int)>();
+        /// <summary>What the links were last built from, and the screen they were measured on (rebuilt when it changes).</summary>
+        private (List<DeckProblem> shown, int firstLine, Vector2Int screen) _linksFrom = (new List<DeckProblem>(), 0, Vector2Int.zero);
+        private bool _linksStale;
+        private UnityEngine.EventSystems.PointerEventData? _linkPointer;
+        private UnityEngine.EventSystems.EventSystem? _linkPointerFor;
+        private Vector2 _linkPointerAt = new Vector2(float.NaN, float.NaN);
+        private RectTransform? _linkOver;
+
+        /// <summary>
+        /// The shown problem lines that name a card become links: a target the size of the line as drawn (wrapped lines too)
+        /// over the unchanged block, underlined while pointed at; a click focuses that card's first copy in the deck.
+        /// <paramref name="firstLine"/>: the block's line the problems start on (after the story, Ban Passes and analysis).
+        /// </summary>
+        private void ShowProblemLinks(List<DeckProblem> shown, int firstLine)
+        {
+            var T = UiTheme.Current;
+            ClearChildren(_problemLinks);
+            _links.Clear();
+            _linksFrom = (shown, firstLine, new Vector2Int(Screen.width, Screen.height));
+            _linksStale = false;
+            _linkOver = null;
+            _linkPointerAt = new Vector2(float.NaN, float.NaN); // look again for the line under the pointer
+            if (shown.Count == 0 || !shown.Any(p => p.Code != 0)) return;
+            var lines = _problems.text.Split('\n');
+            var size = _problems.rectTransform.rect.size;
+            var settings = _problems.GetGenerationSettings(size);
+            settings.verticalOverflow = VerticalWrapMode.Overflow; // the lines' own heights, cut off or not
+            var gen = _problems.cachedTextGeneratorForLayout;
+            float ppu = _problems.pixelsPerUnit > 0 ? _problems.pixelsPerUnit : 1;
+            float Height(string s) => gen.GetPreferredHeight(s, settings) / ppu;
+            float Width(string s) => gen.GetPreferredWidth(s, settings) / ppu;
+            for (int k = 0; k < shown.Count; k++)
+            {
+                int at = firstLine + k;
+                if (shown[k].Code == 0 || at >= lines.Length) continue;
+                float bottom = Height(string.Join("\n", lines.Take(at + 1)));
+                float own = Height(lines[at]);
+                float top = bottom - own;
+                if (top >= size.y - 1) break; // cut off by the box: not drawn, so no link
+                bottom = Mathf.Min(bottom, size.y);
+                var target = Box(_problemLinks, 0, top, size.x, bottom - top);
+                target.name = "ProblemLink";
+                var key = Key(shown[k].Code);
+                Ui.Clickable(target, () => FocusProblem(key));
+                // The underline: 2 px (a line at least one screen pixel at 1280x720), under the line's last row.
+                float width = Mathf.Min(size.x, Width(System.Text.RegularExpressions.Regex.Replace(lines[at], "<.*?>", "")) + 2);
+                var line = Box(target, 0, bottom - top - 2, own > Height("A") * 1.5f ? size.x : width, 2);
+                Ui.Image(line, T.Text.WithAlpha(0.8f)).raycastTarget = false;
+                line.gameObject.SetActive(false);
+                _links.Add((key, target, line.gameObject, at));
+            }
+        }
+
+        /// <summary>A click on a problem line: that card's first copy in the deck (Main, then Extra, then Side) is focused, not armed.</summary>
+        private void FocusProblem(uint key)
+        {
+            foreach (var section in Sections)
+            {
+                int index = Section(_deck, section).FindIndex(c => Key(c) == key);
+                if (index < 0) continue;
+                FocusDeck(section, index, viewed: false);
+                return;
+            }
+        }
+
+        private readonly List<UnityEngine.EventSystems.RaycastResult> _linkHits = new List<UnityEngine.EventSystems.RaycastResult>();
+
+        /// <summary>The problem line under the pointer (the top thing there) is underlined; the others aren't.</summary>
+        private void HoverProblemLinks()
+        {
+            // A new window size wraps the text anew: the targets are measured again, a frame after the canvas has the size.
+            var screen = new Vector2Int(Screen.width, Screen.height);
+            if (_linksStale) ShowProblemLinks(_linksFrom.shown, _linksFrom.firstLine);
+            else if (screen != _linksFrom.screen && _linksFrom.shown.Count > 0) _linksStale = true;
+            if (_links.Count == 0) return;
+            RectTransform? over = null;
+            var events = UnityEngine.EventSystems.EventSystem.current;
+#if ENABLE_INPUT_SYSTEM
+            if (events != null && !Covered)
+            {
+                bool any = false;
+                Vector2 at = default;
+                foreach (var device in UnityEngine.InputSystem.InputSystem.devices)
+                    if (device is UnityEngine.InputSystem.Mouse m && m.enabled) { at = m.position.ReadValue(); any = true; }
+                if (!any) over = null;
+                else if (at == _linkPointerAt) over = _linkOver; // the pointer hasn't moved: no new raycast
+                else
+                {
+                    _linkPointerAt = at;
+                    if (_linkPointer == null || _linkPointerFor != events) { _linkPointer = new UnityEngine.EventSystems.PointerEventData(events); _linkPointerFor = events; }
+                    _linkPointer.position = at;
+                    _linkHits.Clear();
+                    events.RaycastAll(_linkPointer, _linkHits);
+                    if (_linkHits.Count > 0 && _linkHits[0].gameObject.transform.parent == _problemLinks) over = (RectTransform)_linkHits[0].gameObject.transform;
+                }
+            }
+            else _linkPointerAt = new Vector2(float.NaN, float.NaN); // covered: look again once uncovered
+#endif
+            _linkOver = over;
+            foreach (var (_, target, underline, _) in _links)
+                if (underline != null && underline.activeSelf != (target == over)) underline.SetActive(target == over);
+        }
+
+        /// <summary>For checks: the lines of the problems box (by index in its text) that are links.</summary>
+        public List<int> DebugProblemLinkLines() => _links.Select(l => l.line).ToList();
+
+        /// <summary>For checks: what a window of another size would do: the targets are measured again.</summary>
+        public void DebugRemeasureLinks() => _linksStale = true;
+
+        /// <summary>For checks: the problems box as shown, rich text included.</summary>
+        public string DebugProblemsText => _problems.text;
+
+        /// <summary>For checks: every badge in the deck's grids (limit, X, !, P): where, its text and its colour.</summary>
+        public IReadOnlyList<(DeckSection section, int index, string text, string color)> DebugProblemBadges()
+        {
+            var list = new List<(DeckSection, int, string, string)>();
+            foreach (var d in _deckViews)
+                if (d.view != null && d.view.transform.Find("Limit") is Transform badge && badge.GetComponent<Image>() is Image image)
+                    list.Add((d.section, d.index, badge.GetComponentInChildren<Text>()?.text ?? "", ColorUtility.ToHtmlStringRGB(image.color)));
+            return list;
+        }
+
+        /// <summary>For checks: clicks that card's problem line (as a click does); false when it has none.</summary>
+        public bool DebugClickProblem(uint code)
+        {
+            var key = code == 0 ? 0 : Key(code);
+            foreach (var (k, target, _, _) in _links)
+                if (k == key && target != null && target.GetComponent<Clickable>() is Clickable c) { c.Left?.Invoke(); return true; }
+            return false;
+        }
+
+        /// <summary>For checks: the problem links (their card, and whether underlined), and one's centre on screen.</summary>
+        public List<(string card, bool underlined)> DebugProblemLinks() =>
+            _links.Select(l => (_cards.Get(l.key)?.Name ?? l.key.ToString(), l.underline != null && l.underline.activeSelf)).ToList();
+        public Vector2? DebugProblemLinkOnScreen(uint code)
+        {
+            var key = Key(code);
+            foreach (var (k, target, _, _) in _links)
+                if (k == key && target != null) return RectTransformUtility.WorldToScreenPoint(null, target.TransformPoint(target.rect.center));
+            return null;
+        }
     }
 }

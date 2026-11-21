@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -120,6 +121,9 @@ namespace YgoCampaign.Game
         private CardInfo? _selected;
         private List<CardInfo> _results = new List<CardInfo>();
         private int _page;
+        /// <summary>How many cards the last search found (the grid holds the first <see cref="MaxShown"/>).</summary>
+        private int _found;
+        private const int MaxShown = 2000;
         private int _banIndex;
         private string _query = "";
         private readonly HashSet<int> _chips = new HashSet<int>();
@@ -136,6 +140,7 @@ namespace YgoCampaign.Game
         private RectTransform _root = null!, _cardsLayer = null!, _resultsLayer = null!, _handOverlay = null!, _handCards = null!;
         private Text _status = null!, _problems = null!, _mainHeader = null!, _extraHeader = null!, _sideHeader = null!;
         private Text _resultCount = null!, _pageLabel = null!, _banLabel = null!, _openLabel = null!, _detail = null!;
+        private Text? _help;
         private Text _odds = null!, _testResult = null!, _opponentLabel = null!, _opponentDeckLabel = null!, _starterLabel = null!, _handLabel = null!;
         private CardDetail _cardDetail = null!;
         private RectTransform _charts = null!;
@@ -159,6 +164,13 @@ namespace YgoCampaign.Game
         public event Action? Closed;
 
         public bool IsOpen => _root != null && _root.gameObject.activeSelf;
+
+        private static int _shownFrame = -10;
+        /// <summary>
+        /// The editor is open, or was a frame ago (the Esc that closed it): the duel board under it leaves that Esc alone
+        /// (BoardView.UpdateKeys). Whichever of the two runs its Update first, the frame's Esc is the editor's.
+        /// </summary>
+        public static bool ShownLately => Time.frameCount - _shownFrame <= 1;
 
         /// <summary>
         /// Campaign deck building: search shows only cards you own (with how many), and a deck can't use more
@@ -221,6 +233,25 @@ namespace YgoCampaign.Game
         /// A deck's own "#banlist" picks a list on load, which isn't the circuit's say on texts.
         /// </summary>
         private bool _listPickedByHand;
+
+        /// <summary>
+        /// Free play: the list last picked by hand in this opening (null: none). A deck without a "banlist" note opens under it
+        /// (else the newest TCG list), whichever decks were opened in between.
+        /// </summary>
+        private string? _handList;
+
+        /// <summary>
+        /// A list was picked by hand for the deck in the editor: while it was open, or, for a deck made with New, the hand-picked
+        /// list was showing when it was made (New keeps the list). Opening a deck clears it: only then does Save write the
+        /// deck's "banlist" note, so it never gets a list the player didn't pick for it.
+        /// </summary>
+        private bool _deckListPicked;
+
+        /// <summary>Free deck building: no collection and no cup's format (the campaign passes its own lists).</summary>
+        private bool FreePlay => OwnedCards == null && _format == null;
+
+        /// <summary>The list each mode showed when it last closed (free play's is only a fallback: it opens on the newest TCG list).</summary>
+        private int _freeBanIndex, _campaignBanIndex;
 
         /// <summary>The note reads a campaign circuit's own texts ("At this circuit"): opened from a circuit, list not changed by hand.</summary>
         private bool AtCircuit => Format == null && _circuitTexts != null && OwnedCards != null && !_listPickedByHand;
@@ -306,10 +337,23 @@ namespace YgoCampaign.Game
         private void Open(string? deckName, Collection? owned, string? banlist, FormatRules? format, TextRules? circuitTexts = null)
         {
             DropFormatLists(format);
+            CloseLeaveDialog(); // a question left open last time (Close from outside)
+            // Free play and the campaign keep the list each showed last apart: free play's default (the newest TCG list)
+            // never reaches the campaign editor, which stays as it was (spec part B).
+            if (OwnedCards == null && _format == null) _freeBanIndex = _banIndex;
+            else _campaignBanIndex = _banIndex;
             OwnedCards = owned;
             _format = format;
             _circuitTexts = circuitTexts;
             _listPickedByHand = false;
+            _handList = null;
+            if (FreePlay)
+            {
+                // Free play opens on the newest TCG list (a deck's own #banlist, read by LoadDeck, comes over it).
+                int newest = Banlist.NewestTcg(_banlists);
+                _banIndex = newest >= 0 ? newest : Mathf.Clamp(_freeBanIndex, 0, _banlists.Count - 1);
+            }
+            else if (banlist == null) _banIndex = Mathf.Clamp(_campaignBanIndex, 0, _banlists.Count - 1);
             _recipes = null; // the collection or ban list may have changed
             if (_browser != null) CloseBrowser(); // a deck list left open last time
             CloseMore();
@@ -323,6 +367,7 @@ namespace YgoCampaign.Game
             foreach (var go in _freeTools) go.SetActive(owned == null);
             foreach (var go in _campaignTools) go.SetActive(owned != null);
             _root.gameObject.SetActive(true);
+            _shownFrame = Time.frameCount;
             _root.SetAsLastSibling();
             _library.Refresh();
             if (deckName != null && _library.Contains(deckName)) LoadDeck(deckName);
@@ -349,23 +394,21 @@ namespace YgoCampaign.Game
         }
 
         /// <summary>Controller Y: star / unstar the selected card.</summary>
-        public void ControllerFavorite() => ToggleFavorite();
+        public void ControllerFavorite() { if (_leaveDialog == null) ToggleFavorite(); } // (nothing under the leave question)
 
         // ------------------------------------------------------------------ Controller
 
-        /// <summary>Controller B: close the More filters panel or the test hand if one is open, otherwise leave the editor.</summary>
-        public void ControllerBack()
-        {
-            if (MoreOpen) CloseMore();
-            else if (_handOverlay.gameObject.activeSelf) CloseTestHand();
-            else Confirmed("back", Close);
-        }
+        /// <summary>
+        /// Controller B (as Esc): closes the top thing (the leave question, Save's bar, the reading view, the deck list, the
+        /// test hand, the More panel); with none open, leaves the editor (asking first when there are unsaved changes).
+        /// </summary>
+        public void ControllerBack() => BackOne();
 
         /// <summary>Controller LB / RB: previous / next page of search results (the More panel covers them while it's open).</summary>
-        public void ControllerPage(int delta) => TurnPage(delta);
+        public void ControllerPage(int delta) { if (_leaveDialog == null) TurnPage(delta); }
 
         /// <summary>Controller View (the hint bar's "more filters"): opens or closes the More filters panel.</summary>
-        public void ControllerMore() => ToggleMore();
+        public void ControllerMore() { if (_leaveDialog == null) ToggleMore(); }
 
         // Read-outs for automated checks.
         public int CardCount(DeckSection section) => Section(_deck, section).Count;
@@ -599,6 +642,8 @@ namespace YgoCampaign.Game
         {
             // Leaving on purpose (after the "unsaved changes" warning) drops the recovery copy; a crash or quit keeps it.
             if (_dirty) ClearRecovery();
+            _shownFrame = Time.frameCount;
+            CloseLeaveDialog();
             ClearFeedback();
             _dragging = false;
 #if ENABLE_INPUT_SYSTEM
@@ -614,14 +659,15 @@ namespace YgoCampaign.Game
         private void Update()
         {
             if (!IsOpen) return;
-            // Escape shuts the More filters panel (B on a controller: ControllerBack).
-#if ENABLE_INPUT_SYSTEM
-            if (MoreOpen && UnityEngine.InputSystem.Keyboard.current?.escapeKey.wasPressedThisFrame == true) CloseMore();
-#else
-            if (MoreOpen && Input.GetKeyDown(KeyCode.Escape)) CloseMore();
-#endif
+            _shownFrame = Time.frameCount;
+            // Ctrl/Cmd+S, Z, Y, F, "/", and Esc closing the top thing, then leaving (DeckEditor.Keys); before FocusInput, which
+            // moves the one-frame grace after typing on.
+            Shortcuts();
+            if (!IsOpen) return; // Esc left the editor
             FocusInput(); // the focus's keys, the wheel, the right stick (DeckEditor.Focus)
             AnimateFeedback(); // what a change shows (DeckEditor.Feedback)
+            ShowUnsavedMark(); // the Save button's dot (DeckEditor.Leave)
+            HoverProblemLinks(); // a problem line pointed at is underlined (DeckEditor.Feedback)
             // The bot test runs on a background thread; show its progress here.
             if (_tester.Running || _wasTesting)
             {
@@ -778,15 +824,15 @@ namespace YgoCampaign.Game
         private void BuildToolbar()
         {
             _nameField = Ui.Input(Box(_root, 410, 10, 250, 40), "deck name", 17, v => { _deck.Name = v; MarkDirty(); FitName(false); });
-            Button(668, 10, 70, 40, "Save", Save);
-            Button(744, 10, 64, 40, "New", () => Confirmed("new", NewDeck));
+            BuildUnsavedMark(Button(668, 10, 70, 40, "Save", Save)); // its dot while the deck has unsaved changes (DeckEditor.Leave)
+            Button(744, 10, 64, 40, "New", () => AskFirst(NewDeck));
             Button(814, 10, 80, 40, "Delete", Delete);
             Button(904, 10, 90, 40, "Decks...", ShowBrowser);
             Button(1000, 10, 66, 40, "Copy", Duplicate);
             _labelField = Ui.Input(Box(_root, 1072, 10, 192, 40), "label / folder", 15, v => { SetLabel(v); });
             _openLabel = Label(0, 0, 0, 0, "", 1);
             _openLabel.gameObject.SetActive(false);
-            Button(1270, 10, 120, 40, "Back", () => Confirmed("back", Close)); // to the duel, the campaign or the menu, wherever it was opened from
+            Button(1270, 10, 120, 40, "Back", () => AskFirst(Close)); // to the duel, the campaign or the menu, wherever it was opened from
 
             Button(410, 58, 58, 34, "Undo", Undo);
             Button(474, 58, 58, 34, "Redo", Redo);
@@ -834,6 +880,9 @@ namespace YgoCampaign.Game
             Ui.Image(_charts, T.Panel);
             _problems = Label(410, 912, 980, 160, "", 14, TextAnchor.UpperLeft);
             _problems.supportRichText = true;
+            // Over it, a target per problem line that names a card (DeckEditor.Feedback): the block itself never moves.
+            _problemLinks = Box(_root, 410, 912, 980, 160);
+            _problemLinks.name = "ProblemLinks";
         }
 
         private void BuildSearch()
@@ -887,6 +936,10 @@ namespace YgoCampaign.Game
             }
             BuildMoreButton(1850, 118, 60, 28);
             _resultCount = Label(1410, 152, 90, 26, "", 13);
+            // "13,925 cards": the real count shrinks to fit rather than run under the active row.
+            _resultCount.resizeTextForBestFit = true;
+            _resultCount.resizeTextMinSize = 10;
+            _resultCount.resizeTextMaxSize = 13;
             _searchLayout.Add(("More button", _moreFill.rectTransform));
             _searchLayout.Add(("count", _resultCount.rectTransform));
             // The active filters: a window onto a row that scrolls sideways (the wheel, a drag, or the ‹ › ends) when it runs long.
@@ -922,17 +975,21 @@ namespace YgoCampaign.Game
             _emptyNote = Label(1430, 260, 460, 80, "", 15, TextAnchor.UpperCenter);
             _emptyNote.color = T.TextSoft;
             _emptyNote.raycastTarget = false;
+            BuildNoMatch(); // "No cards match." with what's on and Clear all (DeckEditor.Filters)
             var prev = Button(1410, 940, 100, 32, "< Prev", () => { _page--; ShowResults(); });
             _pageLabel = Label(1514, 940, 292, 32, "", 14, TextAnchor.MiddleCenter);
             var next = Button(1810, 940, 100, 32, "Next >", () => { _page++; ShowResults(); });
             _searchLayout.Add(("Prev", (RectTransform)prev.transform));
             _searchLayout.Add(("page", _pageLabel.rectTransform));
             _searchLayout.Add(("Next", (RectTransform)next.transform));
+            var cmd = Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor ? "Cmd" : "Ctrl";
             var help = Label(1410, 980, 500, 90, "Click a card to see it on the left. Click it again to add it.\n"
                 + "Click a card in your deck, then again, to take it out. Shift+click does it at once.\n"
-                + "Right-click: Side Deck. Enter: add. Delete: remove. Drag cards anywhere.",
+                + "Right-click: Side Deck. Enter: add. Delete: remove. Drag cards anywhere.\n"
+                + $"{cmd}+S save · {cmd}+Z undo · {cmd}+F or / search · Esc back",
                 13, TextAnchor.UpperLeft);
             help.color = T.Caption.WithAlpha(0.55f);
+            _help = help;
             _searchLayout.Add(("help", help.rectTransform));
             BuildMorePanel(); // over the grid, so it's built after it (DeckEditor.Filters)
         }
@@ -1285,7 +1342,8 @@ namespace YgoCampaign.Game
             ClearChildren(_activeContent);
             var active = new List<(string label, Action remove)>();
             if (_related != null) active.Add(($"Related: {_related.Name}", () => _related = null));
-            if (_query.Trim().Length > 0) active.Add(($"\"{_query.Trim()}\"", () => { _query = ""; _searchField.SetTextWithoutNotify(""); }));
+            // The box as typed (quotes only where the player typed them).
+            if (_query.Trim().Length > 0) active.Add((_query.Trim(), () => { _query = ""; _searchField.SetTextWithoutNotify(""); }));
             foreach (var c in _chips.OrderBy(c => c).ToList()) active.Add((ChipLabels[c], () => { _chips.Remove(c); _chipImages[c].color = ChipColor(c, false); }));
             var options = new[] { KindOptions, AttributeOptions, TypeOptions, LevelOptions };
             for (int p = 0; p < options.Length; p++)
@@ -1295,6 +1353,7 @@ namespace YgoCampaign.Game
             }
             active.AddRange(MoreChips()); // genres, archetypes, Limit, Look (DeckEditor.Filters)
             _activeCount = active.Count;
+            _activeLabels = active.Select(a => a.label).ToList(); // for "No cards match. On: ..." (DeckEditor.Filters)
             float x = 0;
             if (_scope == ScopeSeen && _seenLog.Duels.Count > 0)
             {
@@ -1472,13 +1531,19 @@ namespace YgoCampaign.Game
             RefreshDeck();
             // Every change signals: its counts and a message (with Undo) that replaces the one before.
             Signal(before, kind, words ?? what, at ?? ChangedSection(before), key);
+            // A bulk change names itself on the status line ("Sorted."), so an older line ("Added Pot of Greed (2 of 3).") never
+            // stays under it; a caller with more to say (Recipe, Import...) writes its own after this. (Single-card changes write theirs.)
+            var said = words ?? what;
+            if (kind == ChangeKind.Bulk && said != "Change") SetStatus(said.EndsWith(".") ? said : said + ".");
         }
 
         /// <summary>Clear: the whole deck out (Undo puts it back: "Undone: Clear (40 cards)").</summary>
         private void ClearDeck()
         {
             int n = _deck.Main.Count + _deck.Extra.Count + _deck.Side.Count;
-            Change(d => { d.Main.Clear(); d.Extra.Clear(); d.Side.Clear(); }, $"Clear ({n} card{(n == 1 ? "" : "s")})", $"Cleared {n} card{(n == 1 ? "" : "s")}");
+            var cleared = $"Cleared {n} card{(n == 1 ? "" : "s")}";
+            Change(d => { d.Main.Clear(); d.Extra.Clear(); d.Side.Clear(); }, $"Clear ({n} card{(n == 1 ? "" : "s")})", cleared);
+            SetStatus($"{cleared}. Undo brings {(n == 1 ? "it" : "them")} back.");
         }
 
         /// <summary>For checks: the Clear button.</summary>
@@ -1674,6 +1739,8 @@ namespace YgoCampaign.Game
             _redo.Clear();
             _dirty = false;
             _rebuilt = false;
+            // New keeps the list showing: a hand-picked one showing is picked for this deck too.
+            _deckListPicked = _handList != null && _banlists[_banIndex].Name == _handList;
             ShowName(_deck.Name);
             _labelField.SetTextWithoutNotify("");
             RefreshDeck();
@@ -1737,9 +1804,14 @@ namespace YgoCampaign.Game
             ShowName(name);
             _labelField.SetTextWithoutNotify(_deck.Note("label"));
             _openIndex = Math.Max(0, OpenableDecks.IndexOf(name));
-            // A historic deck opens under the ban list of its era.
+            // A historic deck opens under the ban list of its era (a free deck under the list it was saved with). In free play a
+            // deck without one (or naming a list that's gone) opens on the newest TCG list, unless a list was picked by hand
+            // in this opening: that one stays.
             var era = _banlists.FindIndex(b => b.Name == _deck.Note("banlist"));
             if (era >= 0) _banIndex = era;
+            else if (FreePlay && _handList != null && _banlists.FindIndex(b => b.Name == _handList) is int picked && picked >= 0) _banIndex = picked;
+            else if (FreePlay && Banlist.NewestTcg(_banlists) is int newest && newest >= 0) _banIndex = newest;
+            _deckListPicked = false; // not picked for this deck yet
             RefreshDeck();
             SetStatus(_deck.Campaign && OwnedCards == null
                 ? $"Opened campaign deck {name}. You can play it anywhere; saving here makes a free copy (edit the original in the campaign)."
@@ -1761,6 +1833,7 @@ namespace YgoCampaign.Game
         private void Save()
         {
             CloseSavePrompt();
+            NoteListPick(); // before the comparison: a list picked by hand is a change to save
             var name = DeckLibrary.SafeName(string.IsNullOrWhiteSpace(_deck.Name) ? "new deck" : _deck.Name);
             var saved = _library.Contains(name) && _library.IsOwn(name) ? _library.Load(name) : null;
             // Nothing changed but at most the title (Recipe on a deck that already is that recipe, starters and notes
@@ -1890,8 +1963,20 @@ namespace YgoCampaign.Game
                 : $"Saved as {_deck.Name}; {from} is kept as it was.");
         }
 
+        /// <summary>
+        /// Free play, after a list was picked by hand in this opening: the deck remembers it (its "banlist" note, "No limits"
+        /// included), so it reopens under it and the deck list shows it. Otherwise a deck's note stays as it is. Never in the
+        /// campaign (a campaign deck and a free deck share the folder; the circuit picks the campaign's list).
+        /// </summary>
+        private void NoteListPick()
+        {
+            if (!FreePlay || !_deckListPicked || _banIndex < 0 || _banIndex >= _banlists.Count) return;
+            _deck.Notes["banlist"] = _banlists[_banIndex].Name;
+        }
+
         private void SaveNow()
         {
+            NoteListPick();
             if (string.IsNullOrWhiteSpace(_deck.Name)) _deck.Name = "new deck";
             _deck.Name = DeckLibrary.SafeName(_deck.Name);
             if (OwnedCards != null)
@@ -2347,14 +2432,16 @@ namespace YgoCampaign.Game
             SetStatus("Copied a YDKE link to the clipboard (paste it into EDOPro, deck sites, or Import).");
         }
 
-        /// <summary>Runs <paramref name="action"/> now, or after a second click if it would discard unsaved changes.</summary>
-        private void Confirmed(string key, Action action, string? question = null)
+        /// <summary>
+        /// Runs <paramref name="action"/> after a second click (Delete's "click Delete again"). Unsaved changes ask in the
+        /// leave dialog instead (<see cref="AskFirst"/>).
+        /// </summary>
+        private void Confirmed(string key, Action action, string question)
         {
-            bool risky = _dirty || key == "delete";
-            if (risky && _confirm != key)
+            if (_confirm != key)
             {
                 _confirm = key;
-                SetStatus(question ?? "You have unsaved changes. Click again to discard them.");
+                SetStatus(question);
                 return;
             }
             _confirm = null;
@@ -2502,7 +2589,7 @@ namespace YgoCampaign.Game
                     Label(540, 0, 260, 44, e.era, 13, parent: row).color = T.TextMuted;
                     Label(800, 0, 130, 44, $"{e.main} main · {e.extra} extra", 13, TextAnchor.MiddleRight, row).color = T.TextMuted;
                     var name = e.name;
-                    Ui.Clickable(row, () => Confirmed("open", () => { CloseBrowser(); LoadDeck(name); }));
+                    Ui.Clickable(row, () => PickFromList(name)); // asks first with unsaved changes (DeckEditor.Leave)
                     y += 48;
                 }
             }
@@ -2552,11 +2639,6 @@ namespace YgoCampaign.Game
             for (int i = _cardsLayer.childCount - 1; i >= 0; i--) Destroy(_cardsLayer.GetChild(i).gameObject);
             _deckViews.Clear();
             _offHome.Clear();
-            Grid(_deck.Main, DeckSection.Main, 152, 4);
-            Grid(_deck.Extra, DeckSection.Extra, 564, 1);
-            Grid(_deck.Side, DeckSection.Side, 688, 1);
-
-            ShowHeaders(); // "Main 40" and what's in it, with a change's "(+1)" (DeckEditor.Feedback)
 
             var banlist = _banlists[_banIndex];
             _banLabel.text = Format != null && Format.Pool.Length > 0
@@ -2570,15 +2652,30 @@ namespace YgoCampaign.Game
             var formatEnd = PoolEnd(banlist);
             if (OwnedCards == null || (EraLimited?.Invoke() ?? true) || Format != null)
                 problems.AddRange(DeckRules.Releases(_deck, banlist, formatEnd, CardFoil.Printings, _cards));
+            // The cards a problem names wear a red badge in the grids (spec part E).
+            _problemKeys.Clear();
+            foreach (var p in problems) if (p.Code != 0) _problemKeys.Add(Key(p.Code));
+
+            Grid(_deck.Main, DeckSection.Main, 152, 4);
+            Grid(_deck.Extra, DeckSection.Extra, 564, 1);
+            Grid(_deck.Side, DeckSection.Side, 688, 1);
+            ShowHeaders(); // "Main 40" and what's in it, with a change's "(+1)" (DeckEditor.Feedback)
+
             var analysis = Analysis();
+            // Free play's "No limits" checks only the deck's size and 3 copies: with no problems it says so in amber (no list
+            // is picked); a real list, and the campaign's No limits, read green.
             _problems.text = problems.Count == 0
-                ? $"<color={T.GoodHex}>This deck is legal under {banlist.Name}.</color>"
+                ? OwnedCards == null && banlist.Name == Banlist.None.Name
+                    ? $"<color={T.WarnHex}>No ban list picked ({banlist.Name}): only deck size and 3 copies are checked. Pick a list with < >.</color>"
+                    : $"<color={T.GoodHex}>This deck is legal under {banlist.Name}.</color>"
                 : string.Join("\n", problems.Take(7).Select(p => $"<color={T.BadHex}>•</color> {p.Message}"))
                   + (problems.Count > 7 ? $"\n...and {problems.Count - 7} more." : "");
+            var shownProblems = problems.Count == 0 ? new List<DeckProblem>() : problems.Take(7).ToList();
             // Original-text slots you don't own enough original copies of: they play current text (spec 4.4, D3: a note).
             if (OwnedCards != null && CollectionRules.TextShortfalls(_deck, OwnedCards, _versions.TextRows, _cards) is { Count: > 0 } shortfalls)
                 _problems.text += "\n" + string.Join("\n", shortfalls.Take(3).Select(p => $"<color={T.WarnHex}>•</color> {p.Message}."))
                                   + (shortfalls.Count > 3 ? $"\n...and {shortfalls.Count - 3} more short of original copies." : "");
+            var body = _problems.text; // the problems (and notes) after it; everything else goes before
             _problems.text = analysis + _problems.text;
             if (OwnedCards != null && PassAllowance != null && _deck.Note("loaner").Length == 0)
                 _problems.text = $"<color={T.GoldHex}>Ban Passes: {BanPasses.Used(_deck, banlist, _cards, NoPass)} of {Passes} used</color>  <size=12><color={T.TextDimHex}>(select a limited card, then + Pass)</color></size>\n" + _problems.text;
@@ -2592,6 +2689,9 @@ namespace YgoCampaign.Game
                 if (_deck.Note("source").Length > 0) story += $"<color={T.TextDimHex}>{_deck.Note("source")}</color>\n";
                 _problems.text = story + "\n" + _problems.text;
             }
+            // The problem lines that name a card become links; they start after what was put before them (story, passes, analysis).
+            int ahead = _problems.text.Length - body.Length;
+            ShowProblemLinks(shownProblems, ahead <= 0 ? 0 : _problems.text.Substring(0, ahead).Count(c => c == '\n'));
 
             DrawCharts();
             var names = OpenableDecks;
@@ -2626,8 +2726,11 @@ namespace YgoCampaign.Game
                 int allowed = limits.Allowed(codes[i], _cards);
                 // A card a Ban Pass lets in shows a gold P instead of its limit.
                 var baseCode = Banlist.BaseCode(codes[i], _cards);
-                if (allowed < 3 && OwnedCards != null && BanPasses.Of(_deck).Contains(baseCode) && NoPass?.Contains(baseCode) != true) Badge(view.transform, "P", Ui.Hex("#C9A227"));
-                else if (allowed < 3) Badge(view.transform, allowed == 0 ? "X" : allowed.ToString(), allowed == 0 ? Ui.Hex("#D9433F") : Ui.Hex("#E3A21A"));
+                // A card a problem names (over its limit, Forbidden, not out yet, not owned, wrong section) wears a red badge:
+                // its limit when it's over a limit of 1 or 2, X when Forbidden, ! for the rest (spec part E).
+                if (_problemKeys.Contains(baseCode)) Badge(view.transform, ProblemBadge(baseCode), ProblemRed);
+                else if (allowed < 3 && OwnedCards != null && BanPasses.Of(_deck).Contains(baseCode) && NoPass?.Contains(baseCode) != true) Badge(view.transform, "P", Ui.Hex("#C9A227"));
+                else if (allowed < 3) Badge(view.transform, allowed == 0 ? "X" : allowed.ToString(), allowed == 0 ? ProblemRed : Ui.Hex("#E3A21A"));
                 var code = codes[i];
                 var drag = view.gameObject.AddComponent<DragSource>();
                 drag.Began = p => { FocusDeck(section, index, viewed: false); BeginDrag(code, p); }; // a drag focuses the dragged card (not "viewed")
@@ -2714,7 +2817,8 @@ namespace YgoCampaign.Game
             var filters = _chips.OrderBy(c => c).Select(c => ChipTokens[c])
                 .Concat(new[] { KindOptions[_picks[0]].token, AttributeOptions[_picks[1]].token, TypeOptions[_picks[2]].token, LevelOptions[_picks[3]].token })
                 .Concat(MoreTokens()); // genres, archetypes (DeckEditor.Filters)
-            var found = _search.Find(typed, _searchMode, string.Join(" ", filters.Where(t => t.Length > 0)), 20000);
+            // exactWords: the editor ranks cards with the box's words as a phrase first (the Card Trader keeps the old order).
+            var found = _search.Find(typed, _searchMode, string.Join(" ", filters.Where(t => t.Length > 0)), 20000, exactWords: true);
             // Close names (when no card is named that) stay after the real results through every filter and sort below.
             int closeAt = _search.LastCloseNameStart;
             var close = closeAt >= 0 ? found.Skip(closeAt).ToList() : new List<CardInfo>();
@@ -2762,14 +2866,18 @@ namespace YgoCampaign.Game
             }
             var real = Sorted(Narrow(found)).ToList();
             _closeNamesFrom = close.Count > 0 ? real.Count : -1;
-            _results = real.Concat(close.Count > 0 ? Sorted(Narrow(close)) : Enumerable.Empty<CardInfo>()).Take(2000).ToList();
+            var all = real.Concat(close.Count > 0 ? Sorted(Narrow(close)) : Enumerable.Empty<CardInfo>()).ToList();
+            _found = all.Count; // the real count (the grid shows the first 2,000)
+            _results = all.Count > MaxShown ? all.Take(MaxShown).ToList() : all;
             if (_closeNamesFrom >= _results.Count) _closeNamesFrom = -1;
             ShowSearchStatus();
             _page = 0;
             _emptyNote.text = _scope == ScopeSeen && _seenLog.Duels.Count == 0 ? "Cards your opponents play show here after a duel."
                 : _scope == ScopeViewed && _seenLog.Viewed.Count == 0 ? "Cards you look at in the editor show here."
+                : _scope == ScopeFavorites && _favorites.Count == 0 ? "Cards you mark ☆ Favorite show here."
                 : "";
             ShowActiveFilters();
+            ShowNoMatch(); // nothing found and something narrows it: what's on, and Clear all (DeckEditor.Filters)
             ShowResults();
         }
 
@@ -2797,7 +2905,7 @@ namespace YgoCampaign.Game
             if (_selected == null) return;
             _related = _cards.Get(Banlist.BaseCode(_selected.Code, _cards)) ?? _selected;
             RunSearch();
-            SetStatus(_results.Count == 0 ? $"Nothing related to {_related.Name} found." : $"{_results.Count} cards related to {_related.Name}: its archetype, and cards that name it.");
+            SetStatus(_results.Count == 0 ? $"Nothing related to {_related.Name} found." : $"{CardsWord(_found)} related to {_related.Name}: its archetype, and cards that name it.");
         }
 
         private void ShowResults()
@@ -2807,8 +2915,9 @@ namespace YgoCampaign.Game
             _resultViews.Clear();
             int pages = Math.Max(1, (_results.Count + ResultsPerPage - 1) / ResultsPerPage);
             _page = Mathf.Clamp(_page, 0, pages - 1);
-            _resultCount.text = $"{_results.Count}{(_results.Count >= 2000 ? "+" : "")} cards";
-            _pageLabel.text = $"{_page + 1} / {pages}";
+            // The real count, and past 2,000 that only the first 2,000 are on the pages.
+            _resultCount.text = CardsWord(_found);
+            _pageLabel.text = $"{_page + 1} / {pages}" + (_found > MaxShown ? $" · first {MaxShown.ToString("N0", CultureInfo.InvariantCulture)}" : "");
             var limits = _banlists[_banIndex];
             for (int slot = 0; slot < ResultsPerPage; slot++)
             {
@@ -2996,6 +3105,8 @@ namespace YgoCampaign.Game
             var T = UiTheme.Current;
             info = Resolve(info);
             _selected = info;
+            // Free play has no collection: no ownership line (the detail would read the campaign's copies).
+            _cardDetail.ShowOwnership = OwnedCards != null;
             _cardDetail.Show(info);
             var key = Banlist.BaseCode(info.Code, _cards);
             var limits = _banlists[_banIndex];
@@ -3209,6 +3320,8 @@ namespace YgoCampaign.Game
             _recipes = null;
             _banIndex = (_banIndex + delta + _banlists.Count) % _banlists.Count;
             _listPickedByHand = true;
+            _handList = _banlists[_banIndex].Name;
+            _deckListPicked = true;
             RefreshDeck();
             // The Limit filter (or a typed limit: / legal) reads the picked list: the results follow it.
             if (BanFilterOn) RunSearch();

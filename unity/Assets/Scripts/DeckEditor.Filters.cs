@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -423,7 +424,7 @@ namespace YgoCampaign.Game
             ResetSearchForChip();
             _genres.Add(genre.Token);
             RunSearch();
-            SetStatus($"{_results.Count}{(_results.Count >= 2000 ? "+" : "")} cards that do \"{genre.Label}\" ({genre.Meaning.TrimEnd('.')}). Remove it in the row over the cards.");
+            SetStatus($"{CardsWord(_found)} that do \"{genre.Label}\" ({genre.Meaning.TrimEnd('.')}). Remove it in the row over the cards.");
         }
 
         /// <summary>An archetype chip on the card detail was clicked: the search becomes that archetype's members.</summary>
@@ -432,7 +433,7 @@ namespace YgoCampaign.Game
             ResetSearchForChip();
             _archetypePicks.Add((code, name));
             RunSearch();
-            SetStatus($"{_results.Count} {name} cards. Remove it in the row over the cards.");
+            SetStatus($"{_found.ToString("N0", CultureInfo.InvariantCulture)} {name} card{(_found == 1 ? "" : "s")}. Remove it in the row over the cards.");
         }
 
         private void ResetSearchForChip()
@@ -590,5 +591,106 @@ namespace YgoCampaign.Game
             _searchLayout.Where(b => b.what != "results grid").SelectMany(b => b.rt.GetComponentsInChildren<Text>())
                 .Concat(_activeContent.GetComponentsInChildren<Text>())
                 .Concat(MoreOpen ? _more.GetComponentsInChildren<Text>() : Enumerable.Empty<Text>()).ToList();
+            // ---- No cards match (docs/dev/EDITOR-QUICK-FIXES-SPEC-2026-11-20.md part C) -----------------------------------
+
+        /// <summary>"1 card", "8,214 cards".</summary>
+        private static string CardsWord(int n) => $"{n.ToString("N0", CultureInfo.InvariantCulture)} card{(n == 1 ? "" : "s")}";
+
+        /// <summary>The active row's labels, as last shown (the box as typed, chips, pickers, Related, the More panel's).</summary>
+        private List<string> _activeLabels = new List<string>();
+
+        private RectTransform _noMatch = null!;
+        private Text _noMatchTitle = null!, _noMatchOn = null!, _noMatchScope = null!;
+        private GameObject _clearAll = null!;
+
+        /// <summary>The empty grid's note, centred over it: "No cards match.", what's on, where it looks, and Clear all.</summary>
+        private void BuildNoMatch()
+        {
+            var T = UiTheme.Current;
+            _noMatch = Box(_root, 1430, 250, 460, 190);
+            _noMatch.name = "NoMatch";
+            _noMatchTitle = Label(0, 0, 460, 28, "No cards match.", 17, TextAnchor.MiddleCenter, _noMatch);
+            _noMatchTitle.color = T.Text;
+            _noMatchOn = Label(0, 32, 460, 40, "", 13, TextAnchor.UpperCenter, _noMatch);
+            _noMatchOn.color = T.TextSoft;
+            _noMatchScope = Label(0, 76, 460, 22, "", 13, TextAnchor.MiddleCenter, _noMatch);
+            _noMatchScope.color = T.TextSoft;
+            _clearAll = Button(170, 110, 120, 36, "Clear all", ClearAll, _noMatch).gameObject;
+            _noMatch.gameObject.SetActive(false);
+        }
+
+        /// <summary>What narrows the search besides the scope: the box (typed ban terms too), a chip, a picker, Related, a More filter.</summary>
+        private bool Narrowed => _query.Trim().Length > 0 || _chips.Count > 0 || _picks.Take(4).Any(p => p > 0) || _related != null || MoreCount > 0;
+
+        /// <summary>
+        /// Nothing found while something narrows it: the empty grid says so, with the active row's labels (two lines at most,
+        /// then "…"), the scope when it isn't All cards, and Clear all. An empty Seen in duels, Recently viewed or Favorites
+        /// keeps its own note.
+        /// </summary>
+        private void ShowNoMatch()
+        {
+            bool show = _results.Count == 0 && Narrowed && _emptyNote.text.Length == 0;
+            _noMatch.gameObject.SetActive(show);
+            if (!show) return;
+            _noMatchOn.text = FitTwoLines(_noMatchOn, _activeLabels);
+            var scope = _scope switch
+            {
+                ScopeFavorites => "Favorites",
+                ScopeOwned => "Owned only",
+                ScopeSeen => "Seen in duels",
+                ScopeViewed => "Recently viewed",
+                _ => "",
+            };
+            _noMatchScope.text = scope.Length > 0 ? $"Looking in: {scope}." : "";
+            _noMatchScope.gameObject.SetActive(scope.Length > 0);
+        }
+
+        /// <summary>"On: a, b, c" in at most two lines of the label; past that the last labels give way to "…".</summary>
+        private static string FitTwoLines(Text label, List<string> labels)
+        {
+            var settings = label.GetGenerationSettings(label.rectTransform.rect.size);
+            settings.resizeTextForBestFit = false;
+            settings.richText = false;
+            settings.verticalOverflow = VerticalWrapMode.Overflow;
+            var gen = label.cachedTextGeneratorForLayout;
+            float line = gen.GetPreferredHeight("On:", settings);
+            bool Fits(string s) => gen.GetPreferredHeight(s, settings) <= line * 2 + 0.5f;
+            var all = "On: " + string.Join(", ", labels);
+            if (Fits(all)) return all;
+            for (int n = labels.Count - 1; n >= 0; n--)
+            {
+                var cut = "On: " + string.Join(", ", labels.Take(n)) + (n > 0 ? ", …" : "…");
+                if (Fits(cut)) return cut;
+            }
+            return "On: …";
+        }
+
+        /// <summary>
+        /// Clear all: the box, the chips, the four pickers, the More panel's filters and Related go; the scope and the sort stay.
+        /// The first result is focused (not armed).
+        /// </summary>
+        private void ClearAll()
+        {
+            _query = "";
+            _searchField.SetTextWithoutNotify("");
+            foreach (var c in _chips.ToList()) _chipImages[c].color = ChipColor(c, false);
+            _chips.Clear();
+            for (int i = 0; i < 4; i++) _picks[i] = 0;
+            _related = null;
+            ClearMoreFilters();
+            RunSearch();
+            if (_results.Count > 0) FocusResult(_results[0], viewed: false);
+        }
+
+        /// <summary>For checks: the cards on the pages and found, the count and page labels.</summary>
+        public (int shown, int found, string count, string page) DebugResultCount => (_results.Count, _found, _resultCount.text, _pageLabel.text);
+
+        /// <summary>For checks: the empty grid's note as shown ("" when it isn't) and whether its Clear all shows.</summary>
+        public (string note, bool clearAll) DebugEmptyResults => _noMatch.gameObject.activeSelf
+            ? (string.Join("\n", new[] { _noMatchTitle.text, _noMatchOn.text, _noMatchScope.text }.Where(t => t.Length > 0)), _clearAll.activeInHierarchy)
+            : (_emptyNote.text, false);
+
+        /// <summary>For checks: the Clear all button.</summary>
+        public void DebugClearAll() => ClearAll();
     }
 }

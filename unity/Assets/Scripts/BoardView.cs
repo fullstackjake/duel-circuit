@@ -2570,7 +2570,8 @@ namespace YgoCampaign.Game
         {
 #if ENABLE_INPUT_SYSTEM
             var keys = UnityEngine.InputSystem.Keyboard.current;
-            if (keys?.escapeKey.wasPressedThisFrame == true) CloseOverlays();
+            // (Not while the deck editor is open over the duel, or left it with this Esc: that Esc is the editor's.)
+            if (keys?.escapeKey.wasPressedThisFrame == true && !DeckEditor.ShownLately) CloseOverlays();
             if (_humanMode && keys != null && !TypingSomewhere() && KeysElsewhere?.Invoke() != true)
             {
                 if (keys.pKey.wasPressedThisFrame) TogglePin();                // pin (or unpin) the card the detail shows
@@ -2581,7 +2582,7 @@ namespace YgoCampaign.Game
                 if (keys.sKey.wasPressedThisFrame) RequestSkip();
             }
 #else
-            if (Input.GetKeyDown(KeyCode.Escape)) CloseOverlays();
+            if (Input.GetKeyDown(KeyCode.Escape) && !DeckEditor.ShownLately) CloseOverlays();
 #endif
         }
 

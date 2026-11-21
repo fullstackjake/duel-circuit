@@ -393,8 +393,9 @@ namespace YgoCampaign.Game
             yield return Press(Key.Enter, shift: true);
             var movedTo = _editor.DebugFocus.ring;
             yield return Press(Key.Enter);
-            Report($"in the deck: Shift+Enter moves the focused copy to the Side (Main {main0} -> {Count(DeckSection.Main) - (Count(DeckSection.Main) - main0 + 1)}, ring {movedTo}); Enter adds one more copy (Main {Count(DeckSection.Main)})",
-                movedTo == $"Side {side0}" && Count(DeckSection.Side) == side0 + 1 && Count(DeckSection.Main) == main0);
+            // (Quick fixes G4, 2026-11-20: Enter on a Side Deck copy adds one more to the Side Deck, the section it's in.)
+            Report($"in the deck: Shift+Enter moves the focused copy to the Side (Main {main0} -> {main0 - 1}, ring {movedTo}); Enter on that Side copy adds one more to the Side (Side {side0} -> {Count(DeckSection.Side)}, Main {Count(DeckSection.Main)})",
+                movedTo == $"Side {side0}" && Count(DeckSection.Side) == side0 + 2 && Count(DeckSection.Main) == main0 - 1);
 
             // ---- 10. A search keeps the focus ---------------------------------------------------------------------------------
             _editor.DebugSearch("dark magician");
@@ -418,6 +419,9 @@ namespace YgoCampaign.Game
             var top = detail.DebugScroll;
             yield return Shot("text-hint");
             Report($"the text hint on {longText}: \"▼ more\" ({top.more}) and the bar ({top.bar}) while it runs on ({top.room:0} px more)", longText != null && top.more && top.bar);
+            var strip = detail.DebugMoreStrip;
+            Report($"G3: \"▼ more\" sits on its own strip in the box's colour, under the fade (shown {strip.shown}, {strip.height:0} px, opaque {strip.opaque})",
+                strip.shown && strip.height >= 16 && strip.opaque);
             int someSlot = _editor.DebugFocus.ring == "result 0" ? 1 : 0;
             yield return Wheel(R(someSlot), -1);
             float o1 = detail.DebugScroll.offset, glow1 = detail.DebugScroll.glow;
@@ -486,7 +490,9 @@ namespace YgoCampaign.Game
             yield return Click(R(Slot(pot)));
             var beforeSort = Deck();
             var addPill = _editor.DebugPill?.text;
+            var addStatus = _editor.DebugDeck.status;
             _editor.DebugSort();
+            var sortStatus = _editor.DebugDeck.status;
             yield return new WaitForSecondsRealtime(0.25f);
             pill = _editor.DebugPill;
             yield return Shot("pill-bulk");
@@ -495,20 +501,26 @@ namespace YgoCampaign.Game
             if (sortAt != null) yield return Click(sortAt.Value);
             Report($"Sort replaces \"{addPill}\" with \"{pill?.text}\" ({pill?.button}), and that Undo undoes the Sort, not the add (order back: {Deck() == beforeSort}; still {Count(DeckSection.Main)} cards)",
                 addPill == $"+ {pot}" && pill?.text == "Sorted" && pill?.button == "Undo" && sorted != beforeSort && Deck() == beforeSort);
+            Report($"G1: after Sort the status line names it (\"{sortStatus}\", not the add's \"{addStatus}\")", sortStatus == "Sorted." && addStatus.StartsWith($"Added {pot}"));
             int all2 = Count(DeckSection.Main) + Count(DeckSection.Extra) + Count(DeckSection.Side);
             _editor.DebugClearDeck();
             yield return new WaitForSecondsRealtime(0.2f);
             Report($"Clear signals too: \"{_editor.DebugPill?.text}\" with {_editor.DebugPill?.button}, \"{_editor.DebugHeader(DeckSection.Main)}\"; overlaps no button ({string.Join(", ", _editor.DebugPillOverlaps())})",
                 _editor.DebugPill?.text == $"Cleared {all2} cards" && _editor.DebugPill?.button == "Undo" && _editor.DebugHeader(DeckSection.Main).Contains("(−") && _editor.DebugPillOverlaps().Count == 0);
+            Report($"G1: and the status line says \"{_editor.DebugDeck.status}\"", _editor.DebugDeck.status == $"Cleared {all2} cards. Undo brings them back.");
             _editor.DebugUndo();
             yield return Frames(2);
 
             // Fix 2: the keys don't act under the test hand or the More panel.
             yield return Click(D(DeckSection.Main, 0));
             deck0 = Deck();
-            var focusHand = Focus();
+            var ringBeforeHand = _editor.DebugFocus.ring;
             _editor.DebugShowTestHand();
             yield return Frames(3);
+            var focusHand = Focus();
+            // G2: a deck card's ring isn't drawn under the test hand (it peeked out at the overlay's corner).
+            Report($"G2: with the test hand open the focused deck card ({_editor.DebugFocus.card}, ring {ringBeforeHand} before) has no ring drawn ({_editor.DebugFocus.ring}, {(_editor.DebugRing == null ? "none" : "drawn")})",
+                ringBeforeHand == "Main 0" && _editor.DebugFocus.zone == "Deck" && _editor.DebugFocus.ring == "none" && _editor.DebugRing == null);
             foreach (var k in new[] { Key.Delete, Key.Backspace, Key.Enter, Key.RightArrow, Key.DownArrow }) yield return Press(k);
             yield return Press(Key.Enter, shift: true);
             yield return Shot("hand-open");
@@ -516,6 +528,7 @@ namespace YgoCampaign.Game
 
             // Fix 3: a message never sits over the test hand: an Extra Deck message hides under it, and Close closes it.
             yield return Click(_editor.DebugHandCloseOnScreen);
+            Report($"G2: closed, the hand gives the ring back ({_editor.DebugFocus.ring})", _editor.DebugFocus.ring == ringBeforeHand);
             _editor.DebugSearch("blue-eyes ultimate dragon");
             yield return Frames(3);
             yield return Click(R(0));
@@ -693,6 +706,30 @@ namespace YgoCampaign.Game
                 hadSignals && _editor.DebugPill == null && !_editor.DebugHeader(DeckSection.Main).Contains("(") && _editor.DebugEdges().Count == 0);
             _editor.DebugSetDeck(new[] { Code(sangan), Code(mst), Code(raigeki), Code(sangan), Code(pot), Code(pot), Code(pot), Code(reborn) }, Array.Empty<uint>());
 
+            // G5: a deck opened from the deck list while a message shows: the message goes, and its Undo can't change that deck.
+            {
+                _editor.DebugSearch("dark magician");
+                yield return Frames(3);
+                int g5 = Slot(magician) >= 0 ? Slot(magician) : 0;
+                yield return Click(R(g5));
+                yield return Click(R(g5));
+                var shown = _editor.DebugPill?.text;
+                var other = _library.Names.FirstOrDefault(n => n == "classic") ?? _library.Names.First();
+                _editor.DebugOpenFromList(other);
+                yield return Frames(2);
+                bool asked = _editor.DebugLeaveDialogOpen;
+                _editor.DebugLeaveAnswer("discard");
+                yield return Frames(3);
+                var openedDeck = Deck();
+                _editor.DebugUndo();
+                yield return Frames(2);
+                Report($"G5: {other} opened from the deck list (asked first: {asked}) while \"{shown}\" showed: no message ({_editor.DebugPill?.text ?? "none"}), and Undo can't change it (\"{_editor.DebugDeck.status}\")",
+                    shown != null && asked && _editor.CurrentDeckName == other && _editor.DebugPill == null && Deck() == openedDeck && _editor.DebugDeck.status == "Nothing to undo.");
+                _editor.DebugNewDeck();
+                _editor.DebugBanlist(b => b.Name == Banlist.None.Name);
+                _editor.DebugSetDeck(new[] { Code(sangan), Code(mst), Code(raigeki), Code(sangan), Code(pot), Code(pot), Code(pot), Code(reborn) }, Array.Empty<uint>());
+            }
+
             // ---- 13. Reduced motion -----------------------------------------------------------------------------------------
             FxSettings.ReducedMotionOverride = true;
             _editor.DebugClearSignals();
@@ -731,10 +768,11 @@ namespace YgoCampaign.Game
             });
             Report($"reduced motion: a refused card doesn't shake ({rmShake:0.0} px) and wears a red edge ({rmRed})", rmShake < 0.5f && rmRed);
             FxSettings.ReducedMotionOverride = null;
-            _editor.DebugClearSignals();
+            // G5 (review of this check, 2026-11-19): the message is still there when Close runs, so the step needs Close to clear it.
+            var beforeClose = _editor.DebugPill?.text;
             _editor.Close();
             yield return Frames(3);
-            Report($"closing the editor leaves no message ({_editor.DebugPill?.text ?? "none"})", _editor.DebugPill == null);
+            Report($"closing the editor with a message showing (\"{beforeClose}\") leaves none ({_editor.DebugPill?.text ?? "none"})", beforeClose != null && _editor.DebugPill == null);
 
             // Fix 12: a right stick that drifts (never at rest since the editor opened) doesn't scroll the text.
             {

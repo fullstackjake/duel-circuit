@@ -174,7 +174,8 @@ The screen has three parts:
 
 Click a card to see it on the left: a white ring shows which card that is. Pointing at a card only lifts it a little,
 so the left side stays on the card you clicked while you move to its buttons. The editor opens with the first search
-result shown.
+result shown. In the campaign the card on the left shows how many copies you
+own; in free play you have no collection, so it shows no ownership line.
 
 ### Adding and removing cards
 
@@ -205,16 +206,36 @@ in, white when it moves; the gap closes when one comes out). A change the editor
 Deck, a card you don't own yet) shakes the card and says why in red. The message hides while the test hand, More,
 the deck list or the bigger card view is open.
 
-**Keys** (they do nothing while you're typing in a box, and while the test hand or More filters is open: close it
-first). **Enter** in the search box shows the first result; **Enter** again adds it.
+**Keys** (the ring keys below do nothing while you're typing in a box, and while the test hand or More filters is
+open: close it first). **Enter** in the search box shows the first result; **Enter** again adds it. The shortcuts
+further down work in more places.
 
 | Key | In the search results | In your deck |
 |---|---|---|
-| **Enter** | Add the card with the ring | Add one more copy |
+| **Enter** | Add the card with the ring | Add one more copy, to the section that copy is in (a Side Deck copy adds to the Side Deck) |
 | **Shift+Enter** | Add it to the Side Deck | Move that copy between Main and Side |
 | **Delete** or **Backspace** | Nothing | Take that copy out |
 | Arrow keys | Move the ring | Move the ring |
 | **Page Up** / **Page Down** | Turn the results page | Turn the results page |
+
+**Shortcuts.** **Ctrl** and **Cmd** work the same on every computer. The help lines under the search results list them.
+
+| Key | What it does | While you're typing in a box |
+|---|---|---|
+| **Ctrl+S** | Save | Works |
+| **Ctrl+Z** | Undo | Does nothing (the box keeps the key) |
+| **Ctrl+Y** or **Ctrl+Shift+Z** | Redo | Does nothing |
+| **Ctrl+F** or **/** | Put the cursor in the search box, with its text selected | **Ctrl+F** works; **/** types a slash |
+| **Esc** | Close the top thing, then leave (see below) | Only leaves the box |
+
+- **Esc** closes one thing at a time, in this order: the "Save changes?" question, the bar that asks how to save, the
+  bigger card view, the deck list, the test hand, the More filters. With none of them open, it goes Back.
+- Undo and Redo do nothing while the bigger card view, the deck list, the bar that asks how to save, or the test hand
+  covers the deck. Save and search do nothing under the bigger card view, the deck list and that bar.
+- Nothing here works while you drag a card, and nothing but **Enter** (Save) and **Esc** (Cancel) works while the
+  "Save changes?" question is open.
+- The search box isn't selected when the editor opens, so the arrows and **Enter** work on the first result at once.
+  Press **Ctrl+F** or **/** to type a search.
 
 **The mouse wheel** scrolls the text of the card on the left from anywhere on the screen, except over the More filters
 panel, the row of active filters and the bigger view you get by clicking the card's picture. While the text runs on, it
@@ -222,11 +243,13 @@ fades out with "▼ more" at the bottom.
 
 **With a controller:** **A** shows a card on the left; **A** again on the same card adds it (or takes that copy out).
 **X** sends a result to the Side Deck, or moves a deck card between Main and Side, at once. Hold **A** and move to
-drag. The right stick scrolls the card's text. **Y**, **B**, **LB** / **RB**, **View** and the d-pad work as everywhere.
+drag. The right stick scrolls the card's text. **B** does what **Esc** does: it closes the top thing, then goes Back.
+**Y**, **LB** / **RB**, **View** and the d-pad work as everywhere.
 
 ### The main buttons
 
-The top row has **Save**, **New**, **Delete**, **Decks...** (open another deck), **Copy** and **Back**. Under it:
+The top row has **Save**, **New**, **Delete**, **Decks...** (open another deck), **Copy** and **Back**. A small amber
+dot on the **Save** button shows that the deck has changes you haven't saved. Under it:
 
 | Button | What it does |
 |---|---|
@@ -256,6 +279,19 @@ Or copy the file's text instead:
 A YDKE link works the same way: copy it, then click **Import**. Decks you save are `.ydk` files, so EDOPro can open
 them too.
 
+**Leaving with unsaved changes.** While the dot shows, **Back**, **New**, picking a deck in **Decks...**, **Esc** and
+the controller's **B** ask "Save changes to <deck>?" first:
+
+| Choice | What happens |
+|---|---|
+| **Save** (or **Enter**) | Saves the deck, then does what you asked |
+| **Don't save** | Throws the changes away, along with the editor's recovery copy of them, then does what you asked |
+| **Cancel** (or **Esc**, **B**, or a click outside the question) | Closes the question; nothing else changes |
+
+If the deck needs the "how to save" question below, the question closes and your action is dropped: choose there, then
+press **Back** again. With no unsaved changes, these buttons act at once. **Delete** keeps its own check: click it,
+then click it again.
+
 **Saving over a deck:** if your changes would replace a saved deck with a very different one, the editor asks:
 **Overwrite it**, or **Save as new**.
 
@@ -264,10 +300,30 @@ them too.
 ### Ban lists
 
 The editor checks your deck as you build: 40 to 60 cards in the Main Deck, up to 15 in the Extra and 15 in the Side,
-and no more than 3 copies of a card. Choose a ban list and it checks that too. Limit badges show on the cards.
+and no more than 3 copies of a card. Choose a ban list with the arrows beside its name and it checks that too.
 
 You can pick today's lists, or dozens of historic TCG lists from 2004 to 2026. A historic deck switches to its own era's list
 when you open it.
+
+**Which list a deck opens under** (Deck Editor from the main menu; the campaign picks its own list, as before):
+- The editor opens on the newest TCG list.
+- A deck with a list of its own opens under it: a historic deck, or a deck you saved after picking a list for it.
+- A deck with none opens under the last list you picked by hand since you opened the editor, or else the newest TCG list.
+- **New** keeps the list that's showing.
+- **Save** remembers a list only if you picked it while that deck was open. For a new deck, a list you picked before
+  starting it counts if it was still showing. A deck you never picked a list for keeps the list it had.
+
+Picking a list yourself isn't an unsaved change, so it doesn't light the dot; **Save** still writes it.
+
+**"No limits"** checks only the deck size and 3 copies. If a free-play deck has no problems under it, the line under
+the deck reads amber and says no ban list is picked, instead of green "legal".
+
+**When a deck isn't legal**, every card a problem names wears a red badge on its tile: the limit number when you have
+too many of a card limited to 1 or 2, **X** when the card is Forbidden, and **!** for any other problem (a card that
+wasn't out yet in that format, or one you don't own). A card within its limit keeps its amber number, and a Ban Pass
+card keeps its gold **P** unless a problem names it. Click a problem line that names a card to show that card's first
+copy in your deck. Lines about the deck as a whole, like its size, can't be clicked. Only the first seven problems get
+a line.
 
 ### Card versions
 
@@ -315,6 +371,12 @@ Type in the search box at the top of the search panel. Everything you type must 
 **Spelling doesn't have to be perfect.** `blueeyes`, `blue eyes` and even `bleu eyes` find Blue-Eyes White Dragon. When
 no card has your words in its name, the game says "showing close names".
 
+**Which cards come first.** Cards whose name matches come first. After them, cards whose text has your words together, as
+you typed them, come before the rest, the earliest in the text first: `destroy all` lists Dark Hole and Raigeki ahead
+of cards that only have "destroy" and "all" somewhere. This works when the words are next to each other. A keyword at
+the edge doesn't stop it (`spell destroy all` still ranks "destroy all"), but another term between the words does
+(`destroy lv4 all`, `destroy limit:1 all`). **Name** only isn't ranked this way. Quotes still mean an exact phrase.
+
 **Looks in:** the switch at the right of the box chooses where plain words look: **Name + text**, **Name** or **Text**.
 
 ### Quick filters
@@ -324,7 +386,15 @@ Under the box:
   turn one on or off.
 - **Pickers:** card kind, Attribute, Type, Level, and **Sort**. Click for the next choice; right-click for the one before.
 
-Every filter that's on shows in a row above the results. Click its **×** to remove it.
+Every filter that's on shows in a row above the results. Click its **×** to remove it. The box's chip shows what you
+typed.
+
+**How many cards:** the count above the results is the real number ("14,415 cards"). Only the first 2,000 fit on the
+pages, and past that the page label says "first 2,000".
+
+**No results.** The grid says "No cards match", lists what's on ("On: ..."), and says where it's looking when that isn't
+All cards. **Clear all** turns off the box, the chips, the four pickers, the More filters and More like this, and keeps
+the scope and the sort.
 
 ### More filters
 
@@ -353,6 +423,8 @@ The scope button switches between:
 | **Seen in duels** | Cards your opponents played in your last 20 duels, newest first. Pick one duel, or all. |
 | **Recently viewed** | The last 40 cards you looked at in the editor |
 
+An empty **Favorites** says how to fill it: "Cards you mark ☆ Favorite show here."
+
 "Seen in duels" answers the question "what was that card the boss just played?"
 
 ## Controls
@@ -368,7 +440,8 @@ The scope button switches between:
 | Skip to my turn (on your opponent's turn) | **S** |
 | Be asked "Chain?" at the next chance | Hold **Shift** |
 | Look at the whole field | Hold **Space** |
-| Close a window, go back | **Esc** |
+| Close a window, go back | **Esc** (in the deck editor it closes one thing at a time, then goes Back) |
+| Save, undo, redo, search in the deck editor | **Ctrl+S**, **Ctrl+Z**, **Ctrl+Y**, **Ctrl+F** or **/** (**Cmd** on a Mac) |
 | Move through menus and the shop | Arrow keys, then **Enter** (or **Space**) |
 | Next line in a story scene | Click, **Space** or **Enter** |
 

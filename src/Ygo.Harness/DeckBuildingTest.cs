@@ -150,6 +150,34 @@ public static class DeckBuildingTest
         var printings = Ygo.Engine.Data.PrintingIndex.Load(Path.Combine(root, "unity", "Assets", "StreamingAssets", "printings.bin"));
         var datedLists = Banlist.LoadFolders(new[] { Path.Combine(root, "lflists"), Path.Combine(root, "vendor", "LFLists") });
         Check(datedLists.First(l => l.Name == "TCG March 2011").Date == "2011-03" && datedLists.First(l => l.Name.Contains("GOAT")).Date == "2005-04", "ban list dates read from their names");
+
+        // The newest TCG list (editor quick fixes spec, 2026-11-20, part B): free play's default.
+        {
+            // The editor's order: the current lists, then the historic ones.
+            var editorLists = Banlist.LoadFolders(new[] { Path.Combine(root, "vendor", "LFLists"), Path.Combine(root, "lflists") });
+            int at = Banlist.NewestTcg(editorLists);
+            var newest = at >= 0 ? editorLists[at] : null;
+            var forbiddenWords = new[] { "traditional", "worlds", "goat", "ocg", "rush", "speed" };
+            var newerTcg = editorLists.Where(l => l.Name.Contains("TCG") && string.CompareOrdinal(l.Date, newest?.Date ?? "") > 0).Select(l => l.Name).ToList();
+            Check(newest != null && string.CompareOrdinal(newest.Date, "2026-10") >= 0 && newest.Name.Contains("TCG")
+                  && !forbiddenWords.Any(w => newest.Name.ToLowerInvariant().Contains(w)) && newerTcg.Count == 0,
+                $"NewestTcg over the editor's {editorLists.Count} lists is \"{newest?.Name}\" ({newest?.Date}), 2026.10 TCG or newer, no newer TCG list");
+            int firstOfDate = newest == null ? -2 : editorLists.FindIndex(l => l.Name.Contains("TCG") && l.Date == newest.Date);
+            var sameDate = newest == null ? new List<string>() : editorLists.Where(l => l.Name.Contains("TCG") && l.Date == newest.Date).Select(l => l.Name).ToList();
+            Check(at == firstOfDate && sameDate.Count >= 1,
+                $"on a tie the first in the editor's order wins (index {at} of {string.Join(" / ", sameDate)})");
+            Banlist L(string name) => new Banlist { Name = name };
+            var noTcg = new List<Banlist> { L("2026.10 Traditional"), L("2026.10 Worlds"), L("2005.4 GOAT"), L("2026.10 OCG"),
+                L("2026.10.01 Rush Duel"), L("2025.07 Speed Duel"), Banlist.None, L("Edison") };
+            Check(Banlist.NewestTcg(noTcg) == -1 && Banlist.NewestTcg(new List<Banlist>()) == -1,
+                "NewestTcg is -1 over lists without a TCG name (Traditional, Worlds, GOAT, OCG, Rush, Speed, No limits) and over none");
+            var tie = new List<Banlist> { L("2026.10 OCG"), L("TCG March 2011"), L("2026.10 TCG"), L("TCG October 2026"), L("2026.10 Worlds") };
+            Check(Banlist.NewestTcg(tie) == 2, $"a tie picks the first in list order (2026.10 TCG before TCG October 2026: index {Banlist.NewestTcg(tie)})");
+            var reversed = new List<Banlist> { L("TCG October 2026"), L("2026.10 TCG"), L("TCG May 2026") };
+            Check(Banlist.NewestTcg(reversed) == 0, $"...and the other way round (index {Banlist.NewestTcg(reversed)})");
+            var older = new List<Banlist> { L("TCG March 2011"), L("TCG September 2026"), L("2026.10 Traditional"), L("TCG May 2026") };
+            Check(Banlist.NewestTcg(older) == 1, $"the latest date wins, not the first TCG name (index {Banlist.NewestTcg(older)})");
+        }
         int flagged = 0, checkedDecks = 0;
         foreach (var file in Directory.GetFiles(Path.Combine(root, "decks", "history"), "*.ydk"))
         {

@@ -300,7 +300,7 @@ namespace YgoCampaign.Game
             var kind = CardVersions.KindOf(info);
             _version.text = kind == CardVersions.TextKind.Current ? "" : $"◆ {CardVersions.Label(kind)}";
             _printingFull = CardFoil.PrintingsText(info, 1);
-            _copiesText = CopiesText(info);
+            _copiesText = ShowOwnership ? CopiesText(info) : "";
             _printing.text = _copiesText.Length > 0 ? _copiesText : _printingFull;
             _type.text = TypeLine(info);
             BuildTags(info);
@@ -314,6 +314,15 @@ namespace YgoCampaign.Game
         }
 
         private uint _scrolledCode;
+
+        /// <summary>
+        /// Whether the detail shows your copies (the campaign's) in place of the printings. Off in free play's deck editor, which
+        /// has no collection (it read the campaign's and said "Not owned"); on everywhere else.
+        /// </summary>
+        public bool ShowOwnership { get; set; } = true;
+
+        /// <summary>For checks: the detail shows an ownership line (your copies, or "Not owned") for the card shown.</summary>
+        public bool OwnershipShown => _shown != null && _copiesText.Length > 0;
 
         /// <summary>The deck editor: showing the card already shown (it redraws after every change) keeps its text's scroll.</summary>
         public bool KeepScrollOnSameCard { get; set; }
@@ -370,6 +379,9 @@ namespace YgoCampaign.Game
         public (float offset, float room, bool runsOn, bool more, bool bar, float glow) DebugScroll =>
             (_textContent.anchoredPosition.y, Mathf.Max(0, _textContent.rect.height - _textView.rect.height), _textContent.rect.height > _textView.rect.height + 1,
              _scrollHint != null && _scrollHint.MoreShown, _scrollHint != null && _scrollHint.BarShown, _scrollHint?.GlowAlpha ?? 0);
+
+        /// <summary>For checks: "▼ more"'s strip under the fade (shown, height, opaque).</summary>
+        public (bool shown, float height, bool opaque) DebugMoreStrip => _scrollHint?.Strip ?? (false, 0f, false);
 
         /// <summary>For checks: the text box (screen pixels).</summary>
         public RectTransform DebugTextView => _textView;
@@ -897,8 +909,8 @@ namespace YgoCampaign.Game
     /// </summary>
     public sealed class ScrollHint : MonoBehaviour
     {
-        private const float FadeHeight = 24, BarWidth = 4, GlowTime = 0.5f;
-        private RectTransform _view = null!, _content = null!, _fade = null!, _track = null!, _thumb = null!;
+        private const float FadeHeight = 24, StripHeight = 16, BarWidth = 4, GlowTime = 0.5f;
+        private RectTransform _view = null!, _content = null!, _fade = null!, _strip = null!, _track = null!, _thumb = null!;
         private ScrollRect _scroll = null!;
         private Text _more = null!;
         private FrameGraphic _glow = null!;
@@ -907,6 +919,9 @@ namespace YgoCampaign.Game
         private static Texture2D? _ramp;
 
         public bool MoreShown => _more != null && _more.gameObject.activeInHierarchy;
+        /// <summary>For checks: "▼ more"'s own strip (shown, its height, opaque) under the fade.</summary>
+        public (bool shown, float height, bool opaque) Strip => _strip == null ? (false, 0, false)
+            : (_strip.gameObject.activeInHierarchy, _strip.rect.height, _strip.GetComponent<Image>() is Image i && i.color.a > 0.99f);
         public bool BarShown => _track != null && _track.gameObject.activeInHierarchy;
         public float GlowAlpha => _glow != null ? _glow.color.a : 0;
 
@@ -918,16 +933,22 @@ namespace YgoCampaign.Game
             h._view = view;
             h._content = content;
             h._scroll = scroll;
-            // The fade: the text box's own colour (black at 0.25 over the panel), clear at the top of the strip.
+            // "▼ more" on its own strip in the box's colour (black at 0.25 over the panel) along the bottom, so it never
+            // touches the text; above it the fade, clear at its top, solid where it meets the strip.
+            var boxColor = Color.Lerp(T.Panel, Color.black, 0.25f);
+            h._strip = Ui.Stretched("MoreStrip", view, Vector2.zero, new Vector2(1, 0));
+            h._strip.offsetMax = new Vector2(0, StripHeight);
+            Ui.Image(h._strip, boxColor).raycastTarget = false;
             h._fade = Ui.Stretched("MoreFade", view, Vector2.zero, new Vector2(1, 0));
-            h._fade.offsetMax = new Vector2(0, FadeHeight);
+            h._fade.offsetMin = new Vector2(0, StripHeight);
+            h._fade.offsetMax = new Vector2(0, StripHeight + FadeHeight);
             var fade = h._fade.gameObject.AddComponent<RawImage>();
             fade.texture = Ramp;
-            fade.color = Color.Lerp(T.Panel, Color.black, 0.25f);
+            fade.color = boxColor;
             fade.raycastTarget = false;
-            var more = Ui.Stretched("More", h._fade, Vector2.zero, Vector2.one);
+            var more = Ui.Stretched("More", h._strip, Vector2.zero, Vector2.one);
             more.offsetMax = new Vector2(-BarWidth - 6, 0);
-            h._more = Ui.Text(more, "▼ more", 12, T.TextSoft, TextAnchor.LowerRight);
+            h._more = Ui.Text(more, "▼ more", 12, T.TextSoft, TextAnchor.MiddleRight);
             h._more.fontStyle = FontStyle.Bold;
             // The bar: a faint track and its thumb, at the box's right edge.
             h._track = Ui.Stretched("Bar", view, new Vector2(1, 0), Vector2.one);
@@ -963,7 +984,7 @@ namespace YgoCampaign.Game
 
         internal void Remove()
         {
-            foreach (var part in new Component[] { _fade, _track, _glow }) if (part != null) Destroy(part.gameObject);
+            foreach (var part in new Component[] { _fade, _strip, _track, _glow }) if (part != null) Destroy(part.gameObject);
             Destroy(this);
         }
 
@@ -985,6 +1006,7 @@ namespace YgoCampaign.Game
             float offset = Mathf.Clamp(_content.anchoredPosition.y, 0, Mathf.Max(0, room));
             bool runsOn = scrolls && offset < room - 1;
             if (_fade.gameObject.activeSelf != runsOn) _fade.gameObject.SetActive(runsOn);
+            if (_strip.gameObject.activeSelf != runsOn) _strip.gameObject.SetActive(runsOn);
             if (_track.gameObject.activeSelf != scrolls) _track.gameObject.SetActive(scrolls);
             if (scrolls)
             {

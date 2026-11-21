@@ -55,6 +55,39 @@ namespace Ygo.Engine.DeckBuilding
             }
         }
 
+        /// <summary>The index of the newest TCG list in <paramref name="lists"/> (the word "TCG" in its name, latest Date,
+        /// first in order on a tie), or -1 when there is none.</summary>
+        public static int NewestTcg(IReadOnlyList<Banlist> lists)
+        {
+            int best = -1;
+            string bestDate = "";
+            if (lists == null) return best;
+            for (int i = 0; i < lists.Count; i++)
+            {
+                var list = lists[i];
+                if (list == null || !IsTcg(list.Name)) continue;
+                var date = list.Date;
+                // "yyyy-mm" compares in order as text; a TCG list without a date only wins when nothing else is dated.
+                if (best < 0 || string.CompareOrdinal(date, bestDate) > 0)
+                {
+                    best = i;
+                    bestDate = date;
+                }
+            }
+            return best;
+        }
+
+        /// <summary>The name has "TCG" as a word of its own ("2026.10 TCG", "TCG October 2026"; not "OCG", "Rush", "Speed",
+        /// "Traditional", "Worlds" or "GOAT" lists).</summary>
+        private static bool IsTcg(string name)
+        {
+            var lower = (name ?? "").ToLowerInvariant();
+            if (!System.Text.RegularExpressions.Regex.IsMatch(lower, @"(?<![a-z0-9])tcg(?![a-z0-9])")) return false;
+            foreach (var other in new[] { "traditional", "worlds", "goat", "ocg", "rush", "speed" })
+                if (System.Text.RegularExpressions.Regex.IsMatch(lower, @"(?<![a-z0-9])" + other + "(?![a-z0-9])")) return false;
+            return true;
+        }
+
         public static List<Banlist> Parse(string text)
         {
             var lists = new List<Banlist>();

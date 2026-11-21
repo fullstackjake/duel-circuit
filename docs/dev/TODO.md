@@ -6,13 +6,40 @@ UI polish ideas live in [UI-ROADMAP.md](UI-ROADMAP.md); the post-game's phases i
 
 ## Deck editor (click to focus, 2026-11-19; docs/dev/EDITOR-CLICK-FOCUS-SPEC-2026-11-19.md)
 
-- [ ] **Leftovers from the final test pass (docs/dev/EVIDENCE-2026-11-19b.md), all small:** after Sort or Clear the
-  status line keeps the previous "Added ..." text (`Change` never sets it); a focused top-left deck card's ring draws
-  along the test hand overlay's edge; "▼ more" touches the last faded line at 1920x1080; Enter on a Side Deck copy adds
-  the new copy to Main (decide where); `-focuscheck`'s "closing the editor leaves no message" step can't fail (it clears
-  the signals itself first), and opening a deck from the list mid-feedback has no step.
-- [ ] **The rest of the editor review** (docs/dev/DECK-EDITOR-UX-REVIEW-2026-11-19.md): unsaved changes lost on a second
-  Back, "No limits" as the default list, small text at 1280x720, two-word search ranking, free play's "Not owned".
+- [x] **Leftovers from the final test pass (docs/dev/EVIDENCE-2026-11-19b.md), all small:** after Sort or Clear the
+  status line keeps the previous "Added ..." text; a focused top-left deck card's ring draws along the test hand
+  overlay's edge; "▼ more" touches the last faded line at 1920x1080; Enter on a Side Deck copy adds the new copy to Main;
+  `-focuscheck`'s "closing the editor leaves no message" step can't fail, and opening a deck from the list mid-feedback
+  has no step.
+  - Done 2026-11-20 (docs/dev/EDITOR-QUICK-FIXES-SPEC-2026-11-20.md, part G): all five. Sort and Clear write the status
+    line; no ring under the test hand; "▼ more" has its own strip; Enter on a Side Deck copy adds to the Side Deck; the
+    two check steps are strengthened or added.
+- [ ] **The rest of the editor review** (docs/dev/DECK-EDITOR-UX-REVIEW-2026-11-19.md):
+  - [x] Unsaved changes lost on a second Back (done 2026-11-20: the Save / Don't save / Cancel question and the dot on
+    Save), "No limits" as the default list (free play opens on the newest TCG list), two-word search ranking (exact
+    words first, in the editor only) and free play's "Not owned" (no ownership line in free play).
+  - [ ] Small text at 1280x720 (M1).
+- [ ] **The ban list menu (M2)**, not built: the arrows are still the only way to pick a list (the spec's "Not in this
+  build").
+- [ ] **Save as / Rename (M5)**, not built.
+- [ ] **Delete still uses "click Delete again"** (owner decision 5 of the quick-fixes spec: leave it for now). The
+  alternative is the same dialog (Delete / Cancel), about an hour.
+- [ ] **Not verified (2026-11-20 quick fixes):** the keyboard, mouse and controller by hand (the checks use test devices,
+  and `-editorcheck`'s `/` step can't fail with the test keyboard); a real window resize for the problem-line click
+  targets; the Back Alley theme; sound; Windows; the legacy Input Manager branches (`#else` paths of the new key code).
+- [ ] **Back, then Save on a rebuilt deck:** "Choose how to save, then leave." is set on the status line under Save's
+  own bar, so nobody sees it (`DeckEditor.Leave.cs:110`; docs/dev/EVIDENCE-2026-11-20.md, finding 1).
+- [ ] **Picking a ban list by hand isn't an unsaved change:** no dot, Back doesn't ask, and the pick is lost unless you
+  Save. Owner to decide whether a pick counts as a change (EVIDENCE-2026-11-20.md, finding 2).
+- [ ] **A 200-character search with no results** shows only "On: …" and a chip that wraps into two tiny lines
+  (EVIDENCE-2026-11-20.md, finding 3).
+- [ ] **From code reading only (EVIDENCE-2026-11-20.md, smaller notes):** a leave-dialog title over about 140 characters
+  loses its end; `/` is read as a physical key and may not work on non-US keyboards; two doc comments
+  (`DeckEditor.Filters.cs:20, 286`) still cite `Find`'s old signature.
+- [ ] **Check steps that assert less than they look** (EVIDENCE-2026-11-20.md, section 6): Ctrl/Cmd+S while typing,
+  Ctrl+F's selected text, the `/` step, Delete's old question, Extra/Side order for problem clicks, the Ban Pass P.
+- [ ] **Decks with no ban list note** (campaign decks opened in free play, older free decks) now open under the newest
+  TCG list and can read illegal there. As decided; noted so it isn't a surprise (EVIDENCE-2026-11-20.md, finding notes).
 
 ## Card looks (from the 2026-11-07 build; docs/dev/CARD-LOOKS-PLAN-2026-11-07.md)
 

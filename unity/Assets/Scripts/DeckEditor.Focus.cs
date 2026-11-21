@@ -139,7 +139,7 @@ namespace YgoCampaign.Game
         private void CloseTestHand()
         {
             _handOverlay.gameObject.SetActive(false);
-            if (_focusZone != FocusZone.Hand) return;
+            if (_focusZone != FocusZone.Hand) { ShowRing(); return; } // a deck card's ring comes back from under it
             _focusZone = _testHand != null && _focusHand < _testHand.Count ? FocusZone.Results : FocusZone.None;
             if (_focusZone == FocusZone.Results) _focusBase = Key(_testHand![_focusHand]);
             _armedAt = null;
@@ -167,6 +167,8 @@ namespace YgoCampaign.Game
                     bg = T.Panel;
                     break;
                 case FocusZone.Deck:
+                    // Under the test hand the deck is covered: its ring would peek out at the overlay's edge (back when it closes).
+                    if (_handOverlay.gameObject.activeSelf) break;
                     int slot = FocusedSlot();
                     foreach (var d in _deckViews)
                         if (d.section == _focusSection && d.index == slot && d.view != null) { view = d.view; break; }
@@ -317,10 +319,11 @@ namespace YgoCampaign.Game
             if (selected != null && selected.transform.IsChildOf(_root) && selected.GetComponent<InputField>() == null) events!.SetSelectedGameObject(null!);
 
             bool typing = Typing();
-            bool blocked = typing || _typingLastFrame || _reading != null || _browser != null;
+            // (The leave question takes Enter and Esc itself, DeckEditor.Keys: nothing under it moves.)
+            bool blocked = typing || _typingLastFrame || _reading != null || _browser != null || _leaveDialog != null || _keysTakenFrame == Time.frameCount;
             _typingLastFrame = typing;
             if (!blocked) Keys();
-            if (_reading == null) Wheel();
+            if (_reading == null && _leaveDialog == null) Wheel();
         }
 
 #if ENABLE_INPUT_SYSTEM
@@ -375,14 +378,17 @@ namespace YgoCampaign.Game
         /// <summary>The card the keys add when no deck copy or result is focused: the one on the left.</summary>
         private CardInfo? FocusedResult() => _focusZone == FocusZone.Results ? _results.FirstOrDefault(c => Key(c.Code) == _focusBase) ?? _selected : _selected;
 
-        /// <summary>Enter: the focused result to Main/Extra, one more copy of the focused deck card, or the card on the left.</summary>
+        /// <summary>
+        /// Enter: the focused result to Main/Extra, one more copy of the focused deck card in the section it's in (a Side Deck
+        /// copy adds to the Side Deck), or the card on the left.
+        /// </summary>
         private void KeyAdd()
         {
             if (_focusZone == FocusZone.Hand) return;
             int slot = FocusedSlot();
             if (slot >= 0)
             {
-                if (_cards.Get(Section(_deck, _focusSection)[slot]) is CardInfo info) Add(info, side: false, DeckTile(_focusSection, slot));
+                if (_cards.Get(Section(_deck, _focusSection)[slot]) is CardInfo info) Add(info, side: _focusSection == DeckSection.Side, DeckTile(_focusSection, slot));
                 return;
             }
             if (FocusedResult() is CardInfo card) Add(card, side: false);

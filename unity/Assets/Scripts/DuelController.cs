@@ -700,6 +700,9 @@ namespace YgoCampaign.Game
             // `-focuscheck <folder>` (absolute; with -mods <empty folder>): the deck editor's click to focus and its change
             // signals, through a test mouse and keyboard (DuelController.FocusCheck).
             if (Arg("-focuscheck") is string focusCheck) StartCoroutine(FocusCheck(focusCheck));
+            // `-editorcheck <folder>` (absolute; with -mods <empty folder>): the deck editor's leave question, lists, keys, red
+            // badges and problem links (DuelController.EditorCheck).
+            if (Arg("-editorcheck") is string editorCheck) StartCoroutine(EditorCheck(editorCheck));
 #endif
             // `-aboutcheck <folder> [-aboutlicenses <folder>]` (absolute): the About screen from the menu (DuelController.AboutCheck).
             var aboutCheck = Arg("-aboutcheck");
@@ -710,7 +713,7 @@ namespace YgoCampaign.Game
             if (importCheck != null) StartCoroutine(ImportCheck(importCheck));
 
             // Players start on the title screen; automated checks go straight to what they test.
-            var checks = new[] { "-autoshot", "-autoshot-end", "-editor", "-fxshots", "-replaycheck", "-campaigncheck", "-finalcheck", "-laddercheck", "-themecheck", "-shopcheck", "-alleycheck", "-tagcheck", "-boardcheck", "-matcheck", "-foilshowcase", "-gradeshowcase", "-slabreveal", "-artcheck", "-autoclick", "-p0", "-p1", "-layoutcheck", "-pilecheck", "-controlscheck", "-qaplay", "-qareplay", "-ordercheck", "-musiccheck", "-stylecheck", "-clickcheck", "-ydkcheck", "-searchcheck", "-focuscheck", "-aboutcheck", "-importcheck" };
+            var checks = new[] { "-autoshot", "-autoshot-end", "-editor", "-fxshots", "-replaycheck", "-campaigncheck", "-finalcheck", "-laddercheck", "-themecheck", "-shopcheck", "-alleycheck", "-tagcheck", "-boardcheck", "-matcheck", "-foilshowcase", "-gradeshowcase", "-slabreveal", "-artcheck", "-autoclick", "-p0", "-p1", "-layoutcheck", "-pilecheck", "-controlscheck", "-qaplay", "-qareplay", "-ordercheck", "-musiccheck", "-stylecheck", "-clickcheck", "-ydkcheck", "-searchcheck", "-focuscheck", "-editorcheck", "-aboutcheck", "-importcheck" };
             PromptTiming = checks.Any(c => Array.IndexOf(args, c) >= 0); // checks log decisions left waiting
             // A check that throws stops its coroutine; without this the app would sit there forever. Fail and quit instead.
             if (PromptTiming)
@@ -5321,7 +5324,7 @@ namespace YgoCampaign.Game
                 // above its in-deck count: "crusadia" lists cards the Mekk-Knight deck plays, each with its "x2".)
                 foreach (var query in new[] { "polymerization", "terraforming", "crusadia" })
                 {
-                    // Terraforming under a list that limits it, so its badge shows (the Free Duel's default list limits nothing).
+                    // Terraforming under the newest TCG list that limits it to 1, so its badge shows (the editor's own list at open may not).
                     _editor.DebugTextLook(true, query, query == "terraforming" ? "Terraforming" : null);
                     yield return new WaitForSecondsRealtime(0.5f);
                     // Not through Shot: the editor's own small labels stay out of the play layout's text-size notes.

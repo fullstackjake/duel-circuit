@@ -48,6 +48,9 @@ public static class CardSearchTest
             "blue eyes", "exodia", "dark magician girl", "magician", "kuriboh", "cyber dragon", "harpie", "ojama", "\"draw 2\"", "mst", "solemn",
             "x-saber", "graveyard", "gy", "a", "the", "\"\"", "-", "destroy", "special summon", "mirror force", "ash blossom", "maxx",
             "-effect -normal monster", "lv4 dragon", "lv4 spellcaster", "\"destroy all\"", "neos", "utopia", "number",
+            // Exact words first (2026-11-20) reorders these; their sets were recorded from the search before it.
+            "destroy all", "draw 2 cards", "destroy all lv4", "lv4 destroy all", "destroy lv4 all", "destroy or all", "spell destroy all",
+            "special summon 1 monster from your deck", "add 1 card from your deck to your hand",
         };
         foreach (var q in typed) yield return q;
         // The editor's chips and pickers, alone and with a word, as RunSearch joined them.
@@ -495,6 +498,168 @@ public static class CardSearchTest
             }
             F("dark magician");
             Check("LastCloseNameStart is -1 when no close names were added", search.LastCloseNameStart == -1);
+        }
+
+        // ---- 6b. Exact words first (editor quick fixes spec, 2026-11-20, part C) ----
+        {
+            const CardSearch.SearchMode Both = CardSearch.SearchMode.NameAndText, Name = CardSearch.SearchMode.NameOnly, Text = CardSearch.SearchMode.TextOnly;
+            // The deck editor's search, which asks for exact words first.
+            List<CardInfo> E(string box, CardSearch.SearchMode mode, string filters) => search.Find(box, mode, filters, All, exactWords: true);
+            List<CardInfo> X(string box, CardSearch.SearchMode mode = Both) => E(box, mode, "");
+            // The same query as filters ranks no phrase (the phrase comes only from the box): today's order, to compare with.
+            List<CardInfo> Today(string q) => search.Find("", Both, q, All, exactWords: true);
+            static string Low(CardInfo c) => c.Text.ToLowerInvariant();
+            static bool NameHasAll(CardInfo c, string[] words) =>
+                words.All(w => c.Name.ToLowerInvariant().Contains(w) || CardSearch.SquashName(c.Name).Contains(CardSearch.SquashName(w)));
+            static bool Same(List<CardInfo> a, List<CardInfo> b) => a.Select(c => c.Code).SequenceEqual(b.Select(c => c.Code));
+            string SetKey(List<CardInfo> r) => $"{r.Count}/{SetHash(r.Select(c => c.Code)):x16}";
+            int At(List<CardInfo> r, string name) => r.FindIndex(c => c.Name == name);
+            // Name matches, then the text-only matches with the phrase (where it starts, then name), then the rest.
+            string? Order(List<CardInfo> r, string phrase, string[] nameWords)
+            {
+                int i = 0;
+                while (nameWords.Length > 0 && i < r.Count && NameHasAll(r[i], nameWords)) i++;
+                int names = i;
+                int lastAt = -1;
+                string lastName = "";
+                for (; i < r.Count && Low(r[i]).Contains(phrase); i++)
+                {
+                    int at = Low(r[i]).IndexOf(phrase, StringComparison.Ordinal);
+                    if (at < lastAt || at == lastAt && Comparer<string>.Default.Compare(r[i].Name, lastName) < 0)
+                        return $"{r[i].Name} (phrase at {at}) after {lastName} (at {lastAt})";
+                    lastAt = at;
+                    lastName = r[i].Name;
+                }
+                int phrased = i - names;
+                var late = r.Skip(i).FirstOrDefault(c => Low(c).Contains(phrase) || nameWords.Length > 0 && NameHasAll(c, nameWords));
+                if (late != null) return $"{late.Name} comes after the first card without the phrase ({r[i].Name}, at {i})";
+                return phrased > 0 ? null : "no card with the phrase leads the text matches";
+            }
+
+            var da = X("destroy all");
+            var daPhrase = search.LastPhrase;
+            Check($"\"destroy all\" ranks the exact words first: Dark Hole at {At(da, "Dark Hole") + 1}, Raigeki at {At(da, "Raigeki") + 1}, " +
+                  $"Heavy Storm at {At(da, "Heavy Storm") + 1} of {da.Count}, in the first 25 (LastPhrase \"{daPhrase}\"; first: {Top(da, 5)})",
+                daPhrase == "destroy all" && At(da, "Dark Hole") is >= 0 and < 25 && At(da, "Raigeki") is >= 0 and < 25);
+            var daOrder = Order(da, "destroy all", new[] { "destroy", "all" });
+            Check($"\"destroy all\": name matches, then the texts with the phrase (earliest first, then name), then the rest{(daOrder != null ? ": " + daOrder : "")}",
+                daOrder == null);
+            var daToday = Today("destroy all");
+            var rest = da.Where(c => !NameHasAll(c, new[] { "destroy", "all" }) && !Low(c).Contains("destroy all")).Select(c => c.Code).ToList();
+            var restToday = daToday.Where(c => !NameHasAll(c, new[] { "destroy", "all" }) && !Low(c).Contains("destroy all")).Select(c => c.Code).ToList();
+            var namesToday = daToday.Where(c => NameHasAll(c, new[] { "destroy", "all" })).Select(c => c.Code).ToList();
+            Check($"the same cards as before ({SetKey(da)} now, {SetKey(daToday)} as filters, which rank no phrase), the name matches and the rest in today's order",
+                SetKey(da) == SetKey(daToday) && da.Count > 100 && rest.SequenceEqual(restToday) && da.Take(namesToday.Count).Select(c => c.Code).SequenceEqual(namesToday));
+            Check($"today's order didn't have that (Dark Hole at {At(daToday, "Dark Hole") + 1} as filters)", At(daToday, "Dark Hole") >= 25);
+
+            var draw = X("draw 2 cards");
+            Check($"\"draw 2 cards\" puts Pot of Greed in the first 11 (at {At(draw, "Pot of Greed") + 1} of {draw.Count}; LastPhrase \"{search.LastPhrase}\"; first: {Top(draw, 5)})",
+                search.LastPhrase == "draw 2 cards" && At(draw, "Pot of Greed") is >= 0 and < 11 && SetKey(draw) == SetKey(Today("draw 2 cards")));
+
+            var text = X("destroy all", Text);
+            var textPhrase = search.LastPhrase;
+            var textOrder = Order(text, "destroy all", new string[0]);
+            var textToday = F("text:destroy text:all");
+            Check($"Text only ranks the phrase first too (LastPhrase \"{textPhrase}\", Dark Hole at {At(text, "Dark Hole") + 1} of {text.Count}{(textOrder != null ? "; " + textOrder : "")})",
+                textPhrase == "destroy all" && textOrder == null && At(text, "Dark Hole") is >= 0 and < 25 && SetKey(text) == SetKey(textToday)
+                && text.Where(c => !Low(c).Contains("destroy all")).Select(c => c.Code).SequenceEqual(textToday.Where(c => !Low(c).Contains("destroy all")).Select(c => c.Code)));
+            // Text only today: kind, then name (no word ranks names there).
+            Check("Text only keeps today's order for the rest: kind, then name",
+                text.Where(c => !Low(c).Contains("destroy all")).Zip(text.Where(c => !Low(c).Contains("destroy all")).Skip(1))
+                    .All(p => CardSearch.KindOrder(p.First.Type) < CardSearch.KindOrder(p.Second.Type)
+                              || CardSearch.KindOrder(p.First.Type) == CardSearch.KindOrder(p.Second.Type) && Comparer<string>.Default.Compare(p.First.Name, p.Second.Name) <= 0));
+
+            // Other terms before or after the run keep the phrase.
+            foreach (var q in new[] { "destroy all lv4", "lv4 destroy all", "atk>1000 destroy all", "destroy all -effect" })
+            {
+                var r = X(q);
+                Check($"\"{q}\" ranks the phrase \"destroy all\" (LastPhrase \"{search.LastPhrase}\", the same {SetKey(r)} cards as before)",
+                    search.LastPhrase == "destroy all" && SetKey(r) == SetKey(Today(q)) && !Same(r, Today(q)));
+            }
+            // A keyword at the edge of the run: the whole run first ("draw 2 cards" above; "destroy all monster" is in "destroy
+            // all monsters"), then without the edge keywords when no text has the whole run.
+            foreach (var (q, want) in new[] { ("spell destroy all", "destroy all"), ("destroy all quickplay", "destroy all"), ("destroy all monster", "destroy all monster"),
+                         ("trap destroy all monsters", "destroy all monsters"), ("dark destroy all", "destroy all") })
+            {
+                var r = X(q);
+                var phrase = search.LastPhrase;
+                var order = Order(r, want, q.Split(' ').Where(w => !new[] { "spell", "trap", "monster", "quickplay" }.Contains(w)).ToArray());
+                Check($"\"{q}\" ranks \"{want}\" (the whole run, else without the keywords at its edges; LastPhrase \"{phrase}\", Dark Hole at {At(r, "Dark Hole") + 1} of {r.Count}{(order != null ? "; " + order : "")})",
+                    phrase == want && order == null && SetKey(r) == SetKey(Today(q)) && !Same(r, Today(q)));
+            }
+            {
+                var r = X("destroy spell all");
+                Check($"a keyword inside the run ranks nothing: \"destroy spell all\" (LastPhrase {search.LastPhrase ?? "null"}) keeps today's order",
+                    search.LastPhrase == null && Same(r, Today("destroy spell all")));
+                X("spell destroy all", Text);
+                Check($"Text only keeps the whole run (spell is a word there): \"spell destroy all\" ranks none (LastPhrase {search.LastPhrase ?? "null"})",
+                    search.LastPhrase == null);
+            }
+            {
+                var r = E("destroy all", Both, "spell");
+                Check($"a chip or picker beside the box keeps the phrase (box \"destroy all\", filter spell: LastPhrase \"{search.LastPhrase}\", Dark Hole at {At(r, "Dark Hole") + 1})",
+                    search.LastPhrase == "destroy all" && At(r, "Dark Hole") is >= 0 and < 25 && SetKey(r) == SetKey(Today("destroy all spell")));
+            }
+            // No phrase: today's order exactly.
+            foreach (var q in new[] { "\"destroy all\"", "destroy", "destroy lv4 all", "destroy OR all", "destroy -all", "-destroy all", "destroy all or raigeki", "name:destroy all", "destroy text:all" })
+            {
+                var r = X(q);
+                var phrase = search.LastPhrase;
+                Check($"\"{q}\" sets no LastPhrase ({phrase ?? "null"}) and keeps today's order ({r.Count})", phrase == null && Same(r, Today(q)));
+            }
+            {
+                var r = X("destroy all", Name);
+                var phrase = search.LastPhrase;
+                Check($"Name only sets no LastPhrase ({phrase ?? "null"}) and keeps today's order ({r.Count}: {Top(r)})",
+                    phrase == null && Same(r, F("$destroy $all")) && r.Count > 0);
+                r = E("destroy all", Name, "");
+                Check("...in the editor's Find too", search.LastPhrase == null && Same(r, F("$destroy $all")));
+            }
+            E("", Both, "destroy all");
+            Check("the phrase comes only from the box: \"destroy all\" as filters sets none", search.LastPhrase == null);
+            E("destroy", Both, "all");
+            Check("...nor a word in the box and one in the filters", search.LastPhrase == null);
+            X("destroy all");
+            X("raigeki");
+            Check("the next search clears LastPhrase", search.LastPhrase == null);
+            X("zzqx wwqy");
+            Check("a phrase no card has sets no LastPhrase", search.LastPhrase == null);
+            X("Destroy  ALL");
+            Check($"case and extra spaces don't matter (LastPhrase \"{search.LastPhrase}\")", search.LastPhrase == "destroy all");
+
+            // Opt-in: without exactWords (the Card Trader) and through the one-box Find, the order and the set are today's.
+            {
+                var before = Today("destroy all");
+                var oneBox = new[] { ("Find(q, limit)", search.Find("destroy all", All)), ("Find(q, mode, limit)", search.Find("destroy all", Both, All)),
+                    ("Find(box, mode, \"\", limit)", search.Find("destroy all", Both, "", All)) };
+                var notToday = oneBox.Where(x => !Same(x.Item2, before)).Select(x => x.Item1).ToList();
+                bool none = new Func<bool>(() => { search.Find("destroy all", All); bool a = search.LastPhrase == null;
+                    search.Find("destroy all", Both, All); bool b = search.LastPhrase == null; search.Find("destroy all", Both, "", All); return a && b && search.LastPhrase == null; })();
+                Check($"without exactWords, \"destroy all\" keeps today's order and sets no LastPhrase, in all three Finds ({before.Count}{(notToday.Count > 0 ? "; differ: " + string.Join(", ", notToday) : "")})",
+                    notToday.Count == 0 && none && SetKey(before) == SetKey(X("destroy all")));
+                var trader = search.Find("destroy all", Both, "", 600, closeNames: false);
+                var trader2 = search.Find("destroy all", 600);
+                Check($"with a limit of 600 (the Card Trader's) the same first 600 as before ({trader.Count}, Dark Hole {(Has(trader, "Dark Hole") ? "in" : "out")})",
+                    trader.Count == 600 && Same(trader, before.Take(600).ToList()) && Same(trader2, before.Take(600).ToList()));
+                var editor600 = search.Find("destroy all", Both, "", 600, exactWords: true);
+                Check($"...while exact words would pick another 600 there (why it's opt-in: {editor600.Count}, Dark Hole {(Has(editor600, "Dark Hole") ? "in" : "out")})",
+                    !new HashSet<uint>(editor600.Select(c => c.Code)).SetEquals(trader.Select(c => c.Code)));
+            }
+
+            // Typed ban terms, taken out as the editor does: one between the words parts them; one beside them doesn't.
+            foreach (var (q, old, want) in new[] { ("destroy limit:1 all", "destroy all", (string?)null), ("destroy legal all", "destroy all", null),
+                         ("destroy -limit:0 all", "destroy all", null), ("destroy limit:1 legal all", "destroy all", null),
+                         ("destroy all limit:1", "destroy all", "destroy all"), ("legal destroy all", "destroy all", "destroy all"),
+                         ("destroy all -legal", "destroy all", "destroy all"), ("limit:2 destroy all lv4", "destroy all lv4", "destroy all") })
+            {
+                var left = CardSearch.TakeBanFilters(q, out CardSearch.BanTerms ban);
+                var r = X(left);
+                var phrase = search.LastPhrase;
+                var oldSet = SetKey(Today(old));
+                var plain = search.Find(left, Both, "", All);
+                Check($"\"{q}\" (rest \"{left}\"): LastPhrase {(phrase == null ? "null" : "\"" + phrase + "\"")}, the same {SetKey(r)} cards as \"{old}\" ({oldSet})",
+                    phrase == want && SetKey(r) == oldSet && ban.Any && Same(plain, Today(old)) && (want != null || Same(r, Today(old))));
+            }
         }
 
         // ---- 7. Ban list terms (section 5): the editor takes them out ----
