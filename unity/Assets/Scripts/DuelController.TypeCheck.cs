@@ -188,6 +188,25 @@ namespace YgoCampaign.Game
                 if (face is Face f) t.font = Typography.Font(f);
                 return t;
             }
+            // A deck named with tags shows as typed through Ui.Plain (rich text off): as wide and as high as the words set with
+            // rich text off by hand, while the same name in a rich-text line takes its tags (bold, size 60). (Legacy rich text
+            // shows a tag left open as typed, so the name goes in with closing tags after it, as a line's own colours supply.)
+            {
+                const string weird = "a <b>bold <size=60>big <color=red>deck";
+                const string tail = "</color></size></b>";
+                var asTyped = Ui.Plain(Probe(18), weird + tail);
+                var typed = Probe(18);
+                typed.supportRichText = false;
+                typed.text = weird + tail;
+                var raw = Probe(18);
+                raw.supportRichText = true;
+                raw.text = weird + tail;
+                Report($"Ui.Plain shows \"{weird}\" as typed (width {asTyped.preferredWidth:0.#}, height {asTyped.preferredHeight:0.#}; by hand {typed.preferredWidth:0.#}, {typed.preferredHeight:0.#}; "
+                       + $"in a rich line {raw.preferredWidth:0.#}, {raw.preferredHeight:0.#})",
+                    asTyped.text == weird + tail && !asTyped.supportRichText && Mathf.Abs(asTyped.preferredWidth - typed.preferredWidth) <= 1
+                    && Mathf.Abs(asTyped.preferredHeight - typed.preferredHeight) <= 1 && raw.preferredHeight > typed.preferredHeight + 1);
+                foreach (var t in new[] { asTyped, typed, raw }) Destroy(t.gameObject);
+            }
             var strongBody = Typography.Strong(Probe(18));
             var strongCond = Typography.Strong(Probe(18, Face.Condensed));
             var strongTitle = Typography.Strong(Probe(34));
@@ -389,7 +408,9 @@ namespace YgoCampaign.Game
             yield return new WaitForSecondsRealtime(0.4f);
             yield return Shot("van");
             yield return Scan("the van");
-            var vanNames = FindObjectsByType<Text>(FindObjectsSortMode.None).Where(t => t.isActiveAndEnabled && t.fontSize == 26 && t.resizeTextForBestFit && !t.supportRichText && t.text.Length > 0).ToList();
+            // (Not a slab label's row: R3 sizes those for the case on screen, and one can come out at 26 too.)
+            var vanNames = FindObjectsByType<Text>(FindObjectsSortMode.None).Where(t => t.isActiveAndEnabled && t.fontSize == 26 && t.resizeTextForBestFit && !t.supportRichText && t.text.Length > 0
+                && t.GetComponent<CardText>() == null && t.canvas != null && t.canvas.enabled).ToList(); // (nor the plain card studio's, its canvas off)
             // (R2: the name is at Heading, a condensed role, so its strong face is Barlow Condensed Bold.)
             Report($"the van's card name has its own text in the strong face ({string.Join(", ", vanNames.Select(t => $"\"{t.text}\" {t.font.name}"))})",
                 vanNames.Count > 0 && vanNames.All(t => t.font == Typography.Font(Face.CondensedBold)));

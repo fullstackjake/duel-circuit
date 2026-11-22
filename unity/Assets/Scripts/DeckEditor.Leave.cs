@@ -72,7 +72,7 @@ namespace YgoCampaign.Game
             _leaveTitle.color = T.Text;
             _leaveTitle.resizeTextForBestFit = true; // a long deck name shrinks rather than runs off
             _leaveTitle.resizeTextMinSize = 14;
-            _leaveTitle.resizeTextMaxSize = 22;
+            _leaveTitle.resizeTextMaxSize = UiTheme.Size(TextRole.Subhead);
             Label(28, 70, 504, 50, "You changed this deck and haven't saved it.", 15, TextAnchor.UpperLeft, panel).color = T.TextSoft;
             // Right-aligned: Save (the accent), Don't save, Cancel.
             const float y = 220 - 28 - 40;

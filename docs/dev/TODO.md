@@ -55,20 +55,38 @@ UI polish ideas live in [UI-ROADMAP.md](UI-ROADMAP.md); the post-game's phases i
   - After New Game+, a "once" guest beaten before pays the full win rate without the prize (as built; flagged for the
     owner: does he expect 150?).
 
-## Type scale and fonts (R1 and R2 built 2026-11-21; docs/dev/TYPE-AND-FONTS-SPEC-2026-11-21.md, "As built: R1" and "As built: R2")
+## Type scale and fonts (R1, R2 and R3 built 2026-11-21; docs/dev/TYPE-AND-FONTS-SPEC-2026-11-21.md, "As built: R1", "As built: R2" and "As built: R3")
 
-R1 (fonts, helpers, checks, licences) and R2 (the scale on the shell screens, the text rule) are built and reviewed (one
-fix round each). Open:
+R1 (fonts, helpers, checks, licences), R2 (the scale on the shell screens, the text rule) and R3 (card faces, slab labels,
+the deck editor) are built (R1 and R2 reviewed, one fix round each; R3 had a fix round and an Evidence pass,
+[EVIDENCE-2026-11-21c.md](EVIDENCE-2026-11-21c.md)). Nothing is committed. Open:
 
-- [x] **R2: the scale on the shell screens** (built 2026-11-21; spec "As built: R2"). The owner has not yet confirmed
-  the R2 choices in the spec's "Owner decisions".
-- [ ] **R3 is next (owner's go-ahead given 2026-11-21).** It does card and editor text (and the deck editor review's M1), slab labels,
-  and removes the three R3 exclusions (card faces, the deck editor, the plain card studio) from the text rule. Until then
-  text inside mid-sized plain cards is still about 5 px at 1280x720.
-- [ ] **One Evidence pass over R2 and R3 on one build,** covering the checks not rerun on the final R2 build (board,
-  pile, controls, sound, editor, focus, search, plain) and the runs with pictures, which were not rerun after R2's fix
-  round.
-- [ ] **Windows is untested.** Run `-typecheck` on the PC: its log shows which font draws each fallback character (Greek
+- [x] **R2: the scale on the shell screens** (built 2026-11-21; spec "As built: R2"). The owner hasn't confirmed the R2
+  and R3 choices in the spec's "Owner decisions".
+- [x] **R3: card and editor text** (built 2026-11-21; spec "As built: R3"), and the deck editor review's M1, slab labels,
+  and the text rule's exclusions (only the board's developer layout is left). The owner hasn't confirmed the R2 and R3
+  choices.
+- [x] **One Evidence pass over R2 and R3 on one build** (done 2026-11-21: 51 runs, see EVIDENCE-2026-11-21c.md).
+- [x] **Follow-up to the evidence pass (2026-11-22):** the `-layoutcheck` long yes/no step passes when the text fits or
+  scrolls (it failed at 1600x900); `-plaincheck` step 17 also checks what must be absent below 70, 150 and 200 px and
+  reads `CardFoil`'s real material; the pictured-tile step checks the line is the card's name.
+- [ ] **A deck name with rich-text tags is drawn as markup: partly fixed.** `Ui.Plain` shows the name as typed on the
+  editor's "with …" line, the Decks list, the campaign deck picker, the tag partner lines, the duel plate and the
+  matchup picker. Left: the editor's status lines that carry `_deck.Name`, the campaign's "Deck: …" lines and status,
+  and the tag-match deck strings. The evidence pass's odd-name editor run was not repeated after the fix.
+- [ ] **An emoji in a deck name disappears** (evidence, finding 3): a known limit of legacy `Text`, nothing breaks.
+- [ ] **The board's card detail at Larger text cuts mid-line with no "more" cue** (evidence, finding 6; the text scrolls
+  under a mask, so the rule passes it; probably older than R2).
+- [ ] **The hand's big Level digit overlaps the "LV n" chip text** (evidence, finding 7; older than R2).
+- [ ] **`-tagcheck` can time out on a long loop** (evidence, finding 4: once, "1 swaps, turn 2"; the rerun passed; not
+  R2 or R3).
+- [ ] **Runs with pictures at 1920x1080 and 3024x1964 were not run.**
+- [ ] **Checks not run in the Evidence pass:** `-finalcheck`, `-laddercheck`, `-musiccheck`, `-matcheck`, `-ordercheck`,
+  `-versioncheck`, `-artcheck`.
+- [ ] **The live stat strip's look:** it is Barlow Condensed SemiBold (spec section 3) and reads smaller than before in the
+  same band. For the owner to see.
+- [ ] **The Mac app in `build/unity` is still 0.3.0, without the fonts.** Rebuild it when the owner asks.
+- [ ] **Windows is untested.** Run `-typecheck` on the PC (R3's checks too): its log shows which font draws each fallback character (Greek
   letters in three card names, the katakana middle dot in seven, two Chinese characters in one card's text, arrows).
 - [ ] **About 100 script lines still use rich-text `<b>` / `<i>`,** which draw as synthesized bold or italic on Barlow.
   The glyph corpus lists them as `# faux` lines and `-typecheck` step 6 prints them. Among them: the shop's opened-card
@@ -81,9 +99,9 @@ fix round each). Open:
 Built and reviewed (one fix round). The Evidence Collector's report is
 [EVIDENCE-2026-11-21b.md](EVIDENCE-2026-11-21b.md). Open:
 
-- [ ] **Text is small** (docs/dev/EVIDENCE-2026-11-21b.md, finding 3). Inside Standard plain cards it is about 5 px at
+- [x] **Text is small** (docs/dev/EVIDENCE-2026-11-21b.md, finding 3; fixed by R3, 2026-11-21: every card text is 7 px or more on screen). Inside Standard plain cards it is about 5 px at
   1280x720 and can't be read; deck-tile and field-card names are 6-7 px. The type scale build is where this gets fixed.
-- [ ] **Sparkle foil hides a name** (evidence, finding 8): a whole-card sparkle foil can make a plain card's name hard to
+- [x] **Sparkle foil hides a name** (evidence, finding 8; fixed by R3: foil follows the face's variant, no region crosses the name): a whole-card sparkle foil can make a plain card's name hard to
   read in the editor.
 - [ ] **The hand's big Level digit** now sits partly over the "LV n" chip (evidence, finding 5; the glyph is clear of it).
 - [x] **`-themecheck`'s story crossfade step** fails now and then at exactly its 0.54 s floor (evidence, finding 6; old):

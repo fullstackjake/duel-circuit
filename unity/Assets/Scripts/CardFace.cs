@@ -14,6 +14,12 @@ namespace YgoCampaign.Game
     public enum CardFit { Normal, Badged }
 
     /// <summary>
+    /// What a plain face shows at its width on screen (docs/dev/TYPE-AND-FONTS-SPEC-2026-11-21.md section 2): Compact drops to
+    /// its name alone under 52 px, Standard drops its text box under 200 px, so nothing on a card is under 7 px (8 for text).
+    /// </summary>
+    public enum FaceVariant { Thumb, Compact, CompactNameOnly, Standard, StandardNoText, Full }
+
+    /// <summary>
     /// Every card face in the game: the player's picture when there is one, else the plain card (the game's own drawn face,
     /// docs/dev/PLAIN-CARDS-SPEC-2026-11-20.md). Never null for a card the game has data for; null only for code 0.
     /// Plain cards are textures drawn once per card, layout, fit and resolution by <see cref="PlainCards"/> and kept in a
@@ -33,6 +39,32 @@ namespace YgoCampaign.Game
         private static readonly int[] Ladder = { 64, 96, 128, 192, 288, 432, 648, 972 };
         private const string Prefix = "plain:";
 
+        /// <summary>The variant a plain face takes at <paramref name="screenWidthPx"/> pixels wide on screen (section 2).</summary>
+        public static FaceVariant VariantFor(CardLayout layout, float screenWidthPx) => layout switch
+        {
+            CardLayout.Thumb => FaceVariant.Thumb,
+            CardLayout.Compact => screenWidthPx < 52 ? FaceVariant.CompactNameOnly : FaceVariant.Compact,
+            CardLayout.Standard => screenWidthPx < 200 ? FaceVariant.StandardNoText : FaceVariant.Standard,
+            _ => FaceVariant.Full,
+        };
+
+        /// <summary>
+        /// Each text on a drawn plain face (name, chip, type line, card text, pendulum text, stats, rating) with its size on
+        /// screen in pixels at the width it was drawn for, and whether it was cut ("…"). Empty for a picture or a face not
+        /// drawn yet.
+        /// </summary>
+        public static IReadOnlyList<(string element, string text, float px, bool cut)> DebugTexts(Texture texture) =>
+            texture != null && Elements.TryGetValue(texture, out var list) ? list : (IReadOnlyList<(string, string, float, bool)>)Array.Empty<(string, string, float, bool)>();
+
+        /// <summary>A plain texture's variant (null for a picture).</summary>
+        public static FaceVariant? VariantOf(Texture? texture)
+        {
+            if (texture == null || !IsPlain(texture)) return null;
+            if (ByTexture.TryGetValue(texture, out var entry)) return entry.Key.Variant;
+            var parts = texture.name.Split(':');
+            return parts.Length >= 6 && Enum.TryParse(parts[5], out FaceVariant v) ? v : (FaceVariant?)null;
+        }
+
         public static CardLayout LayoutFor(Vector2 layoutSize) =>
             layoutSize.x < 60 ? CardLayout.Thumb : layoutSize.x < 140 ? CardLayout.Compact : layoutSize.x < 280 ? CardLayout.Standard : CardLayout.Full;
 
@@ -51,12 +83,19 @@ namespace YgoCampaign.Game
             return PlainOnly(code, info, layout, PixelWidth(layout, layoutSize.x), fit);
         }
 
-        /// <summary>The plain card alone (never a picture), for checks and the title wall's fill.</summary>
+        /// <summary>
+        /// The plain card alone (never a picture), for checks and the title wall's fill. <paramref name="pixelWidth"/> is its
+        /// width on screen: it picks the face's variant and the least sizes its texts may take (section 2), and keys the
+        /// cache (a Thumb, which has no text, by its texture width alone).
+        /// </summary>
         public static Texture PlainOnly(uint code, CardInfo? info, CardLayout layout, int pixelWidth, CardFit fit = CardFit.Normal)
         {
             if (layout != CardLayout.Compact) fit = CardFit.Normal; // only Compact cards wear the editor's badges
+            CheckFonts();
             int width = Snap(layout, pixelWidth);
-            var key = new Key(code, info != null, layout, fit, width);
+            int screen = layout == CardLayout.Thumb ? 0 : Math.Max(1, pixelWidth);
+            var variant = VariantFor(layout, pixelWidth);
+            var key = new Key(code, info != null, layout, fit, width, variant, screen);
             if (Cache.TryGetValue(key, out var hit))
             {
                 Lru.Remove(hit.Node);
@@ -65,7 +104,7 @@ namespace YgoCampaign.Game
             }
             int height = Mathf.RoundToInt(width / Aspect);
             var entry = new Entry { Key = key, Info = info };
-            entry.Texture = PlainCards.NewTexture(width, height, $"{Prefix}{code}:{layout}:{fit}:{width}");
+            entry.Texture = PlainCards.NewTexture(width, height, $"{Prefix}{code}:{layout}:{fit}:{width}:{variant}:{screen}");
             entry.Bytes = PlainCards.BytesOf(entry.Texture);
             entry.Node = Lru.AddFirst(entry);
             Cache[key] = entry;
@@ -110,7 +149,9 @@ namespace YgoCampaign.Game
         /// Callers then call CardFoil.Apply as they do today.</summary>
         public static RawImage Draw(RawImage image, uint code, CardInfo? info, Vector2 layoutSize, CardFit fit = CardFit.Normal, bool full = false)
         {
-            var texture = Picture(code, info, layoutSize, fit, full);
+            // The face for the card's real size on screen: a card under a scaled parent (a detail at 0.62) gets the layout and
+            // variant that size takes.
+            var texture = Picture(code, info, layoutSize * ScaleOf(image.rectTransform), fit, full);
             image.texture = texture;
             if (IsPlain(texture)) image.uvRect = new Rect(0, 0, 1, 1);
             Tag(image, code, layoutSize, fit, info);
@@ -132,7 +173,8 @@ namespace YgoCampaign.Game
             // be evicted, and are drawn again when it shows (FaceTag.OnEnable).
             tag.Code = code;
             tag.Info = info;
-            tag.Width = image.texture.width;
+            // A plain face is drawn again at the width on screen it was drawn for (its variant and floors), not its texture's.
+            tag.Width = ByTexture.TryGetValue(image.texture, out var drawn) ? drawn.Key.Screen : image.texture.width;
             tag.Plain = PlainLayout(image.texture, out var layout, out var plainFit);
             tag.Layout = tag.Plain ? layout : LayoutFor(layoutSize);
             tag.Fit = tag.Plain ? plainFit : fit;
@@ -144,7 +186,7 @@ namespace YgoCampaign.Game
         {
             if (PlainLayout(texture, out var layout, out var fit))
             {
-                var w = PlainCards.FoilRects(layout, fit).art;
+                var w = PlainCards.FoilRects(layout, fit, VariantOf(texture)).art;
                 if (layout == CardLayout.Thumb) w = new Vector4(0.2f, 0.5f - 0.3f * Aspect, 0.8f, 0.5f + 0.3f * Aspect);
                 return new Rect(w.x, w.y, w.z - w.x, w.w - w.y);
             }
@@ -207,6 +249,7 @@ namespace YgoCampaign.Game
             {
                 Names.Remove(entry.Texture);
                 Texts.Remove(entry.Texture);
+                Elements.Remove(entry.Texture);
                 if (shown.Contains(entry.Texture))
                 {
                     entry.Queued = true;
@@ -319,19 +362,26 @@ namespace YgoCampaign.Game
             public readonly CardLayout Layout;
             public readonly CardFit Fit;
             public readonly int Width;
+            /// <summary>The variant (section 2) and the width on screen (4 px steps) the face's texts are sized for.</summary>
+            public readonly FaceVariant Variant;
+            public readonly int Screen;
 
-            public Key(uint code, bool known, CardLayout layout, CardFit fit, int width)
+            public Key(uint code, bool known, CardLayout layout, CardFit fit, int width, FaceVariant variant, int screen)
             {
                 Code = code;
                 Known = known;
                 Layout = layout;
                 Fit = fit;
                 Width = width;
+                Variant = variant;
+                Screen = screen;
             }
 
-            public bool Equals(Key o) => Code == o.Code && Known == o.Known && Layout == o.Layout && Fit == o.Fit && Width == o.Width;
+            public bool Equals(Key o) => Code == o.Code && Known == o.Known && Layout == o.Layout && Fit == o.Fit && Width == o.Width
+                                         && Variant == o.Variant && Screen == o.Screen;
             public override bool Equals(object? obj) => obj is Key k && Equals(k);
-            public override int GetHashCode() => unchecked((int)Code * 397 ^ (Known ? 1 : 0) ^ ((int)Layout << 1) ^ ((int)Fit << 3) ^ (Width << 5));
+            public override int GetHashCode() => unchecked((int)Code * 397 ^ (Known ? 1 : 0) ^ ((int)Layout << 1) ^ ((int)Fit << 3) ^ (Width << 5)
+                                                           ^ ((int)Variant << 17) ^ (Screen << 20));
         }
 
         private sealed class Entry
@@ -349,6 +399,25 @@ namespace YgoCampaign.Game
         private static readonly Dictionary<Texture, Entry> ByTexture = new Dictionary<Texture, Entry>();
         private static readonly Dictionary<Texture, PlainName> Names = new Dictionary<Texture, PlainName>();
         private static readonly Dictionary<Texture, PlainText> Texts = new Dictionary<Texture, PlainText>();
+        private static readonly Dictionary<Texture, List<(string, string, float, bool)>> Elements = new Dictionary<Texture, List<(string, string, float, bool)>>();
+
+        /// <summary>The fonts the faces were drawn with: when one changes (a missing file found, a new face), the cache and the
+        /// studio's templates are emptied.</summary>
+        private static readonly Font?[] _fonts = new Font?[4];
+        private static readonly Face[] FontFaces = { Face.Body, Face.Strong, Face.Condensed, Face.Italic };
+
+        private static void CheckFonts()
+        {
+            bool changed = false, first = _fonts[0] == null;
+            for (int i = 0; i < FontFaces.Length; i++)
+            {
+                var f = Typography.Font(FontFaces[i]);
+                if (!ReferenceEquals(f, _fonts[i])) { _fonts[i] = f; changed = true; }
+            }
+            if (!changed || first) return;
+            PlainCards.ResetTemplates();
+            Invalidate();
+        }
         private static readonly Queue<Entry> Queue = new Queue<Entry>();
         /// <summary>Textures dropped by <see cref="Invalidate"/> while a face still showed them: destroyed once none does.</summary>
         private static readonly List<Texture2D> Retired = new List<Texture2D>();
@@ -358,12 +427,22 @@ namespace YgoCampaign.Game
         private static double _spent;
         private static bool _warnedFull;
 
+        /// <summary>A rect's scale against its root canvas (1 when it isn't under one yet).</summary>
+        internal static float ScaleOf(RectTransform rt)
+        {
+            var canvas = rt.GetComponentInParent<Canvas>();
+            if (canvas == null) return 1;
+            float root = canvas.rootCanvas.transform.lossyScale.y;
+            return root > 0 && rt.lossyScale.y > 0 ? rt.lossyScale.y / root : 1;
+        }
+
         /// <summary>The texture width for a card <paramref name="layoutWidth"/> layout units wide on this screen.</summary>
         internal static int PixelWidth(CardLayout layout, float layoutWidth)
         {
             // The canvases' scale (CanvasScaler, 1920x1080 reference, Expand): pixels, so Retina screens get sharper faces.
+            // The width on screen (PlainOnly snaps it to a texture width, and picks the variant and floors from it).
             float scale = DebugScale ?? Mathf.Min(Screen.width / 1920f, Screen.height / 1080f);
-            return Snap(layout, Mathf.CeilToInt(layoutWidth * scale - 0.01f));
+            return Mathf.CeilToInt(layoutWidth * scale - 0.01f);
         }
 
         /// <summary>Textures held for a while without a face showing them (a destroyed card's shards): until when.</summary>
@@ -418,12 +497,13 @@ namespace YgoCampaign.Game
         private static void Render(Entry entry)
         {
             var clock = System.Diagnostics.Stopwatch.StartNew();
-            var (name, text) = PlainCards.Draw(entry.Texture, entry.Key.Code, entry.Info, entry.Key.Layout, entry.Key.Fit);
+            var (name, text, elements) = PlainCards.Draw(entry.Texture, entry.Key.Code, entry.Info, entry.Key.Layout, entry.Key.Fit, entry.Key.Variant, entry.Key.Screen);
             double ms = clock.Elapsed.TotalMilliseconds;
             _spent += ms;
             if (Timings.Count < 8192) Timings.Add(ms);
             if (name != null) Names[entry.Texture] = name;
             if (text != null) Texts[entry.Texture] = text;
+            Elements[entry.Texture] = elements;
         }
 
         /// <summary>Draws queued faces while this frame's budget lasts (the runner, every frame), and frees retired textures.</summary>
@@ -479,6 +559,7 @@ namespace YgoCampaign.Game
                     ByTexture.Remove(entry.Texture);
                     Names.Remove(entry.Texture);
                     Texts.Remove(entry.Texture);
+                    Elements.Remove(entry.Texture);
                     Bytes -= entry.Bytes;
                     entry.Queued = false;
                     UnityEngine.Object.Destroy(entry.Texture);
@@ -534,7 +615,7 @@ namespace YgoCampaign.Game
         }
     }
 
-    public sealed class PlainName { public string Text = ""; public int Size; public Rect Rect; public List<string> Problems = new(); }
+    public sealed class PlainName { public string Text = ""; public int Size; public Rect Rect; public int Lines; public List<string> Problems = new(); }
 
     /// <summary>For checks: a plain card's text box as drawn.</summary>
     internal sealed class PlainText { public string Text = ""; public string Pendulum = ""; public bool Italic; public bool AllShown; }

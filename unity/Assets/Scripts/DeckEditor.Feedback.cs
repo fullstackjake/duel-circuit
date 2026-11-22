@@ -232,10 +232,10 @@ namespace YgoCampaign.Game
             Ui.Image(pill, T.PanelDeep.WithAlpha(0.95f)).raycastTarget = true; // takes the pointer: pointed at, it stays
             _pillEdge = FrameGraphic.Make("Edge", pill, 0, 1, KindColor(kind));
             bool button = kind != ChangeKind.Refused;
-            _pillText = Ui.Text(Box(pill, 8, 0, button ? 296 - 8 - 62 : 296 - 16, 24), text, 15, T.Text, TextAnchor.MiddleLeft);
+            _pillText = Ui.Text(Box(pill, 8, 0, button ? 296 - 8 - 62 : 296 - 16, 24), text, TextRole.Small, T.Text, TextAnchor.MiddleLeft);
             _pillText.resizeTextForBestFit = true;
-            _pillText.resizeTextMinSize = 11;
-            _pillText.resizeTextMaxSize = 15;
+            _pillText.resizeTextMinSize = UiTheme.Floor;
+            _pillText.resizeTextMaxSize = UiTheme.Size(TextRole.Small);
             _pillButton = null;
             if (button)
             {
@@ -243,7 +243,7 @@ namespace YgoCampaign.Game
                 _pillButton = Button(296 - 58, 2, 56, 20, redo ? "Redo" : "Undo", () => { if (redo) RedoSteps(_pillSteps); else UndoSteps(_pillSteps); }, pill);
                 var label = _pillButton.GetComponentInChildren<Text>();
                 label.color = T.Info;
-                label.fontSize = 14;
+                label.fontSize = UiTheme.Size(TextRole.Caption);
                 Typography.Strong(label);
             }
             _pillGroup = pill.gameObject.AddComponent<CanvasGroup>();

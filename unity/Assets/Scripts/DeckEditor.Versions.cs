@@ -193,7 +193,7 @@ namespace YgoCampaign.Game
             ShowDetail(sangan);
             int clicks = 0;
             do { CycleText(); clicks++; } while (clicks < 5 && _selected?.Code != sanganRow.Code);
-            var status = Plain(_status.text);
+            var status = Plain(StatusText);
             int originals = _deck.Main.Count(c => c == sanganRow.Code), currents = _deck.Main.Count(c => c == sangan.Code);
             Report($"switching to the original: \"{status}\" ({originals} original, {currents} current Sangan in the deck)",
                 _selected?.Code == sanganRow.Code && originals == 1 && currents == 2

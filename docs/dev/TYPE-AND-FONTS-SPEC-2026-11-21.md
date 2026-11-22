@@ -402,6 +402,16 @@ Chosen by the session for R2 (2026-11-21), with a sensible default each. **Not y
   deck names and the card detail's copies line. The duel log keeps the newest lines that fit. The 16-slot bracket drops
   the word "Elo" only where the line doesn't fit.
 
+Chosen by the session for R3 (2026-11-21). **Not yet confirmed by the owner**:
+
+- **The developer layout stays excluded from the text rule**, as the one exception (this spec wanted the list empty).
+- **Sizes on cards use the smallest size that measures 7.0 px on screen** (8.0 for card text), not a rounder size above it.
+- **The live stat strip is Barlow Condensed SemiBold** per section 3. It reads smaller than before in the same band (a look
+  note for the owner).
+- **The editor's detail block grows when the versions panel is hidden**; the status, detail and ban-list tooltips show only
+  when their line is cut.
+- **The hand's Level digit keeps its old sizes at Large and Larger** (`FxSettings.Scaled(30)`) and its box grows.
+
 ## Not verified
 
 - **No Barlow on screen yet:** widths, line heights and the 9.3 px floor's legibility in Barlow are judged from the face's
@@ -542,3 +552,116 @@ Harness: `--texts-check`, `--campaign-test` and `--deckbuilding-test` pass.
 ### Still open
 
 R3, and one Evidence pass over R2 and R3 on one build. Both are in `docs/dev/TODO.md`, "Type scale and fonts".
+
+## As built: R3 (2026-11-21)
+
+R3 is built on top of R2 (96d5aea). Models: a Unity Architect (Opus) built it; a Code Reviewer (Opus) read the diff
+against this spec and reported 16 findings; the same builder fixed them in one fix round; an Evidence Collector (Opus)
+tested R2 and R3 on one fresh build (`docs/dev/EVIDENCE-2026-11-21c.md`, built 22:45, with and without pictures); a
+small follow-up fixed what that pass found in the checks.
+
+### What exists
+
+- **Plain faces by width on screen.** `FaceVariant` (Thumb, Compact, CompactNameOnly, Standard, StandardNoText, Full) and
+  `CardFace.VariantFor(CardLayout, float screenWidthPx)`: Compact under 52 px is the name alone (four lines, then "...");
+  Standard under 200 px has no text box (a bigger name plate, the type line from 150 px, the window with the glyph and the
+  chip). Names, chips and stats are 7 px or more on screen, card text 8 px. What can't meet its floor drops in section 2's
+  order (card text, type line, chip words, then the chip; a Link rating; ATK/DEF becomes ATK, then goes). Names never drop.
+  `CardFace.PixelWidth` is the width on screen. The cache keys on that exact width (a thumbnail on 0) and is emptied when
+  the faces' fonts change (`PlainCards.ResetTemplates` clears the studio's templates too). `CardFace.Draw` reads the
+  image's own scale, so a face under a scaled parent (a slab at 0.62) gets the variant of its size on screen.
+  `CardFace.DebugTexts`, `CardFace.VariantOf` and `PlainName.Lines` were added.
+- **`CardText`** (CardView.cs) fits text drawn on a card: on enable, then only when its scale or box changes. It keeps the
+  least size whose whole pixels are `FloorPx` (7, or 8 for card text); it can try wordings (`Choices`), cut with "..."
+  (`Cut`) or hide with its plate (`Holder`). `CardView.CardTextFit` makes one; a bare `AddComponent<CardText>()` is a mark
+  only (the rule's probes).
+- **Live stat strip.** Barlow Condensed SemiBold, shown bold. The wording steps down Level/ATK/DEF, ATK/DEF, ATK; when one
+  line can't fit at 7 px the strip grows up the card (to 40%); it hides only when ATK alone can't fit. NEGATED, "set this
+  turn", counters, SET and a set card's peek are `CardText` too. Pile labels under a pile are shell text at Caption.
+- **Rarity mark.** `CardText` at 7 px, in the face's own window for its variant; it disappears when it can't meet 7 px.
+- **Foil.** `PlainCards.FoilRects(layout, fit, variant)`; `CardFoil` passes the face's variant everywhere (material, rarity
+  mark, `WindowUv`). No region crosses the drawn name plate.
+- **Slab labels.** `SlabView.Create(..., scale)` sets the case's scale before drawing (GradingDeskScreen, VanScreen and
+  SlabShowcase pass it). `SlabView.LabelFit` refits once the scale has held still for 0.25 s, and lays the label out again
+  only when its rows or sizes change. Rows drop in the order cert, house, grade (the grade ends in "..." first); the name
+  never drops. The Van's 0.62 detail gets a Standard face without text; the text is in the panel beside it.
+- **The deck editor** (`DeckEditor*.cs`). Every `Ui.Text` takes a `TextRole`; buttons, chips and pickers at Label, best
+  fit to 14; the help in three lines at Caption; the status line, the ban-list label and the block under the card Small on
+  one line, cut with "...", whole in a tooltip that shows only when the line is cut; badges Caption in their 20x20. A
+  pictured result tile keeps its name under it; a plain face carries the name, so it isn't repeated (what you own, a
+  verdict or who played it stays). The card text button shows its label only ("click to switch" in its tooltip). The detail
+  block takes the versions panel's room when that panel is hidden (106 px, not 52). Clickable rects that moved: the active
+  filter chips and the More panel's archetype chips are as wide as their words at 14.
+- **Hand Level digit** (`BoardView.cs`): `FxSettings.Scaled(30)`; its box grows to hold the digit, keeping its left and
+  bottom edges.
+- **The text rule** now also runs at every shot of `-editorcheck`, `-searchcheck` and `-focuscheck`. Only the board's
+  developer layout is still excluded. Card and slab text is judged by `CardText.FloorPx` in screen pixels; the self-test
+  has a 6 px card name (fails) and a 7 px one (passes).
+- **Check steps added.** `-plaincheck` step 17: 741 faces (19 kinds, Compact, Standard and Full at 30, 41, 52, 57, 70, 71,
+  115, 150, 151, 172, 200, 240 and 271 px), each in its variant with every text at its floor (2335 texts); the long name
+  at 41 px; 199 against 201 px as two textures; foil never over a name; the rarity mark in its window. With the player's
+  pictures it runs step 17 and the pictured-faces step only. `-editorcheck` checks the names under pictured result tiles
+  (it only bites with pictures). `-layoutcheck` re-checks the 13 hyphenation words in the new face, and runs all 13 in a
+  plate just wide enough for their first part.
+
+### Where the build differs from this spec
+
+- **The developer layout stays excluded** from the text rule (the spec wanted the list empty).
+- Compact names are max 17, min 12, set with 5% width slack (whole-pixel text).
+- Two shared files outside R3's list were touched: `CardDetail.cs` (the "more" strip 16 to 18 high; the card text's box
+  refits at once when a card is shown) and `BoardView.cs` (the hand's Level digit).
+- Words changed: the editor's help (three lines), the More panel's archetype hint ("Members only. Related: cards naming
+  it."), the card text button.
+- The builder's first report said 627 faces in step 17; the log says 741 (19 x 3 layouts x 13 widths).
+
+### Checks (Evidence pass, one fresh build, no pictures unless noted)
+
+51 app runs: 4,471 ok lines, 12 FAIL lines (10 in the evidence report's summary; its table adds the owner-save run's 2),
+0 exceptions, every run exited 0. Harness `--texts-check`, `--campaign-test`, `--deckbuilding-test` and `--games 3` pass.
+
+| Check | 1280x720 (ok) | 1920x1080 and 3024x1964 (ok) | Other |
+|---|---|---|---|
+| `-plaincheck` | 38 | 38 each | with pictures: 6 |
+| `-editorcheck` | 74 | 74 each | with pictures 74; `-textsize 2` 74; 1600x900 and 1152x648 74 |
+| `-searchcheck` | 89 | 89 each | |
+| `-focuscheck` | 94 | 94 each | |
+| `-layoutcheck` | 89 | 89 each | with pictures 82; `-textsize 2` 89; 1152x648 89; 1600x900 88 ok, 1 FAIL (twice) |
+| `-campaigncheck` | 356 | 356 each | with pictures 344 |
+| `-typecheck` | 58 | 58 each | |
+| `-menucheck` 15, `-shopcheck` 117, `-themecheck` 107, `-alleycheck` 230, `-climbcheck` 22, `-aboutcheck` 39, `-replaycheck` 18 | all 0 FAIL | | `-shopcheck` with pictures 113 |
+| `-boardcheck` 24, `-pilecheck` 21, `-controlscheck` 40, `-soundcheck` 51, `-clickcheck` 26, `-stylecheck` 19, `-importcheck` (pictures) 65 | all 0 FAIL | | `-fxshots`: 24 shots, no step lines |
+| `-tagcheck` | 10 ok, 1 FAIL; rerun 11 ok | | |
+
+The 12 FAIL lines:
+
+1. `-layoutcheck` at 1600x900, twice: "a yes/no over 1187 characters of card text keeps all of it (... size 14, scrolls False)".
+   The text fits at that size, so nothing is cut. The step demands a scroll (`DuelController.cs`, `&& ynScrolls`): a check
+   bug, not a game bug. A fix is in progress.
+2. `-tagcheck`, once: "the tag duel is under way (1 swaps, turn 2)". A long frog loop in turn 2 ate the 60 s window; the
+   rerun passed. Timing in a random lineup, not R2 or R3.
+3. Seven text-rule FAILs in `-editorcheck` with a deck named `a <b>bold <size=60>big <color=red>deck`: the editor's "with ..."
+   line is drawn as markup and clipped. Deck names are not escaped before they reach rich text (fix in progress).
+4. Two in `-campaigncheck` on a copy of the owner's save ("no save yet", and a trade the owner already has): the check
+   assumes a fresh save. The save loads (Level 16, 9,563 DP).
+
+By eye (1280x720, 1920x1080, 3024x1964): no cut, doubled or overlapping card name, no foil over a name, every small Spell
+and Trap tile keeps its footer, no empty tooltip. Editor deck-tile names at 720 are 7 px: readable up close, small.
+
+### Not verified
+
+- Windows; a real 4K or Retina screen (the 3024x1964 runs are a window of that size); audio (every run muted but
+  `-menucheck`, which nobody heard).
+- Runs with pictures at 1920x1080 and 3024x1964.
+- Not run: `-finalcheck`, `-laddercheck`, `-musiccheck`, `-matcheck`, `-ordercheck`, `-versioncheck`, `-artcheck`.
+- A click-through of the app on the owner's save copy (the window opened on another Space).
+- Break tests that would not catch a break: a live face drawn for the wrong width at a size no check shoots; foil regions
+  after a face is redrawn for a new width; deck names with markup; the board's card detail at Larger. The variant at 70 and
+  150 px is asserted only from above (chip words from 70, type line from 150).
+
+### Still open
+
+- Deck names with markup (in progress). An emoji in a deck name disappears (a known limit).
+- The board's card detail at Larger text cuts mid-line with no "more" cue (probably older than R2).
+- The hand's Level digit overlaps the "LV n" chip text (older than R2).
+- The stat strip's look (see Owner decisions). The Mac app in `build/unity` is still 0.3.0, without the fonts.
+- All in `docs/dev/TODO.md`, "Type scale and fonts".

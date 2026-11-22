@@ -108,8 +108,7 @@ namespace YgoCampaign.Game
                     var cell = Ui.Placed($"{col.name} {grade}", root, new Vector2(cx, cy), new Vector2(widths[c], col.height));
                     cell.gameObject.AddComponent<RectMask2D>();
                     var copy = Copy(info.Code, Rarity.UltraRare, grade == 0 ? 10 : grade);
-                    var slab = SlabView.Create(cell, new Vector2(0, -col.focus * col.scale), col.size, copy, info, set, sealedLabel: grade == 0);
-                    slab.localScale = Vector3.one * col.scale;
+                    var slab = SlabView.Create(cell, new Vector2(0, -col.focus * col.scale), col.size, copy, info, set, sealedLabel: grade == 0, scale: col.scale);
                     Checked.Add((col.name, grade == 0 ? "sealed" : grade.ToString(), slab));
                 }
             }
@@ -152,11 +151,11 @@ namespace YgoCampaign.Game
 
             // Top row: Full at 0.62 on the panel, Full on the reveal scrim, Full at 0.62 on light parchment.
             var panel = Ground(root, new Vector2(-640, 200), new Vector2(300, 420), Ui.Hex("#1A1F2B"), "Full at 0.62 on the panel");
-            SlabView.Create(panel, Vector2.zero, SlabView.Size.Full, mint, magician, setMint).localScale = Vector3.one * 0.62f;
+            SlabView.Create(panel, Vector2.zero, SlabView.Size.Full, mint, magician, setMint, scale: 0.62f);
             var scrim = Ground(root, new Vector2(-100, 140), new Vector2(420, 640), new Color(0, 0, 0, 0.78f), "Full on the reveal's scrim");
             SlabView.Create(scrim, Vector2.zero, SlabView.Size.Full, gem, stardust, setGem);
             var paper = Ground(root, new Vector2(420, 200), new Vector2(300, 420), Ui.Hex("#EFE6D2"), "Full at 0.62 on parchment");
-            SlabView.Create(paper, Vector2.zero, SlabView.Size.Full, gem, stardust, setGem).localScale = Vector3.one * 0.62f;
+            SlabView.Create(paper, Vector2.zero, SlabView.Size.Full, gem, stardust, setGem, scale: 0.62f);
 
             // Bottom row: grid rims at each screen's tile size, on its ground.
             var tiles = new (string name, Vector2 size, Color ground, CardCopy copy, CardInfo info, Vector2 at)[]

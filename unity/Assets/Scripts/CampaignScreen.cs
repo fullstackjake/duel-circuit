@@ -1338,7 +1338,7 @@ namespace YgoCampaign.Game
             var profile = _state.Profile!;
             Ui.Text(Ui.Box(_detail, 30, top, 400, 26), "YOUR DECK", TextRole.Small, T.Caption, TextAnchor.MiddleLeft);
             Ui.BoxButton(_detail, 30, top + 32, 44, 44, "<", () => CycleDeck(-1), TextRole.Label);
-            var label = Ui.Text(Ui.Box(_detail, 80, top + 32, 380, 44), profile.Deck.Length > 0 ? CampaignState.SlugTitle(profile.Deck) : "(no deck)", TextRole.Subhead, T.Text);
+            var label = Ui.Plain(Ui.Text(Ui.Box(_detail, 80, top + 32, 380, 44), "", TextRole.Subhead, T.Text), profile.Deck.Length > 0 ? CampaignState.SlugTitle(profile.Deck) : "(no deck)");
             Typography.Strong(label);
             Ui.BoxButton(_detail, 466, top + 32, 44, 44, ">", () => CycleDeck(+1), TextRole.Label);
             Ui.BoxButton(_detail, 540, top + 32, 200, 44, "Edit deck", () => EditDeck?.Invoke(profile.Deck), TextRole.Label);
@@ -1442,10 +1442,10 @@ namespace YgoCampaign.Game
                         ShowTagCup(index);
                     }
                     Ui.BoxButton(_detail, 230, 176, 40, 40, "<", () => PickDeck(-1), TextRole.Label);
-                    Ui.Text(Ui.Box(_detail, 274, 176, 300, 40), _state.DeckTitle(deck), TextRole.Body, T.Text);
+                    Ui.Plain(Ui.Text(Ui.Box(_detail, 274, 176, 300, 40), "", TextRole.Body, T.Text), _state.DeckTitle(deck));
                     Ui.BoxButton(_detail, 578, 176, 40, 40, ">", () => PickDeck(1), TextRole.Label);
                 }
-                else Ui.Text(Ui.Box(_detail, 230, 176, 388, 40), deck.Length > 0 ? _state.DeckTitle(deck) : "(no deck)", TextRole.Body, T.Text, TextAnchor.MiddleLeft);
+                else Ui.Plain(Ui.Text(Ui.Box(_detail, 230, 176, 388, 40), "", TextRole.Body, T.Text, TextAnchor.MiddleLeft), deck.Length > 0 ? _state.DeckTitle(deck) : "(no deck)");
                 // Bond 3's one trade, while it's on offer: a Trade button beside the bond.
                 bool trade = !TagPartners.IsShopRegular(partner) && _state.Unlocks.CanTrade(profile, partner.Id);
                 Ui.Text(Ui.Box(_detail, 630, 170, trade ? 230 : 340, 52), BondText(TagPartners.Bond(partner, profile)), TextRole.Caption, T.TextQuiet, TextAnchor.MiddleLeft);

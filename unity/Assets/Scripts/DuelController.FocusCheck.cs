@@ -31,6 +31,7 @@ namespace YgoCampaign.Game
             {
                 yield return new WaitForEndOfFrame();
                 ScreenCapture.CaptureScreenshot(Path.Combine(folder, $"focus-{name}.png"));
+                yield return TextRule($"focus-{name}", Report);
                 yield return null;
             }
             yield return new WaitForSecondsRealtime(1.5f);

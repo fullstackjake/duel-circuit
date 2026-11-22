@@ -1086,7 +1086,7 @@ namespace YgoCampaign.Game
         {
             _pickName[seat].text = name;
             _pickStyle[seat].text = style;
-            _pickDeck[seat].text = deck;
+            Ui.Plain(_pickDeck[seat], deck);
         }
 
         /// <summary>Human play shows the decision panel and shortens the log; spectating gives the log the space.</summary>
@@ -2048,9 +2048,14 @@ namespace YgoCampaign.Game
             if ((info.Type & CardType.Monster) == 0 || (info.Type & CardType.Link) != 0) return;
             uint level = info.Level & 0xff;
             if (level == 0) return;
-            var rt = Ui.Placed("Level", card, new Vector2(-HandCardSize.x / 2 + 17, -HandCardSize.y / 2 + 42), new Vector2(34, 40));
+            // The digit at the text size's scale (Settings > Text size), its box grown to hold it: the box keeps its left and
+            // bottom edges on the card (34 x 40 at 30), so a bigger digit grows up and right over the card, not off it.
+            int digit = FxSettings.Scaled(30);
+            var box = new Vector2(Mathf.Max(34, Mathf.Ceil(digit * (level >= 10 ? 1.25f : 0.8f))), Mathf.Max(40, Mathf.Ceil(digit * 1.3f)));
+            var rt = Ui.Placed("Level", card, new Vector2(-HandCardSize.x / 2 + box.x / 2, -HandCardSize.y / 2 + 22 + box.y / 2), box);
             bool rank = (info.Type & CardType.Xyz) != 0;
-            var text = Ui.Text(rt, level.ToString(), FxSettings.Scaled(30), rank ? Ui.Hex("#D8DCE4") : Color.white);
+            var text = Ui.Text(rt, level.ToString(), digit, rank ? Ui.Hex("#D8DCE4") : Color.white);
+            text.horizontalOverflow = HorizontalWrapMode.Overflow; // (a digit never wraps; its box holds it, the outline included)
             Typography.Strong(text);
             text.raycastTarget = false;
             var outline = text.gameObject.AddComponent<Outline>();
@@ -2541,7 +2546,7 @@ namespace YgoCampaign.Game
             if (_plateDeckFitted[p] != deckKey)
             {
                 _plateDeckFitted[p] = deckKey;
-                _plateDeck[p].text = _deckNames[p];
+                Ui.Plain(_plateDeck[p], _deckNames[p]);
                 _plateDeck[p].fontSize = UiTheme.Size(TextRole.Label);
                 Ui.OneLine(_plateDeck[p], UiTheme.Floor);
             }

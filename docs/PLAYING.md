@@ -505,9 +505,13 @@ Open **Settings** from the main menu, or from the gear icon in a duel. Click a s
 | Screen shake | The board shakes on big hits |
 | Flashes | Full-screen color flashes on damage and the final blow |
 | Slow down for combos | When a headliner (a duelist famous for one big combo) plays that combo, the duel slows to Normal speed so you can follow it |
-| Card text size | Bigger text for card effects, the log and dialogs |
+| Card text size | Normal, Large or Larger text for reading: card effects, the log and dialogs |
 | Card term help | Card terms (Quick Effect, once per turn...) in blue; point at one to see what it means |
 | Playable card tabs | A gold ▶ tab above every card you can play now (off at first) |
+
+**Card text size** makes the text you read bigger (Large is 20% bigger, Larger 40%): a card's text in its detail and in the
+reading view, the duel log, the words in dialogs and the term help, and the options in prompts. It doesn't change buttons,
+titles or the text printed on the cards themselves. Long text that no longer fits scrolls.
 
 **Sound and screen**
 

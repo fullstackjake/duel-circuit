@@ -8,24 +8,22 @@ namespace YgoCampaign.Game
 {
     /// <summary>
     /// The layout rule (docs/dev/TYPE-AND-FONTS-SPEC-2026-11-21.md, sections 5 and 7), taken at the shots of -layoutcheck,
-    /// -campaigncheck, -menucheck, -shopcheck, -themecheck, -alleycheck, -tagcheck, -aboutcheck and -replaycheck's list:
+    /// -campaigncheck, -menucheck, -shopcheck, -themecheck, -alleycheck, -tagcheck, -aboutcheck, -editorcheck, -searchcheck,
+    /// -focuscheck and -replaycheck's list:
     /// every visible shell text draws at <see cref="UiTheme.Floor"/> or more at 1080 (best-fit text at the size it came out,
     /// scaled parents and &lt;size&gt; runs counted), and none is clipped: it loses no characters to its box (vertical
     /// truncation; best fit at its minimum and still over), no single word is wider than its box, and an overflowing text
     /// runs past its box by no more than its leading. Text under a screen drawn over the whole window doesn't count. Hero
-    /// numbers (<see cref="Typography.IsHero"/>) keep their sizes; the areas in <see cref="TextRuleExclusions"/> are skipped
-    /// by name (the card faces and the deck editor until part R3 removes them).
+    /// numbers (<see cref="Typography.IsHero"/>) keep their sizes. Text drawn on a card or a slab (<see cref="CardText"/>) is
+    /// judged in screen pixels against the card's floor (section 2: 7 px; plain faces themselves, drawn into textures, are
+    /// -plaincheck's). The areas in <see cref="TextRuleExclusions"/> are skipped by name.
     /// </summary>
     public sealed partial class DuelController
     {
-        /// <summary>Areas the rule skips, each named in the log: card-face text and the deck editor until part R3; slabs and the developer layout.</summary>
+        /// <summary>Areas the rule skips, each named in the log: the developer layout. (A rarity mark is card text, CardText
+        /// at 7 px, judged like any other.)</summary>
         private static readonly (string what, Func<Text, bool> test)[] TextRuleExclusions =
         {
-            ("text on card faces (inside a CardView: plain faces, the stat strip, badges)", t => t.GetComponentInParent<CardView>(true) != null),
-            ("the deck editor (DeckEditorCanvas)", t => Under(t.transform, "DeckEditorCanvas")),
-            ("the plain card studio (PlainCardStudio, drawn into textures)", t => Under(t.transform, "PlainCardStudio")),
-            ("rarity marks on card faces (CardFoil's RarityMark, sized by the card)", t => Under(t.transform, "RarityMark")),
-            ("slab labels (the label on a graded card's case, SlabView: sized by the case, like a card face)", t => Under(t.transform, "Slab")),
             // Not R3's: the board in its developer layout (F12; only with -dev, the editor, a dev build or a check) is a tool,
             // drawn at 0.6 scale beside the dev panel, not a player's screen.
             ("the board in the developer layout (F12, not a player's screen)", t => _ruleDevBoard != null && t.transform.IsChildOf(_ruleDevBoard)),
@@ -36,11 +34,6 @@ namespace YgoCampaign.Game
 
         private static bool _textRuleNamed;
 
-        private static bool Under(Transform t, string name)
-        {
-            for (var p = t; p != null; p = p.parent) if (p.name == name) return true;
-            return false;
-        }
 
         /// <summary>A text the rule found under the floor or clipped: the Text itself (the re-check matches on it) and the note.</summary>
         internal sealed class TextProblem
@@ -63,7 +56,7 @@ namespace YgoCampaign.Game
             if (!_textRuleNamed)
             {
                 _textRuleNamed = true;
-                Debug.Log($"text rule: excluded until R3: {string.Join("; ", TextRuleExclusions.Select(e => e.what))}");
+                Debug.Log($"text rule: excluded: {string.Join("; ", TextRuleExclusions.Select(e => e.what))}");
                 SelfTest(report);
             }
             var (problems, seen) = TextProblems();
@@ -135,16 +128,21 @@ namespace YgoCampaign.Game
                 float px = (fit ? gen.fontSizeUsedForBestFit : text.fontSize * ppu) * rel;
                 float at1080 = px / ppu;
                 // Best fit picks whole pixels: a minimum of 14 at 720 draws at 9 px; that is the floor there.
-                bool under = fit ? px < Mathf.FloorToInt(UiTheme.Floor * ppu * rel) - 0.01f : text.fontSize * rel < UiTheme.Floor - 0.01f;
+                // Text drawn on a card or a slab (CardText) has the card's floor in screen pixels (section 2: 7 px, 8 for card
+                // text); shell text the type scale's floor at 1080.
+                bool onCard = text.TryGetComponent<CardText>(out var cardText);
+                bool under = onCard ? px < cardText.FloorPx - 0.01f
+                    : fit ? px < Mathf.FloorToInt(UiTheme.Floor * ppu * rel) - 0.01f : text.fontSize * rel < UiTheme.Floor - 0.01f;
                 string where = $"{(rt.parent != null ? rt.parent.name + "/" : "")}{rt.name}: \"{Words(text.text)}\"";
-                if (under) problems.Add(new TextProblem { Text = text, Small = true, Note = $"{where} ({at1080:0.#} at 1080{(fit ? $", best fit {text.resizeTextMinSize}-{text.resizeTextMaxSize}" : "")})" });
+                if (under) problems.Add(new TextProblem { Text = text, Small = true, Note = onCard ? $"{where} ({px:0.#} px on screen, a card's floor is {cardText.FloorPx:0} px)"
+                    : $"{where} ({at1080:0.#} at 1080{(fit ? $", best fit {text.resizeTextMinSize}-{text.resizeTextMaxSize}" : "")})" });
                 // A rich-text run with a smaller <size=N> than the floor (a second line in one text), best fit or not.
                 else if (text.supportRichText && text.text.Contains("<size="))
                 {
                     int least = int.MaxValue;
                     foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(text.text, @"<size=(\d+)>"))
                         least = Math.Min(least, int.Parse(m.Groups[1].Value));
-                    if (least * rel < UiTheme.Floor - 0.01f) problems.Add(new TextProblem { Text = text, Small = true, Note = $"{where} (a <size={least}> run: {least * rel:0.#} at 1080)" });
+                    if (!onCard && least * rel < UiTheme.Floor - 0.01f) problems.Add(new TextProblem { Text = text, Small = true, Note = $"{where} (a <size={least}> run: {least * rel:0.#} at 1080)" });
                 }
                 var why = Clip(text) ?? Sideways(s, shown, buttons, screen);
                 if (why != null) problems.Add(new TextProblem { Text = text, Note = $"{where} ({why})" });
@@ -244,6 +242,7 @@ namespace YgoCampaign.Game
                     return t;
                 }
                 var small = Probe("Small", "Thirteen", 13, 300, 40);
+                Canvas.ForceUpdateCanvases();
                 var shrunk = Probe("Shrunk", "A best-fit line that has to shrink to fit", 20, 120, 24, fit: true, min: 10);
                 Probe("Cut", "A line far too long for its box, which holds one line only", 18, 120, 24);
                 Probe("Over", "A best-fit line at its minimum and still over its box", 20, 60, 20, fit: true, min: 16);
@@ -259,16 +258,25 @@ namespace YgoCampaign.Game
                 run.supportRichText = true;
                 Typography.Hero(Probe("Hero", "13", 13, 100, 40, x: 10, y: 460));
                 Probe("Faded", "Thirteen", 13, 300, 40, x: 10, y: 520).color = new Color(1, 1, 1, 0.05f);
-                Probe("Excluded", "Thirteen", 13, 300, 40, parent: Ui.Box(root, 0, 0, 1920, 1080).gameObject.transform, x: 10, y: 580).transform.parent.name = "DeckEditorCanvas";
+                // The excluded area: a 13 text on a stand-in for the developer layout's board.
+                var devStandIn = Ui.Box(root, 0, 0, 1920, 1080);
+                Probe("Excluded", "Thirteen", 13, 300, 40, parent: devStandIn.gameObject.transform, x: 10, y: 580);
+                var devBefore = _ruleDevBoard;
+                _ruleDevBoard = devStandIn;
                 var sideways = Probe("Sideways", "A one-line label far wider than its little box", 16, 80, 30, x: 1000, y: 700);
                 sideways.horizontalOverflow = HorizontalWrapMode.Overflow;
                 sideways.alignment = TextAnchor.MiddleLeft;
                 Probe("Neighbour", "Next door", 16, 200, 30, x: 1100, y: 700);
+                // Card text: judged in screen pixels against 7 px (a 6 px name fails, a 7 px one passes), whatever its size at 1080.
+                float ppuNow = small.pixelsPerUnit;
+                Probe("CardSix", "Name", Mathf.Max(1, Mathf.FloorToInt(6f / ppuNow)), 200, 40, x: 10, y: 640).gameObject.AddComponent<CardText>();
+                Probe("CardSeven", "Name", Mathf.CeilToInt(7f / ppuNow), 200, 40, x: 300, y: 640).gameObject.AddComponent<CardText>();
                 var (first, _) = TextProblems();
+                _ruleDevBoard = devBefore;
                 bool Has(List<TextProblem> list, string name, bool isSmall) => list.Any(p => p.Text != null && p.Text.name == name && p.Small == isSmall);
                 bool caught = Has(first, "Small", true) && Has(first, "Shrunk", true) && Has(first, "Nested", true) && Has(first, "Run", true)
-                    && Has(first, "Cut", false) && Has(first, "Over", false) && Has(first, "Word", false) && Has(first, "Spill", false) && Has(first, "Sideways", false);
-                string[] spare = { "Fits", "Ellipsis", "Leading", "Hero", "Faded", "Excluded", "Neighbour" };
+                    && Has(first, "Cut", false) && Has(first, "Over", false) && Has(first, "Word", false) && Has(first, "Spill", false) && Has(first, "Sideways", false) && Has(first, "CardSix", true);
+                string[] spare = { "Fits", "Ellipsis", "Leading", "Hero", "Faded", "Excluded", "Neighbour", "CardSeven" };
                 var wrongly = first.Where(p => p.Text != null && spare.Contains(p.Text.name)).Select(p => p.Note).ToList();
                 // The re-check: the same Text with other words is still the same problem.
                 small.text = "Thirteen, now other words";
@@ -286,8 +294,8 @@ namespace YgoCampaign.Game
                 string calibration = $"the shrunk probe: best fit {shrunk.cachedTextGenerator.fontSizeUsedForBestFit} px at {shrunk.pixelsPerUnit:0.###} px per unit";
                 var mine = first.Where(p => p.Text != null && p.Text.transform.IsChildOf(root)).Select(p => p.Note);
                 report("text rule: the rule catches a 13 text, best fit shrunk under 14, a 20 text at half scale, a <size=10> run in a best-fit text, a cut line, "
-                       + "best fit at its minimum still over, a word wider than its box, lines spilling out, a line running sideways into its neighbour; "
-                       + "spares a 14 text, a line cut with \"…\", leading-only overflow, a hero number, a faded text, an excluded area; skips text under a full-window "
+                       + "best fit at its minimum still over, a word wider than its box, lines spilling out, a line running sideways into its neighbour, a 6 px card name; "
+                       + "spares a 14 text, a line cut with \"…\", leading-only overflow, a hero number, a faded text, an excluded area, a 7 px card name; skips text under a full-window "
                        + $"opaque screen but not under a sprite; keeps a problem whose words change (caught {caught}, wrongly caught {wrongly.Count}, re-check {recheck}, "
                        + $"covered {hidden}, sprite {spriteShows}; {string.Join(" / ", mine)}; {calibration})",
                     caught && wrongly.Count == 0 && recheck && hidden && spriteShows);

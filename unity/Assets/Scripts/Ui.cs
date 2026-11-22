@@ -150,6 +150,18 @@ namespace YgoCampaign.Game
         /// line whose whole text is a hover or click away. A cut keeps rich-text tags (closing the open ones after the "…"),
         /// a literal "&lt;" and whole surrogate pairs.
         /// </summary>
+        /// <summary>
+        /// Shows <paramref name="s"/> (a deck's or a file's name, or a line built round one) exactly as typed: rich text off,
+        /// so "a &lt;b&gt;bold" shows its "&lt;b&gt;". (Legacy Text has no escape for "&lt;": a zero-width character after it
+        /// draws a box in Barlow, so a name never goes into a rich-text line; the line goes plain.)
+        /// </summary>
+        public static Text Plain(Text t, string? s)
+        {
+            t.supportRichText = false;
+            t.text = s ?? "";
+            return t;
+        }
+
         public static Text OneLine(Text t, int? min = null)
         {
             float room = t.rectTransform.rect.width;

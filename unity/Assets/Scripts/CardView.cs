@@ -39,6 +39,8 @@ namespace YgoCampaign.Game
         /// <summary>The face drawn (picture or plain card), and whether it's a plain one.</summary>
         private RawImage? _face;
         private bool _plainFace;
+        /// <summary>The face is a plain card (drawn, no picture): it carries the name, so nothing repeats it under the tile.</summary>
+        public bool PlainFace => _plainFace;
 
         /// <summary>For checks (CardFace.DebugAudit): this view draws a card's face (not a back, not a peek).</summary>
         public bool DebugFaceDrawn => _face != null;
@@ -119,10 +121,8 @@ namespace YgoCampaign.Game
                 bool setTag = card.SetThisTurn && (card.Type & CardType.Trap) != 0;
                 var peek = Ui.Stretched("Peek", face, new Vector2(0, setTag ? 0.2f : 0), new Vector2(1, setTag ? 0.44f : 0.24f));
                 Ui.Image(peek, new Color(0, 0, 0, 0.7f)).raycastTarget = false;
-                var peekText = Ui.Text(peek, info.Name, 9, new Color(1f, 0.9f, 0.6f));
-                peekText.resizeTextForBestFit = true;
-                peekText.resizeTextMinSize = 7;
-                peekText.resizeTextMaxSize = 10;
+                // On the card: the card's floor (7 px on screen), cut with "…" when even that doesn't fit.
+                OnCard(Ui.Text(peek, info.Name, 10, new Color(1f, 0.9f, 0.6f)), 10, cut: true);
                 return view;
             }
 
@@ -185,19 +185,25 @@ namespace YgoCampaign.Game
         /// word fits <paramref name="width"/>; when even that's too wide, a word breaks after its own hyphen ("Mekk-" /
         /// "Knight"), then with a hyphen added. The text then shrinks to fit its box's height (best fit), never wider.
         /// </summary>
-        public static void FitWords(Text t, float width, int max)
+        public static void FitWords(Text t, float width, int max) => FitWords(t, width, max, MinWordSize);
+
+        /// <summary>
+        /// <see cref="FitWords(Text, float, int)"/> never below <paramref name="least"/> (a card's floor, section 2 of the type
+        /// spec): words that don't fit there break, and best fit stops there too.
+        /// </summary>
+        public static void FitWords(Text t, float width, int max, int least)
         {
             if (width <= 4 || string.IsNullOrEmpty(t.text)) return;
             var text = t.text;
             var words = text.Split(' ');
-            int size = max;
-            while (size > MinWordSize && !AllFit(t, words, size, width)) size--;
+            int size = Mathf.Max(max, least);
+            while (size > Mathf.Max(least, Mathf.Min(MinWordSize, max)) && !AllFit(t, words, size, width)) size--;
             if (!AllFit(t, words, size, width)) text = BreakWords(t, words, size, width);
             t.text = text;
             t.fontSize = size;
             t.resizeTextForBestFit = true;
             t.resizeTextMaxSize = size;
-            t.resizeTextMinSize = Mathf.Min(size, 6);
+            t.resizeTextMinSize = Mathf.Min(size, least == MinWordSize ? 6 : least);
         }
 
         /// <summary>
@@ -351,6 +357,11 @@ namespace YgoCampaign.Game
             var text = strip.GetComponentInChildren<Text>();
             if (text == null) return;
             text.text = StatLine(card, info, withLevel: false);
+            if (text.TryGetComponent<CardText>(out var fit))
+            {
+                fit.Choices = new[] { text.text, StatLine(card, info, false, atkOnly: true) };
+                fit.Full = text.text;
+            }
             bool lower = text.alignment == TextAnchor.LowerCenter; // the text-only card's stats sit at its bottom
             text.alignment = flip ? (lower ? TextAnchor.LowerRight : TextAnchor.MiddleRight) : (lower ? TextAnchor.LowerLeft : TextAnchor.MiddleLeft);
             text.rectTransform.offsetMin = new Vector2(5, text.rectTransform.offsetMin.y);
@@ -374,9 +385,7 @@ namespace YgoCampaign.Game
                 var label = Ui.Text(strip, "⊘ NEGATED", 11, Color.white);
                 Typography.Strong(label);
                 label.raycastTarget = false;
-                label.resizeTextForBestFit = true;
-                label.resizeTextMinSize = 7;
-                label.resizeTextMaxSize = 11;
+                OnCard(label, 11, cut: true);
             }
             if (card.SetThisTurn && known && (card.Type & CardType.Trap) != 0 && !card.IsFaceUp)
             {
@@ -385,9 +394,7 @@ namespace YgoCampaign.Game
                 Ui.Image(tag, new Color(0.04f, 0.04f, 0.06f, 1f)).raycastTarget = false;
                 var t = Ui.Text(tag, "set this turn", 10, new Color(1f, 0.85f, 0.5f));
                 t.raycastTarget = false;
-                t.resizeTextForBestFit = true;
-                t.resizeTextMinSize = 7;
-                t.resizeTextMaxSize = 10;
+                OnCard(t, 10, cut: true);
             }
             if (card.Counters > 0)
             {
@@ -400,6 +407,7 @@ namespace YgoCampaign.Game
                 var t = Ui.Text(badge, $"⬢{card.Counters}", 13, Color.white);
                 Typography.Strong(t);
                 t.raycastTarget = false;
+                OnCard(t, 13);
             }
         }
 
@@ -457,13 +465,25 @@ namespace YgoCampaign.Game
                 stripBack.sprite = SlabTextures.RoundBottom(0.028f * height);
                 stripBack.type = Image.Type.Sliced;
                 var stripText = Ui.Text(strip, StatLine(card, info, size.x >= MinWidthForLevel), 11, Color.white);
+                // The strip in Barlow Condensed SemiBold (section 3), bold for weight.
+                stripText.font = Typography.Font(Face.Condensed);
                 Typography.Strong(stripText);
                 stripText.supportRichText = true;
-                // Shrinks to fit rather than cutting off "2500/2000" (or a ▲ changed stat) on narrow hand cards; on the
-                // narrowest cards (the deck editor's list) the Level gives way so ATK/DEF always fit at a readable size.
-                stripText.resizeTextForBestFit = true;
-                stripText.resizeTextMinSize = 9;
-                stripText.resizeTextMaxSize = 11;
+                // Never under the card's floor of 7 px on screen (fitted again when the card's size on screen changes): the
+                // Level gives way, then DEF (ATK alone, section 2); a strip too low for one line at 7 px grows up the card
+                // (to 40% of it); only when even that can't hold ATK does the strip go.
+                var fit = CardTextFit(stripText, 11, cut: false);
+                fit.Choices = new[] { StatLine(card, info, size.x >= MinWidthForLevel), StatLine(card, info, false), StatLine(card, info, false, atkOnly: true) };
+                fit.Holder = stripBack;
+                fit.Adjust = (t, least) =>
+                {
+                    var faceRt = (RectTransform)strip.parent;
+                    float h = faceRt.rect.height > 0 ? faceRt.rect.height : size.y;
+                    float need = Mathf.Clamp(TextHeight(t, "Ag", least, 0) * 1.08f / Mathf.Max(1, h), 0.18f, 0.4f);
+                    bool turned = strip.anchorMin.y > 0.5f;
+                    if (turned) strip.anchorMin = new Vector2(0, 1 - need); else strip.anchorMax = new Vector2(1, need);
+                };
+                fit.Refit(force: true);
             }
             SetTag(face, card, offField);
             return raw;
@@ -475,7 +495,7 @@ namespace YgoCampaign.Game
             if (card.IsFaceUp || offField) return;
             var tag = Ui.Stretched("SetTag", face, new Vector2(0, 0.42f), new Vector2(1, 0.58f));
             Ui.Image(tag, new Color(0, 0, 0, 0.6f)).raycastTarget = false;
-            Ui.Text(tag, "SET", 11, Color.white);
+            OnCard(Ui.Text(tag, "SET", 11, Color.white), 11);
         }
 
         /// <summary>
@@ -601,9 +621,10 @@ namespace YgoCampaign.Game
                 icon.raycastTarget = false;
             }
             // Its name on a dark plate underneath, so it reads on any mat picture.
-            var badge = Ui.Placed("Count", slot, new Vector2(0, -FieldSize.y / 2 - 11), new Vector2(Mathf.Min(FieldSize.x + 24, label.Length * 7.5f + 14), 19));
+            // (Shell text under the card, not on it: the zone label is Caption.)
+            var badge = Ui.Placed("Count", slot, new Vector2(0, -FieldSize.y / 2 - 11), new Vector2(Mathf.Min(FieldSize.x + 30, label.Length * 8.5f + 14), 19));
             Ui.Image(badge, new Color(0.02f, 0.03f, 0.06f, 0.72f)).raycastTarget = false;
-            Ui.Text(badge, label, 13, new Color(1, 1, 1, 0.92f)).raycastTarget = false;
+            Ui.Text(badge, label, TextRole.Caption, new Color(1, 1, 1, 0.92f)).raycastTarget = false;
             if (highlight && FxSettings.PlayableTabs) ActionTab(slot, FieldSize);
             return slot;
         }
@@ -655,7 +676,7 @@ namespace YgoCampaign.Game
         /// <summary>Cards narrower than this leave the Level / Rank out of their stat line (ATK/DEF come first).</summary>
         private const float MinWidthForLevel = 80;
 
-        private static string StatLine(FieldCard card, CardInfo? info, bool withLevel = true)
+        private static string StatLine(FieldCard card, CardInfo? info, bool withLevel = true, bool atkOnly = false)
         {
             var type = info?.Type ?? card.Type;
             if ((type & CardType.Monster) == 0) return (type & CardType.Spell) != 0 ? "SPELL" : "TRAP";
@@ -671,7 +692,7 @@ namespace YgoCampaign.Game
             int rank = card.Rank > 0 ? (int)card.Rank : (int)((info?.Level ?? (uint)card.Level) & 0xff);
             var stars = (type & CardType.Xyz) != 0 ? $"R{rank}" : $"L{card.Level}";
             var mats = card.OverlayCount > 0 ? $" [{card.OverlayCount}]" : "";
-            var stats = $"{Stat(card.Attack, info?.Attack ?? 0)}/{Stat(card.Defense, info?.Defense ?? 0)}{mats}";
+            var stats = atkOnly ? Stat(card.Attack, info?.Attack ?? 0) : $"{Stat(card.Attack, info?.Attack ?? 0)}/{Stat(card.Defense, info?.Defense ?? 0)}{mats}";
             return withLevel ? $"{stars} {stats}" : stats;
         }
 
@@ -689,9 +710,129 @@ namespace YgoCampaign.Game
             return Ui.Hex("#D9B85C"); // Normal
         }
 
+        private static string Plain(string s) => System.Text.RegularExpressions.Regex.Replace(s, "<[^>]+>", "");
+
+        /// <summary>
+        /// Marks text drawn on a card (<see cref="CardText"/>) and gives it the card's floor: best fit from
+        /// <paramref name="max"/> down to the size that is <paramref name="floorPx"/> on screen at this canvas's scale (and the
+        /// card's own); returns that least size. <paramref name="cut"/>: a text that can't fit at it ends in "…".
+        /// </summary>
+        internal static int OnCard(Text t, int max, float floorPx = CardText.NameFloor, bool cut = false)
+        {
+            var fit = CardTextFit(t, max, floorPx, cut);
+            fit.Refit(force: true);
+            return fit.Least;
+        }
+
+        /// <summary>
+        /// Text drawn on a card or a slab: a <see cref="CardText"/> that keeps it at <paramref name="floorPx"/> on screen or
+        /// more, fitted now (when it has a canvas), when it's enabled and when the card's size on screen changes.
+        /// </summary>
+        internal static CardText CardTextFit(Text t, int max, float floorPx = CardText.NameFloor, bool cut = true)
+        {
+            if (!t.TryGetComponent<CardText>(out var fit)) fit = t.gameObject.AddComponent<CardText>();
+            fit.FloorPx = floorPx;
+            fit.Max = max;
+            fit.Cut = cut;
+            fit.Full = t.text;
+            fit.Fitting = true;
+            return fit;
+        }
+
         public static Color TextColor(uint type) =>
             (type & (CardType.Xyz | CardType.Link | CardType.Spell | CardType.Trap | CardType.Fusion)) != 0
                 ? Color.white
                 : new Color(0.1f, 0.08f, 0.05f);
+    }
+
+    /// <summary>
+    /// A text drawn on a card or a slab (the stat strip, NEGATED, a rarity mark, a slab's label rows): kept at
+    /// <see cref="FloorPx"/> on screen or more (docs/dev/TYPE-AND-FONTS-SPEC-2026-11-21.md section 2), fitted when it's
+    /// enabled and again when its size on screen changes (keyed by its scale and box, not every frame): best fit down to the
+    /// size that is the floor; the first of <see cref="Choices"/> that fits; cut with "…" (<see cref="Cut"/>); else hidden,
+    /// with its <see cref="Holder"/>. The layout rule judges it in screen pixels against <see cref="FloorPx"/>.
+    /// </summary>
+    public sealed class CardText : MonoBehaviour
+    {
+        /// <summary>Names, chips and stats: 7 px on screen; card text: 8 px.</summary>
+        public const float NameFloor = 7, TextFloor = 8;
+        public float FloorPx = NameFloor;
+        public int Max = 11;
+        public bool Cut;
+        /// <summary>The words in full (a cut shows what fits of them).</summary>
+        public string Full = "";
+        /// <summary>Wordings from longest to shortest: the first that fits on one line at the floor is shown.</summary>
+        public string[]? Choices;
+        /// <summary>A graphic that goes with the text (its plate): hidden when the text is.</summary>
+        public Graphic? Holder;
+        /// <summary>Called with the least size before the text is measured (the strip grows to hold it).</summary>
+        public System.Action<Text, int>? Adjust;
+        /// <summary>The least size of the last fit (layout units).</summary>
+        public int Least { get; private set; }
+        /// <summary>False for a bare mark (added with AddComponent, as the layout rule's probes do): judged, never fitted.</summary>
+        public bool Fitting;
+        /// <summary>A least size of its own (layout units), above the floor's.</summary>
+        public int MinSize;
+        /// <summary>Hidden when its box is too low for one line at the floor (else it stays, best fit at the floor).</summary>
+        public bool DropWhenShort = true;
+
+        /// <summary>The least font size (layout units) whose whole pixels at <paramref name="pxPerUnit"/> are <paramref name="floorPx"/> or more.</summary>
+        public static int LeastFor(float pxPerUnit, float floorPx)
+        {
+            float p = Mathf.Max(0.01f, pxPerUnit);
+            int least = Mathf.Max(1, Mathf.CeilToInt(floorPx / p - 0.001f));
+            while (least < 2000 && Mathf.Floor(least * p + 0.0001f) < floorPx - 0.001f) least++;
+            return least;
+        }
+
+        private Text? _text;
+        private string? _shown;
+        private Vector4 _key = new Vector4(-1, -1, -1, -1);
+
+        private void OnEnable() => Refit(force: true);
+        private void LateUpdate() => Refit(force: false);
+
+        public void Refit(bool force = false)
+        {
+            if (!Fitting || _text == null && !TryGetComponent(out _text)) return;
+            var t = _text!;
+            // Words set from outside since the last fit (a counter's new count) are the new full text.
+            if (_shown != null && t.text != _shown) { Full = t.text; force = true; }
+            var canvas = t.canvas != null ? t.canvas.rootCanvas : null;
+            if (canvas == null) return; // not on screen yet: fitted when it is (OnEnable)
+            float root = canvas.transform.lossyScale.y;
+            float p = canvas.scaleFactor * (root > 0 && t.transform.lossyScale.y > 0 ? t.transform.lossyScale.y / root : 1);
+            if (p <= 0.001f) return;
+            var size = t.rectTransform.rect.size;
+            var key = new Vector4(Mathf.Round(p * 1000) / 1000, size.x, size.y, t.text.Length > 0 ? 1 : 0);
+            if (!force && key == _key) return;
+            _key = key;
+            // Best fit sets text in whole pixels: the least size whose whole pixels are still the floor.
+            int least = Mathf.Max(LeastFor(p, FloorPx), MinSize);
+            Least = least;
+            Adjust?.Invoke(t, least);
+            size = t.rectTransform.rect.size;
+            string text = Full;
+            if (Choices != null)
+            {
+                text = Choices[Choices.Length - 1];
+                foreach (var c in Choices)
+                    if (CardView.TextWidth(t, System.Text.RegularExpressions.Regex.Replace(c, "<[^>]+>", ""), least) <= size.x - 2) { text = c; break; }
+            }
+            bool tall = CardView.TextHeight(t, "Ag", least, 0) <= size.y + 0.5f;
+            bool wide = Cut || CardView.TextWidth(t, System.Text.RegularExpressions.Regex.Replace(text, "<[^>]+>", ""), least) <= size.x + 0.5f
+                        || text.Contains(" ") && CardView.TextHeight(t, text, least, size.x) <= size.y + 0.5f;
+            bool show = (tall || !DropWhenShort) && (wide || !DropWhenShort) && text.Length > 0;
+            t.enabled = show;
+            if (Holder != null) Holder.enabled = show;
+            if (!show) { _shown = t.text; return; }
+            t.text = text;
+            t.resizeTextForBestFit = true;
+            t.resizeTextMinSize = least;
+            t.resizeTextMaxSize = Mathf.Max(Max, least);
+            t.fontSize = Mathf.Max(Max, least);
+            if (Cut) Ui.OneLine(t, least);
+            _shown = t.text;
+        }
     }
 }

@@ -42,6 +42,7 @@ namespace YgoCampaign.Game
             {
                 yield return new WaitForSecondsRealtime(0.4f); // pictures load
                 ScreenCapture.CaptureScreenshot(Path.Combine(folder, $"search-{name}.png"));
+                yield return TextRule($"search-{name}", Report);
                 yield return null;
                 yield return null;
             }

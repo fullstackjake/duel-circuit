@@ -323,13 +323,13 @@ run, so working beside it can't press anything in the check. Its window still co
 | `-soundcheck <folder>` | (51 steps) The sound groups and Settings sliders (mouse, `<` `>`, keys, pad), the old-settings conversion, hover, the pause (the duel theme at half volume under Settings from the gear), the background fade, moves and chains, a real duel's phases, LP ticks and climbing chains, the coin, the draw game, packs and grading, tuning to the music, the voices, the limiter on a final blow's pile-up, a simulated output-device change. Run it with `-mute` and `-mods <empty folder>`: `-mute` zeroes the output after the limiter, so the check still reads real levels |
 | `-climbcheck <folder>` | (22 steps) The climb's screens: the billed final on a row and its versus, rematch pay on rows and results, deck stars on circuit and Tag Cup rows, guests and the Recipe Book, a recipe kept from before a swap, "You already own every card in it.", the starter ribbon. Deck-star lines must be whole (no "…"). Also runs as the last part of `-campaigncheck` |
 | `-stylecheck <folder>` | Card art styles; run twice to check the choices are kept |
-| `-searchcheck <folder>` | The deck editor's card search (71 steps): chips, pickers, More filters, scopes; exact words first (`destroy all` puts Dark Hole and Raigeki on the first page), the chip showing what was typed, the real count and the "first 2,000" page label, the "No cards match" note with Clear all (it keeps the scope), an empty Favorites' own note |
-| `-focuscheck <folder>` | (77 steps) The deck editor's click to focus and change signals, through a test mouse and keyboard: pointing, clicks, Shift and right clicks, a 3 px wobble, the ring after a removal, keys in every text field, Enter / Delete / arrows / Page keys, the wheel, a search keeping the focus, the test hand, the messages and their Undo, reduced motion, the sounds asked for (logged as `editor sound:`), a card not owned in the campaign, Sort and Clear writing the status line, no ring under the test hand, "▼ more" on its own strip, Enter on a Side Deck copy adding to the Side Deck, a deck opened from the list mid-message |
-| `-editorcheck <folder>` | The deck editor's quick fixes (65 steps), through a test mouse, keyboard and gamepad: the unsaved dot and the "Save changes?" question for Back, New, Decks..., Esc and the controller's B (Save, Don't save, Cancel, the recovery copy, Save's own bar); the newest TCG list in free play, a deck's own list, the hand-picked list and the `banlist` note a save writes, the amber "No limits" line, the campaign editor unchanged; Ctrl/Cmd+S, Z, Y, F, `/` and Esc in and out of text fields and under overlays; the red badges and the clickable problem lines; no ownership line in free play; Esc leaving a duel board's reader alone. Needs `-mods <empty folder>` |
+| `-searchcheck <folder>` | The deck editor's card search (89 lines, the text rule on each shot): chips, pickers, More filters, scopes; exact words first (`destroy all` puts Dark Hole and Raigeki on the first page), the chip showing what was typed, the real count and the "first 2,000" page label, the "No cards match" note with Clear all (it keeps the scope), an empty Favorites' own note |
+| `-focuscheck <folder>` | (94 lines, the text rule on each shot) The deck editor's click to focus and change signals, through a test mouse and keyboard: pointing, clicks, Shift and right clicks, a 3 px wobble, the ring after a removal, keys in every text field, Enter / Delete / arrows / Page keys, the wheel, a search keeping the focus, the test hand, the messages and their Undo, reduced motion, the sounds asked for (logged as `editor sound:`), a card not owned in the campaign, Sort and Clear writing the status line, no ring under the test hand, "▼ more" on its own strip, Enter on a Side Deck copy adding to the Side Deck, a deck opened from the list mid-message |
+| `-editorcheck <folder>` | The deck editor's quick fixes (74 lines, the text rule on each shot; result tiles with a picture have a line under them and plain ones don't repeat their name, which needs a run with pictures to bite), through a test mouse, keyboard and gamepad: the unsaved dot and the "Save changes?" question for Back, New, Decks..., Esc and the controller's B (Save, Don't save, Cancel, the recovery copy, Save's own bar); the newest TCG list in free play, a deck's own list, the hand-picked list and the `banlist` note a save writes, the amber "No limits" line, the campaign editor unchanged; Ctrl/Cmd+S, Z, Y, F, `/` and Esc in and out of text fields and under overlays; the red badges and the clickable problem lines; no ownership line in free play; Esc leaving a duel board's reader alone. Needs `-mods <empty folder>` |
 | `-aboutcheck <folder> [-aboutlicenses <folder>]` | The About screen: every notice (the fonts' credit line among them), the license and third-party readers, missing files, keys, controller and mouse; it never opens a browser or Finder. It also checks that the app's own `licenses` folder holds both font licences (a note when it has no licence files of its own and the test folder is used) |
 | `-ydkcheck <folder> -ydkfile <.ydk> -ydkfixture <.ydk>` | Importing `.ydk` files from paths |
 | `-importcheck <folder>` | The Import Cards screen: the menu and screen layout, a zip, loose pictures and bad names, Keep mine and Replace them, HD, the card back, Cancel. It makes its own flat-colour pictures and never opens the file dialog |
-| `-plaincheck <folder>` | (34 steps) The plain card renderer: every layout and card kind drawn and not blank, light writing on every plate, names kept whole and clear of the editor's badges, the text box, foil regions and the rarity mark, pictures still winning (it makes its own flat-colour test pictures), the opponent's cards read upright, face-down cards untouched, the time and memory budget, the cache and the hidden studio. Needs `-mods <empty folder>`, `-pics <empty folder>` and `-hdpics off`; it fails at once if it finds pictures |
+| `-plaincheck <folder>` | (38 lines) The plain card renderer: every layout and card kind drawn and not blank, light writing on every plate, names kept whole and clear of the editor's badges, the text box, foil regions and the rarity mark, pictures still winning (it makes its own flat-colour test pictures), the opponent's cards read upright, face-down cards untouched, the time and memory budget, the cache and the hidden studio. Step 17: 741 faces (19 kinds, Compact, Standard and Full at 13 widths from 30 to 271 px), each in its variant with every text at its floor on screen (7 px, 8 for card text), a name on every card, the long name at 41 px, 199 against 201 px as two textures, foil never over a name and the rarity mark inside its window. With the player's pictures it runs step 17 and the pictured-faces step only. Needs `-mods <empty folder>`, `-pics <empty folder>` and `-hdpics off`; it fails at once if it finds pictures |
 | `-typecheck <folder>` | The fonts (see [Fonts and text](#fonts-and-text)). Needs `-mods <empty folder>`, `-pics <empty folder>` and `-hdpics off`. Steps: each face loads its own font file and the alley's stencil lookup finds none; every character in the glyph corpus and in every card's name and text is drawn by some font (with a control character no font has, so the test can fail), and a note says which font draws each symbol; the corpus carries its hash; `Strong`, `Italic` and `Weight` pick the right face; fixed-width digits hold their places through an LP roll, in three alignments, with colour tags, over two lines and at mixed sizes (and don't without the effect); on the title, menu, Settings, About, campaign, shop, van, board and concede dialog no text has a faux weight or draws in the built-in font; hero numbers are marked; a long wallet stays inside its box; About credits the fonts and the third-party reader ends with both licences. A cut made by `Ui.OneLine` keeps its tags, a literal `<` and a whole surrogate pair. It also lists the script lines that still use rich-text `<b>` or `<i>` (a note, not a failure). Run it at 1280x720, 1920x1080 and 3024x1964 |
 | `-artcheck <folder>` | Card picture load times and memory (needs an HD picture folder) |
 | `-editor <deck> -versioncheck <folder>` | Switching card versions in the editor |
@@ -388,8 +388,8 @@ build's `licenses` folder and shown in About's third-party reader; the sources a
 [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md). Code is `unity/Assets/Scripts/Typography.cs`.
 
 The type scale (`TextRole`, `UiTheme.Floor` = 14, `UiTheme.Size`, `UiTheme.RoleFor`, `UiTheme.Mapped`) is in `UiTheme.cs`.
-Part R2 of the spec applied it to the shell screens; part R3 (card faces, the deck editor, slab labels) is not built, so
-those still use literal sizes (`docs/dev/TYPE-AND-FONTS-SPEC-2026-11-21.md`).
+Part R2 of the spec applied it to the shell screens; part R3 applied it to card faces, slab labels and the deck editor
+(`docs/dev/TYPE-AND-FONTS-SPEC-2026-11-21.md`, "As built: R2" and "As built: R3").
 
 **Putting text on screen.**
 
@@ -428,9 +428,22 @@ New shell text takes a `TextRole` through `Ui.Text(rt, text, TextRole.Body, colo
 - **Hero numbers** (LP, pile counts, the turn disc, the results' DP total) stay outside the scale: mark them with
   `Typography.Hero`.
 
-**The text rule** (`DuelController.TextRule.cs`) checks every visible shell text at each screenshot of `-layoutcheck`,
-`-campaigncheck`, `-menucheck`, `-shopcheck`, `-themecheck`, `-alleycheck`, `-tagcheck`, `-aboutcheck` and the list in
-`-replaycheck`. Each shot logs `text rule on <shot>: ...` and fails on:
+**Text on a card or slab** is judged in screen pixels, not at 1080: 7 px for names, chips and stats, 8 px for card text.
+- **Face variants** (`FaceVariant`, `CardFace.VariantFor(layout, widthPx)`, by the face's width on screen): a Compact face
+  under 52 px is the name alone (`CompactNameOnly`); a Standard face under 200 px has no text box (`StandardNoText`: a
+  bigger name, the type line from 150 px, the window and chip); Full has everything.
+- **Elements drop in a fixed order** when they can't meet their floor: card text, type line, chip words, then the chip;
+  a Link rating; ATK/DEF becomes ATK, then goes. Names never drop: they end in "…".
+- **`CardText`** (CardView.cs) marks text drawn on a card (the live stat strip, NEGATED, "set this turn", counters, SET, a
+  set card's peek, the rarity mark, slab label rows) with its floor in screen pixels and refits it when its size on screen
+  changes (a scaled parent, a window resize). The text rule judges it against `CardText.FloorPx`. Plain faces drawn into
+  textures are checked by `-plaincheck` step 17 (`CardFace.DebugTexts` lists each text's size on screen).
+- **Foil regions follow the variant** (`PlainCards.FoilRects(layout, fit, variant)`; `CardFoil` passes the face's own), so foil never covers a
+  drawn name.
+
+**The text rule** (`DuelController.TextRule.cs`) checks every visible text at each screenshot of `-layoutcheck`,
+`-campaigncheck`, `-menucheck`, `-shopcheck`, `-themecheck`, `-alleycheck`, `-tagcheck`, `-aboutcheck`, `-editorcheck`,
+`-searchcheck`, `-focuscheck` and the list in `-replaycheck`. Each shot logs `text rule on <shot>: ...` and fails on:
 
 - text drawn under the floor at 1080 (best fit at the size it came out; scaled parents and `<size=N>` runs count);
 - clipped text: characters lost to the box, or best fit at its minimum and still too big (a cut ending in "…" passes);
@@ -439,19 +452,15 @@ New shell text takes a `TextRole` through `Ui.Text(rt, text, TextRole.Body, colo
 - one-line text that runs sideways off the screen, or into another text or a button it isn't part of.
 
 It skips hero numbers, text that is faded out (alpha under 0.1), and text under a screen drawn over the whole window.
+Card and slab text is judged against its own floor (above).
 A problem must still be there 0.4 s later on the same text. The first call also runs a self-test on a probe canvas, so
 the rule can fail.
 
-The exclusion list is `TextRuleExclusions` in that file; the log names it. Today it holds:
+The exclusion list is `TextRuleExclusions` in that file; the log names it. Today it holds one area:
 
 | Skipped | Why |
 |---|---|
-| Card faces (inside a `CardView`: plain faces, stat strip, badges) | R3 |
-| The deck editor (`DeckEditorCanvas`) | R3 |
-| The plain card studio (`PlainCardStudio`) | R3 |
-| Slab labels (`SlabView`) | R3: sized by the case, like a card face |
-| Rarity mark (`RarityMark`) | Sized by the card |
-| The board in its developer layout (F12) | A tool, not a player's screen |
+| The board in its developer layout (F12) | A tool, not a player's screen. The spec wanted the list empty; this stays as the one exception |
 
 **Missing fonts.** If a face's file isn't in a build, that face draws in Unity's built-in font with a warning in the log,
 and `Strong` and `Italic` use the built-in font's own bold and italic. `-typecheck` fails when a file is missing.

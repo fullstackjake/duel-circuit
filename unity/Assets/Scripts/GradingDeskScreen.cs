@@ -226,7 +226,7 @@ namespace YgoCampaign.Game
             else
             {
                 var info = _cards.Get(copy.Code);
-                if (copy.IsSlab) SlabView.Create(_detail, new Vector2(-490 + 30 + 180, 411 - 20 - 293) , SlabView.Size.Full, copy, info, SetCode(copy)).localScale = Vector3.one * 0.62f;
+                if (copy.IsSlab) SlabView.Create(_detail, new Vector2(-490 + 30 + 180, 411 - 20 - 293) , SlabView.Size.Full, copy, info, SetCode(copy), scale: 0.62f);
                 else Thumb(_detail, new Vector2(-490 + 30 + 120, 411 - 20 - 175), new Vector2(240, 350), copy, info);
                 var facts = Ui.Text(Ui.Box(_detail, 300, 20, 650, 160),
                     $"<b><size=26>{info?.Name}</size></b>\n{CardFoil.ColoredName(copy.Rarity)}\n<color={Grades.Color(copy.Shown)}>{Grades.Glyph(copy.Shown)} {Grades.Describe(copy)}</color>\n"
@@ -523,7 +523,7 @@ namespace YgoCampaign.Game
                 return;
             }
             var info = _cards.Get(l.Copy.Code);
-            if (l.Copy.IsSlab) SlabView.Create(_detail, new Vector2(-490 + 30 + 180, 411 - 20 - 293), SlabView.Size.Full, l.Copy, info, SetCode(l.Copy)).localScale = Vector3.one * 0.62f;
+            if (l.Copy.IsSlab) SlabView.Create(_detail, new Vector2(-490 + 30 + 180, 411 - 20 - 293), SlabView.Size.Full, l.Copy, info, SetCode(l.Copy), scale: 0.62f);
             else Thumb(_detail, new Vector2(-490 + 30 + 120, 411 - 20 - 175), new Vector2(240, 350), l.Copy, info);
             var facts = Ui.Text(Ui.Box(_detail, 300, 20, 650, 200),
                 $"<b><size=26>{info?.Name}</size></b>\n{(CardDetail.PrintingLine(l.Copy) is { Length: > 0 } printed ? printed : SetCode(l.Copy))} · {CardFoil.ColoredName(l.Copy.Rarity)}\n"

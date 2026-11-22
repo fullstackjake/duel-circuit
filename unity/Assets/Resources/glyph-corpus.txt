@@ -10,8 +10,8 @@
 # faux unity/Assets/Scripts/BoardView.cs:1398: _phaseLabel.text = $"<size=18>{TurnText(board.Turn, compact: true)}</size>\n<b>{phase}</b>";
 # faux unity/Assets/Scripts/BoardView.cs:2004: return $"<b><color=#FFC940>Turn {turn.Groups[1].Value} · {turn.Groups[2].Value}</color></b>   LP {tu
 # faux unity/Assets/Scripts/BoardView.cs:2006: return result.Success ? $"<b><color=#FFC940>{result.Groups[1].Value}</color></b>" : line;
-# faux unity/Assets/Scripts/BoardView.cs:2389: _handsLabel.text = HandsMode == 0 ? "Hands: <b><color=#5FE1FF>BOTH</color></b>" : $"Hand: <b><color=
-# faux unity/Assets/Scripts/BoardView.cs:2612: : IsPaused?.Invoke() == true ? "<color=#FFC940><b>Paused</b></color> · click to resume"
+# faux unity/Assets/Scripts/BoardView.cs:2394: _handsLabel.text = HandsMode == 0 ? "Hands: <b><color=#5FE1FF>BOTH</color></b>" : $"Hand: <b><color=
+# faux unity/Assets/Scripts/BoardView.cs:2617: : IsPaused?.Invoke() == true ? "<color=#FFC940><b>Paused</b></color> · click to resume"
 # faux unity/Assets/Scripts/BracketScreen.cs:746: return "<b>A Prize Pack:</b>\n" + string.Join("\n", parts) + "\nPrize cards sell for nothing: they'r
 # faux unity/Assets/Scripts/BracketScreen.cs:939: return "<b>A Contraband Pack</b> (sealed by Moth):\n"
 # faux unity/Assets/Scripts/BracketScreen.cs:962: return "<b>A No Limits Pack</b> (sealed by Moth):\n"
@@ -35,22 +35,22 @@
 # faux unity/Assets/Scripts/CampaignScreen.cs:947: "<b>The history way: Historic Rules (era-limited cards).</b> Your team plays by each circuit's real 
 # faux unity/Assets/Scripts/CampaignScreen.cs:1428: Ui.Text(Ui.Box(_detail, 280, 128, 560, 44), $"<b>{partner.DisplayName}</b>  <color={T.TextDimHex}>({
 # faux unity/Assets/Scripts/CampaignScreen.cs:1724: _status.text = $"<b>{cup.Name}</b>: your deck answers to {cup.Banlist} and cards out by {PoolMonth(c
-# faux unity/Assets/Scripts/CardDetail.cs:455: string open = $"<b><color={TermColor}>", close = "</color></b>";
-# faux unity/Assets/Scripts/CardDetail.cs:677: + (CarriesOriginal(c) ? $" · <color={UiTheme.Current.GoldSoftHex}><b>ORIGINAL TEXT</b></color>" : ""
+# faux unity/Assets/Scripts/CardDetail.cs:458: string open = $"<b><color={TermColor}>", close = "</color></b>";
+# faux unity/Assets/Scripts/CardDetail.cs:680: + (CarriesOriginal(c) ? $" · <color={UiTheme.Current.GoldSoftHex}><b>ORIGINAL TEXT</b></color>" : ""
 # faux unity/Assets/Scripts/DeckEditor.Feedback.cs:171: var head = $"<b>{name} {n}</b>";
 # faux unity/Assets/Scripts/DeckEditor.Feedback.cs:173: head += $" <color={(d.delta > 0 ? T.GoodHex : T.BadHex)}><b>({(d.delta > 0 ? "+" : "−")}{Math.Abs(d.
-# faux unity/Assets/Scripts/DeckEditor.cs:1091: lines.Add(own == 0 ? $"<color={T.BadHex}>You don't own it.</color> Get it {WhereToGet?.Invoke(key) ?
-# faux unity/Assets/Scripts/DeckEditor.cs:1297: lines.Add($"<b>{arch.name}</b>: {keys.Count - missing.Count} of its {keys.Count} key cards in the de
-# faux unity/Assets/Scripts/DeckEditor.cs:1915: Label(10, 0, 240, 40, $"This replaces most of <b>{name}</b>.", 13, parent: bar).supportRichText = tr
-# faux unity/Assets/Scripts/DeckEditor.cs:2502: Label(10, 0, 640, 34, $"Unsaved changes to <b>{name}</b> from {when} were kept.", 14, parent: bar).s
-# faux unity/Assets/Scripts/DeckEditor.cs:2692: var story = $"<b>{_deck.Note("era")}{(_deck.Note("tier").Length > 0 ? " · " + _deck.Note("tier") : "
-# faux unity/Assets/Scripts/DeckEditor.cs:2693: if (_deck.Note("about").Length > 0) story += $"<b>How it worked:</b> {_deck.Note("about")}\n";
-# faux unity/Assets/Scripts/DeckEditor.cs:2694: if (_deck.Note("why").Length > 0) story += $"<b>Why it mattered:</b> {_deck.Note("why")}\n";
-# faux unity/Assets/Scripts/DeckEditor.cs:3125: _detail.text = $"In deck: <b>{CopiesInDeck(info.Code)}</b>{(notOwned ? "" : ownLine)}{draw}{(note.Le
-# faux unity/Assets/Scripts/DeckEditor.cs:3197: _odds.text = "Select a card and press <b>Mark starter</b> for each card that can start your combo. S
-# faux unity/Assets/Scripts/DeckEditor.cs:3202: + $"At least one: <b>{OpeningOdds.AtLeastOne(_deck.Main.Count, hits, 5):P1}</b> going first (5 cards
-# faux unity/Assets/Scripts/DeckEditor.cs:3203: + $"<b>{OpeningOdds.AtLeastOne(_deck.Main.Count, hits, 6):P1}</b> going second (6)";
-# faux unity/Assets/Scripts/DeckEditor.cs:3297: + $"<b>You won {_tester.Wins} ({pct(_tester.Wins, done):F0}%)</b>\n"
+# faux unity/Assets/Scripts/DeckEditor.cs:1100: lines.Add(own == 0 ? $"<color={T.BadHex}>You don't own it.</color> Get it {WhereToGet?.Invoke(key) ?
+# faux unity/Assets/Scripts/DeckEditor.cs:1309: lines.Add($"<b>{arch.name}</b>: {keys.Count - missing.Count} of its {keys.Count} key cards in the de
+# faux unity/Assets/Scripts/DeckEditor.cs:1928: Label(10, 0, 240, 40, $"This replaces most of <b>{name}</b>.", 13, parent: bar).supportRichText = tr
+# faux unity/Assets/Scripts/DeckEditor.cs:2515: Label(10, 0, 640, 34, $"Unsaved changes to <b>{name}</b> from {when} were kept.", 14, parent: bar).s
+# faux unity/Assets/Scripts/DeckEditor.cs:2711: var story = $"<b>{_deck.Note("era")}{(_deck.Note("tier").Length > 0 ? " · " + _deck.Note("tier") : "
+# faux unity/Assets/Scripts/DeckEditor.cs:2712: if (_deck.Note("about").Length > 0) story += $"<b>How it worked:</b> {_deck.Note("about")}\n";
+# faux unity/Assets/Scripts/DeckEditor.cs:2713: if (_deck.Note("why").Length > 0) story += $"<b>Why it mattered:</b> {_deck.Note("why")}\n";
+# faux unity/Assets/Scripts/DeckEditor.cs:3158: FitDetail($"In deck: <b>{CopiesInDeck(info.Code)}</b>{(notOwned ? "" : ownLine)}{draw}{(note.Length 
+# faux unity/Assets/Scripts/DeckEditor.cs:3228: _odds.text = "Select a card and press <b>Mark starter</b> for each card that can start your combo. S
+# faux unity/Assets/Scripts/DeckEditor.cs:3233: + $"At least one: <b>{OpeningOdds.AtLeastOne(_deck.Main.Count, hits, 5):P1}</b> going first (5 cards
+# faux unity/Assets/Scripts/DeckEditor.cs:3234: + $"<b>{OpeningOdds.AtLeastOne(_deck.Main.Count, hits, 6):P1}</b> going second (6)";
+# faux unity/Assets/Scripts/DeckEditor.cs:3331: + $"<b>You won {_tester.Wins} ({pct(_tester.Wins, done):F0}%)</b>\n"
 # faux unity/Assets/Scripts/DuelController.Alley.cs:196: _alleyVersusChip = theirs != null ? $"THEIR STAKE   <b>{_campaign.StakeText(theirs)}</b>  ·  <color=
 # faux unity/Assets/Scripts/DuelController.Alley.cs:311: $"YOUR CARD   <b>{_campaign.CopyText(_orvelPick)}</b>  ·  <color={T.GoldHex}>{profile.Collection.Val
 # faux unity/Assets/Scripts/DuelController.Alley.cs:496: + $"Stakes won <b>{profile.AnteWins}</b> · lost <b>{profile.AnteLosses}</b>",
@@ -67,15 +67,16 @@
 # faux unity/Assets/Scripts/DuelController.Scouting.cs:166: ? $"Bought {cards} card{(cards == 1 ? "" : "s")} ({price:N0} DP) and built <b>{name}</b>, now your c
 # faux unity/Assets/Scripts/DuelController.Scouting.cs:167: : $"Built <b>{name}</b> from your cards, now your campaign deck{Paid}");
 # faux unity/Assets/Scripts/DuelController.ThemeCheck.cs:93: Progress = new List<bool> { true, false, false }, Record = "Against Ryo: <b>1</b> win, <b>0</b> loss
-# faux unity/Assets/Scripts/DuelController.TypeCheck.cs:228: string tags = Ui.Cut("<color=#FF0000>Red name</color> · <b>Bold part</b>", 12, true);
-# faux unity/Assets/Scripts/DuelController.TypeCheck.cs:233: tags == "<color=#FF0000>Red name</color> · <b>B…</b>" && less == "Deck <3…" && pair == "Ab" + emoji 
-# faux unity/Assets/Scripts/DuelController.TypeCheck.cs:420: Note($"script lines with <b> or <i> (faux weight on Barlow; a note until R2 ends): {fauxLines.Count}
-# faux unity/Assets/Scripts/DuelController.TypeCheck.cs:421: var tagged = scanned.Where(t => t.supportRichText && (t.text.Contains("<b>") || t.text.Contains("<i>
-# faux unity/Assets/Scripts/DuelController.TypeCheck.cs:422: Note($"texts with <b> or <i> on the screens seen: {(tagged.Count == 0 ? "none" : string.Join(", ", t
+# faux unity/Assets/Scripts/DuelController.TypeCheck.cs:195: const string weird = "a <b>bold <size=60>big <color=red>deck";
+# faux unity/Assets/Scripts/DuelController.TypeCheck.cs:247: string tags = Ui.Cut("<color=#FF0000>Red name</color> · <b>Bold part</b>", 12, true);
+# faux unity/Assets/Scripts/DuelController.TypeCheck.cs:252: tags == "<color=#FF0000>Red name</color> · <b>B…</b>" && less == "Deck <3…" && pair == "Ab" + emoji 
+# faux unity/Assets/Scripts/DuelController.TypeCheck.cs:441: Note($"script lines with <b> or <i> (faux weight on Barlow; a note until R2 ends): {fauxLines.Count}
+# faux unity/Assets/Scripts/DuelController.TypeCheck.cs:442: var tagged = scanned.Where(t => t.supportRichText && (t.text.Contains("<b>") || t.text.Contains("<i>
+# faux unity/Assets/Scripts/DuelController.TypeCheck.cs:443: Note($"texts with <b> or <i> on the screens seen: {(tagged.Count == 0 ? "none" : string.Join(", ", t
 # faux unity/Assets/Scripts/DuelController.cs:479: : $"Continue: <b>{c.Name}</b> ({won}/{c.Matches.Count} won) · <color=#FFC940>{profile.Dp:N0} DP</col
 # faux unity/Assets/Scripts/DuelController.cs:1401: r.Record = $"Against {opponent.Name}: <b>{wins}</b> win{(wins == 1 ? "" : "s")}, <b>{losses}</b> los
 # faux unity/Assets/Scripts/DuelController.cs:1478: r.Record = $"Against {opponent.Name}: <b>{wins}</b> win{(wins == 1 ? "" : "s")}, <b>{losses}</b> los
-# faux unity/Assets/Scripts/DuelController.cs:5995: r.Record = $"Against {opponent.Name}: <b>{wins}</b> win{(wins == 1 ? "" : "s")}, <b>{losses}</b> los
+# faux unity/Assets/Scripts/DuelController.cs:6058: r.Record = $"Against {opponent.Name}: <b>{wins}</b> win{(wins == 1 ? "" : "s")}, <b>{losses}</b> los
 # faux unity/Assets/Scripts/GradingDeskScreen.cs:232: $"<b><size=26>{info?.Name}</size></b>\n{CardFoil.ColoredName(copy.Rarity)}\n<color={Grades.Color(cop
 # faux unity/Assets/Scripts/GradingDeskScreen.cs:261: var t = Ui.Text(inner, $"<b>{(express ? "Express" : "Standard")}</b> · {fee:N0} DP\n<size=14>{(expre
 # faux unity/Assets/Scripts/GradingDeskScreen.cs:529: $"<b><size=26>{info?.Name}</size></b>\n{(CardDetail.PrintingLine(l.Copy) is { Length: > 0 } printed 

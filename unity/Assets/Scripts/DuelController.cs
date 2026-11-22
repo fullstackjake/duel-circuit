@@ -5344,9 +5344,18 @@ namespace YgoCampaign.Game
                 yield return new WaitForSecondsRealtime(0.4f);
                 yield return Shot("prompt-yesno-long");
                 var yn = _view.Dialogs.DebugText;
+                // All of it at 14 or more, and either it fits its box (a big window) or its box scrolls.
+                static string Ending(UnityEngine.UI.Text? t)
+                {
+                    if (t == null) return "";
+                    var plain = System.Text.RegularExpressions.Regex.Replace(t.text, "<[^>]+>", "");
+                    return plain.Substring(Math.Max(0, plain.Length - 20));
+                }
+                static bool Fits(UnityEngine.UI.Text? t) => t != null && t.preferredHeight <= t.rectTransform.rect.height + 1;
                 bool ynScrolls = yn != null && yn.GetComponentInParent<UnityEngine.UI.ScrollRect>() != null;
-                Report($"a yes/no over {longText.Length} characters of card text keeps all of it (ends \"{(yn != null ? Words(yn.text).Substring(Math.Max(0, Words(yn.text).Length - 20)) : "")}\", "
-                       + $"size {yn?.fontSize}, scrolls {ynScrolls})", yn != null && yn.text.Contains("THE-LAST-WORDS") && yn.fontSize >= UiTheme.Floor && ynScrolls);
+                Report($"a yes/no over {longText.Length} characters of card text keeps all of it (ends \"{Ending(yn)}\", "
+                       + $"size {yn?.fontSize}, fits {Fits(yn)}, scrolls {ynScrolls})",
+                    yn != null && yn.text.Contains("THE-LAST-WORDS") && yn.fontSize >= UiTheme.Floor && (Fits(yn) || ynScrolls));
                 var longOptions = new ChoiceSet { Title = "Choose an effect", Prompt = new Ygo.Engine.Protocol.OptionPrompt() };
                 longOptions.Choices.Add(new Choice { Label = string.Concat(Enumerable.Repeat(sentence, 4)) + "then OPTION-ONE-END." });
                 longOptions.Choices.Add(new Choice { Label = string.Concat(Enumerable.Repeat(sentence, 2)) + "then OPTION-TWO-END." });
@@ -5355,8 +5364,9 @@ namespace YgoCampaign.Game
                 yield return new WaitForSecondsRealtime(0.4f);
                 yield return Shot("prompt-options-long");
                 var opt = _view.Dialogs.DebugText;
-                Report($"a long effect in the option tabs keeps all of it (size {opt?.fontSize}, scrolls {opt?.GetComponentInParent<UnityEngine.UI.ScrollRect>() != null})",
-                    opt != null && opt.text.Contains("OPTION-ONE-END") && opt.fontSize >= UiTheme.Floor);
+                bool optScrolls = opt != null && opt.GetComponentInParent<UnityEngine.UI.ScrollRect>() != null;
+                Report($"a long effect in the option tabs keeps all of it (ends \"{Ending(opt)}\", size {opt?.fontSize}, fits {Fits(opt)}, scrolls {optScrolls})",
+                    opt != null && opt.text.Contains("OPTION-ONE-END") && opt.fontSize >= UiTheme.Floor && (Fits(opt) || optScrolls));
                 // Card text size: a short option at Normal and at Larger.
                 var shortOptions = new ChoiceSet { Title = "Choose an effect", Prompt = new Ygo.Engine.Protocol.OptionPrompt() };
                 shortOptions.Choices.Add(new Choice { Label = "Draw 1 card." });
@@ -5444,6 +5454,59 @@ namespace YgoCampaign.Game
                 var wrongCuts = cuts.Select(k => (want: k.Item3, got: CardView.DebugHyphenate(k.Item1, k.Item2))).Where(k => k.got != k.want).ToList();
                 Report($"names hyphenate between syllables ({string.Join(", ", cuts.Select(k => CardView.DebugHyphenate(k.Item1, k.Item2)))})"
                        + (wrongCuts.Count > 0 ? ": wanted " + string.Join("; ", wrongCuts.Select(k => $"{k.want}, got {k.got}")) : ""), wrongCuts.Count == 0);
+                // (R3) The same words in the new face at a Compact name's floor: Barlow Condensed SemiBold at the least size that
+                // is 7 px on a 57 px card, in the width the face measures a name with (its plate less padding, at 0.9). Each
+                // word fits whole or breaks only at SyllableCut's places; then each of the 13 cases above in a plate just wide
+                // enough for its first part, so it must break, and there.
+                {
+                    var probeRoot = Ui.Overlay(null!, "HyphenProbe", 95);
+                    float plate = PlainCards.DebugNameWidth(CardLayout.Compact, CardFit.Normal, FaceVariant.Compact);
+                    int least = CardText.LeastFor(57f / PlainCards.RefWidth(CardLayout.Compact), CardText.NameFloor);
+                    var probe = Ui.Text(Ui.Box(probeRoot, 10, 10, plate, 400), "", least, Color.white);
+                    probe.font = Typography.Font(Face.Condensed);
+                    // Every break is where SyllableCut puts one in what's left of the word, and the lines rebuild it.
+                    bool AtSyllables(string word, string[] lines)
+                    {
+                        string rest = word;
+                        for (int i = 0; i < lines.Length - 1; i++)
+                        {
+                            if (!lines[i].EndsWith("-")) return false;
+                            var head = lines[i].Substring(0, lines[i].Length - 1);
+                            if (head.Length < 3 || !rest.StartsWith(head, StringComparison.Ordinal)) return false;
+                            var after = rest.Substring(head.Length);
+                            if (!Enumerable.Range(3, Math.Max(1, rest.Length - 3)).Any(k => CardView.DebugHyphenate(rest, k) == head + "-" + after)) return false;
+                            rest = after;
+                        }
+                        return lines[lines.Length - 1] == rest;
+                    }
+                    var badBreaks = new List<string>();
+                    var hyphenShown = new List<string>();
+                    foreach (var word in cuts.Select(k => k.Item1).Distinct())
+                    {
+                        probe.text = word;
+                        CardView.FitWords(probe, plate, least, least);
+                        var lines = probe.text.Split('\n');
+                        hyphenShown.Add(probe.text.Replace("\n", "/"));
+                        if (!AtSyllables(word, lines) || probe.fontSize < least) badBreaks.Add(probe.text.Replace("\n", "/"));
+                    }
+                    var mustShown = new List<string>();
+                    foreach (var (word, most, want) in cuts)
+                    {
+                        // Just wide enough for the expected first part with its hyphen: the whole word can't fit.
+                        float room = CardView.TextWidth(probe, word.Substring(0, most) + "-", least) + 0.5f;
+                        probe.text = word;
+                        CardView.FitWords(probe, room, least, least);
+                        var lines = probe.text.Split('\n');
+                        mustShown.Add(probe.text.Replace("\n", "/"));
+                        bool first = lines.Length >= 2 && lines[0] == want.Substring(0, want.IndexOf('-') + 1);
+                        if (!first || !AtSyllables(word, lines)) badBreaks.Add($"{word} in {room:0.#}: {probe.text.Replace("\n", "/")} (wanted {want} first)");
+                    }
+                    Canvas.ForceUpdateCanvases();
+                    Destroy(probeRoot.parent.gameObject);
+                    Report($"names keep whole or break between syllables in the new face at the Compact floor ({least} in {plate:0.#}): {string.Join(", ", hyphenShown)}; "
+                           + $"the {cuts.Length} cases made to break: {string.Join(", ", mustShown)}"
+                           + (badBreaks.Count > 0 ? ": wrong " + string.Join("; ", badBreaks) : ""), badBreaks.Count == 0);
+                }
                 // (2026-11-19: hyphens no longer split "gh", "th"... ("Knig-htmare" is "Knight-mare"), and a result's name ends
                 // above its in-deck count: "crusadia" lists cards the Mekk-Knight deck plays, each with its "x2".)
                 foreach (var query in new[] { "polymerization", "terraforming", "crusadia" })

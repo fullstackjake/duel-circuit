@@ -727,8 +727,9 @@ namespace YgoCampaign.Game
             return rt;
         }
 
+        /// <summary>A label at the type scale's role for <paramref name="size"/> (the mapping rule: never under Caption, 14).</summary>
         private Text Label(float x, float y, float w, float h, string text, int size, TextAnchor anchor = TextAnchor.MiddleLeft, Transform? parent = null) =>
-            Ui.Text(Box(parent ?? _root, x, y, w, h), text, size, UiTheme.Current.TextBody, anchor);
+            Ui.Text(Box(parent ?? _root, x, y, w, h), text, UiTheme.RoleFor(size), UiTheme.Current.TextBody, anchor);
 
         private Button Button(float x, float y, float w, float h, string label, Action onClick, Transform? parent = null)
         {
@@ -738,7 +739,11 @@ namespace YgoCampaign.Game
             var button = rt.gameObject.AddComponent<Button>();
             button.targetGraphic = image;
             button.onClick.AddListener(() => { Sounds.Play("click"); onClick(); });
-            Ui.Text(rt, label, 15, T.Text);
+            // Buttons and chips: Label (Barlow Condensed SemiBold 20), shrinking to the floor (14) in a narrow one.
+            var text = Ui.Text(rt, label, TextRole.Label, T.Text);
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = UiTheme.Floor;
+            text.resizeTextMaxSize = UiTheme.Size(TextRole.Label);
             UiHover.Attach(button);
             return button;
         }
@@ -780,11 +785,13 @@ namespace YgoCampaign.Game
             Label(140, 0, 220, 22, "CARD TEXT", 12, parent: _versionPanel).color = T.Caption;
             var text = Button(140, 20, 220, 28, "", CycleText, _versionPanel);
             _textLabel = text.GetComponentInChildren<Text>();
-            _textLabel.fontSize = 13;
-            // ("Original text (until Sep 2026, CPUs only)" is long for the button: it shrinks.)
+            // ("Original text (until Sep 2026, CPUs only)" is long for the button: it shrinks, to the floor; "click to switch"
+            // is the button's tooltip, not a second line its 28 px can't hold at 14.)
             _textLabel.resizeTextForBestFit = true;
-            _textLabel.resizeTextMinSize = 9;
-            _textLabel.resizeTextMaxSize = 13;
+            _textLabel.resizeTextMinSize = UiTheme.Floor;
+            _textLabel.resizeTextMaxSize = UiTheme.Size(TextRole.Label);
+            _textTip = text.gameObject.AddComponent<TipOnHover>();
+            _textTip.Title = "Card text";
             _versionPanel.gameObject.SetActive(false);
             // Copies in the deck, opening-hand odds, and the ban list's limit.
             _detail = Label(20, 500, 360, 52, "", 13, TextAnchor.UpperLeft);
@@ -792,8 +799,8 @@ namespace YgoCampaign.Game
             _detail.verticalOverflow = VerticalWrapMode.Truncate;
             // (A text note adds a line or two: the block shrinks to keep them all rather than cut the last.)
             _detail.resizeTextForBestFit = true;
-            _detail.resizeTextMinSize = 10;
-            _detail.resizeTextMaxSize = 13;
+            _detail.resizeTextMinSize = UiTheme.Floor;
+            _detail.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
             // The text block beside the art shows the name and stats; the box below shows card text.
             Button(20, 556, 110, 34, "Add", () => { if (_selected != null) Add(_selected, side: false); });
             Button(140, 556, 110, 34, "To Side", () => { if (_selected != null) Add(_selected, side: true); });
@@ -831,13 +838,13 @@ namespace YgoCampaign.Game
 
         private void BuildToolbar()
         {
-            _nameField = Ui.Input(Box(_root, 410, 10, 250, 40), "deck name", 17, v => { _deck.Name = v; MarkDirty(); FitName(false); });
+            _nameField = Ui.Input(Box(_root, 410, 10, 250, 40), "deck name", UiTheme.Size(TextRole.Body), v => { _deck.Name = v; MarkDirty(); FitName(false); });
             BuildUnsavedMark(Button(668, 10, 70, 40, "Save", Save)); // its dot while the deck has unsaved changes (DeckEditor.Leave)
             Button(744, 10, 64, 40, "New", () => AskFirst(NewDeck));
             Button(814, 10, 80, 40, "Delete", Delete);
             Button(904, 10, 90, 40, "Decks...", ShowBrowser);
             Button(1000, 10, 66, 40, "Copy", Duplicate);
-            _labelField = Ui.Input(Box(_root, 1072, 10, 192, 40), "label / folder", 15, v => { SetLabel(v); });
+            _labelField = Ui.Input(Box(_root, 1072, 10, 192, 40), "label / folder", UiTheme.Size(TextRole.Small), v => { SetLabel(v); });
             _openLabel = Label(0, 0, 0, 0, "", 1);
             _openLabel.gameObject.SetActive(false);
             Button(1270, 10, 120, 40, "Back", () => AskFirst(Close)); // to the duel, the campaign or the menu, wherever it was opened from
@@ -866,11 +873,12 @@ namespace YgoCampaign.Game
             Button(1048, 58, 30, 34, "<", () => CycleBanlist(-1));
             _banLabel = Label(1080, 58, 278, 34, "", 15, TextAnchor.MiddleCenter);
             Button(1360, 58, 30, 34, ">", () => CycleBanlist(+1));
-            _status = Label(410, 98, 980, 26, "", 14);
-            // A longer message (Build's comparison, Save as new's how-to) shrinks to two lines rather than losing its end.
-            _status.resizeTextForBestFit = true;
-            _status.resizeTextMinSize = 11;
-            _status.resizeTextMaxSize = 14;
+            _status = Label(410, 98, 980, 26, "", 16);
+            // One line (Small); a longer message (Build's comparison, Save as new's how-to) ends in "…" and its tooltip has it whole.
+            _status.supportRichText = true;
+            _status.raycastTarget = true;
+            _statusTip = _status.gameObject.AddComponent<TipOnHover>();
+            _statusTip.Title = "Status";
         }
 
         private void BuildDeckArea()
@@ -896,13 +904,13 @@ namespace YgoCampaign.Game
         private void BuildSearch()
         {
             var T = UiTheme.Current;
-            _searchField = Ui.Input(Box(_root, 1410, 10, 406, 40), "search: name, text, lv8, atk>2000, @archetype...", 16,
+            _searchField = Ui.Input(Box(_root, 1410, 10, 406, 40), "search: name, text, lv8, atk>2000, @archetype...", UiTheme.Size(TextRole.Small),
                 v => { _query = v; RunSearch(); });
             _searchField.onSubmit.AddListener(_ => SearchEntered());
             // Where the box's plain words look: Name + text, Name, Text (click: the next, right-click: the previous).
             var mode = Box(_root, 1820, 10, 90, 40);
             Ui.Image(mode, T.Inset);
-            _modeLabel = Ui.Text(mode, "", 13, T.Text);
+            _modeLabel = Ui.Text(mode, "", TextRole.Caption, T.Text);
             _modeLabel.supportRichText = true;
             Ui.Clickable(mode, () => CycleMode(+1), () => CycleMode(-1), style: HoverStyle.Button);
             _searchLayout.Add(("search box", (RectTransform)_searchField.transform));
@@ -919,10 +927,11 @@ namespace YgoCampaign.Game
                 var icon = Box(rt, 4, 3, 20, 20).gameObject.AddComponent<RawImage>();
                 icon.texture = Icons.For(ChipIcons[i]);
                 icon.raycastTarget = false;
-                var label = Ui.Text(Box(rt, 26, 0, 69, 26), ChipLabels[i], 12, T.Text, TextAnchor.MiddleLeft);
+                // Chips at Label (Barlow Condensed), shrinking to the floor in their box (the rects as before).
+                var label = Ui.Text(Box(rt, 26, 0, 69, 26), ChipLabels[i], TextRole.Label, T.Text, TextAnchor.MiddleLeft);
                 label.resizeTextForBestFit = true;
-                label.resizeTextMinSize = 9;
-                label.resizeTextMaxSize = 12;
+                label.resizeTextMinSize = UiTheme.Floor;
+                label.resizeTextMaxSize = UiTheme.Size(TextRole.Label);
                 label.raycastTarget = false;
                 Ui.Clickable(rt, () => ToggleChip(chip));
                 _searchLayout.Add(($"chip {ChipLabels[i]}", rt));
@@ -934,10 +943,10 @@ namespace YgoCampaign.Game
                 // Five 85 px pickers; the More button takes the row's right 60 px.
                 var rt = Box(_root, 1410 + i * 88, 118, 85, 28);
                 Ui.Image(rt, T.Inset);
-                _pickLabels[i] = Ui.Text(rt, "", 13, T.Text);
+                _pickLabels[i] = Ui.Text(rt, "", TextRole.Label, T.Text);
                 _pickLabels[i].resizeTextForBestFit = true;
-                _pickLabels[i].resizeTextMinSize = 9;
-                _pickLabels[i].resizeTextMaxSize = 13;
+                _pickLabels[i].resizeTextMinSize = UiTheme.Floor;
+                _pickLabels[i].resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
                 Ui.Clickable(rt, () => { _picks[picker] = (_picks[picker] + 1) % count; RunSearch(); },
                     () => { _picks[picker] = (_picks[picker] - 1 + count) % count; RunSearch(); });
                 _searchLayout.Add(($"picker {i + 1}", rt));
@@ -946,8 +955,8 @@ namespace YgoCampaign.Game
             _resultCount = Label(1410, 152, 90, 26, "", 13);
             // "13,925 cards": the real count shrinks to fit rather than run under the active row.
             _resultCount.resizeTextForBestFit = true;
-            _resultCount.resizeTextMinSize = 10;
-            _resultCount.resizeTextMaxSize = 13;
+            _resultCount.resizeTextMinSize = UiTheme.Floor;
+            _resultCount.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
             _searchLayout.Add(("More button", _moreFill.rectTransform));
             _searchLayout.Add(("count", _resultCount.rectTransform));
             // The active filters: a window onto a row that scrolls sideways (the wheel, a drag, or the ‹ › ends) when it runs long.
@@ -969,10 +978,10 @@ namespace YgoCampaign.Game
             // The scope: click for the next, right-click for the previous (as the pickers do).
             var owned = Box(_root, 1806, 152, 104, 26);
             Ui.Image(owned, T.Button);
-            _ownedLabel = Ui.Text(owned, "", 12, T.Text);
+            _ownedLabel = Ui.Text(owned, "", TextRole.Caption, T.Text);
             _ownedLabel.resizeTextForBestFit = true;
-            _ownedLabel.resizeTextMinSize = 10;
-            _ownedLabel.resizeTextMaxSize = 12;
+            _ownedLabel.resizeTextMinSize = UiTheme.Floor;
+            _ownedLabel.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
             Ui.Clickable(owned, () => CycleScope(+1), () => CycleScope(-1), style: HoverStyle.Button);
             _ownedToggle = owned.gameObject;
             _resultsLayer = Box(_root, 1410, 184, 500, 5 * 150);
@@ -991,11 +1000,11 @@ namespace YgoCampaign.Game
             _searchLayout.Add(("page", _pageLabel.rectTransform));
             _searchLayout.Add(("Next", (RectTransform)next.transform));
             var cmd = Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor ? "Cmd" : "Ctrl";
-            var help = Label(1410, 980, 500, 90, "Click a card to see it on the left. Click it again to add it.\n"
-                + "Click a card in your deck, then again, to take it out. Shift+click does it at once.\n"
-                + "Right-click: Side Deck. Enter: add. Delete: remove. Drag cards anywhere.\n"
-                + $"{cmd}+S save · {cmd}+Z undo · {cmd}+F or / search · Esc back",
-                13, TextAnchor.UpperLeft);
+            // Three lines at Caption (four at 13 before the type scale): the keys line shortened.
+            var help = Label(1410, 980, 500, 90, "Click a card to see it, again to add it (or, in your deck, to take it out).\n"
+                + "Shift+click: at once. Right-click: Side Deck. Drag cards anywhere.\n"
+                + $"Enter add · Del remove · {cmd}+S save · {cmd}+Z undo · {cmd}+F or / search · Esc back",
+                14, TextAnchor.UpperLeft);
             help.color = T.Caption.WithAlpha(0.55f);
             _help = help;
             _searchLayout.Add(("help", help.rectTransform));
@@ -1008,7 +1017,7 @@ namespace YgoCampaign.Game
             var T = UiTheme.Current;
             var rt = Box(_activeRow, x, 0, 14, 26);
             Ui.Image(rt, T.Panel.WithAlpha(0.92f));
-            Ui.Text(rt, glyph, 16, T.Text).raycastTarget = false;
+            Ui.Text(rt, glyph, TextRole.Small, T.Text).raycastTarget = false;
             Ui.Clickable(rt, () =>
             {
                 float room = Mathf.Max(0, _activeContent.rect.width - _activeRow.rect.width);
@@ -1071,7 +1080,7 @@ namespace YgoCampaign.Game
             content.pivot = new Vector2(0.5f, 1);
             content.offsetMin = new Vector2(16, -10);
             content.offsetMax = new Vector2(-16, -12);
-            var text = Ui.Text(content, info.Text, FxSettings.Scaled(21), T.TextBright, TextAnchor.UpperLeft);
+            var text = Ui.Text(content, info.Text, FxSettings.Scaled(UiTheme.Size(TextRole.Subhead)), T.TextBright, TextAnchor.UpperLeft); // reading text, grown by Card text size as before
             text.verticalOverflow = VerticalWrapMode.Overflow;
             content.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             var scroll = view.gameObject.AddComponent<ScrollRect>();
@@ -1100,6 +1109,9 @@ namespace YgoCampaign.Game
             if (printings.Length > 0) lines.Add(printings);
             var facts = Label(30, 570, 1200, 170, string.Join("\n", lines), 15, TextAnchor.UpperLeft, panel);
             facts.supportRichText = true;
+            facts.resizeTextForBestFit = true; // many copies: down to the floor, not past the box
+            facts.resizeTextMinSize = UiTheme.Floor;
+            facts.resizeTextMaxSize = facts.fontSize;
             Button(1100, 740, 130, 40, "Close", CloseReading, panel);
             Button(950, 740, 140, 40, "Related cards", () => { CloseReading(); _selected = info; ShowRelated(); }, panel);
             Button(800, 740, 140, 40, "Add to deck", () => Add(info, side: false), panel);
@@ -1368,10 +1380,10 @@ namespace YgoCampaign.Game
                 float w = Mathf.Min(170, label.Length * 7f + 18);
                 var rt = Box(_activeContent, x, 0, w - 4, 26);
                 Ui.Image(rt, T.Inset);
-                var t = Ui.Text(rt, label, 12, T.Text);
+                var t = Ui.Text(rt, label, TextRole.Caption, T.Text);
                 t.resizeTextForBestFit = true;
-                t.resizeTextMinSize = 9;
-                t.resizeTextMaxSize = 12;
+                t.resizeTextMinSize = UiTheme.Floor;
+                t.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
                 Ui.Clickable(rt, () => CycleSeenDuel(+1), () => CycleSeenDuel(-1));
                 var tip = rt.gameObject.AddComponent<TipOnHover>();
                 tip.Title = "Which duel";
@@ -1382,13 +1394,14 @@ namespace YgoCampaign.Game
             }
             foreach (var (label, remove) in active)
             {
-                float w = Mathf.Min(150, label.Length * 7f + 26);
+                // As wide as its words at the floor in the chip face (the row scrolls), so a long search reads whole.
+                float w = Mathf.Min(320, Ui.LineWidth($"{label} ×", Typography.Font(Face.Condensed), UiTheme.Floor) + 22);
                 var rt = Box(_activeContent, x, 0, w - 4, 26);
                 Ui.Image(rt, T.Chip);
-                var t = Ui.Text(rt, $"{label} ×", 12, T.Text);
+                var t = Ui.Text(rt, $"{label} ×", TextRole.Label, T.Text);
                 t.resizeTextForBestFit = true;
-                t.resizeTextMinSize = 9;
-                t.resizeTextMaxSize = 12;
+                t.resizeTextMinSize = UiTheme.Floor;
+                t.resizeTextMaxSize = UiTheme.Size(TextRole.Label);
                 Ui.Clickable(rt, () => { remove(); RunSearch(); });
                 x += w;
             }
@@ -1407,7 +1420,7 @@ namespace YgoCampaign.Game
                 ScopeViewed => "Recently viewed",
                 _ => "All cards",
             };
-            _modeLabel.text = $"<size=10>LOOKS IN</size>\n{ModeLabel(_searchMode)}";
+            _modeLabel.text = $"<size=14>LOOKS IN</size>\n{ModeLabel(_searchMode)}";
             ShowMoreButton();
         }
 
@@ -1447,7 +1460,7 @@ namespace YgoCampaign.Game
             face.offsetMax = new Vector2(-3, -3);
             _ghostArt = face.gameObject.AddComponent<RawImage>();
             _ghostArt.raycastTarget = false;
-            _ghostName = Ui.Text(Ui.Stretched("Name", face, Vector2.zero, Vector2.one), "", 11, Color.white);
+            _ghostName = Ui.Text(Ui.Stretched("Name", face, Vector2.zero, Vector2.one), "", TextRole.Caption, Color.white);
             _ghost.gameObject.SetActive(false);
         }
 
@@ -1772,8 +1785,8 @@ namespace YgoCampaign.Game
             var text = _nameField.textComponent;
             float width = ((RectTransform)text.transform).rect.width;
             var generator = new TextGenerator();
-            int size = 17;
-            for (; size > 11 && width > 0; size--)
+            int size = UiTheme.Size(TextRole.Body);
+            for (; size > UiTheme.Floor && width > 0; size--)
             {
                 text.fontSize = size;
                 if (generator.GetPreferredWidth(_nameField.text, text.GetGenerationSettings(Vector2.zero)) / text.pixelsPerUnit <= width) break;
@@ -1914,7 +1927,7 @@ namespace YgoCampaign.Game
             bool campaign = OwnedCards != null;
             Label(10, 0, 240, 40, $"This replaces most of <b>{name}</b>.", 13, parent: bar).supportRichText = true;
             Button(256, 5, 116, 30, "Overwrite it", () => { CloseSavePrompt(); SaveNow(); }, bar);
-            var field = Ui.Input(Box(bar, 380, 5, campaign ? 200 : 370, 30), "new deck name", 14);
+            var field = Ui.Input(Box(bar, 380, 5, campaign ? 200 : 370, 30), "new deck name", UiTheme.Size(TextRole.Caption));
             field.text = suggestion;
             Button(campaign ? 588 : 758, 5, 130, 30, "Save as new", () => SaveAsNew(field.text, play: false), bar);
             if (campaign) Button(726, 5, 166, 30, "Save new & play it", () => SaveAsNew(field.text, play: true), bar);
@@ -2111,7 +2124,7 @@ namespace YgoCampaign.Game
                       + (cuts.Count > 0 ? " " + string.Join(". ", cuts) + "." : "")
                       + (missing > 0 ? $" Its {missing} missing cards are on your wishlist in the Card Shop." : "")
                       + $" Click Recipe again for {DeckTitle(next.recipe.Name)} ({Math.Round(next.owned * 100)}%).");
-            if (PayOwed?.Invoke() is { Length: > 0 } paid) SetStatus(_status.text + "  " + paid);
+            if (PayOwed?.Invoke() is { Length: > 0 } paid) SetStatus(StatusText + "  " + paid);
         }
 
         /// <summary>
@@ -2124,9 +2137,9 @@ namespace YgoCampaign.Game
             _recipes = new List<(Deck, double)>();
             _noRecipeSaid = null;
             NextRecipe();
-            var first = _status.text;
+            var first = StatusText;
             NextRecipe();
-            var second = _status.text;
+            var second = StatusText;
             (_recipes, _noRecipeSaid) = (keep, keepSaid);
             return (first, second);
         }
@@ -2135,7 +2148,7 @@ namespace YgoCampaign.Game
         public int DebugRecipe(out string status)
         {
             NextRecipe();
-            status = _status.text;
+            status = StatusText;
             return DeckRules.Validate(_deck, _banlists[_banIndex], _cards).Count
                    + (OwnedCards != null ? CollectionRules.Validate(_deck, OwnedCards, _cards).Count : 0);
         }
@@ -2147,17 +2160,17 @@ namespace YgoCampaign.Game
         public string DebugBuild()
         {
             BuildFromCollection();
-            if (_confirm != "build") return _status.text;
-            var asked = _status.text;
+            if (_confirm != "build") return StatusText;
+            var asked = StatusText;
             BuildFromCollection();
-            return $"{asked} / {_status.text}";
+            return $"{asked} / {StatusText}";
         }
 
         /// <summary>For automated checks: presses Auto-fix and reports the problems left (ban list and collection).</summary>
         public int DebugAutoFix(out string status)
         {
             AutoFix();
-            status = _status.text;
+            status = StatusText;
             return Problems();
         }
 
@@ -2179,24 +2192,24 @@ namespace YgoCampaign.Game
                     ShowDetail(info);
                     int before = BanPasses.Of(_deck).Count;
                     AddPass();
-                    steps.Add($"+ Pass on {info.Name}: {_status.text}");
+                    steps.Add($"+ Pass on {info.Name}: {StatusText}");
                     if (BanPasses.Of(_deck).Count == before) break;
                 }
             }
             if (Problems() > 0)
             {
                 AutoFix();
-                steps.Add($"Auto-fix: {_status.text}");
+                steps.Add($"Auto-fix: {StatusText}");
             }
             Save();
             if (_savePrompt != null)
             {
-                steps.Add($"Save asked: {_status.text}");
+                steps.Add($"Save asked: {StatusText}");
                 // The QA player saves as new and plays the new deck (Save new & play it).
                 var field = _savePrompt.GetComponentInChildren<InputField>();
                 SaveAsNew(field != null ? field.text : "", play: true);
             }
-            steps.Add($"Save: {_status.text}");
+            steps.Add($"Save: {StatusText}");
             return (steps, Problems());
         }
 
@@ -2239,7 +2252,7 @@ namespace YgoCampaign.Game
             Save();
             bool asked = _savePrompt != null;
             CloseSavePrompt();
-            return (asked, _status.text);
+            return (asked, StatusText);
         }
 
         /// <summary>
@@ -2267,7 +2280,7 @@ namespace YgoCampaign.Game
         {
             LoadDeck(name);
             var (asked, saved) = DebugReplaceAndSaveAsNew();
-            return (asked, saved, _status.text);
+            return (asked, saved, StatusText);
         }
 
         /// <summary>Campaign: drops cards the ban list or your collection doesn't allow and refills from your best spare cards.</summary>
@@ -2398,7 +2411,7 @@ namespace YgoCampaign.Game
                 }
                 _recipeIndex = at;
                 NextRecipe();
-                SetStatus(status + "  " + _status.text);
+                SetStatus(status + "  " + StatusText);
                 return true;
             }
             var read = YdkImport.ReadFile(path, _cards);
@@ -2430,7 +2443,7 @@ namespace YgoCampaign.Game
         }
 
         /// <summary>For checks: the deck in the editor now (a copy), and whether Save would ask how to save.</summary>
-        public (Deck deck, bool rebuilt, string status) DebugDeck => (_deck.Clone(), _rebuilt, _status.text);
+        public (Deck deck, bool rebuilt, string status) DebugDeck => (_deck.Clone(), _rebuilt, StatusText);
 
         private void Export()
         {
@@ -2583,7 +2596,7 @@ namespace YgoCampaign.Game
             float y = 0;
             foreach (var group in entries.GroupBy(e => e.folder).OrderBy(g => Order(g.Key)).ThenBy(g => g.Key))
             {
-                var heading = Label(4, y + 6, 900, 26, $"{group.Key.ToUpperInvariant()}  <color={T.TextDimHex}><size=13>{group.Count()}</size></color>", 16, parent: list);
+                var heading = Label(4, y + 6, 900, 26, $"{group.Key.ToUpperInvariant()}  <color={T.TextDimHex}><size=14>{group.Count()}</size></color>", 16, parent: list);
                 heading.supportRichText = true;
                 heading.color = T.Gold; // DebugBrowser finds headings by this role
                 y += 36;
@@ -2591,7 +2604,7 @@ namespace YgoCampaign.Game
                 {
                     var row = Box(list, 0, y, 940, 44);
                     Ui.Image(row, e.name == _deck.Name ? T.RowSelected : T.RowB);
-                    Label(14, 0, 520, 44, DeckLabel(e.name), 16, parent: row).color = T.Text;
+                    Ui.Plain(Label(14, 0, 520, 44, "", 16, parent: row), DeckLabel(e.name)).color = T.Text;
                     Label(540, 0, 260, 44, e.era, 13, parent: row).color = T.TextMuted;
                     Label(800, 0, 130, 44, $"{e.main} main · {e.extra} extra", 13, TextAnchor.MiddleRight, row).color = T.TextMuted;
                     var name = e.name;
@@ -2648,10 +2661,16 @@ namespace YgoCampaign.Game
 
             var banlist = _banlists[_banIndex];
             _banLabel.text = Format != null && Format.Pool.Length > 0
-                ? $"Ban list: {banlist.Name}  <size=12><color={T.TextDimHex}>(this cup: cards out by {Format.Pool})</color></size>"
+                ? $"Ban list: {banlist.Name}  <size=14><color={T.TextDimHex}>(this cup: cards out by {Format.Pool})</color></size>"
                 : banlist.Date.Length > 0 && DeckRules.FormatEnd(banlist, _banlists) is string end && end.Length > 0
-                ? $"Ban list: {banlist.Name}  <size=12><color={T.TextDimHex}>(format until {end})</color></size>" : $"Ban list: {banlist.Name}";
+                ? $"Ban list: {banlist.Name}  <size=14><color={T.TextDimHex}>(format until {end})</color></size>" : $"Ban list: {banlist.Name}";
             _banLabel.supportRichText = true;
+            // One line between its arrows: shrinks to the floor, then ends in "…" (its tooltip has it whole).
+            if (!_banLabel.TryGetComponent<TipOnHover>(out var banTip)) { banTip = _banLabel.gameObject.AddComponent<TipOnHover>(); banTip.Title = "Ban list"; _banLabel.raycastTarget = true; }
+            var banFull = _banLabel.text;
+            _banLabel.fontSize = UiTheme.Size(TextRole.Small);
+            Ui.OneLine(_banLabel, UiTheme.Floor);
+            ShowTip(banTip, banFull, _banLabel.text != banFull);
             var problems = DeckRules.Validate(_deck, EffectiveList, _cards);
             if (OwnedCards != null) problems.AddRange(CollectionRules.Validate(_deck, OwnedCards, _cards));
             // Cards that weren't out yet in the list's format (in the campaign only when it's era-limited).
@@ -2684,7 +2703,7 @@ namespace YgoCampaign.Game
             var body = _problems.text; // the problems (and notes) after it; everything else goes before
             _problems.text = analysis + _problems.text;
             if (OwnedCards != null && PassAllowance != null && _deck.Note("loaner").Length == 0)
-                _problems.text = $"<color={T.GoldHex}>Ban Passes: {BanPasses.Used(_deck, banlist, _cards, NoPass)} of {Passes} used</color>  <size=12><color={T.TextDimHex}>(select a limited card, then + Pass)</color></size>\n" + _problems.text;
+                _problems.text = $"<color={T.GoldHex}>Ban Passes: {BanPasses.Used(_deck, banlist, _cards, NoPass)} of {Passes} used</color>  <size=14><color={T.TextDimHex}>(select a limited card, then + Pass)</color></size>\n" + _problems.text;
             // Historic recipes carry their story: when it was played, how it worked, and why it mattered.
             // (A part a deck doesn't note, like a starter's tier, is left out.)
             if (_deck.Note("era").Length > 0)
@@ -2768,7 +2787,7 @@ namespace YgoCampaign.Game
                 float w = width * count / total;
                 var seg = Box(_charts, x, 30, w - 2, 34);
                 Ui.Image(seg, Ui.Hex(color)).raycastTarget = false;
-                if (w > 44) Typography.Strong(Ui.Text(seg, count.ToString(), 16, Color.white));
+                if (w > 44) Typography.Strong(Ui.Text(seg, count.ToString(), TextRole.Small, Color.white));
                 x += w;
             }
             var legend = Label(14, 70, 440, 36, $"<color=#F0A060>■</color> {monsters} monsters  ({100 * monsters / total}%)    "
@@ -2785,10 +2804,10 @@ namespace YgoCampaign.Game
                 float colX = 500 + (lv - 1) * 34, h = 44f * levels[lv] / most;
                 var col = Box(_charts, colX, 84 - h, 28, Math.Max(h, levels[lv] > 0 ? 3 : 1));
                 Ui.Image(col, levels[lv] > 0 ? (lv >= 7 ? Ui.Hex("#FFB347") : lv >= 5 ? Ui.Hex("#FFD86B") : Ui.Hex("#9FD8FF")) : new Color(1, 1, 1, 0.12f)).raycastTarget = false;
-                if (levels[lv] > 0) Label(colX, 84 - h - 15, 28, 15, levels[lv].ToString(), 11, TextAnchor.MiddleCenter, _charts);
+                if (levels[lv] > 0) Label(colX, 84 - h - 17, 28, 17, levels[lv].ToString(), 11, TextAnchor.MiddleCenter, _charts);
                 Label(colX, 88, 28, 18, lv.ToString(), 11, TextAnchor.MiddleCenter, _charts).color = T.Caption.WithAlpha(0.55f);
             }
-            var tributes = Label(500 + 12 * 34 + 8, 28, 64, 76, $"<size=11>Lv 5-6:</size> {levels[5] + levels[6]}\n<size=11>Lv 7+:</size> {levels.Skip(7).Sum()}", 12, TextAnchor.MiddleLeft, _charts);
+            var tributes = Label(500 + 12 * 34 + 8, 28, 64, 76, $"<size=14>Lv 5-6:</size> {levels[5] + levels[6]}\n<size=14>Lv 7+:</size> {levels.Skip(7).Sum()}", 12, TextAnchor.MiddleLeft, _charts);
             tributes.supportRichText = true;
         }
 
@@ -2810,7 +2829,7 @@ namespace YgoCampaign.Game
             rt.anchoredPosition = new Vector2(2, -2);
             rt.sizeDelta = new Vector2(20, 20);
             Ui.Image(rt, color).raycastTarget = false;
-            Typography.Strong(Ui.Text(rt, text, 13, Color.white));
+            Typography.Strong(Ui.Text(rt, text, TextRole.Caption, Color.white));
         }
 
         private void RunSearch()
@@ -2899,7 +2918,7 @@ namespace YgoCampaign.Game
             if (_closeNamesFrom >= 0) notes.Add("No card named that; showing close names."); // (some made it through the scope and Limit)
             var note = string.Join(" ", notes);
             if (note.Length > 0) SetStatus(note);
-            else if (_searchStatus.Length > 0 && _status.text == _searchStatus) SetStatus("");
+            else if (_searchStatus.Length > 0 && StatusText == _searchStatus) SetStatus("");
             _searchStatus = note;
         }
 
@@ -2923,6 +2942,7 @@ namespace YgoCampaign.Game
             _resultCount.text = CardsWord(_found);
             _pageLabel.text = $"{_page + 1} / {pages}" + (_found > MaxShown ? $" · first {MaxShown.ToString("N0", CultureInfo.InvariantCulture)}" : "");
             var limits = _banlists[_banIndex];
+            ResultUnders.Clear();
             for (int slot = 0; slot < ResultsPerPage; slot++)
             {
                 int i = _page * ResultsPerPage + slot;
@@ -2973,7 +2993,7 @@ namespace YgoCampaign.Game
                 {
                     var tag = Ui.Placed("InDeck", view.transform, new Vector2(ResultCard.x / 2 - 14, -ResultCard.y / 2 + 38), new Vector2(26, 22)); // above the stat strip
                     Ui.Image(tag, Ui.Hex("#13203A")).raycastTarget = false; // theme: kept, a badge on the card
-                    Typography.Strong(Ui.Text(tag, $"x{copies}", 13, CardView.Actionable));
+                    Typography.Strong(Ui.Text(tag, $"x{copies}", TextRole.Caption, CardView.Actionable));
                 }
                 // Under the card: how many you own (campaign), or its kind.
                 var under = OwnedCards != null && allowed > 0
@@ -2984,13 +3004,18 @@ namespace YgoCampaign.Game
                 // Seen in duels: who played it (the latest duel it was seen in, or the duel picked).
                 if (_scope == ScopeSeen && (SeenDuel ?? _seenLog.LastSeenIn(Banlist.BaseCode(info.Code, _cards))) is SeenLog.Duel seenIn)
                     under = $"<color={T.InfoSoftHex}>vs {seenIn.Opponent}</color>";
-                var line = Ui.Text(Ui.Placed("Under", _resultsLayer, new Vector2(cx, cy - ResultCard.y / 2 - 10), new Vector2(98, 18)), under, 11,
-                    T.TextMuted);
-                line.supportRichText = true;
-                line.resizeTextForBestFit = true;
-                line.resizeTextMinSize = 10;
-                line.resizeTextMaxSize = 11;
-                line.raycastTarget = false;
+                // (A plain face carries the card's name, so it isn't repeated under it; a picture doesn't, so its name stays under
+                // the tile. What you own, a list's verdict, who played it, always stay.)
+                bool underLine = under != shown.Name || !view.PlainFace;
+                ResultUnders.Add((shown.Name, view.PlainFace, underLine ? under : null));
+                if (underLine)
+                {
+                    var line = Ui.Text(Ui.Placed("Under", _resultsLayer, new Vector2(cx, cy - ResultCard.y / 2 - 10), new Vector2(98, 18)), under, TextRole.Caption,
+                        T.TextMuted);
+                    line.supportRichText = true;
+                    line.raycastTarget = false;
+                    Ui.OneLine(line); // "own 2 · ◆ Near Mint" ends in "…" past the tile's width (the detail has the copy whole)
+                }
                 var drag = view.gameObject.AddComponent<DragSource>();
                 drag.Began = p => { FocusResult(info, viewed: false); BeginDrag(info.Code, p); }; // a drag focuses the dragged card (not "viewed")
                 drag.Moved = p => MoveDrag(p, fromDeck: false);
@@ -2998,6 +3023,9 @@ namespace YgoCampaign.Game
             }
             ShowRing(); // the focused card's ring, if it's on this page (or in the deck)
         }
+
+        /// <summary>For the checks: each result tile on the page, whether its face is plain, and the line under it (null: none).</summary>
+        internal readonly List<(string name, bool plain, string? under)> ResultUnders = new List<(string, bool, string?)>();
 
         private static Color ChipColor(int chip, bool on)
         {
@@ -3122,11 +3150,12 @@ namespace YgoCampaign.Game
             var note = TextNote(info);
             // (Not owned and where to get it goes last: the longest, and the first the block shrinks for.)
             bool notOwned = owned == 0;
-            _detail.text = $"In deck: <b>{CopiesInDeck(info.Code)}</b>{(notOwned ? "" : ownLine)}{draw}{(note.Length > 0 ? $"\n{note}" : "")}{legality}{(notOwned ? ownLine : "")}";
             _starterLabel.text = _deck.Starters.Contains(key) ? "Starter ✓" : "Mark starter";
             _favoriteLabel.text = _favorites.Contains(key) ? "★ Favorite" : "☆ Favorite";
             SetCardButtons(true);
             ShowVersions(info);
+            // (After the versions: without their panel the block has its room too.)
+            FitDetail($"In deck: <b>{CopiesInDeck(info.Code)}</b>{(notOwned ? "" : ownLine)}{draw}{(note.Length > 0 ? $"\n{note}" : "")}{legality}{(notOwned ? ownLine : "")}");
         }
 
         private void ShowVersions(CardInfo info)
@@ -3137,8 +3166,10 @@ namespace YgoCampaign.Game
             _versionPanel.gameObject.SetActive(arts.Count > 1 || texts.Count > 1);
             _artLabel.text = arts.Count > 1 ? $"{arts.IndexOf(code) + 1} of {arts.Count}" : "only one";
             var label = _versions.TextLabel(code);
-            _textLabel.text = texts.Count > 1 ? $"{label}\n<size=11>click to switch</size>" : label;
+            _textLabel.text = label;
             _textLabel.supportRichText = true;
+            Ui.OneLine(_textLabel, UiTheme.Floor);
+            if (_textTip != null) _textTip.Body = texts.Count > 1 ? $"{label}\n\nClick to switch to the card's other text." : label;
         }
 
         /// <summary>
@@ -3256,7 +3287,10 @@ namespace YgoCampaign.Game
             var decks = OpponentDecks;
             _opponentDeckIndex = Mathf.Clamp(_opponentDeckIndex, 0, Math.Max(0, decks.Count - 1));
             _opponentLabel.text = _roster.Count == 0 ? "Balanced bot" : $"{_roster[_opponentIndex].Name}";
-            _opponentDeckLabel.text = decks.Count == 0 ? "(no decks)" : $"with {DeckTitle(decks[_opponentDeckIndex])}";
+            Ui.Plain(_opponentDeckLabel, decks.Count == 0 ? "(no decks)" : $"with {DeckTitle(decks[_opponentDeckIndex])}");
+            // One line: shrinks to the floor, then ends in "…" (a long deck name).
+            _opponentDeckLabel.fontSize = UiTheme.Size(UiTheme.RoleFor(15));
+            Ui.OneLine(_opponentDeckLabel, UiTheme.Floor);
         }
 
         /// <summary>A deck's name as players know it ("ABC-Dragon Buster", not the file name "abc").</summary>
@@ -3324,7 +3358,64 @@ namespace YgoCampaign.Game
             if (_selected != null && _versions.PlayerTexts(_versions.Canonical(_selected.Code)).Count > 1) ShowDetail(_selected);
         }
 
-        private void SetStatus(string text) => _status.text = text;
+        /// <summary>
+        /// The block under the card (copies, odds, the text note, legality, where to get it): shrinks to the floor; it takes
+        /// the versions panel's room too when that's hidden (446 to 552, not 500 to 552); what still doesn't fit ends in "…"
+        /// and reads whole in the block's tooltip, which shows only then (the buttons under it don't move).
+        /// </summary>
+        private void FitDetail(string full)
+        {
+            _detail.text = full;
+            if (_detailTip == null)
+            {
+                _detail.raycastTarget = true;
+                _detailTip = _detail.gameObject.AddComponent<TipOnHover>();
+                _detailTip.Title = "This card in your deck";
+            }
+            _detailTip.Body = "";
+            _detailTip.enabled = false;
+            var rt = _detail.rectTransform;
+            bool room = !_versionPanel.gameObject.activeSelf;
+            rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, room ? -446 : -500);
+            rt.sizeDelta = new Vector2(rt.sizeDelta.x, room ? 106 : 52);
+            var settings = _detail.GetGenerationSettings(new Vector2(rt.rect.width, 0));
+            settings.resizeTextForBestFit = false;
+            settings.fontSize = UiTheme.Floor;
+            float Height(string s) => new TextGenerator().GetPreferredHeight(s, settings) / _detail.pixelsPerUnit;
+            if (rt.rect.height <= 0 || Height(full) <= rt.rect.height - 1) return;
+            int n = full.Length;
+            string cut = full;
+            while (n > 4 && Height(cut = Ui.Cut(full, n, true)) > rt.rect.height - 1) n -= 4;
+            _detail.text = cut;
+            ShowTip(_detailTip, full, cut: true);
+        }
+
+        /// <summary>A line's tooltip: on, with the words whole, only when the line shows them cut (never an empty tip).</summary>
+        private static void ShowTip(TipOnHover tip, string full, bool cut)
+        {
+            var body = System.Text.RegularExpressions.Regex.Replace(full, "<[^>]+>", "").Trim();
+            tip.Body = cut ? body : "";
+            tip.enabled = cut && body.Length > 0;
+        }
+
+        /// <summary>
+        /// The status line: Small, on one line; a longer message ends in "…" and reads whole in the line's tooltip (and in
+        /// <see cref="StatusText"/>).
+        /// </summary>
+        private void SetStatus(string text)
+        {
+            _statusFull = text;
+            _status.fontSize = UiTheme.Size(TextRole.Small);
+            _status.text = text;
+            Ui.OneLine(_status);
+            if (_statusTip != null) ShowTip(_statusTip, text, _status.text != text);
+        }
+
+        private string _statusFull = "";
+        private TipOnHover? _textTip, _detailTip;
+        private TipOnHover? _statusTip;
+        /// <summary>The status message in full (the line may show it cut).</summary>
+        private string StatusText => _statusFull;
 
         private static string Describe(CardInfo info)
         {

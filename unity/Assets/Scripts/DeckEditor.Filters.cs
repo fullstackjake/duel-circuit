@@ -65,10 +65,10 @@ namespace YgoCampaign.Game
             var T = UiTheme.Current;
             var rt = Box(_root, x, y, w, h);
             _moreFill = Ui.Image(rt, T.Button);
-            _moreLabel = Ui.Text(rt, "More", 13, T.Text);
+            _moreLabel = Ui.Text(rt, "More", TextRole.Caption, T.Text);
             _moreLabel.resizeTextForBestFit = true;
-            _moreLabel.resizeTextMinSize = 10;
-            _moreLabel.resizeTextMaxSize = 13;
+            _moreLabel.resizeTextMinSize = UiTheme.Floor;
+            _moreLabel.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
             Ui.Clickable(rt, ToggleMore, style: HoverStyle.Button);
             var tip = rt.gameObject.AddComponent<TipOnHover>();
             tip.Title = "More filters";
@@ -88,7 +88,7 @@ namespace YgoCampaign.Game
 
             // Archetype: two letters or more for up to 8 suggestions ("Burning Abyss · 24"); a pick adds @name.
             Label(16, 50, 300, 18, "ARCHETYPE", 12, parent: _more).color = T.Caption;
-            _archetypeField = Ui.Input(Box(_more, 16, 70, 300, 32), "two letters or more...", 15, ShowSuggestions, _ =>
+            _archetypeField = Ui.Input(Box(_more, 16, 70, 300, 32), "two letters or more...", UiTheme.Size(TextRole.Small), ShowSuggestions, _ =>
             {
                 // Enter picks the first suggestion (leaving the box any other way doesn't).
 #if ENABLE_INPUT_SYSTEM
@@ -100,7 +100,7 @@ namespace YgoCampaign.Game
                 var first = _archetypeField.text.Trim().Length >= 2 ? _search.ArchetypeSuggestions(_archetypeField.text, 1) : null;
                 if (enter && first is { Count: > 0 }) PickArchetype(first[0].code, first[0].name);
             });
-            var hint = Label(326, 68, 158, 36, "Its members only: Related finds cards that name it.", 12, TextAnchor.MiddleLeft, _more);
+            var hint = Label(326, 66, 158, 40, "Members only. Related: cards naming it.", 12, TextAnchor.MiddleLeft, _more);
             hint.color = T.TextSoft;
             _archetypeRow = Box(_more, 16, 108, 468, 24);
 
@@ -108,8 +108,8 @@ namespace YgoCampaign.Game
             _limitCaption = Label(16, 142, 226, 18, "LIMIT", 12, parent: _more);
             _limitCaption.color = T.Caption;
             _limitCaption.resizeTextForBestFit = true; // (the list's name rides along: a long one shrinks)
-            _limitCaption.resizeTextMinSize = 9;
-            _limitCaption.resizeTextMaxSize = 12;
+            _limitCaption.resizeTextMinSize = UiTheme.Floor;
+            _limitCaption.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
             Label(258, 142, 226, 18, "LOOK", 12, parent: _more).color = T.Caption;
             _limitLabel = MorePicker(16, 162, 226, d => { _limit = (_limit + d + LimitLabels.Length) % LimitLabels.Length; RunSearch(); },
                 "Limit", "The picked ban list's limit: Forbidden (Not legal under a whitelist list such as Goat), Limited, Semi-Limited, Unlimited, "
@@ -127,7 +127,7 @@ namespace YgoCampaign.Game
             float y = 240;
             foreach (var group in CardTags.Groups)
             {
-                Label(16, y, 468, 16, group.ToUpperInvariant(), 12, parent: _more).color = T.Caption;
+                Label(16, y - 1, 468, 18, group.ToUpperInvariant(), 12, parent: _more).color = T.Caption;
                 y += 18;
                 var genres = CardTags.GenresIn(group);
                 for (int i = 0; i < genres.Count; i++)
@@ -135,10 +135,10 @@ namespace YgoCampaign.Game
                     var genre = genres[i];
                     var rt = Box(_more, 16 + (i % 4) * 118, y + (i / 4) * 30, 114, 26);
                     _genreChips[genre.Token] = Ui.Image(rt, T.Inset);
-                    var label = Ui.Text(rt, genre.Label, 13, T.Text);
+                    var label = Ui.Text(rt, genre.Label, TextRole.Caption, T.Text);
                     label.resizeTextForBestFit = true;
-                    label.resizeTextMinSize = 10;
-                    label.resizeTextMaxSize = 13;
+                    label.resizeTextMinSize = UiTheme.Floor;
+                    label.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
                     label.raycastTarget = false;
                     Ui.Clickable(rt, () => ToggleGenre(genre.Token), style: HoverStyle.Button);
                     var tip = rt.gameObject.AddComponent<TipOnHover>();
@@ -165,10 +165,10 @@ namespace YgoCampaign.Game
             var T = UiTheme.Current;
             var rt = Box(_more, x, y, w, 30);
             Ui.Image(rt, T.Inset);
-            var label = Ui.Text(rt, "", 14, T.Text);
+            var label = Ui.Text(rt, "", TextRole.Caption, T.Text);
             label.resizeTextForBestFit = true;
-            label.resizeTextMinSize = 10;
-            label.resizeTextMaxSize = 14;
+            label.resizeTextMinSize = UiTheme.Floor;
+            label.resizeTextMaxSize = UiTheme.Size(TextRole.Caption);
             Ui.Clickable(rt, () => step(+1), () => step(-1));
             var tip = rt.gameObject.AddComponent<TipOnHover>();
             tip.Title = title;
@@ -181,7 +181,7 @@ namespace YgoCampaign.Game
             var T = UiTheme.Current;
             var rt = Box(_more, x, y, 98, 26);
             var image = Ui.Image(rt, T.ButtonOff);
-            Ui.Text(rt, label, 13, T.Text).raycastTarget = false;
+            Ui.Text(rt, label, TextRole.Caption, T.Text).raycastTarget = false;
             Ui.Clickable(rt, () => { _matchAny = any; RunSearch(); }, style: HoverStyle.Button);
             var tip = rt.gameObject.AddComponent<TipOnHover>();
             tip.Title = label;
@@ -256,7 +256,7 @@ namespace YgoCampaign.Game
                 var (code, name, count) = found[i];
                 var row = Box(_suggestions, 1, 1 + i * 28, 298, 28);
                 Ui.Image(row, i % 2 == 0 ? T.RowA : T.RowB);
-                var label = Ui.Text(Box(row, 10, 0, 280, 28), $"{name}  <color={T.TextDimHex}>· {count}</color>", 14, T.Text, TextAnchor.MiddleLeft);
+                var label = Ui.Text(Box(row, 10, 0, 280, 28), $"{name}  <color={T.TextDimHex}>· {count}</color>", TextRole.Caption, T.Text, TextAnchor.MiddleLeft);
                 label.supportRichText = true;
                 label.raycastTarget = false;
                 Ui.Clickable(row, () => PickArchetype(code, name), style: HoverStyle.Row);
@@ -403,11 +403,15 @@ namespace YgoCampaign.Game
             float x = 0;
             foreach (var (code, name) in _archetypePicks)
             {
-                float w = Mathf.Min(200, name.Length * 7.5f + 28);
+                float w = Mathf.Min(260, Ui.LineWidth($"{name} ×", Typography.Font(Face.Condensed), UiTheme.Floor) + 22);
                 if (x + w > 468) break;
                 var rt = Box(_archetypeRow, x, 0, w - 4, 24);
                 Ui.Image(rt, T.Chip);
-                Ui.Text(rt, $"{name} ×", 12, T.Text).raycastTarget = false;
+                var t = Ui.Text(rt, $"{name} ×", TextRole.Label, T.Text);
+                t.raycastTarget = false;
+                t.resizeTextForBestFit = true;
+                t.resizeTextMinSize = UiTheme.Floor;
+                t.resizeTextMaxSize = UiTheme.Size(TextRole.Label);
                 Ui.Clickable(rt, () => { _archetypePicks.RemoveAll(a => a.code == code); RunSearch(); });
                 x += w;
             }

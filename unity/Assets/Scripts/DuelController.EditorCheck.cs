@@ -34,6 +34,7 @@ namespace YgoCampaign.Game
             {
                 yield return new WaitForEndOfFrame();
                 ScreenCapture.CaptureScreenshot(Path.Combine(folder, $"editor-{name}.png"));
+                yield return TextRule($"editor-{name}", Report);
                 yield return null;
             }
             yield return new WaitForSecondsRealtime(1.5f);
@@ -272,6 +273,18 @@ namespace YgoCampaign.Game
             yield return Shot("no-limits");
             Report($"\"No limits\" with no problems is amber with the new words (\"{Plain(noLimits).Split('\n').LastOrDefault()}\")",
                 noLimits.Contains($"<color={T.WarnHex}>No ban list picked (No limits): only deck size and 3 copies are checked. Pick a list with < >.</color>"));
+            // A pictured result tile keeps its name under it (a picture doesn't carry the name); a plain face doesn't repeat it.
+            {
+                var tiles = _editor.ResultUnders.ToList();
+                var pictured = tiles.Where(r => !r.plain).ToList();
+                // (Free play under No limits: the line under a pictured card is its name, nothing else.)
+                var badPic = pictured.Where(r => r.under == null || Plain(r.under) != r.name).Select(r => $"{r.name}: \"{r.under}\"").ToList();
+                var badPlain = tiles.Where(r => r.plain && r.under != null && Plain(r.under) == r.name).Select(r => r.name).ToList();
+                Report($"result tiles: {pictured.Count} pictured all have their name under them (wrong: {string.Join(", ", badPic.Take(4))}), "
+                    + $"{tiles.Count - pictured.Count} plain don't repeat their name ({string.Join(", ", badPlain.Take(4))})",
+                    tiles.Count > 0 && badPic.Count == 0 && badPlain.Count == 0);
+                if (pictured.Count > 0) Debug.Log($"editor check: (pictured tiles on the page: {pictured.Count} of {tiles.Count})");
+            }
             _editor.Close();
             yield return Frames(2);
 

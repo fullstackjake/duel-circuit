@@ -49,7 +49,10 @@ namespace YgoCampaign.Game
             UpdateControls();
             var art = CardView.Art!;
             Debug.Log($"plain check: window {Screen.width}x{Screen.height}, canvas scale {F(Mathf.Min(Screen.width / 1920f, Screen.height / 1080f))}");
-            if (art.Installed.Count > 0)
+            // With the player's pictures (no -pics): only the plain card's own rules (section 2 of the type spec) and that
+            // pictured faces are unchanged; the full pass needs no pictures.
+            bool withPictures = art.Installed.Count > 0;
+            if (withPictures && EmptyPicsFolder() != null)
             {
                 Report($"runs with no pictures (-pics <empty folder> -hdpics off): {art.Installed.Count} found in {string.Join(" + ", art.Folders)}", false);
                 Application.Quit();
@@ -96,6 +99,160 @@ namespace YgoCampaign.Game
             var cards = kinds.Where(k => k.info != null).Select(k => (k.label, code: k.info!.Code, k.info)).ToList();
             cards.Add(("Unknown", unknown, (CardInfo?)null));
             CardInfo Kind(string label) => kinds.First(k => k.label == label).info!;
+
+            // ==== 17. Section 2 of the type spec: each face's variant at its width, its texts at their floors on screen ========
+            {
+                float[] widths = { 30, 41, 52, 57, 70, 71, 115, 150, 151, 172, 200, 240, 271 };
+                var problems = new List<string>();
+                int faces = 0, entries = 0;
+                var drawnFaces = new List<(string label, CardLayout layout, int w, Texture tex)>();
+                foreach (var layout in new[] { CardLayout.Compact, CardLayout.Standard, CardLayout.Full })
+                    foreach (int w in widths)
+                    {
+                        // A width at a time (the cache may drop faces nothing shows): drawn, then read at once.
+                        var batch = cards.Select(c => (c.label, layout, w, (Texture)CardFace.PlainOnly(c.code, c.info, layout, w))).ToList();
+                        yield return Drawn(2000);
+                        foreach (var (label, l, ww, tex) in batch) drawnFaces.Add((label, l, ww, tex));
+                        foreach (var (label, l, ww, tex) in batch) Check(label, l, ww, tex);
+                    }
+                void Check(string label, CardLayout layout, int w, Texture tex)
+                {
+                    faces++;
+                    var want = layout == CardLayout.Compact ? (w < 52 ? FaceVariant.CompactNameOnly : FaceVariant.Compact)
+                        : layout == CardLayout.Standard ? (w < 200 ? FaceVariant.StandardNoText : FaceVariant.Standard) : FaceVariant.Full;
+                    if (CardFace.VariantFor(layout, w) != want || CardFace.VariantOf(tex) != want)
+                        problems.Add($"{label} {layout} at {w} px: VariantFor {CardFace.VariantFor(layout, w)}, drawn {CardFace.VariantOf(tex)}, wanted {want}");
+                    var texts = CardFace.DebugTexts(tex);
+                    if (label != "Unknown" && !texts.Any(t => t.element == "name")) problems.Add($"{label} {layout} at {w} px: no name");
+                    if (texts.Count == 0) problems.Add($"{label} {layout} at {w} px: not drawn");
+                    foreach (var (element, text, px, cut) in texts)
+                    {
+                        entries++;
+                        float floor = element is "card text" or "pendulum text" ? CardText.TextFloor : CardText.NameFloor;
+                        if (px < floor - 0.05f) problems.Add($"{label} {layout} at {w} px: {element} \"{(text.Length > 24 ? text.Substring(0, 24) + "…" : text)}\" at {F(px)} px{(cut ? " (cut)" : "")}");
+                    }
+                    // Absent where section 2 drops them: no text box under 200 px, no type line under 150, no chip words under 70.
+                    if (want == FaceVariant.StandardNoText && texts.Any(t => t.element is "card text" or "pendulum text")) problems.Add($"{label} Standard at {w} px: a text box under 200 px");
+                    if (layout == CardLayout.Standard && w < 150 && texts.Any(t => t.element == "type line")) problems.Add($"{label} Standard at {w} px: a type line under 150 px");
+                    if (layout == CardLayout.Compact && w < 70 && texts.Any(t => t.element == "chip" && t.text.Any(char.IsLetter)))
+                        problems.Add($"{label} Compact at {w} px: chip words \"{texts.First(t => t.element == "chip").text}\" under 70 px");
+                    if (want == FaceVariant.CompactNameOnly && texts.Any(t => t.element == "chip")) problems.Add($"{label} Compact at {w} px: a chip under 52 px");
+                    // And present where section 2 keeps them: the type line from 150 px (Standard), card text from 200 px and on
+                    // Full, the chip from 52 px with its words from 70 px (Compact), the footer on a name-only face.
+                    var info = cards.First(c => c.label == label).info;
+                    if (info == null) return;
+                    bool Has(string element) => texts.Any(t => t.element == element);
+                    if (layout == CardLayout.Standard && w >= 150 && !Has("type line")) problems.Add($"{label} Standard at {w} px: no type line");
+                    if ((want == FaceVariant.Standard || want == FaceVariant.Full) && (info.Text?.Length ?? 0) > 0 && !Has("card text")) problems.Add($"{label} {layout} at {w} px: no card text");
+                    if (want == FaceVariant.Compact && PlainCards.HasChip(info, CardLayout.Compact))
+                    {
+                        bool monster = (info.Type & CardType.Monster) != 0;
+                        var chip = texts.FirstOrDefault(t => t.element == "chip").text;
+                        if ((monster || w >= 70) && string.IsNullOrEmpty(chip)) problems.Add($"{label} Compact at {w} px: no chip");
+                        else if (w >= 70 && chip != null && !chip.Any(char.IsLetter)) problems.Add($"{label} Compact at {w} px: the chip \"{chip}\" lost its words");
+                    }
+                    if (want == FaceVariant.CompactNameOnly && !Has("stats")) problems.Add($"{label} Compact at {w} px: no footer on the name-only face");
+                }
+                Report($"17. {faces} faces ({cards.Count} kinds, Compact / Standard / Full at {string.Join(", ", widths)} px): each in its section 2 variant, "
+                       + $"a name on every known card, {entries} texts at 7 px or more on screen (8 for card text)"
+                       + (problems.Count > 0 ? $": {problems.Count} problems: " + string.Join("; ", problems.Take(8)) : ""), problems.Count == 0);
+                // The long name at 41 px (Compact, name only): cut with "…" within four lines.
+                var longCard = pack.All.FirstOrDefault(c => c.Name == "Number 38: Hope Harbinger Dragon Titanic Galaxy");
+                if (longCard != null)
+                {
+                    var tex = CardFace.PlainOnly(longCard.Code, longCard, CardLayout.Compact, 41);
+                    yield return Drawn();
+                    var name = CardFace.DebugTexts(tex).FirstOrDefault(t => t.element == "name");
+                    var drawnName = CardFace.DebugName(tex);
+                    Report($"17. {longCard.Name} at 41 px: \"{name.text?.Replace("\n", "/")}\" ({drawnName?.Lines} lines, {F(name.px)} px), ends in \"…\" within four lines",
+                        name.text != null && name.text.EndsWith("…") && drawnName != null && drawnName.Lines <= 4 && name.px >= CardText.NameFloor - 0.05f);
+                }
+                else Report("17. the long-name card (Number 38: Hope Harbinger Dragon Titanic Galaxy) is in the data", false);
+                // The cache keys the variant: the same card at 199 and 201 px is two textures, without and with its text.
+                var probe = cards.First(c => c.label == "Effect");
+                var at199 = CardFace.PlainOnly(probe.code, probe.info, CardLayout.Standard, 199);
+                var at201 = CardFace.PlainOnly(probe.code, probe.info, CardLayout.Standard, 201);
+                Report($"17. the cache keys the variant: {probe.info?.Name} at 199 px ({CardFace.VariantOf(at199)}, {at199.width} px texture) and 201 px ({CardFace.VariantOf(at201)}, {at201.width} px) are two textures",
+                    !ReferenceEquals(at199, at201) && CardFace.VariantOf(at199) == FaceVariant.StandardNoText && CardFace.VariantOf(at201) == FaceVariant.Standard);
+
+                // Foil never over a name: for each variant, the foil's name rect is the drawn plate and no other foil region
+                // (window, glyph disc, chip, text or footer) crosses it; the rarity mark sits inside the face's own window.
+                bool Cross(Vector4 a, Vector4 b) => a.z > a.x && b.z > b.x && a.x < b.z - 0.001f && b.x < a.z - 0.001f && a.y < b.w - 0.001f && b.y < a.w - 0.001f;
+                string V4(Vector4 v) => $"({v.x:0.###}, {v.y:0.###}, {v.z:0.###}, {v.w:0.###})";
+                var foilProblems = new List<string>();
+                var variants = new (CardLayout layout, FaceVariant variant)[]
+                {
+                    (CardLayout.Compact, FaceVariant.CompactNameOnly), (CardLayout.Compact, FaceVariant.Compact),
+                    (CardLayout.Standard, FaceVariant.StandardNoText), (CardLayout.Standard, FaceVariant.Standard), (CardLayout.Full, FaceVariant.Full),
+                };
+                foreach (var (layout, variant) in variants)
+                    foreach (var fit in new[] { CardFit.Normal, CardFit.Badged })
+                    {
+                        if (fit == CardFit.Badged && layout != CardLayout.Compact) continue;
+                        var r = PlainCards.FoilRects(layout, fit, variant);
+                        var plate = PlainCards.DebugNameRect(layout, fit, variant);
+                        if (r.name != plate) foilProblems.Add($"{variant} {fit}: foil name {V4(r.name)} isn't the drawn plate {V4(plate)}");
+                        foreach (var (what, rect) in new[] { ("window", r.art), ("disc", r.attr), ("chip", r.stars), ("text", r.text) })
+                            if (Cross(rect, plate)) foilProblems.Add($"{variant} {fit}: the {what} foil {V4(rect)} crosses the name {V4(plate)}");
+                    }
+                var foilRoot = Ui.Overlay(transform, "FoilProbe", 31990);
+                var rare = cards.First(c => c.label == "Effect");
+                var foilRaws = new List<(int w, RawImage raw)>();
+                foreach (var (w, units) in new[] { (172, new Vector2(172, 251)), (240, new Vector2(240, 350)), (360, new Vector2(360, 525)) })
+                {
+                    var layout = w >= 280 ? CardLayout.Full : CardLayout.Standard;
+                    var tex = CardFace.PlainOnly(rare.code, rare.info, layout, w);
+                    var raw = Ui.Placed($"Foil {w}", foilRoot, Vector2.zero, units).gameObject.AddComponent<RawImage>();
+                    raw.texture = tex;
+                    CardFoil.Apply(raw, rare.info, Rarity.UltraRare, 0.6f);
+                    var window = PlainCards.FoilRects(layout, CardFit.Normal, CardFace.VariantOf(tex)).art;
+                    var plate = PlainCards.DebugNameRect(layout, CardFit.Normal, CardFace.VariantOf(tex) ?? FaceVariant.Standard);
+                    if (raw.transform.Find("RarityMark") is not RectTransform mark) { foilProblems.Add($"{CardFace.VariantOf(tex)} at {w}: no rarity mark"); continue; }
+                    var m = new Vector4(mark.anchorMin.x, mark.anchorMin.y, mark.anchorMax.x, mark.anchorMax.y);
+                    bool inside = m.x >= window.x - 0.001f && m.y >= window.y - 0.001f && m.z <= window.z + 0.001f && m.w <= window.w + 0.001f;
+                    if (!inside || Cross(m, plate)) foilProblems.Add($"{CardFace.VariantOf(tex)} at {w}: mark {V4(m)}, window {V4(window)}, name {V4(plate)}");
+                    foilRaws.Add((w, raw));
+                }
+                // Through CardFoil's own path (its material, as drawn): the regions each variant must have, written out here (not
+                // read from FoilRects), so a CardFoil that dropped the variant fails at 172 px (no text box: the name plate low).
+                yield return null;
+                var wanted = new Dictionary<int, (Vector4 name, Vector4 window)>
+                {
+                    [172] = (new Vector4(0.05f, 0.58f, 0.95f, 0.965f), new Vector4(0.05f, 0.20f, 0.95f, 0.50f)),
+                    [240] = (new Vector4(0.05f, 0.865f, 0.95f, 0.965f), new Vector4(0.05f, 0.50f, 0.95f, 0.79f)),
+                    [360] = (new Vector4(0.05f, 0.865f, 0.95f, 0.965f), new Vector4(0.05f, 0.66f, 0.95f, 0.79f)),
+                };
+                var materialSeen = new List<string>();
+                foreach (var (w, raw) in foilRaws)
+                {
+                    var mat = raw.materialForRendering;
+                    bool has = mat != null && mat.HasProperty("_NameRect") && mat.HasProperty("_ArtRect");
+                    var name = has ? mat!.GetVector("_NameRect") : Vector4.zero;
+                    var win = has ? mat!.GetVector("_ArtRect") : Vector4.zero;
+                    materialSeen.Add($"{w}: name {V4(name)} window {V4(win)}");
+                    if (!has || (name - wanted[w].name).sqrMagnitude > 1e-5f || (win - wanted[w].window).sqrMagnitude > 1e-5f)
+                        foilProblems.Add($"CardFoil's material at {w} px ({CardFace.VariantOf(raw.texture)}): name {V4(name)}, window {V4(win)}; wanted {V4(wanted[w].name)}, {V4(wanted[w].window)}");
+                }
+                Debug.Log($"plain check: (CardFoil materials: {string.Join("; ", materialSeen)})");
+                Destroy(foilRoot.gameObject);
+                Report($"17. foil never over a name: each variant's foil regions stay off its drawn name plate, the rarity mark sits in its window, and CardFoil's material has each variant's own regions"
+                       + (foilProblems.Count > 0 ? ": " + string.Join("; ", foilProblems.Take(6)) : ""), foilProblems.Count == 0);
+            }
+            if (withPictures)
+            {
+                // Pictured faces unchanged: a card with the player's picture shows that picture, never a plain face, at every size.
+                var pictured = pack.All.Where(c => c.Alias == 0 && art.Get(c.Code) != null).Take(20).ToList();
+                var notPicture = pictured.SelectMany(c => new[] { new Vector2(61, 89), new Vector2(200, 292), new Vector2(360, 525) }
+                    .Where(size => CardFace.IsPlain(CardFace.Picture(c.Code, c, size)) || CardFace.Picture(c.Code, c, size) != art.Get(c.Code)).Select(size => $"{c.Name} at {size.x}")).ToList();
+                Report($"17. with pictures: {pictured.Count} pictured cards show their pictures at 61, 200 and 360 units, unchanged" + (notPicture.Count > 0 ? ": not at " + string.Join(", ", notPicture.Take(5)) : ""),
+                    pictured.Count > 0 && notPicture.Count == 0);
+                CardFoil.FixedLight = null;
+                CardFoil.Override = null;
+                Debug.Log($"plain check done: {bad} failure(s)");
+                yield return new WaitForSecondsRealtime(0.5f);
+                Application.Quit();
+                yield break;
+            }
 
             var canvasRoot = Ui.Overlay(transform, "PlainCheck", 32000);
             var canvasGo = canvasRoot.parent.gameObject;
@@ -157,7 +314,8 @@ namespace YgoCampaign.Game
                 ("compact", CardLayout.Compact, CardFit.Normal, new Vector2(88, 128), 1f, 19),
                 ("compact-badged", CardLayout.Compact, CardFit.Badged, new Vector2(88, 128), 1f, 19),
                 ("standard", CardLayout.Standard, CardFit.Normal, new Vector2(200, 292), 0.85f, 10),
-                ("full", CardLayout.Full, CardFit.Normal, new Vector2(360, 525), 0.5f, 10),
+                // (Full: 720 units at half scale, so 360 on screen: a face takes the layout of its size on screen.)
+                ("full", CardLayout.Full, CardFit.Normal, new Vector2(720, 1050), 0.5f, 10),
             };
             var standardFaces = new Dictionary<string, Texture>();
             foreach (var sheet in sheets)
@@ -275,11 +433,11 @@ namespace YgoCampaign.Game
                                     && t.text.Trim().Length > 0 && t.cachedTextGenerator.characterCountVisible > 0)
                         .Select(t => (t, t.text)).ToList();
                     yield return null;
-                    var std = CardFace.PlainOnly(ash.Code, ash, CardLayout.Standard, CardFace.PixelWidth(CardLayout.Standard, 200));
+                    var std = CardFace.PlainOnly(ash.Code, ash, CardLayout.Standard, Mathf.Max(200, CardFace.PixelWidth(CardLayout.Standard, 200))); // (R3: under 200 px a Standard face has no text box)
                     var full = CardFace.PlainOnly(ash.Code, ash, CardLayout.Full, CardFace.PixelWidth(CardLayout.Full, 360));
                     var big = CardFace.PlainOnly(ash.Code, ash, CardLayout.Full, 972);
-                    var nText = CardFace.PlainOnly(normal.Code, normal, CardLayout.Standard, CardFace.PixelWidth(CardLayout.Standard, 200));
-                    var pText = CardFace.PlainOnly(pendulum.Code, pendulum, CardLayout.Standard, CardFace.PixelWidth(CardLayout.Standard, 200));
+                    var nText = CardFace.PlainOnly(normal.Code, normal, CardLayout.Standard, Mathf.Max(200, CardFace.PixelWidth(CardLayout.Standard, 200)));
+                    var pText = CardFace.PlainOnly(pendulum.Code, pendulum, CardLayout.Standard, Mathf.Max(200, CardFace.PixelWidth(CardLayout.Standard, 200)));
                     yield return Drawn();
                     yield return new WaitForEndOfFrame();
                     var lost = lettered.Where(e => e.t != null && e.t.isActiveAndEnabled && e.t.text == e.text && e.t.cachedTextGenerator.characterCountVisible == 0)
@@ -354,10 +512,12 @@ namespace YgoCampaign.Game
                 yield return Shot("foil");
                 CardFoil.FixedLight = new Vector3(0.3f, 0.78f, 0);
                 var m = plainUr.material;
-                Report($"5. a plain Ultra Rare's material has the plain regions: name {V(m.GetVector("_NameRect"))}, window {V(m.GetVector("_ArtRect"))}, text {V(m.GetVector("_TextRect"))}, "
+                // The regions of the variant the face was drawn in (at 720 a 170-unit Standard face has no text box).
+                var want = PlainCards.FoilRects(CardLayout.Standard, CardFit.Normal, CardFace.VariantOf(plainUr.texture));
+                Report($"5. a plain Ultra Rare ({CardFace.VariantOf(plainUr.texture)}) has its variant's regions: name {V(m.GetVector("_NameRect"))}, window {V(m.GetVector("_ArtRect"))}, text {V(m.GetVector("_TextRect"))}, "
                        + $"chip {V(m.GetVector("_StarsRect"))}, _Ink {m.GetFloat("_Ink")}, name foil {m.GetFloat("_NameFoil")}",
-                    CardFace.IsPlain(plainUr.texture) && Near(m.GetVector("_NameRect"), new Vector4(0.05f, 0.865f, 0.95f, 0.965f)) && Near(m.GetVector("_ArtRect"), new Vector4(0.05f, 0.50f, 0.95f, 0.79f))
-                    && Near(m.GetVector("_TextRect"), new Vector4(0.06f, 0.20f, 0.94f, 0.49f)) && m.GetFloat("_Ink") == 1 && m.GetFloat("_NameFoil") > 0);
+                    CardFace.IsPlain(plainUr.texture) && Near(m.GetVector("_NameRect"), want.name) && Near(m.GetVector("_ArtRect"), want.art)
+                    && Near(m.GetVector("_TextRect"), want.text) && m.GetFloat("_Ink") == 1 && m.GetFloat("_NameFoil") > 0);
                 var pm = picUr.material;
                 bool lightLetters = (effect.Type & (CardType.Spell | CardType.Trap | CardType.Xyz | CardType.Link)) != 0;
                 Report($"5. the same Ultra Rare as a test picture (the picture's own texture: {picUr.texture == art.Get(effect.Code)}) keeps today's regions: window {V(pm.GetVector("_ArtRect"))}, text {V(pm.GetVector("_TextRect"))}, "

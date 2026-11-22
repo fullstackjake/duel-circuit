@@ -320,7 +320,13 @@ namespace YgoCampaign.Game
                 if (existing != null) Destroy(existing.gameObject);
                 return;
             }
-            var window = PlainCards.FoilRects(layout, CardFit.Normal).art;
+            // The face's own window (its variant's: a Standard face without text has its window lower down).
+            var window = PlainCards.FoilRects(layout, CardFit.Normal, CardFace.VariantOf(image.texture)).art;
+            if (window.z <= window.x)
+            {
+                if (existing != null) Destroy(existing.gameObject);
+                return;
+            }
             float w = 0.22f, h = 0.07f, m = 0.012f;
             var mark = existing;
             Text label;
@@ -330,9 +336,6 @@ namespace YgoCampaign.Game
                 Ui.Image(mark, Color.black).raycastTarget = false;
                 label = Ui.Text(mark, "", 12, Color.white);
                 Typography.Strong(label);
-                label.resizeTextForBestFit = true;
-                label.resizeTextMinSize = 5;
-                label.resizeTextMaxSize = 40;
                 label.rectTransform.offsetMin = new Vector2(1, 1);
                 label.rectTransform.offsetMax = new Vector2(-1, -1);
             }
@@ -343,6 +346,11 @@ namespace YgoCampaign.Game
             mark.GetComponent<Image>().color = PlainCards.PlateColor(info);
             label.text = CardFace.RarityShort(rarity);
             label.color = CardFace.RarityColor(rarity);
+            // Text on a card: 7 px on screen or more (CardText fits it as the card's size on screen changes), the whole mark
+            // hidden when its box can't hold that.
+            var fit = CardView.CardTextFit(label, 40, cut: false);
+            fit.Holder = mark.GetComponent<Image>();
+            fit.Refit();
         }
 
         // ---- The prized moment -------------------------------------------------------------------------
@@ -437,7 +445,7 @@ namespace YgoCampaign.Game
             _material.SetFloat("_Ink", plain || LightLetters(info.Type) ? 1 : 0);
             if (plain)
             {
-                var rects = PlainCards.FoilRects(layout, fit);
+                var rects = PlainCards.FoilRects(layout, fit, CardFace.VariantOf(image.texture)); // the face's own variant: foil never over its name
                 _material.SetVector("_NameRect", rects.name);
                 _material.SetVector("_ArtRect", rects.art);
                 _material.SetVector("_AttrRect", rects.attr);

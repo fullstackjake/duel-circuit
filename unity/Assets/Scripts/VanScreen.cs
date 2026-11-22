@@ -237,7 +237,7 @@ namespace YgoCampaign.Game
         private void Showcase(CardCopy copy)
         {
             var info = _cards.Get(copy.Code);
-            if (copy.IsSlab) SlabView.Create(_detail, new Vector2(-490 + 30 + 180, 405 - 20 - 293), SlabView.Size.Full, copy, info, SetCode(copy)).localScale = Vector3.one * 0.62f;
+            if (copy.IsSlab) SlabView.Create(_detail, new Vector2(-490 + 30 + 180, 405 - 20 - 293), SlabView.Size.Full, copy, info, SetCode(copy), scale: 0.62f);
             else Thumb(_detail, new Vector2(-490 + 30 + 120, 405 - 20 - 175), new Vector2(240, 350), copy);
         }
 

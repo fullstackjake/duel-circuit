@@ -314,6 +314,9 @@ namespace YgoCampaign.Game
             SetText(info.Text);
             _text.fontSize = FxSettings.Scaled(_reading ? 22 : 16);
             Layout();
+            // The text's box takes its new height now (its fitter waited for a layout pass that a screen opening this frame
+            // can skip: the box stayed one line tall under longer text).
+            if (_textContent.gameObject.activeInHierarchy) LayoutRebuilder.ForceRebuildLayoutImmediate(_textContent);
             // Each card starts at the top of its text; the editor's same card shown again (after an add) stays where it was read to.
             if (!(KeepScrollOnSameCard && sameCard)) _scroll.verticalNormalizedPosition = 1;
         }
@@ -944,7 +947,7 @@ namespace YgoCampaign.Game
     /// </summary>
     public sealed class ScrollHint : MonoBehaviour
     {
-        private const float FadeHeight = 24, StripHeight = 16, BarWidth = 4, GlowTime = 0.5f;
+        private const float FadeHeight = 24, StripHeight = 18, BarWidth = 4, GlowTime = 0.5f; // (18: "▼ more" at Caption needs it)
         private RectTransform _view = null!, _content = null!, _fade = null!, _strip = null!, _track = null!, _thumb = null!;
         private ScrollRect _scroll = null!;
         private Text _more = null!;
