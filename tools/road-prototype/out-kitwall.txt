@@ -1,0 +1,6 @@
+RR5 | greedy: Kit passed-up 75% clear 32.6% | refuse: Kit passed-up 75% clear 32.6%
+RR6 | greedy: Kit passed-up 0% clear 26.2% | refuse: Kit passed-up 52% clear 20.5%
+RR7 | greedy: Kit passed-up 0% clear 16.8% | refuse: Kit passed-up 52% clear 12.8%
+RR8 | greedy: Kit passed-up 0% clear 12.1% | refuse: Kit passed-up 52% clear 9.0%
+RR9 | greedy: Kit passed-up 0% clear 7.4% | refuse: Kit passed-up 50% clear 5.6%
+RR10 | greedy: Kit passed-up 0% clear 4.3% | refuse: Kit passed-up 68% clear 2.2%

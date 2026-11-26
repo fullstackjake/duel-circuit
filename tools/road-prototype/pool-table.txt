@@ -1,0 +1,87 @@
+tearlaments 1947 2022/22-26 5.3t 89/93 graveyard/fusion
+chaos-ritual 1896 2026/22-26 7.0t 84/92* combo/ritual
+ishizu-tearlaments 1879 2022/22-26 5.0t 88/90 graveyard/fusion
+ryzeal 1867 2025/22-26 6.5t 78/86 combo/xyz
+dark-magician-chaos-ritual 1839 2026/22-26 7.8t 72/86* midrange/ritual
+branded-despia 1830 2026/22-26 6.4t 84/86 midrange/fusion
+kashtira 1828 2023/22-26 9.2t 78/84 stun/xyz
+angelechy 1810 2026/22-26 7.7t 73/79 control/synchro
+light-and-darkness 1768 2026/22-26 6.6t 76/82 midrange/ritual
+eldlich 1764 2020/17-21 10.7t 78/80 control/main E
+mitsurugi 1742 2026/22-26 7.1t 69/86* midrange/ritual
+thunder-dragon 1693 2018/17-21 8.0t 75/71 midrange/fusion
+spright 1693 2022/22-26 7.5t 73/77 combo/link
+mekk-knight-invoked 1692 2026/22-26 8.5t 71/73 midrange/fusion W
+bystial-dragon-link 1686 2022/22-26 8.9t 64/76* combo/link
+tenpai-dragon 1675 2024/22-26 10.7t 63/67 beatdown/synchro E
+radiant-typhoon 1674 2026/22-26 13.8t 69/72 control/main
+k9-vanquish-soul 1673 2025/22-26 7.3t 76/81 midrange/xyz
+sacred-beast 1670 2026/22-26 9.0t 68/70 beatdown/main E
+fire-king-snake-eye 1654 2024/22-26 8.8t 68/64 combo/link
+yubel 1653 2024/22-26 10.2t 71/66 burn/fusion
+magistus-fairy-tail 1628 2026/22-26 8.9t 62/73 midrange/fusion
+blitzclique 1619 2026/22-26 7.0t 56/74* beatdown/fusion E
+danger-dark-world 1618 2018/17-21 8.1t 50/79* graveyard/link
+artmage 1613 2026/22-26 9.2t 64/65 combo/fusion
+kozmo 1613 2015/11-16 9.7t 57/65 beatdown/main E
+snake-eye 1612 2024/22-26 9.5t 66/70 combo/link
+unchained 1598 2023/22-26 9.1t 53/73* combo/link
+shaddoll 1592 2014/11-16 9.5t 52/56 control/fusion
+abc 1585 2016/11-16 9.7t 51/70* midrange/fusion
+mermail-atlantean 1578 2026/22-26 8.3t 51/61 midrange/xyz
+drytron 1566 2021/17-21 9.0t 57/61 combo/ritual
+lunalight 1563 2026/22-26 7.9t 42/73* beatdown/fusion
+elfnote 1557 2026/22-26 9.5t 69/62 combo/synchro
+dracotail 1549 2026/22-26 10.1t 50/68* midrange/fusion
+power-patron 1546 2026/22-26 10.5t 44/60* combo/pendulum
+exosister 1531 2022/22-26 10.2t 47/62* stun/xyz
+synchron 1527 2009/05-10 11.1t 49/56 combo/synchro W
+wind-up 1526 2012/11-16 13.5t 43/53 stun/xyz
+adamancipator 1526 2020/17-21 11.5t 53/66* combo/synchro
+dragon-ruler 1522 2013/11-16 11.7t 45/57* midrange/xyz E
+mekk-knight 1522 2018/17-21 11.4t 48/59* midrange/link W
+six-samurai 1491 2011/11-16 10.0t 38/56* beatdown/synchro E
+nekroz 1481 2015/11-16 10.7t 46/53 combo/ritual
+gadgets 1480 2005/05-10 14.7t 44/49 midrange/main W E
+tri-brigade 1480 2021/17-21 9.4t 46/55 graveyard/link
+hat 1478 2014/11-16 13.5t 45/47 stun/xyz
+orcust 1472 2019/17-21 9.3t 47/47 graveyard/link
+spyral 1466 2017/17-21 11.1t 46/49 combo/link
+teledad 1465 2008/05-10 11.4t 43/53 midrange/synchro E
+dino-rabbit 1438 2012/11-16 12.2t 42/37 beatdown/xyz E
+true-draco 1435 2017/17-21 11.3t 32/52* stun/tribute
+machine-re-volt 1435 2008/05-10 11.8t 33/42 beatdown/fusion W E
+dragunity-legion 1433 2013/11-16 12.4t 39/51* combo/synchro W
+blackwing 1430 2009/05-10 10.2t 37/43 beatdown/synchro E
+modern 1419 2019/17-21 14.0t 40/45 midrange/link W
+plant-synchro 1418 2011/11-16 11.9t 34/46* graveyard/synchro
+warriors 1418 2005/05-10 12.4t 40/43 beatdown/main W E
+inzektor 1416 2012/11-16 10.7t 39/36 beatdown/xyz E
+chaos-yata 1414 2004/05-10 12.2t 38/42 stun/main
+performapal 1412 2016/11-16 12.5t 38/41 combo/pendulum
+goat-control 1401 2005/05-10 13.9t 35/43 control/fusion
+spellcasters-command 1399 2005/05-10 11.4t 38/42 midrange/main W E
+sky-striker 1397 2018/17-21 12.3t 32/41 control/link
+maliss 1392 2025/22-26 9.8t 32/41 combo/link
+floowandereeze 1387 2022/22-26 13.3t 35/29 stun/tribute
+satellarknight 1386 2014/11-16 9.9t 29/30 midrange/xyz E
+zombies 1384 2005/05-10 12.4t 36/37 graveyard/main W E
+salamangreat 1376 2019/17-21 10.5t 32/36 midrange/link
+pendulum-magician 1371 2018/17-21 10.6t 33/34 combo/pendulum
+lightsworn 1368 2009/05-10 10.7t 30/32 graveyard/synchro
+infernity 1351 2010/05-10 11.1t 28/37 combo/synchro
+synchron-extreme 1316 2015/11-16 12.7t 26/35 combo/synchro W
+burning-abyss 1297 2014/11-16 12.1t 27/40* graveyard/xyz
+zoodiac 1289 2017/17-21 10.5t 22/23 combo/xyz
+classic 1276 2005/05-10 13.1t 23/34* beatdown/main W E
+fury-from-the-deep 1273 2005/05-10 12.9t 21/22 beatdown/main W E
+gouki 1259 2018/17-21 10.7t 25/28 combo/link
+dinosaurs-rage 1252 2009/05-10 12.0t 22/25 beatdown/main W E
+altergeist 1237 2018/17-21 10.3t 19/23 control/link
+lost-sanctuary 1234 2011/11-16 12.5t 22/26 control/main W
+qliphort 1225 2014/11-16 10.0t 20/29 stun/pendulum
+runick-spright 1206 2022/22-26 10.0t 20/20 control/link
+domain-monarch 1202 2016/11-16 11.0t 21/23 stun/tribute
+yummy 1198 2026/22-26 11.9t 17/21 control/synchro
+spellbook 1180 2013/11-16 10.1t 14/24* control/main
+purrely 1179 2023/22-26 11.4t 15/25* midrange/xyz

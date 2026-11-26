@@ -1,0 +1,14 @@
+rank | rule | attempts discarded | fallback | gate rejects | predicted clear (no boons) | bot clear | drop | Jaccard seats/faced | coverage mean/min (reach) | (poster,champ,Kit) repeats in 10 | Kit plays a passed-up deck
+RR0 | base | 0.2% | 0 | {} | 35.2% | 62.4% |  | 0.130/0.083 | 98%/94% (51) | 0 | Kit passed-up 96%
+   duels 61914: |Elo gap| p50 92 p95 128 max 312; era gap p50 5 p95 14 max 18; era gap >=15: 3.4%, >=20: 0.0%
+RR1 | wall offers 1 deck | 0.1% | 0 | {} | 32.3% | 59.2% | 3.2 | 0.127/0.083 | 99%/94% (51) | 0 | Kit passed-up 72%
+RR2 | champion +40 and calls the toss | 0.1% | 0 | {} | 28.5% | 54.2% | 4.9 | 0.136/0.094 | 99%/94% (51) | 0 | Kit passed-up 72%
+RR3 | boons show 2 | 0.1% | 0 | {} | 28.6% | 49.8% | 4.5 | 0.136/0.093 | 98%/94% (51) | 0 | Kit passed-up 73%
+RR4 | wall decks -20 | 0.1% | 0 | {} | 23.1% | 43.1% | 6.7 | 0.137/0.094 | 99%/94% (51) | 0 | Kit passed-up 69%
+RR5 | every CPU calls the toss; gate p 0.33 | 0.2% | 0 | {} | 14.9% | 32.1% | 11.0 | 0.137/0.088 | 98%/94% (51) | 0 | Kit passed-up 68%
+RR6 | Kit 1760-1840; the S5 wall shows a Kit-window deck (refuse it and Kit plays it); fork centres +20 | 0.1% | 0 | {} | 11.5% | 26.6% | 5.5 | 0.156/0.096 | 97%/91% (57) | 0 | Kit passed-up 0%
+RR7 | 2 strikes (Spare Tire repairs to 3) | 0.4% | 0 | {} | 4.9% | 16.9% | 9.7 | 0.156/0.083 | 98%/95% (57) | 0 | Kit passed-up 0%
+RR8 | boons show 1 | 0.3% | 0 | {} | 4.9% | 11.8% | 5.1 | 0.155/0.082 | 97%/93% (57) | 0 | Kit passed-up 0%
+RR9 | no Spare Tire; fork centres +15 | 0.8% | 0 | {} | 4.3% | 8.1% | 3.7 | 0.153/0.071 | 95%/88% (56) | 0 | Kit passed-up 0%
+RR10 | Kit two decks 1740-1950 in one sitting (each p >= 0.33); a loss replays the deck that beat you | 1.0% | 0 | {} | 2.0% | 4.5% | 3.6 | 0.160/0.070 | 95%/89% (61) | 0 | Kit passed-up 0%
+   duels 38857: |Elo gap| p50 35 p95 113 max 311; era gap p50 5 p95 14 max 18; era gap >=15: 3.8%, >=20: 0.0%
